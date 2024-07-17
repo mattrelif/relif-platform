@@ -11,8 +11,9 @@ const buttonVariants = cva(
                 default: "bg-relif-orange-200 text-white hover:bg-relif-orange-300",
                 destructive: "bg-red-500 text-slate-50 hover:bg-red-500/90",
                 outline:
-                    "border border-relif-orange-200 bg-white text-relif-orange-200 hover:bg-relif-orange-200 hover:text-white",
-                secondary: "bg-relif-orange-400 text-white hover:bg-relif-orange-500",
+                    "border border-relif-orange-200 bg-white text-relif-orange-200 hover:border-relif-orange-400 hover:text-relif-orange-400 ",
+                secondary:
+                    "bg-relif-orange-200/10 text-relif-orange-200 hover:bg-relif-orange-200/30 hover:text-relif-orange-300",
                 ghost: "text-relif-orange-200 hover:bg-relif-orange-200/10 hover:text-relif-orange-300",
                 link: "w-max text-relif-orange-200 underline-offset-4 underline hover:text-relif-orange-300",
             },

@@ -30,12 +30,7 @@ export default function RootLayout({
 }>): ReactNode {
     return (
         <html lang={params.lang}>
-            <body
-                className={cn(
-                    "min-h-screen bg-background font-sans antialiased",
-                    fontSans.variable
-                )}
-            >
+            <body className={cn("min-h-screen bg-white font-sans antialiased", fontSans.variable)}>
                 {children}
             </body>
         </html>
