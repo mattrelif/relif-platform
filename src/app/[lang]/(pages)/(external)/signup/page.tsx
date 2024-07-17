@@ -1,14 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import Link from "next/link";
 import { ReactNode } from "react";
 
 export default function Page(): ReactNode {
     return (
         <div className="w-full max-w-[500px] py-[90px]">
             <div className="flex flex-col mb-10">
-                <h1 className="font-bold text-3xl text-relif-orange-300">Create account</h1>
-                <p className="text-base text-gray-500">We'd love to have you!</p>
+                <Image
+                    src="/images/logo-relif.svg"
+                    alt="Logo Relif"
+                    width={188}
+                    height={62}
+                    className="mb-[80px]"
+                />
+                <h1 className="font-bold text-3xl text-slate-500">Create account</h1>
+                <p className="text-base text-slate-400">We'd love to have you!</p>
             </div>
 
             <form>
@@ -71,9 +80,17 @@ export default function Page(): ReactNode {
                     </div>
                 </div>
 
-                <Button type="submit" variant="default" className="mt-[43px] w-full">
-                    Sign up
-                </Button>
+                <div className="w-full flex flex-col items-center">
+                    <Button type="submit" variant="default" className="mt-[43px] w-full">
+                        Sign up
+                    </Button>
+                    <span className="text-sm text-gray-500">
+                        Already have an account?
+                        <Button variant="link" asChild>
+                            <Link href="/">Log in</Link>
+                        </Button>
+                    </span>
+                </div>
             </form>
         </div>
     );
