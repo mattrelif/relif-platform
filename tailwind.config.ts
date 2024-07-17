@@ -12,11 +12,11 @@ const config = {
     theme: {
         extend: {
             colors: {
-                orange100: "#ED8A5f",
-                orange200: "#E5855B",
-                orange300: "#C3714E",
-                orange400: "#A15D40",
-                orange500: "#7F4933",
+                "relif-orange-100": "#ED8A5f",
+                "relif-orange-200": "#E5855B",
+                "relif-orange-300": "#C3714E",
+                "relif-orange-400": "#A15D40",
+                "relif-orange-500": "#7F4933",
             },
             keyframes: {
                 "accordion-down": {
@@ -41,8 +41,8 @@ const config = {
             },
         },
         fontSize: {
-            xs: "0.6rem",
-            sm: "0.7rem",
+            xs: "0.65rem",
+            sm: "0.8rem",
             base: "1rem",
             xl: "1.25rem",
             "2xl": "1.563rem",
