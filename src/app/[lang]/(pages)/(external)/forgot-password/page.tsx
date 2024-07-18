@@ -1,9 +1,52 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import Link from "next/link";
 import { ReactNode } from "react";
+import { FaArrowLeftLong } from "react-icons/fa6";
 
 export default function Page(): ReactNode {
     return (
-        <div>
-            <h1>Forgot Password</h1>
+        <div className="w-full max-w-[500px] py-[90px]">
+            <div className="flex flex-col mb-10">
+                <Image
+                    src="/images/logo-relif.svg"
+                    alt="Logo Relif"
+                    width={188}
+                    height={62}
+                    className="mb-[40px]"
+                />
+                <h1 className="font-bold text-2xl text-slate-500">Forgot password?</h1>
+                <p className="text-base text-slate-400">
+                    No worries, we'll send you reset instructions.
+                </p>
+            </div>
+
+            <form className="flex flex-col gap-5">
+                <div>
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="email">E-mail</Label>
+                        <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="Enter your e-mail"
+                        />
+                    </div>
+                    <div className="w-full flex flex-col items-center">
+                        <Button type="submit" variant="default" className="mt-[43px] w-full">
+                            Reset password
+                        </Button>
+                        <Button variant="link" className="no-underline mt-[20px]" asChild>
+                            <Link href="/" className="flex items-center gap-2">
+                                <FaArrowLeftLong />
+                                Back to log in
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+            </form>
         </div>
     );
 }

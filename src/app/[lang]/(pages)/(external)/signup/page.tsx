@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
@@ -77,6 +78,35 @@ export default function Page(): ReactNode {
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="confirmPassword">Confirm password *</Label>
                         <Input id="confirmPassword" name="confirmPassword" type="password" />
+                    </div>
+
+                    <div className="items-top flex space-x-2">
+                        <Checkbox id="terms" />
+                        <div className="grid gap-1.5 leading-none">
+                            <label
+                                htmlFor="terms"
+                                className="text-sm text-slate-500 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                Accept terms and conditions
+                            </label>
+                            <p className="text-sm text-slate-400">
+                                You agree to our{" "}
+                                <Link
+                                    href="/terms-of-service"
+                                    className="underline hover:text-relif-orange-200 underline-offset-4"
+                                >
+                                    Terms of Service
+                                </Link>{" "}
+                                and{" "}
+                                <Link
+                                    href="/privacy-policy"
+                                    className="underline hover:text-relif-orange-200 underline-offset-4"
+                                >
+                                    Privacy Policy
+                                </Link>
+                                .
+                            </p>
+                        </div>
                     </div>
                 </div>
 
