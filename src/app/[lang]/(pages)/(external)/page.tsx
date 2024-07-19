@@ -13,8 +13,8 @@ export default function Page(): ReactNode {
                     height={62}
                     className="mb-[80px]"
                 />
-                <h1 className="font-bold text-2xl text-slate-700">Get Started Now</h1>
-                <p className="text-base text-slate-400">
+                <h1 className="font-bold text-2xl text-slate-900">Get Started Now</h1>
+                <p className="text-base text-slate-600">
                     Enter your credentials to access our account
                 </p>
             </div>

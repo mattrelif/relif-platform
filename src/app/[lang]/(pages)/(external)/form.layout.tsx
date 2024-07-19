@@ -45,7 +45,7 @@ const SignInForm = (): ReactNode => {
                     <Button type="submit" variant="default" className="mt-[43px] w-full">
                         Sign in
                     </Button>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-slate-900">
                         Need an account?
                         <Button variant="link" asChild>
                             <Link href="/signup">Sign up here</Link>
@@ -55,7 +55,7 @@ const SignInForm = (): ReactNode => {
             </div>
             <div className="w-full relative flex justify-center mb-[17px]">
                 <span className="w-full border-b-[1px] border-slate-200 absolute top-[10px]" />
-                <span className="w-max text-sm text-gray-500 flex justify-center px-[10px] bg-white z-10">
+                <span className="w-max text-sm text-slate-900 flex justify-center px-[10px] bg-white z-10">
                     or
                 </span>
             </div>

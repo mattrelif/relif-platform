@@ -87,11 +87,11 @@ const Form = (): ReactNode => {
                     <div className="grid gap-1.5 leading-none">
                         <label
                             htmlFor="terms"
-                            className="text-sm text-slate-500 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-sm text-slate-900 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Accept terms and conditions
                         </label>
-                        <p className="text-sm text-slate-400">
+                        <p className="text-sm text-slate-600">
                             You agree to our{" "}
                             <Link
                                 href="/terms-of-service"
@@ -116,7 +116,7 @@ const Form = (): ReactNode => {
                 <Button type="submit" variant="default" className="mt-[43px] w-full">
                     Sign up
                 </Button>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-900">
                     Already have an account?
                     <Button variant="link" asChild>
                         <Link href="/">Log in</Link>
