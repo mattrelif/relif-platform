@@ -17,7 +17,7 @@ export default function Page(): ReactNode {
                     height={62}
                     className="mb-[40px]"
                 />
-                <h1 className="font-bold text-2xl text-slate-500">Set your new password</h1>
+                <h1 className="font-bold text-2xl text-slate-700">Set your new password</h1>
                 <p className="text-base text-slate-400">Must be at least 8 characters</p>
             </div>
 

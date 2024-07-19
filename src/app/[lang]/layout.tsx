@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Locale } from "@/app/i18n-config";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = FontSans({
     subsets: ["latin"],
@@ -31,7 +32,8 @@ export default function RootLayout({
     return (
         <html lang={params.lang}>
             <body className={cn("min-h-screen bg-white font-sans antialiased", fontSans.variable)}>
-                {children}
+                <main>{children}</main>
+                <Toaster />
             </body>
         </html>
     );
