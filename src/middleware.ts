@@ -20,7 +20,15 @@ function getLocale(request: NextRequest): string | undefined {
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    if (["/manifest.json", "/favicon.ico", "/images/logo-relif.svg"].includes(pathname)) return;
+    if (
+        [
+            "/manifest.json",
+            "/favicon.ico",
+            "/images/logo-relif.svg",
+            "/images/logo-relif-black.svg",
+        ].includes(pathname)
+    )
+        return;
 
     const pathnameIsMissingLocale = i18n.locales.every(
         locale => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`

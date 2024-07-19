@@ -41,8 +41,9 @@ const config = {
             },
         },
         fontSize: {
-            xs: "0.65rem",
+            xs: "0.7rem",
             sm: "0.8rem",
+            medium: "0.9rem",
             base: "1rem",
             xl: "1.25rem",
             "2xl": "1.563rem",
