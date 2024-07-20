@@ -15,7 +15,7 @@ const OrganizationInviteDialog = ({ children }: { children: Readonly<ReactNode> 
         <DialogTrigger>{children}</DialogTrigger>
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>Accept data access request</DialogTitle>
+                <DialogTitle className="pb-3">Accept data access request</DialogTitle>
                 <DialogDescription>
                     Confirming the request to grant the organization below access to your
                     organization's data.

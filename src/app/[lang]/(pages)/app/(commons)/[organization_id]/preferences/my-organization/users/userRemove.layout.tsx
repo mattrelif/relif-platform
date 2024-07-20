@@ -20,7 +20,7 @@ const UserRemove = ({
     <Dialog open={removeUserDialogOpenState} onOpenChange={setRemoveUserDialogOpenState}>
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
                 <DialogDescription>
                     This action cannot be undone. This will permanently delete the user below.
                 </DialogDescription>

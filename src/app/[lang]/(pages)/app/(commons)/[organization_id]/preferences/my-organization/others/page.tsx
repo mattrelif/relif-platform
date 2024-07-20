@@ -1,3 +1,4 @@
+import { CoordinationRequestDialog } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/others/coordinationRequestDialog.layout";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 
@@ -12,7 +13,9 @@ export default function Page(): ReactNode {
                     A coordinating organization can access data from other organizations, such as
                     lists of beneficiaries, shelters, and similar information.
                 </p>
-                <Button>Request to be a coordinating organization</Button>
+                <CoordinationRequestDialog>
+                    <Button>Request to be a coordinating organization</Button>
+                </CoordinationRequestDialog>
             </div>
             <div className="border-[1px] border-relif-orange-200 rounded-md w-full h-max p-4">
                 <h2 className="text-base font-bold text-relif-orange-200 pb-1">
