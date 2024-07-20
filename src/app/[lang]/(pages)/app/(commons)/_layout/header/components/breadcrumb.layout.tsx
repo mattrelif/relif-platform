@@ -24,6 +24,9 @@ const LABELS = {
     "my-profile": "My Profile",
     support: "Support",
     users: "Users",
+    overview: "Overview",
+    invites: "Invites",
+    others: "Others",
 };
 
 const Breadcrumb = (): ReactNode => {

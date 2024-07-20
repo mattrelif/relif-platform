@@ -20,7 +20,7 @@ const TabsLayout = ({ children }: { children: Readonly<ReactNode> }): ReactNode 
                     <Link href={`${urlPath}/users`}>Users</Link>
                 </TabsTrigger>
                 <TabsTrigger value="invites" asChild>
-                    <Link href={`${urlPath}/invites/users`}>Invites</Link>
+                    <Link href={`${urlPath}/invites`}>Invites</Link>
                 </TabsTrigger>
                 <TabsTrigger value="others" asChild>
                     <Link href={`${urlPath}/others`}>Others</Link>

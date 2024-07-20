@@ -1,3 +1,4 @@
+import { UserInviteDialogLayout } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/userInviteDialog.layout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -23,9 +24,11 @@ const UserInvite = (): ReactNode => (
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Button className="w-7 h-7 p-0 flex items-center justify-center">
-                            <MdCheck />
-                        </Button>
+                        <UserInviteDialogLayout>
+                            <Button className="w-7 h-7 p-0 flex items-center justify-center">
+                                <MdCheck />
+                            </Button>
+                        </UserInviteDialogLayout>
                     </TooltipTrigger>
                     <TooltipContent>
                         <p>Accept invitation</p>

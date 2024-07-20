@@ -1,3 +1,4 @@
+import { OrganizationInviteDialog } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/organizationInviteDialog.layout";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -52,9 +53,11 @@ const OrganizationInvite = (): ReactNode => (
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Button className="w-7 h-7 p-0 flex items-center justify-center">
-                            <MdCheck />
-                        </Button>
+                        <OrganizationInviteDialog>
+                            <Button className="w-7 h-7 p-0 flex items-center justify-center">
+                                <MdCheck />
+                            </Button>
+                        </OrganizationInviteDialog>
                     </TooltipTrigger>
                     <TooltipContent>
                         <p>Accept invitation</p>
