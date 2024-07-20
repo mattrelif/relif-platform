@@ -23,6 +23,7 @@ const LABELS = {
     "my-organization": "My Organization",
     "my-profile": "My Profile",
     support: "Support",
+    users: "Users",
 };
 
 const Breadcrumb = (): ReactNode => {

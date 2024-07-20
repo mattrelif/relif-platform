@@ -35,7 +35,7 @@ const Menu = (): ReactNode => {
                     </li>
                 </Link>
 
-                <Link href={`${urlPath}/my-organization`}>
+                <Link href={`${urlPath}/my-organization/overview`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
