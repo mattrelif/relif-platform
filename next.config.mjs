@@ -5,6 +5,15 @@ const nextConfig = {
             exclude: ["error"]
         },
     },
+    async redirects() {
+        return [
+            {
+                source: '/:lang/app/:id/preferences/my-organization',
+                destination: '/:lang/app/:id/preferences/my-organization/overview',
+                permanent: true,
+            },
+        ]
+    },
 };
 
 export default nextConfig;
