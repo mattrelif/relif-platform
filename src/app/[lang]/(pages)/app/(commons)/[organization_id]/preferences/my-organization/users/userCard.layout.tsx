@@ -2,6 +2,7 @@
 
 import { UserActivities } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/users/userActivities.layout";
 import { UserEdit } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/users/userEdit.layout";
+import { UserRemove } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/users/userRemove.layout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { SlOptions } from "react-icons/sl";
 const UserCard = (): ReactNode => {
     const [userActivitiesSheetOpenState, setUserActivitiesSheetOpenState] = useState(false);
     const [editUserSheetOpenState, setEditUserSheetOpenState] = useState(false);
+    const [removeUserDialogOpenState, setRemoveUserDialogOpenState] = useState(false);
 
     return (
         <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
@@ -67,7 +69,7 @@ const UserCard = (): ReactNode => {
                                 Edit
                             </span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setRemoveUserDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaTrash className="text-xs" />
                                 Remove
@@ -85,6 +87,11 @@ const UserCard = (): ReactNode => {
             <UserEdit
                 editUserSheetOpenState={editUserSheetOpenState}
                 setEditUserSheetOpenState={setEditUserSheetOpenState}
+            />
+
+            <UserRemove
+                removeUserDialogOpenState={removeUserDialogOpenState}
+                setRemoveUserDialogOpenState={setRemoveUserDialogOpenState}
             />
         </li>
     );
