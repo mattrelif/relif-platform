@@ -1,107 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Form } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-profile/form.layout";
 import { ReactNode } from "react";
-import { MdAdd, MdClose, MdSave } from "react-icons/md";
 
 export default function Page(): ReactNode {
     return (
         <div className="w-full h-[calc(100vh-204px)] p-4 border-[1px] border-slate-200 rounded-md overflow-x-hidden overflow-y-scroll">
-            <form>
-                <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-bold text-base text-relif-orange-200 mb-6">
-                    Your profile
-                </h2>
-                <div className="flex flex-col gap-5">
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="email">E-mail</Label>
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            disabled
-                            defaultValue="anthony.vii27@gmail.com"
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="firstName">First name *</Label>
-                        <Input id="firstName" name="firstName" type="text" defaultValue="Anthony" />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="lastName">Last name *</Label>
-                        <Input id="lastName" name="lastName" type="text" defaultValue="Vinicius" />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="role">Role *</Label>
-                        <Input
-                            id="role"
-                            name="role"
-                            type="text"
-                            defaultValue="Software Engineer"
-                            placeholder="e.g. Director of Human Resources"
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                            <Label htmlFor="phone">Phones *</Label>
-                            <Button variant="secondary" className="flex items-center gap-2">
-                                <MdAdd size={16} />
-                                Add new phone number
-                            </Button>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <div className="w-full flex gap-2">
-                                <Input
-                                    id="country-code"
-                                    name="country-code"
-                                    type="text"
-                                    placeholder="e.g. +55"
-                                    className="w-[20%]"
-                                />
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    type="text"
-                                    className="w-[calc(100%-20%-40px)]"
-                                />
-                                <Button variant="destructive" className="flex p-0 w-[40px]">
-                                    <MdClose size={16} />
-                                </Button>
-                            </div>
-                            <div className="w-full flex gap-2">
-                                <Input
-                                    id="country-code"
-                                    name="country-code"
-                                    type="text"
-                                    placeholder="e.g. +55"
-                                    className="w-[20%]"
-                                />
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    type="text"
-                                    className="w-[calc(100%-20%-40px)]"
-                                />
-                                <Button variant="destructive" className="flex p-0 w-[40px]">
-                                    <MdClose size={16} />
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <Button
-                    type="submit"
-                    variant="default"
-                    className="mt-[43px] w-full flex items-center gap-1"
-                >
-                    <MdSave size={14} />
-                    Save
-                </Button>
-            </form>
+            <Form />
         </div>
     );
 }
