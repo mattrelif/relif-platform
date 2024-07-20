@@ -119,7 +119,7 @@ const Sidebar = (): ReactNode => {
             <span className="w-full border-b-[1px] border-slate-200" />
 
             <ul className="flex flex-col gap-1">
-                <Link href={`/app/${organizationID}/preferences`}>
+                <Link href={`/app/${organizationID}/preferences/platform`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,

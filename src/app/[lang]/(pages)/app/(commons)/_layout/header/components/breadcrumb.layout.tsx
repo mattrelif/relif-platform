@@ -18,6 +18,11 @@ const LABELS = {
     beneficiaries: "Beneficiaries",
     volunteers: "Volunteers",
     suppliers: "Suppliers",
+    preferences: "Preferences",
+    platform: "Platform",
+    "my-organization": "My Organization",
+    "my-profile": "My Profile",
+    support: "Support",
 };
 
 const Breadcrumb = (): ReactNode => {
