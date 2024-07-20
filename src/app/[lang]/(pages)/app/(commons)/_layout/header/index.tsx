@@ -1,3 +1,5 @@
+"use client";
+
 import { Breadcrumb } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/components/breadcrumb.layout";
 import { UserDropdown } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/components/userDropdown.layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -5,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { HiMiniBellAlert } from "react-icons/hi2";
 import { MdSettings } from "react-icons/md";
 
 const Header = (): ReactNode => {
     const withNotifications = true;
+    const pathname = usePathname();
+    const urlPath = pathname.split("/").slice(0, 4).join("/");
 
     return (
         <header className="col-span-1 w-full h-max border-b-[1px] border-slate-200 flex items-center justify-between py-2 px-4">
@@ -45,7 +50,7 @@ const Header = (): ReactNode => {
                     <Tooltip>
                         <TooltipTrigger>
                             <Button variant="icon" asChild className="w-7 h-7 p-0">
-                                <Link href="#">
+                                <Link href={`${urlPath}/preferences/platform`}>
                                     <MdSettings />
                                 </Link>
                             </Button>

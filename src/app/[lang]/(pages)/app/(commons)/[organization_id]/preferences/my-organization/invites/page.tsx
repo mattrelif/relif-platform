@@ -13,6 +13,13 @@ export default function Page(): ReactNode {
                     Users
                 </h3>
                 <ul className="w-full h-full flex flex-col gap-2 p-2 overflow-x-hidden overflow-y-scroll">
+                    {/* <span className="text-sm text-slate-900 font-medium"> */}
+                    {/*    You have no invitations... */}
+                    {/* </span> */}
+                    {/* <span className="text-sm text-red-600 font-medium flex items-center gap-1"> */}
+                    {/*    <MdError /> */}
+                    {/*    Something went wrong. Please try again later. */}
+                    {/* </span> */}
                     <UserInvite />
                 </ul>
             </div>
@@ -22,6 +29,13 @@ export default function Page(): ReactNode {
                     Data Access
                 </h3>
                 <ul className="w-full h-full flex flex-col gap-2 p-2 overflow-x-hidden overflow-y-scroll">
+                    {/* <span className="text-sm text-slate-900 font-medium"> */}
+                    {/*    You have no data access requests... */}
+                    {/* </span> */}
+                    {/* <span className="text-sm text-red-600 font-medium flex items-center gap-1"> */}
+                    {/*    <MdError /> */}
+                    {/*    Something went wrong. Please try again later. */}
+                    {/* </span> */}
                     <OrganizationInvite />
                 </ul>
             </div>
