@@ -27,6 +27,7 @@ const LABELS = {
     overview: "Overview",
     invites: "Invites",
     others: "Others",
+    housings: "Housings",
 };
 
 const Breadcrumb = (): ReactNode => {
