@@ -28,6 +28,8 @@ const LABELS = {
     invites: "Invites",
     others: "Others",
     housings: "Housings",
+    assistance: "Assistance",
+    movements: "Movements",
 };
 
 const Breadcrumb = (): ReactNode => {

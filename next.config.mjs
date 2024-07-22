@@ -5,6 +5,16 @@ const nextConfig = {
             exclude: ["error"]
         },
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'github.com',
+                port: '',
+                pathname: '/**',
+            },
+        ],
+    },
     async redirects() {
         return [
             {
