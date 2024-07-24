@@ -269,6 +269,9 @@ export default function Page({
                             <strong>Use of prosthesics or medical devices:</strong> Uso de
                             marca-passo
                         </li>
+                        <Button variant="link" className="p-0 pl-2">
+                            See more
+                        </Button>
                     </ul>
                 </div>
                 <div className="w-full grow border-[1px] border-relif-orange-200 rounded-lg overflow-hidden">
