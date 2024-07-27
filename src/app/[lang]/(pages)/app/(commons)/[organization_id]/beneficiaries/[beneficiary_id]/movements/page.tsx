@@ -34,10 +34,10 @@ export default function Page({
                             July 24, 2024
                         </span>
                         <span className="text-sm text-slate-900">
-                            <strong>From:</strong> Abrigo Santo Agostino
+                            <strong>From:</strong> Abrigo Santo Agostino (QUARTO-02)
                         </span>
                         <span className="text-sm text-slate-900">
-                            <strong>To:</strong> Abrigo Miguel Pereira
+                            <strong>To:</strong> Abrigo Miguel Pereira (QUARTO-227)
                         </span>
                         <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
                             <FaInfoCircle />
