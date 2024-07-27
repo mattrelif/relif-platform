@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ReactNode } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { MdSave } from "react-icons/md";
+import { MdEdit, MdSave } from "react-icons/md";
 import { BirthdateInput } from "./birthdate.layout";
 import { CivilStatus } from "./civilStatus.layout";
 import { Education } from "./education.layout";
@@ -22,6 +22,10 @@ export default function Page({
     return (
         <div className="w-full h-max p-4 grid grid-cols-2 gap-4 border border-slate-200 rounded-lg">
             <div className="w-full h-max flex flex-col gap-6">
+                <h1 className="text-2xl text-relif-orange-200 font-bold flex items-center gap-3">
+                    <MdEdit />
+                    Edit beneficiary
+                </h1>
                 <div className="flex flex-col gap-3 border border-slate-200 p-4 rounded-lg">
                     <div className="w-full h-max flex items-center justify-center">
                         <div className="w-[120px] h-[120px] rounded-full bg-red-200"></div>
