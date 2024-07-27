@@ -10,14 +10,22 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaBirthdayCake, FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { IoMdMove } from "react-icons/io";
 import { SlOptions } from "react-icons/sl";
+import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
 
 const Card = (): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
+    const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
+
+    const pathname = usePathname();
+    const urlPath = pathname.split("/").slice(0, 5).join("/");
+    const userID = 123456;
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
@@ -59,14 +67,18 @@ const Card = (): ReactNode => {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
-                        <DropdownMenuItem>View his/her housing</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`${urlPath}/${userID}`}>Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>View housing</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <span className="flex items-center gap-2">
-                                <FaEdit className="text-xs" />
-                                Edit beneficiary
-                            </span>
+                        <DropdownMenuItem asChild>
+                            <Link href={`${urlPath}/${userID}/edit`}>
+                                <span className="flex items-center gap-2">
+                                    <FaEdit className="text-xs" />
+                                    Edit beneficiary
+                                </span>
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
@@ -74,7 +86,7 @@ const Card = (): ReactNode => {
                                 Remove beneficiary
                             </span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setMoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <IoMdMove className="text-xs" />
                                 Move to other housing
@@ -95,6 +107,11 @@ const Card = (): ReactNode => {
             <RemoveModal
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
+            />
+
+            <MoveModal
+                moveDialogOpenState={moveDialogOpenState}
+                setMoveDialogOpenState={setMoveDialogOpenState}
             />
         </li>
     );
