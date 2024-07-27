@@ -1,5 +1,5 @@
-import { TabsLayout } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/beneficiaries/[beneficiary_id]/tabs.layout";
 import { ReactNode } from "react";
+import { TabsLayout } from "./tabs.layout";
 
 export default function Layout({ children }: { children: ReactNode }): ReactNode {
     return (
@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: ReactNode }): ReactNode
             <div className="w-full h-max border-b-[1px] p-2">
                 <TabsLayout />
             </div>
-            <div className="h-[calc(100vh-140px)] overflow-x-hidden overflow-y-scroll">
+            <div className="p-2 h-[calc(100vh-140px)] overflow-x-hidden overflow-y-scroll">
                 {children}
             </div>
         </div>

@@ -57,7 +57,7 @@ const MoveModal = ({ moveDialogOpenState, setMoveDialogOpenState }: Props): Reac
                             Anthony Vinicius Mota Silva
                         </span>
                         <span className="text-xs text-slate-500">
-                            <strong>From:</strong>Abrigo Santo Agostino (Since Mar 04, 2023)
+                            <strong>Current:</strong>Abrigo Santo Agostino (housed on QUARTO-02)
                         </span>
                     </div>
                     <div className="pt-4 flex flex-col gap-2">

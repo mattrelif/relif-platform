@@ -5,10 +5,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
-import { FaMapMarkerAlt, FaCity, FaBirthdayCake } from "react-icons/fa";
-import { FaHouseChimneyUser, FaBriefcaseMedical } from "react-icons/fa6";
+import { FaBirthdayCake, FaCity, FaMapMarkerAlt } from "react-icons/fa";
+import { FaBriefcaseMedical, FaHouseChimneyUser } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
 import { MdContactEmergency, MdOutlineFamilyRestroom, MdSpaceDashboard } from "react-icons/md";
+import { Toolbar } from "./toolbar.layout";
 
 export default function Page({
     params,
@@ -21,19 +22,7 @@ export default function Page({
         <div className="w-full h-max flex flex-col gap-2">
             {/* <h2>Beneficiary {params.beneficiary_id}</h2> */}
             <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
-                <div className="w-full h-max flex justify-between items-center">
-                    <Button size="sm" variant="secondary">
-                        Back to list
-                    </Button>
-                    <div className="flex items-center gap-2">
-                        <Button size="sm" variant="default">
-                            Edit
-                        </Button>
-                        <Button size="sm" variant="outline">
-                            Remove
-                        </Button>
-                    </div>
-                </div>
+                <Toolbar />
                 <div className="w-[130px] h-[130px] rounded-full overflow-hidden border-4 border-relif-orange-200">
                     {/* <Image */}
                     {/*    src="https://github.com/anthonyvii27.png" */}
