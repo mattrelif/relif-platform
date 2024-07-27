@@ -17,7 +17,7 @@ const LABELS = {
     housing: "Housing",
     beneficiaries: "Beneficiaries",
     volunteers: "Volunteers",
-    suppliers: "Suppliers",
+    inventory: "Inventory",
     preferences: "Preferences",
     platform: "Platform",
     "my-organization": "My Organization",

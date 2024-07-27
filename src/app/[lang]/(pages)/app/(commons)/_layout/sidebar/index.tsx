@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { FaUsers, FaHome } from "react-icons/fa";
+import { FaHome, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser, FaUserNurse } from "react-icons/fa6";
 import { MdSettings } from "react-icons/md";
 
@@ -101,17 +101,17 @@ const Sidebar = (): ReactNode => {
                     </li>
                 </Link>
 
-                <Link href={`/app/${organizationID}/suppliers`}>
+                <Link href={`/app/${organizationID}/inventory`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
-                            activeOption !== "suppliers"
+                            activeOption !== "inventory"
                                 ? BASE_LIST_ITEM_HOVER_CLASSES
                                 : BASE_LIST_ITEM_ACTIVE_CLASSES
                         )}
                     >
                         <FaBoxesPacking size={15} />
-                        Suppliers
+                        Inventory
                     </li>
                 </Link>
             </ul>
