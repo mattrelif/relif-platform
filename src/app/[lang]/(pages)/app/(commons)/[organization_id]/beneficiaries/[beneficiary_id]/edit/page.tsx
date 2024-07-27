@@ -20,7 +20,7 @@ export default function Page({
     };
 }): ReactNode {
     return (
-        <div className="w-full h-max p-4 grid grid-cols-2 gap-4 border border-slate-200 rounded-lg">
+        <div className="w-full h-max p-4 grid grid-cols-2 gap-4">
             <div className="w-full h-max flex flex-col gap-6">
                 <h1 className="text-2xl text-relif-orange-200 font-bold flex items-center gap-3">
                     <MdEdit />

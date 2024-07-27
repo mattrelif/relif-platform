@@ -7,7 +7,7 @@ export default function Layout({ children }: { children: ReactNode }): ReactNode
             <div className="w-full h-max border-b-[1px] p-2">
                 <TabsLayout />
             </div>
-            <div className="p-2 h-[calc(100vh-140px)] overflow-x-hidden overflow-y-scroll">
+            <div className="h-[calc(100vh-140px)] overflow-x-hidden overflow-y-scroll">
                 {children}
             </div>
         </div>
