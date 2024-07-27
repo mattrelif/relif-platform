@@ -1,12 +1,12 @@
 "use client";
 
 import {
-    Breadcrumb as UIBreadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
+    Breadcrumb as UIBreadcrumb,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,6 +30,8 @@ const LABELS = {
     housings: "Housings",
     assistance: "Assistance",
     movements: "Movements",
+    create: "Create",
+    edit: "Edit",
 };
 
 const Breadcrumb = (): ReactNode => {
