@@ -14,12 +14,10 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
-import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
 
 const Card = (): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
-    const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
@@ -94,11 +92,6 @@ const Card = (): ReactNode => {
             <RemoveModal
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
-            />
-
-            <MoveModal
-                moveDialogOpenState={moveDialogOpenState}
-                setMoveDialogOpenState={setMoveDialogOpenState}
             />
         </li>
     );

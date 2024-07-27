@@ -23,7 +23,7 @@ const RemoveModal = ({ removeDialogOpenState, setRemoveDialogOpenState }: Props)
     const handleDelete = (): void => {
         toast({
             title: "Removed!",
-            description: "Beneficiary removed successfully.",
+            description: "Housing removed successfully.",
             variant: "success",
         });
 
@@ -41,15 +41,15 @@ const RemoveModal = ({ removeDialogOpenState, setRemoveDialogOpenState }: Props)
                 <DialogHeader>
                     <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This will permanently delete the beneficiary
+                        This action cannot be undone. This will permanently delete the housing
                         below.
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
-                            Anthony Vinicius Mota Silva
+                            Abrigo Santo Agostino
                         </span>
                         <span className="text-xs text-slate-500">
-                            Abrigo Santo Agostino (Since Mar 04, 2023)
+                            1234 Elm Street, Apt 56B - Springfield, IL 62704 - United States
                         </span>
                     </div>
                     <div className="flex gap-4 pt-5">
@@ -59,6 +59,13 @@ const RemoveModal = ({ removeDialogOpenState, setRemoveDialogOpenState }: Props)
                         <DialogClose asChild>
                             <Button onClick={handleDelete}>Delete</Button>
                         </DialogClose>
+                    </div>
+                    <div className="flex flex-col gap-4 pt-10">
+                        <span className="text-xs text-red-500">
+                            You have beneficiaries associated with this shelter. Move or remove them
+                            before removing this housing.
+                        </span>
+                        <Button onClick={() => setRemoveDialogOpenState(false)}>Close</Button>
                     </div>
                 </DialogHeader>
             </DialogContent>

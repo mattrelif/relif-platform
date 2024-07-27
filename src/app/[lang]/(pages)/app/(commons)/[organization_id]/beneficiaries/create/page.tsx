@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ReactNode } from "react";
-import { FaMapMarkerAlt } from "react-icons/fa";
-import { MdAdd, MdSave } from "react-icons/md";
+import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
+import { MdAdd } from "react-icons/md";
 import { BirthdateInput } from "./birthdate.layout";
 import { CivilStatus } from "./civilStatus.layout";
 import { Education } from "./education.layout";
@@ -12,20 +12,15 @@ import { Languages } from "./languages.layout";
 import { Medical } from "./medical.layout";
 import { Phones } from "./phones.layout";
 
-export default function Page({
-    params,
-}: {
-    params: {
-        beneficiary_id: string;
-    };
-}): ReactNode {
+export default function Page(): ReactNode {
     return (
-        <div className="w-full h-max p-4 grid grid-cols-2 gap-4 border border-slate-200 rounded-lg">
+        <div className="w-full h-max p-4 grid grid-cols-2 gap-4">
             <div className="w-full h-max flex flex-col gap-6">
-                <h1 className="text-2xl text-relif-orange-200 font-bold flex items-center gap-3">
-                    <MdAdd />
+                <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
+                    <FaUsers />
                     Create beneficiary
                 </h1>
+
                 <div className="flex flex-col gap-3 border border-slate-200 p-4 rounded-lg">
                     <div className="w-full h-max flex items-center justify-center">
                         <div className="w-[120px] h-[120px] rounded-full bg-red-200"></div>
@@ -118,7 +113,7 @@ export default function Page({
                 </div>
 
                 <Button className="flex items-center gap-2">
-                    <MdSave />
+                    <MdAdd size={16} />
                     Create beneficiary
                 </Button>
             </div>

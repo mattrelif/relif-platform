@@ -1,10 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
     Pagination,
@@ -16,9 +9,9 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ReactNode } from "react";
-import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 import { Card } from "./card.layout";
+import { Toolbar } from "./toolbar.layout";
 
 export default function Page(): ReactNode {
     return (
@@ -29,23 +22,7 @@ export default function Page(): ReactNode {
                     <Input type="text" placeholder="Search" className="w-[300px]" />
                 </div>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="icon" className="w-[40px] h-[40px] p-0">
-                            <FaDownload />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem className="flex gap-2">
-                            <FaFileCsv />
-                            Download CSV
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="flex gap-2">
-                            <FaFilePdf />
-                            Download PDF
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Toolbar />
             </div>
             <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
