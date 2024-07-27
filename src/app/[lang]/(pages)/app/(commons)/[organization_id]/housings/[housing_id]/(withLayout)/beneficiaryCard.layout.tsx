@@ -13,7 +13,11 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { SlOptions } from "react-icons/sl";
 
-const BeneficiaryCard = (): ReactNode => {
+type Props = {
+    type: "current" | "historic";
+};
+
+const BeneficiaryCard = ({ type }: Props): ReactNode => {
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const userID = 123456;
@@ -30,7 +34,7 @@ const BeneficiaryCard = (): ReactNode => {
                         Anthony Vinicius Mota Silva
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                        Since Feb 27, 2000
+                        {type === "current" ? "Since Feb 27, 2000" : "Released on Feb 27, 2000"}
                     </span>
                 </div>
             </div>

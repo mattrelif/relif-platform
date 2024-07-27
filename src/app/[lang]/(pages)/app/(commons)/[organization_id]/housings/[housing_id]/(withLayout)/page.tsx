@@ -1,18 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { ReactNode } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
 import { MdAdd, MdSearch, MdSpaceDashboard } from "react-icons/md";
+import { CreateSpace } from "./(spaces)/createSpace.layout";
+import { SpaceCard } from "./(spaces)/spaceCard.layout";
 import { BeneficiaryCard } from "./beneficiaryCard.layout";
 import { Toolbar } from "./toolbar.layout";
 
@@ -63,15 +72,24 @@ export default function Page({
                                 <MdSpaceDashboard />
                                 Spaces
                             </h3>
-                            <Button variant="outline" size="sm" className="flex items-center gap-2">
-                                <MdAdd size={16} /> New
-                            </Button>
+                            <CreateSpace />
                         </div>
                         <div className="flex items-center gap-2">
                             <MdSearch className="text-slate-400 text-2xl" />
                             <Input type="text" placeholder="Search" className="w-full h-8" />
                         </div>
-                        <div className="w-full h-[calc(100vh-583px)] border border-slate-100 rounded-md"></div>
+                        <div className="w-full h-[calc(100vh-583px)] border border-slate-200 rounded-md overflow-hidden">
+                            <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
+                                <SpaceCard status="available" />
+                                <SpaceCard status="overCrowded" />
+                                <SpaceCard status="available" />
+                                <SpaceCard status="available" />
+                                <SpaceCard status="available" />
+                                <SpaceCard status="full" />
+                                <SpaceCard status="full" />
+                                <SpaceCard status="overCrowded" />
+                            </div>
+                        </div>
                         <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
                             <Pagination>
                                 <PaginationContent>
@@ -105,9 +123,22 @@ export default function Page({
                             <FaUsers />
                             Beneficiaries
                         </h3>
-                        <Button variant="outline" size="sm" className="flex items-center gap-2">
-                            <MdAdd size={16} /> New
-                        </Button>
+
+                        <div className="flex items-center gap-2">
+                            <Select defaultValue="current">
+                                <SelectTrigger className="w-[110px] h-8">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="current">Current</SelectItem>
+                                    <SelectItem value="historic">Historic</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                <MdAdd size={16} /> New
+                            </Button>
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <MdSearch className="text-slate-400 text-2xl" />
@@ -115,16 +146,16 @@ export default function Page({
                     </div>
                     <div className="w-full h-[calc(100vh-459px)] border border-slate-200 rounded-md overflow-hidden">
                         <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
-                            <BeneficiaryCard />
+                            <BeneficiaryCard type="current" />
+                            <BeneficiaryCard type="historic" />
+                            <BeneficiaryCard type="current" />
+                            <BeneficiaryCard type="historic" />
+                            <BeneficiaryCard type="current" />
+                            <BeneficiaryCard type="historic" />
+                            <BeneficiaryCard type="current" />
+                            <BeneficiaryCard type="current" />
+                            <BeneficiaryCard type="current" />
+                            <BeneficiaryCard type="current" />
                         </div>
                     </div>
                     <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
@@ -168,9 +199,7 @@ export default function Page({
                         <Input type="text" placeholder="Search" className="w-full h-8" />
                     </div>
                     <div className="w-full h-[calc(100vh-459px)] border border-slate-200 rounded-md overflow-hidden">
-                        <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
-
-                        </div>
+                        <div className="w-full h-full overflow-x-hidden overflow-y-scroll"></div>
                     </div>
                     <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
                         <Pagination>
