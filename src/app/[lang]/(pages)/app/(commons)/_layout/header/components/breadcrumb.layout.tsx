@@ -32,6 +32,7 @@ const LABELS = {
     movements: "Movements",
     create: "Create",
     edit: "Edit",
+    entry: "Entrypoint",
 };
 
 const Breadcrumb = (): ReactNode => {
