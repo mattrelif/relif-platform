@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 import { FaUsers } from "react-icons/fa";
-import { BeneficiaryCard } from "../beneficiaryCard.layout";
+import { BeneficiaryCard } from "../beneficiaries/card.layout";
 
 type Props = {
     sheetOpenState: boolean;
@@ -29,24 +29,24 @@ const ViewSpace = ({ sheetOpenState, setSheetOpenState }: Props): ReactNode => {
                 </h3>
                 <div className="border border-slate-200 rounded-lg overflow-hidden">
                     <ul className="w-full h-[calc(100vh-225px)] overflow-x-hidden overflow-y-scroll">
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
-                        <BeneficiaryCard />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
+                        <BeneficiaryCard type="current" />
                     </ul>
                 </div>
             </SheetContent>

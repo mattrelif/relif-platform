@@ -19,7 +19,7 @@ type Props = {
 
 const BeneficiaryCard = ({ type }: Props): ReactNode => {
     const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 5).join("/");
+    const urlPath = pathname.split("/").slice(0, 4).join("/");
     const userID = 123456;
 
     return (
@@ -47,7 +47,7 @@ const BeneficiaryCard = ({ type }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${userID}`}>View profile</Link>
+                            <Link href={`${urlPath}/beneficiaries/${userID}`}>View profile</Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
