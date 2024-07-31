@@ -1,4 +1,6 @@
 import { client } from "@/lib/axios-client";
+import { SignUpRequest } from "@/types/auth.types";
+import { UserSchema } from "@/types/user.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "auth";
@@ -18,7 +20,7 @@ export async function signOut(): Promise<void> {
     });
 }
 
-export async function signUp(): Promise<AxiosResponse> {
+export async function signUp(data: SignUpRequest): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/sign-up`,
         method: "POST",
@@ -32,7 +34,7 @@ export async function orgSignUp(): Promise<AxiosResponse> {
     });
 }
 
-export async function getMe(): Promise<AxiosResponse> {
+export async function getMe(): Promise<AxiosResponse<UserSchema>> {
     return client.request({
         url: `${PREFIX}/me`,
         method: "GET",

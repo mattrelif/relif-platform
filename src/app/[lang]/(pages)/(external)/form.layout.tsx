@@ -4,15 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { getMe, signIn } from "@/repository/auth.repository";
 import Link from "next/link";
-import { FormEvent, ReactNode } from "react";
-import { FcGoogle } from "react-icons/fc";
+import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
 
 const SignInForm = (): ReactNode => {
     const { toast } = useToast();
+    const router = useRouter();
 
-    const handleSubmit = (e: FormEvent): void => {
+    const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
+
+        try {
+            const formData: FormData = new FormData(e.target);
+
+            // @ts-ignore
+            const data: {
+                email: string;
+                password: string;
+            } = Object.fromEntries(formData);
+
+            await signIn(data.email, data.password);
+
+            const { data: responseData } = await getMe();
+
+            // ORG_ID
+            router.push("/app");
+        } catch (err) {}
 
         toast({
             title: "Invalid credentials",
@@ -53,7 +72,7 @@ const SignInForm = (): ReactNode => {
                     </span>
                 </div>
             </div>
-            <div className="w-full relative flex justify-center mb-[17px]">
+            {/* <div className="w-full relative flex justify-center mb-[17px]">
                 <span className="w-full border-b-[1px] border-slate-200 absolute top-[10px]" />
                 <span className="w-max text-sm text-slate-900 flex justify-center px-[10px] bg-white z-10">
                     or
@@ -62,7 +81,7 @@ const SignInForm = (): ReactNode => {
             <Button variant="outline" className="w-full flex items-center gap-3">
                 <FcGoogle size={18} />
                 Sign in with Google
-            </Button>
+            </Button> */}
         </form>
     );
 };
