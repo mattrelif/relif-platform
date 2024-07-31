@@ -1,0 +1,56 @@
+export type JoinOrganizationInviteSchema = {
+    id: string;
+    user_id: string;
+    organization_id: string;
+    creator_id: string;
+    created_at: string;
+    expires_at: string;
+};
+
+export type JoinOrganizationRequestSchema = {
+    id: string;
+    user_id: string;
+    organization_id: string;
+    created_at: string;
+    expires_at: string;
+};
+
+export type JoinPlatformInviteSchema = {
+    id: string; //invited_email
+    code: string;
+    organization_id: string;
+    inviter_id: string;
+    created_at: string;
+    expires_at: string;
+};
+
+export type UpdateOrganizationTypeRequestSchema = {
+    id: string;
+    organization_id: string;
+    creator_id: string;
+    auditor_id: string;
+    status: string;
+    created_at: string;
+    reject_reason: string;
+    rejected_at: string;
+};
+
+export type CreateJoinOrganizationInviteRequest = {
+    organization_id: string;
+};
+
+export type CreateJoinOrganizationRequest = {
+    organization_id: string;
+};
+
+export type CreateJoinPlatformInviteRequest = {
+    invited_email: string;
+};
+
+export type CreateUpdateOrganizationTypeRequest = {
+    organization_id: string;
+};
+
+export type RejectUpdateOrganizationTypeRequest = {
+    reject_reason: string;
+};
