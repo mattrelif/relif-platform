@@ -16,7 +16,7 @@ export default function Page({
     };
 }): ReactNode {
     return (
-        <div className="w-full h-max flex flex-col gap-2">
+        <div className="w-full h-max flex flex-col gap-2 p-2">
             <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
                 <div className="flex flex-col items-center">
                     <h2 className="text-xl font-semibold text-slate-900">John Doe Marks</h2>
