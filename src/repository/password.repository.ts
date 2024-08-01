@@ -1,9 +1,8 @@
 import { client } from "@/lib/axios-client";
-import { AxiosResponse } from "axios";
 
 const PREFIX = "password";
 
-export async function requestChange(email: string): Promise<AxiosResponse> {
+export async function requestChange(email: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/request-change`,
         method: "POST",
@@ -11,7 +10,7 @@ export async function requestChange(email: string): Promise<AxiosResponse> {
     });
 }
 
-export async function updatePassword(code: string, newPassword: string): Promise<AxiosResponse> {
+export async function updatePassword(code: string, newPassword: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/${code}`,
         method: "PUT",

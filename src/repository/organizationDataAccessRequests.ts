@@ -4,7 +4,7 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "organization-data-access-requests";
 
-export async function createRequest(): Promise<AxiosResponse> {
+export async function createRequest(): Promise<void> {
     return client.request({
         url: `${PREFIX}`,
         method: "POST",
@@ -20,14 +20,14 @@ export async function findRequests(): Promise<
     });
 }
 
-export async function acceptRequest(requestId: string): Promise<AxiosResponse> {
+export async function acceptRequest(requestId: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/${requestId}`,
         method: "DELETE",
     });
 }
 
-export async function rejectRequest(requestId: string): Promise<AxiosResponse> {
+export async function rejectRequest(requestId: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/${requestId}`,
         method: "DELETE",

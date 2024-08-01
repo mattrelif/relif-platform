@@ -1,6 +1,7 @@
 import { client } from "@/lib/axios-client";
 import {
     CreateOrganizationRequest,
+    OrganizationDataAccessRequestSchema,
     OrganizationDataAccessSchema,
     OrganizationSchema,
     UpdateOrganizationRequest,
@@ -14,7 +15,7 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "organizations";
 
-export async function createOrganization(data: CreateOrganizationRequest): Promise<AxiosResponse> {
+export async function createOrganization(data: CreateOrganizationRequest): Promise<void> {
     return client.request({
         url: `${PREFIX}`,
         method: "POST",
@@ -34,7 +35,7 @@ export async function findOrganizationByID(
 export async function updateOrganization(
     orgId: string,
     data: UpdateOrganizationRequest
-): Promise<AxiosResponse> {
+): Promise<void> {
     return client.request({
         url: `${PREFIX}/${orgId}`,
         method: "PUT",
@@ -42,7 +43,9 @@ export async function updateOrganization(
     });
 }
 
-export async function findAllOrganizations(): Promise<AxiosResponse> {
+export async function findAllOrganizations(): Promise<
+    AxiosResponse<{ count: number; data: OrganizationSchema[] }>
+> {
     return client.request({
         url: `${PREFIX}`,
         method: "GET",
@@ -86,7 +89,7 @@ export async function findDataAccessRequestsByOrganizationId(
     orgId: string,
     offset: number,
     limit: number
-): Promise<AxiosResponse> {
+): Promise<AxiosResponse<{ count: number; data: OrganizationDataAccessRequestSchema[] }>> {
     return client.request({
         url: `${PREFIX}/${orgId}/data-accesses-requests?offset=${offset}&limit=${limit}`,
         method: "GET",

@@ -5,7 +5,7 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "auth";
 
-export async function signIn(email: string, password: string): Promise<AxiosResponse> {
+export async function signIn(email: string, password: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/sign-in`,
         method: "POST",
@@ -20,7 +20,7 @@ export async function signOut(): Promise<void> {
     });
 }
 
-export async function signUp(data: SignUpRequest): Promise<AxiosResponse> {
+export async function signUp(data: SignUpRequest): Promise<void> {
     return client.request({
         url: `${PREFIX}/sign-up`,
         method: "POST",
@@ -28,7 +28,7 @@ export async function signUp(data: SignUpRequest): Promise<AxiosResponse> {
     });
 }
 
-export async function orgSignUp(): Promise<AxiosResponse> {
+export async function orgSignUp(): Promise<void> {
     return client.request({
         url: `${PREFIX}/orgSignUp`,
         method: "POST",
