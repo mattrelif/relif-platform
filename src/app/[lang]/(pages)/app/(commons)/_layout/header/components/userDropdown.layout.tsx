@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { signOut } from "@/repository/auth.repository";
+import { removeFromLocalStorage } from "@/utils/localStorage";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
@@ -27,6 +28,7 @@ const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
     const onHandleSignOut = async (): Promise<void> => {
         try {
             await signOut();
+            removeFromLocalStorage("r_ud");
             router.push("/", { scroll: false });
         } catch {
             toast({

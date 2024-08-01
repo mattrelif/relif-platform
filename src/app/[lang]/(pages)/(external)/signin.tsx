@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { getMe, signIn } from "@/repository/auth.repository";
+import { saveToLocalStorage } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -30,6 +31,7 @@ const SignInForm = (): ReactNode => {
             await signIn(data.email, data.password);
 
             const { data: responseData } = await getMe();
+            saveToLocalStorage("r_ud", responseData);
 
             if (!responseData.organization_id) {
                 router.push("/app/entry");
@@ -37,7 +39,8 @@ const SignInForm = (): ReactNode => {
             }
 
             router.push(`/app/${responseData.organization_id}`);
-        } catch {
+        } catch (err) {
+            console.warn(err);
             setIsLoading(false);
             toast({
                 title: "Invalid credentials",

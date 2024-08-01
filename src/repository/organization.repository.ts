@@ -1,5 +1,10 @@
 import { client } from "@/lib/axios-client";
-import { CreateOrganizationRequest } from "@/types/organization.types";
+import {
+    CreateOrganizationRequest,
+    OrganizationSchema,
+    UpdateOrganizationRequest,
+} from "@/types/organization.types";
+import { UserSchema } from "@/types/user.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "organizations";
@@ -12,10 +17,23 @@ export async function createOrganization(data: CreateOrganizationRequest): Promi
     });
 }
 
-export async function updateOrganization(orgId: string): Promise<AxiosResponse> {
+export async function findOrganizationByID(
+    orgId: string
+): Promise<AxiosResponse<OrganizationSchema>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}`,
+        method: "GET",
+    });
+}
+
+export async function updateOrganization(
+    orgId: string,
+    data: UpdateOrganizationRequest
+): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${orgId}`,
         method: "PUT",
+        data,
     });
 }
 
@@ -26,9 +44,13 @@ export async function findAllOrganizations(): Promise<AxiosResponse> {
     });
 }
 
-export async function findUsersByOrganizationId(orgId: string): Promise<AxiosResponse> {
+export async function findUsersByOrganizationId(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ data: UserSchema[]; count: number }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/users`,
+        url: `${PREFIX}/${orgId}/users?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
