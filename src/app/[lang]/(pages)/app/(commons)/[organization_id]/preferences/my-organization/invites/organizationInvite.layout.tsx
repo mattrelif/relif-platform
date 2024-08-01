@@ -2,9 +2,13 @@ import { OrganizationInviteDialog } from "@/app/[lang]/(pages)/app/(commons)/[or
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useToast } from "@/components/ui/use-toast";
+import { rejectRequest } from "@/repository/organizationDataAccessRequests";
+import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
 import { ReactNode } from "react";
 import { MdCheck, MdClose, MdInfo, MdPhone } from "react-icons/md";
 
+// TODO
 const OrganizationInfoCard = ({ children }: { children: Readonly<ReactNode> }): ReactNode => (
     <HoverCard>
         <HoverCardTrigger>{children}</HoverCardTrigger>
@@ -30,58 +34,84 @@ const OrganizationInfoCard = ({ children }: { children: Readonly<ReactNode> }): 
     </HoverCard>
 );
 
-const OrganizationInvite = (): ReactNode => (
-    <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
-        <div className="flex gap-4">
-            <OrganizationInfoCard>
-                <div className="w-8 h-8 rounded-md bg-relif-orange-500 text-white text-xl flex items-center justify-center">
-                    <MdInfo />
+type Props = OrganizationDataAccessRequestSchema & {
+    refreshList: () => void;
+};
+
+const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
+    const { toast } = useToast();
+
+    const handleReject = async () => {
+        try {
+            await rejectRequest(data.id);
+            refreshList();
+            toast({
+                title: "Request Rejected!",
+                description: "You have successfully rejected the request.",
+            });
+        } catch {
+            toast({
+                title: "Request Failed!",
+                description: "There was an error processing your request. Please try again later.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    return (
+        <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
+            <div className="flex gap-4">
+                <OrganizationInfoCard>
+                    <div className="w-8 h-8 rounded-md bg-relif-orange-500 text-white text-xl flex items-center justify-center">
+                        <MdInfo />
+                    </div>
+                </OrganizationInfoCard>
+                <div className="flex flex-col">
+                    <span className="text-sm text-slate-900 font-bold">
+                        Prefeitura do Rio de Janeiro
+                    </span>
+                    <span className="text-xs text-slate-500">
+                        <strong>By: </strong>anthony.vinicius@example.com
+                    </span>
+                    <span className="text-xs text-slate-400 mt-2">2 days ago</span>
                 </div>
-            </OrganizationInfoCard>
-            <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">
-                    Prefeitura do Rio de Janeiro
-                </span>
-                <span className="text-xs text-slate-500">
-                    <strong>By: </strong>anthony.vinicius@example.com
-                </span>
-                <span className="text-xs text-slate-400 mt-2">2 days ago</span>
             </div>
-        </div>
 
-        <div className="flex items-start gap-2">
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <OrganizationInviteDialog>
-                            <Button className="w-7 h-7 p-0 flex items-center justify-center">
-                                <MdCheck />
+            <div className="flex items-start gap-2">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <OrganizationInviteDialog refreshList={refreshList} request={data}>
+                                <Button className="w-7 h-7 p-0 flex items-center justify-center">
+                                    <MdCheck />
+                                </Button>
+                            </OrganizationInviteDialog>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Accept invitation</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Button
+                                variant="outline"
+                                className="w-7 h-7 p-0 flex items-center justify-center"
+                                onClick={handleReject}
+                            >
+                                <MdClose />
                             </Button>
-                        </OrganizationInviteDialog>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Accept invitation</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Button
-                            variant="outline"
-                            className="w-7 h-7 p-0 flex items-center justify-center"
-                        >
-                            <MdClose />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Reject invitation</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
-        </div>
-    </li>
-);
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Reject invitation</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+        </li>
+    );
+};
 
 export { OrganizationInvite };

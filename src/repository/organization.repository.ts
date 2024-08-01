@@ -1,9 +1,14 @@
 import { client } from "@/lib/axios-client";
 import {
     CreateOrganizationRequest,
+    OrganizationDataAccessSchema,
     OrganizationSchema,
     UpdateOrganizationRequest,
 } from "@/types/organization.types";
+import {
+    JoinOrganizationInviteSchema,
+    JoinOrganizationRequestSchema,
+} from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
 import { AxiosResponse } from "axios";
 
@@ -55,25 +60,35 @@ export async function findUsersByOrganizationId(
     });
 }
 
-export async function findJoinInvitesByOrganizationId(orgId: string): Promise<AxiosResponse> {
+export async function findJoinInvitesByOrganizationId(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: JoinOrganizationInviteSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/join-invites`,
+        url: `${PREFIX}/${orgId}/join-invites?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
 
-export async function findJoinRequestsByOrganizationId(orgId: string): Promise<AxiosResponse> {
+export async function findJoinRequestsByOrganizationId(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: JoinOrganizationRequestSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/join-requests`,
+        url: `${PREFIX}/${orgId}/join-requests?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
 
 export async function findDataAccessRequestsByOrganizationId(
-    orgId: string
+    orgId: string,
+    offset: number,
+    limit: number
 ): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${orgId}/data-accesses-requests`,
+        url: `${PREFIX}/${orgId}/data-accesses-requests?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
@@ -95,10 +110,12 @@ export async function findHousingsByOrganizationId(orgId: string): Promise<Axios
 }
 
 export async function findJoinPlatformInvitesByOrganizationId(
-    orgId: string
-): Promise<AxiosResponse> {
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: OrganizationDataAccessSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/join-platform-invites`,
+        url: `${PREFIX}/${orgId}/join-platform-invites?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

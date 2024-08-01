@@ -1,4 +1,5 @@
 import { client } from "@/lib/axios-client";
+import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "organization-data-access-requests";
@@ -10,7 +11,9 @@ export async function createRequest(): Promise<AxiosResponse> {
     });
 }
 
-export async function findRequests(): Promise<AxiosResponse> {
+export async function findRequests(): Promise<
+    AxiosResponse<OrganizationDataAccessRequestSchema[]>
+> {
     return client.request({
         url: `${PREFIX}`,
         method: "GET",

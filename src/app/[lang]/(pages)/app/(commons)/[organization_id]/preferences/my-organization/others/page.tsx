@@ -1,3 +1,5 @@
+"use client";
+
 import { CoordinationRequestDialog } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/others/coordinationRequestDialog.layout";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";

@@ -13,24 +13,37 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { createInvite } from "@/repository/joinPlatformInvites.repository";
 import { ReactNode } from "react";
 
 const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {
     const { toast } = useToast();
 
-    const handleSubmit = (): void => {
-        toast({
-            title: "Invited!",
-            description: "User invited successfully.",
-            variant: "success",
-        });
+    const handleSubmit = async (e: any): Promise<void> => {
+        e.preventDefault();
 
-        // toast({
-        //     title: "Invalid entered data",
-        //     description:
-        //         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        //     variant: "destructive",
-        // });
+        try {
+            const formData: FormData = new FormData(e.target);
+
+            // @ts-ignore
+            const data: {
+                email: string;
+            } = Object.fromEntries(formData);
+
+            await createInvite(data.email);
+            toast({
+                title: "Success!",
+                description: "The user has been successfully invited.",
+                variant: "success",
+            });
+        } catch {
+            toast({
+                title: "Error!",
+                description:
+                    "An error occurred while processing your request. Please try again later.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
@@ -42,23 +55,26 @@ const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => 
                     <DialogDescription>
                         Enter the email of the user you want to add to your organization.
                     </DialogDescription>
-                    <div className="flex flex-col pt-4 gap-2">
-                        <Label htmlFor="email">E-mail *</Label>
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="e.g. john.doe@example.com"
-                        />
-                    </div>
-                    <div className="flex gap-4 pt-5">
-                        <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                            <Button onClick={handleSubmit}>Invite user</Button>
-                        </DialogClose>
-                    </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="flex flex-col pt-4 gap-2">
+                            <Label htmlFor="email">E-mail *</Label>
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                placeholder="e.g. john.doe@example.com"
+                            />
+                        </div>
+                        <div className="flex gap-4 pt-5">
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                                <Button type="submit">Invite user</Button>
+                            </DialogClose>
+                        </div>
+                    </form>
                 </DialogHeader>
             </DialogContent>
         </Dialog>

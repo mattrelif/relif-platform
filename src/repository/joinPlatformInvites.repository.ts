@@ -3,10 +3,11 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "join-platform-invites";
 
-export async function createInvite(): Promise<AxiosResponse> {
+export async function createInvite(invited_email: string): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}`,
         method: "POST",
+        data: { invited_email },
     });
 }
 

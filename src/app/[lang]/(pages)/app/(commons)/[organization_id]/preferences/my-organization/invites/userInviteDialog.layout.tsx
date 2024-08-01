@@ -11,24 +11,34 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { acceptRequest } from "@/repository/joinOrganizationRequests.repository";
+import { JoinOrganizationRequestSchema } from "@/types/requests.types";
 import { ReactNode } from "react";
 
-const UserInviteDialogLayout = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {
+type Props = {
+    request: JoinOrganizationRequestSchema;
+    refreshList: () => void;
+    children: Readonly<ReactNode>;
+};
+
+const UserInviteDialogLayout = ({ request, refreshList, children }: Props): ReactNode => {
     const { toast } = useToast();
 
-    const handleInvite = (): void => {
-        toast({
-            title: "Accepted!",
-            description: "Invitation accepted successfully.",
-            variant: "success",
-        });
-
-        // toast({
-        //     title: "Invalid entered data",
-        //     description:
-        //         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        //     variant: "destructive",
-        // });
+    const handleAccept = async () => {
+        try {
+            await acceptRequest(request.id);
+            refreshList();
+            toast({
+                title: "Request Accepted!",
+                description: "You have successfully accepted the request.",
+            });
+        } catch {
+            toast({
+                title: "Request Failed!",
+                description: "There was an error processing your request. Please try again later.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
@@ -42,6 +52,7 @@ const UserInviteDialogLayout = ({ children }: { children: Readonly<ReactNode> })
                         organization.
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
+                        {/* TODO */}
                         <span className="text-sm text-slate-900 font-bold">Anthony Vinicius</span>
                         <span className="text-xs text-slate-500">anthony.vii27@gmail.com</span>
                     </div>
@@ -50,7 +61,7 @@ const UserInviteDialogLayout = ({ children }: { children: Readonly<ReactNode> })
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
                         <DialogClose asChild>
-                            <Button onClick={handleInvite}>Accept</Button>
+                            <Button onClick={handleAccept}>Accept</Button>
                         </DialogClose>
                     </div>
                 </DialogHeader>

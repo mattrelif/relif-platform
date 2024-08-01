@@ -1,8 +1,8 @@
-import { OrganizationInvite } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/organizationInvite.layout";
-import { UserInvite } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/userInvite.layout";
 import { ReactNode } from "react";
 import { FaUsers } from "react-icons/fa";
 import { MdDataset } from "react-icons/md";
+import { OrganizationInviteList } from "./organizationInviteList.layout";
+import { UserInviteList } from "./userInviteList.layout";
 
 export default function Page(): ReactNode {
     return (
@@ -12,32 +12,14 @@ export default function Page(): ReactNode {
                     <FaUsers size={14} />
                     Users
                 </h3>
-                <ul className="w-full h-full flex flex-col gap-2 p-2 overflow-x-hidden overflow-y-scroll">
-                    {/* <span className="text-sm text-slate-900 font-medium"> */}
-                    {/*    You have no invitations... */}
-                    {/* </span> */}
-                    {/* <span className="text-sm text-red-600 font-medium flex items-center gap-1"> */}
-                    {/*    <MdError /> */}
-                    {/*    Something went wrong. Please try again later. */}
-                    {/* </span> */}
-                    <UserInvite />
-                </ul>
+                <UserInviteList />
             </div>
             <div className="w-full h-full">
                 <h3 className="text-sm bg-slate-50 font-bold text-slate-900 py-2 px-4 border-b-[1px] border-slate-200 flex items-center gap-2">
                     <MdDataset size={14} />
                     Data Access
                 </h3>
-                <ul className="w-full h-full flex flex-col gap-2 p-2 overflow-x-hidden overflow-y-scroll">
-                    {/* <span className="text-sm text-slate-900 font-medium"> */}
-                    {/*    You have no data access requests... */}
-                    {/* </span> */}
-                    {/* <span className="text-sm text-red-600 font-medium flex items-center gap-1"> */}
-                    {/*    <MdError /> */}
-                    {/*    Something went wrong. Please try again later. */}
-                    {/* </span> */}
-                    <OrganizationInvite />
-                </ul>
+                <OrganizationInviteList />
             </div>
         </div>
     );

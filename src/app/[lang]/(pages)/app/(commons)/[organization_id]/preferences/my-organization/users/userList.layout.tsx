@@ -44,7 +44,9 @@ const UserList = (): ReactNode => {
 
     return (
         <ul className="w-full h-[calc(100vh-316px)] border-[1px] border-slate-200 rounded-md p-2 mt-4 overflow-x-hidden overflow-y-scroll flex flex-col gap-2">
-            {isLoading && <h2 className="p-2 text-relif-orange-400 font-medium">Loading...</h2>}
+            {isLoading && (
+                <h2 className="p-2 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+            )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1">

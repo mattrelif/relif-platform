@@ -4,45 +4,92 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { updateUser } from "@/repository/user.repository";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
-import { FormEvent, ReactNode, useEffect, useState } from "react";
-import { MdAdd, MdClose, MdSave } from "react-icons/md";
+import { ReactNode, useEffect, useState } from "react";
+import { MdError, MdSave } from "react-icons/md";
+import { Phones } from "./phones.layout";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
+
+    const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [userData, setUserData] = useState<UserSchema | null>(null);
-    const [phones, setPhones] = useState([]);
+    const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         setIsLoading(true);
-        const ud: UserSchema = getFromLocalStorage("r_ud");
-        setUserData(ud);
-        // setPhones(ud.phones);
-        setIsLoading(false);
+        setError(false);
+
+        try {
+            const ud: UserSchema = getFromLocalStorage("r_ud");
+            setCurrentUser(ud);
+        } catch {
+            setError(true);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
-    const handleSubmit = (e: FormEvent): void => {
+    const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
 
-        toast({
-            title: "Saved!",
-            description: "The new data was saved successfully.",
-            variant: "success",
-        });
+        try {
+            const formData: FormData = new FormData(e.target);
 
-        // toast({
-        //     title: "Invalid entered data",
-        //     description:
-        //         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        //     variant: "destructive",
-        // });
+            // @ts-ignore
+            const data: {
+                firstName: string;
+                lastName: string;
+                role: string;
+            } = Object.fromEntries(formData);
+
+            if (currentUser) {
+                // TO DO: REMOVER COUNTRY, PASSWORD E ACERTAR PHONES
+                await updateUser(currentUser.id, {
+                    first_name: data.firstName,
+                    last_name: data.lastName,
+                    role: data.role,
+                    email: currentUser?.email,
+                    country: "Brasil",
+                    password: "",
+                    phones: currentUser?.phones,
+                    preferences: currentUser?.preferences,
+                });
+
+                toast({
+                    title: "Saved!",
+                    description: "The new data was saved successfully.",
+                    variant: "success",
+                });
+            } else {
+                throw new Error();
+            }
+        } catch {
+            toast({
+                title: "Invalid entered data",
+                description:
+                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
         <>
-            {!isLoading && (
+            {isLoading && (
+                <h2 className="p-2 text-relif-orange-400 text-sm font-medium">Loading...</h2>
+            )}
+
+            {!isLoading && error && (
+                <span className="text-sm text-red-600 font-medium flex items-center gap-1">
+                    <MdError />
+                    Something went wrong. Please try again later.
+                </span>
+            )}
+
+            {!isLoading && !error && (
                 <form onSubmit={handleSubmit}>
                     <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-bold text-base text-relif-orange-200 mb-6">
                         Your profile
@@ -56,7 +103,8 @@ const Form = (): ReactNode => {
                                 name="email"
                                 type="email"
                                 disabled
-                                defaultValue={userData?.email}
+                                required
+                                defaultValue={currentUser?.email}
                             />
                         </div>
 
@@ -66,7 +114,8 @@ const Form = (): ReactNode => {
                                 id="firstName"
                                 name="firstName"
                                 type="text"
-                                defaultValue={userData?.first_name}
+                                required
+                                defaultValue={currentUser?.first_name}
                             />
                         </div>
 
@@ -76,7 +125,8 @@ const Form = (): ReactNode => {
                                 id="lastName"
                                 name="lastName"
                                 type="text"
-                                defaultValue={userData?.last_name}
+                                required
+                                defaultValue={currentUser?.last_name}
                             />
                         </div>
 
@@ -86,58 +136,13 @@ const Form = (): ReactNode => {
                                 id="role"
                                 name="role"
                                 type="text"
-                                defaultValue={userData?.role}
+                                required
+                                defaultValue={currentUser?.role}
                                 placeholder="e.g. Director of Human Resources"
                             />
                         </div>
 
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="phone">Phones *</Label>
-                                <Button variant="secondary" className="flex items-center gap-2">
-                                    <MdAdd size={16} />
-                                    Add new phone number
-                                </Button>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <div className="w-full flex gap-2">
-                                    <Input
-                                        id="country-code"
-                                        name="country-code"
-                                        type="text"
-                                        placeholder="e.g. +55"
-                                        className="w-[20%]"
-                                    />
-                                    <Input
-                                        id="phone"
-                                        name="phone"
-                                        type="text"
-                                        className="w-[calc(100%-20%-40px)]"
-                                    />
-                                    <Button variant="destructive" className="flex p-0 w-[40px]">
-                                        <MdClose size={16} />
-                                    </Button>
-                                </div>
-                                <div className="w-full flex gap-2">
-                                    <Input
-                                        id="country-code"
-                                        name="country-code"
-                                        type="text"
-                                        placeholder="e.g. +55"
-                                        className="w-[20%]"
-                                    />
-                                    <Input
-                                        id="phone"
-                                        name="phone"
-                                        type="text"
-                                        className="w-[calc(100%-20%-40px)]"
-                                    />
-                                    <Button variant="destructive" className="flex p-0 w-[40px]">
-                                        <MdClose size={16} />
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
+                        <Phones />
                     </div>
 
                     <Button
