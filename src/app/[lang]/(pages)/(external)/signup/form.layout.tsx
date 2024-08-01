@@ -50,11 +50,12 @@ const Form = (): ReactNode => {
                 last_name: data.lastName,
                 email: data.email,
                 password: data.password,
+                // TODO: Remove country
                 country: "Brazil",
                 phones: [`${data.countryCode}_${data.phone}`],
                 role: data.role,
                 preferences: {
-                    language: "English",
+                    language: "english",
                     timezone: timezone,
                 },
             });
@@ -128,7 +129,7 @@ const Form = (): ReactNode => {
 
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="password">Password *</Label>
-                    <Input id="password" name="password" type="password" required minLength={6} />
+                    <Input id="password" name="password" type="password" required minLength={8} />
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -138,7 +139,7 @@ const Form = (): ReactNode => {
                         name="confirmPassword"
                         type="password"
                         required
-                        minLength={6}
+                        minLength={8}
                     />
                 </div>
 
@@ -158,14 +159,14 @@ const Form = (): ReactNode => {
                         <p className="text-sm text-slate-600">
                             You agree to our{" "}
                             <Link
-                                href="/terms-of-service"
+                                href="/terms/terms-of-service"
                                 className="underline hover:text-relif-orange-200 underline-offset-4"
                             >
                                 Terms of Service
                             </Link>{" "}
                             and{" "}
                             <Link
-                                href="/privacy-policy"
+                                href="/terms/privacy-policy"
                                 className="underline hover:text-relif-orange-200 underline-offset-4"
                             >
                                 Privacy Policy

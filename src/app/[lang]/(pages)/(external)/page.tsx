@@ -1,4 +1,4 @@
-import { SignInForm } from "@/app/[lang]/(pages)/(external)/form.layout";
+import { SignInForm } from "@/app/[lang]/(pages)/(external)/signin";
 import Image from "next/image";
 import { ReactNode } from "react";
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { RemoveModal } from "../remove.modal";
+import { RemoveModal } from "../_components/remove.modal";
 
 const Toolbar = (): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
@@ -36,7 +36,7 @@ const Toolbar = (): ReactNode => {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Edit beneficiary</TooltipContent>
+                        <TooltipContent>Edit housing</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
 
@@ -52,7 +52,7 @@ const Toolbar = (): ReactNode => {
                                 <FaTrash />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Remove beneficiary</TooltipContent>
+                        <TooltipContent>Remove housing</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>

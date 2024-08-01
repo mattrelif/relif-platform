@@ -61,7 +61,8 @@ const Breadcrumb = (): ReactNode => {
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
                                 <Link href={getHref(page)}>
-                                    {LABELS[page as keyof typeof LABELS] ?? page}
+                                    {LABELS[page as keyof typeof LABELS] ??
+                                        page?.toString().slice(0, 5).concat("...")}
                                 </Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
@@ -71,7 +72,8 @@ const Breadcrumb = (): ReactNode => {
 
                 <BreadcrumbItem>
                     <BreadcrumbPage>
-                        {LABELS[currentPage as keyof typeof LABELS] ?? currentPage}
+                        {LABELS[currentPage as keyof typeof LABELS] ??
+                            currentPage?.toString().slice(0, 5).concat("...")}
                     </BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>

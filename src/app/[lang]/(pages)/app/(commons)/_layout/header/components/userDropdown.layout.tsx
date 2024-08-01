@@ -11,13 +11,31 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
+import { signOut } from "@/repository/auth.repository";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
     const pathname = usePathname();
+    const router = useRouter();
+    const { toast } = useToast();
+
     const urlPath = pathname.split("/").slice(0, 4).join("/");
+
+    const onHandleSignOut = async (): Promise<void> => {
+        try {
+            await signOut();
+            router.push("/", { scroll: false });
+        } catch {
+            toast({
+                title: "Error",
+                description: "An error occurred. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
 
     return (
         <DropdownMenu>
@@ -48,9 +66,7 @@ const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
                     </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href="#">Logout</Link>
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onHandleSignOut}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -54,7 +54,7 @@ const SignInForm = (): ReactNode => {
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="email">E-mail</Label>
-                        <Input id="email" name="email" type="email" />
+                        <Input id="email" name="email" type="email" required />
                     </div>
 
                     <div className="flex flex-col gap-3">
@@ -64,11 +64,17 @@ const SignInForm = (): ReactNode => {
                                 <Link href="/forgot-password">Forgot password?</Link>
                             </Button>
                         </div>
-                        <Input id="password" name="password" type="password" />
+                        <Input id="password" name="password" type="password" required />
                     </div>
                 </div>
+
                 <div className="w-full flex flex-col items-center">
-                    <Button type="submit" variant="default" className="mt-[43px] w-full">
+                    <Button
+                        type="submit"
+                        variant="default"
+                        className="mt-[43px] w-full"
+                        disabled={isLoading}
+                    >
                         {!isLoading ? "Sign in" : "Loading..."}
                     </Button>
                     <span className="text-sm text-slate-900">

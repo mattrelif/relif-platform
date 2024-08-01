@@ -68,7 +68,7 @@ const Form = (): ReactNode => {
                             id="password"
                             name="password"
                             type="password"
-                            minLength={6}
+                            minLength={8}
                             required
                         />
                     </div>
@@ -78,7 +78,7 @@ const Form = (): ReactNode => {
                             id="confirmPassword"
                             name="confirmPassword"
                             type="password"
-                            minLength={6}
+                            minLength={8}
                             required
                         />
                     </div>
