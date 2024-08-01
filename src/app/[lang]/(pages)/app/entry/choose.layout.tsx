@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { ReactNode } from "react";
 import { MdAdd } from "react-icons/md";
 
@@ -14,7 +15,9 @@ const Choose = (): ReactNode => {
                     <h2 className="text-slate-900 text-base font-semibold flex items-center gap-2">
                         <MdAdd size={20} /> Create an organization
                     </h2>
-                    <Button>I want to create a new organization</Button>
+                    <Button asChild>
+                        <Link href="/app/entry/create">I want to create a new organization</Link>
+                    </Button>
                 </div>
                 <div className="w-full h-full bg-white p-6 flex flex-col gap-3">
                     <h2 className="text-slate-900 text-base font-semibold">Join an organization</h2>

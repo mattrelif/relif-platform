@@ -24,6 +24,7 @@ export async function signUp(data: SignUpRequest): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/sign-up`,
         method: "POST",
+        data: { ...data },
     });
 }
 

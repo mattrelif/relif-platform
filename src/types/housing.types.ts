@@ -12,10 +12,10 @@ export type HousingSchema = {
 
 export type CreateHousingRequest = Omit<
     HousingSchema,
-    "id" | "organization_id" | "status" | "created_at" | "updated_At"
+    "id" | "organization_id" | "status" | "created_at" | "updated_at"
 >;
 
 export type UpdateHousingRequest = Omit<
     HousingSchema,
-    "id" | "organization_id" | "status" | "created_at" | "updated_At"
+    "id" | "organization_id" | "status" | "created_at" | "updated_at"
 >;

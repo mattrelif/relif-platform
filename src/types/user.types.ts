@@ -17,16 +17,17 @@ export type UserSchema = {
     preferences: UserPreferencesSchema;
     created_at: string;
     updated_at: string;
+    organization_id: string | null;
 };
 
 export type CreateUserRequest = Omit<
     UserSchema,
-    "id" | "platform_role" | "status" | "created_at" | "updated_at"
+    "id" | "platform_role" | "status" | "created_at" | "updated_at" | "organization_id"
 >;
 
 export type UpdateUserRequest = Omit<
     UserSchema,
-    "id" | "platform_role" | "status" | "created_at" | "updated_at"
+    "id" | "platform_role" | "status" | "created_at" | "updated_at" | "organization_id"
 >;
 
 export type UpdateUserPreferencesRequest = UserPreferencesSchema;

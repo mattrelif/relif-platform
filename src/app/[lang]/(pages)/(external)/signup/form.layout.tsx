@@ -8,10 +8,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { signUp } from "@/repository/auth.repository";
 import { getTimezone } from "@/utils/getTimezone";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
+    const router = useRouter();
     const [checkState, setCheckState] = useState<boolean>(false);
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -48,7 +50,7 @@ const Form = (): ReactNode => {
                 last_name: data.lastName,
                 email: data.email,
                 password: data.password,
-                country: "",
+                country: "Brazil",
                 phones: [`${data.countryCode}_${data.phone}`],
                 role: data.role,
                 preferences: {
@@ -61,6 +63,8 @@ const Form = (): ReactNode => {
                 title: "Registration successful",
                 description: "User registered successfully!",
             });
+
+            router.push("/");
         } catch (err) {
             toast({
                 title: "Registration Error",

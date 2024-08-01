@@ -13,10 +13,10 @@ import { ReactNode } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
 import { MdSearch, MdSpaceDashboard } from "react-icons/md";
-import { CreateSpace } from "./(spaces)/createSpace.layout";
-import { SpaceCard } from "./(spaces)/spaceCard.layout";
+import { CreateSpace } from "./_components/createSpace.layout";
+import { InventoryCard } from "./_components/inventoryCard.layout";
+import { SpaceCard } from "./_components/spaceCard.layout";
 import { BeneficiaryList } from "./beneficiaries/list.layout";
-import { InventoryCard } from "./inventoryCard.layout";
 import { Toolbar } from "./toolbar.layout";
 
 export default function Page({

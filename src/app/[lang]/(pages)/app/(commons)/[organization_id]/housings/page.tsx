@@ -1,3 +1,5 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
 import {
     Pagination,
@@ -10,10 +12,22 @@ import {
 } from "@/components/ui/pagination";
 import { ReactNode } from "react";
 import { MdSearch } from "react-icons/md";
-import { Card } from "./card.layout";
-import { Toolbar } from "./toolbar.layout";
+import { Card } from "./_components/card.layout";
+import { Toolbar } from "./_components/toolbar.layout";
 
 export default function Page(): ReactNode {
+    // const [housings, setHousings] = useState<HousingSchema[] | []>([]);
+
+    // useEffect(() => {
+    //     (async () => {
+    //         try {
+    //           const response = await findHousingsByOrganizationId("");
+    //         } catch(err) {
+
+    //         }
+    //     })()
+    // }, [])
+
     return (
         <div className="p-4 flex flex-col gap-4">
             <div className="flex items-end gap-4 justify-between">

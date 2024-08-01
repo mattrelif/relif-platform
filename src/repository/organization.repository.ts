@@ -1,12 +1,14 @@
 import { client } from "@/lib/axios-client";
+import { CreateOrganizationRequest } from "@/types/organization.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "organizations";
 
-export async function createOrganization(): Promise<AxiosResponse> {
+export async function createOrganization(data: CreateOrganizationRequest): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}`,
         method: "POST",
+        data,
     });
 }
 

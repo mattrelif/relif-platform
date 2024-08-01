@@ -7,14 +7,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { getMe, signIn } from "@/repository/auth.repository";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 const SignInForm = (): ReactNode => {
     const { toast } = useToast();
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
+        setIsLoading(true);
 
         try {
             const formData: FormData = new FormData(e.target);
@@ -29,16 +31,21 @@ const SignInForm = (): ReactNode => {
 
             const { data: responseData } = await getMe();
 
-            // ORG_ID
-            router.push("/app");
-        } catch (err) {}
+            if (!responseData.organization_id) {
+                router.push("/app/entry");
+                return;
+            }
 
-        toast({
-            title: "Invalid credentials",
-            description:
-                "The email address or password you entered is incorrect. Please try again.",
-            variant: "destructive",
-        });
+            router.push(`/app/${responseData.organization_id}`);
+        } catch {
+            setIsLoading(false);
+            toast({
+                title: "Invalid credentials",
+                description:
+                    "The email address or password you entered is incorrect. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
@@ -62,7 +69,7 @@ const SignInForm = (): ReactNode => {
                 </div>
                 <div className="w-full flex flex-col items-center">
                     <Button type="submit" variant="default" className="mt-[43px] w-full">
-                        Sign in
+                        {!isLoading ? "Sign in" : "Loading..."}
                     </Button>
                     <span className="text-sm text-slate-900">
                         Need an account?

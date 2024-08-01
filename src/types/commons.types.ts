@@ -1,6 +1,6 @@
 export type AddressSchema = {
     street_name: string;
-    street_number: number;
+    street_number: string;
     city: string;
     zip_code: string;
     district: string;
