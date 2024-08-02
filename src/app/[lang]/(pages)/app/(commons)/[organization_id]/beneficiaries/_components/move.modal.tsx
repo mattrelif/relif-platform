@@ -17,9 +17,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
 type Props = {
+    beneficiary: BeneficiarySchema;
+    refreshList?: () => void;
     moveDialogOpenState: boolean;
     setMoveDialogOpenState: Dispatch<SetStateAction<boolean>>;
 };

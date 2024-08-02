@@ -10,6 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -19,13 +20,33 @@ import { SlOptions } from "react-icons/sl";
 import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
 
-const Card = (): ReactNode => {
+type Props = BeneficiarySchema & {
+    refreshList: () => void;
+};
+
+const calculateAge = (birthdate: string): number => {
+    const birthDate = new Date(birthdate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    return age;
+};
+
+const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 5).join("/");
-    const userID = 123456;
+    const beneficiaryPath = pathname.split("/").slice(0, 5).join("/");
+    const housingPath = pathname.split("/").slice(0, 4).join("/");
+
+    const age = calculateAge(data.birthdate);
+    const isUnderage = age < 18;
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
@@ -35,27 +56,23 @@ const Card = (): ReactNode => {
                     <AvatarFallback className="bg-relif-orange-200 text-white">AV</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="text-sm text-slate-900 font-bold">
-                        Anthony Vinicius Mota Silva
-                    </span>
+                    <span className="text-sm text-slate-900 font-bold">{data?.full_name}</span>
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        Abrigo Santo Agostino (Since Mar 04, 2023)
+                        {/* TODO: NAME */}
+                        {data?.current_housing_id}
                     </span>
-                    <div></div>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                        <FaBirthdayCake /> Feb 27, 2000
+                        <FaBirthdayCake /> {data.birthdate} ({age} years old)
                     </span>
                     <div className="flex mt-2 gap-2">
-                        <span>
+                        {isUnderage && (
                             <Badge className="bg-yellow-300 text-slate-900">Underage</Badge>
-                        </span>
-                        <span>
-                            <Badge className="bg-blue-600">Men</Badge>
-                        </span>
-                        <span>
-                            <Badge className="bg-pink-500">Woman</Badge>
-                        </span>
+                        )}
+                        {/* TODO: GENDER */}
+                        {/* <Badge className={data.gender === "male" ? "bg-blue-600" : "bg-pink-500"}>
+                            {data.gender === "male" ? "Male" : "Female"}
+                        </Badge> */}
                     </div>
                 </div>
             </div>
@@ -68,12 +85,16 @@ const Card = (): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${userID}`}>Profile</Link>
+                            <Link href={`${beneficiaryPath}/${data.id}`}>Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>View housing</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`${housingPath}/${data.current_housing_id}`}>
+                                View housing
+                            </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${userID}/edit`}>
+                            <Link href={`${beneficiaryPath}/${data.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
                                     Edit beneficiary
@@ -105,11 +126,15 @@ const Card = (): ReactNode => {
             </div>
 
             <RemoveModal
+                beneficiary={data}
+                refreshList={refreshList}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />
 
             <MoveModal
+                beneficiary={data}
+                refreshList={refreshList}
                 moveDialogOpenState={moveDialogOpenState}
                 setMoveDialogOpenState={setMoveDialogOpenState}
             />

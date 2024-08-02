@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { ReactNode } from "react";
 import { MdSearch } from "react-icons/md";
 
+import { HousingList } from "./_components/list.layout";
 import { Toolbar } from "./_components/toolbar.layout";
-import { HousingList } from "./housingList.layout";
 
 export default function Page(): ReactNode {
     // const [housings, setHousings] = useState<HousingSchema[] | []>([]);

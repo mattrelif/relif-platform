@@ -1,4 +1,5 @@
 import { client } from "@/lib/axios-client";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "beneficiaries";
@@ -10,9 +11,22 @@ export async function createBeneficiary(): Promise<AxiosResponse> {
     });
 }
 
-export async function getBeneficiaryById(beneficiaryId: string): Promise<AxiosResponse> {
+export async function getBeneficiaryById(
+    beneficiaryId: string
+): Promise<AxiosResponse<BeneficiarySchema>> {
     return client.request({
         url: `${PREFIX}/${beneficiaryId}`,
+        method: "GET",
+    });
+}
+
+export async function getBeneficiariesByOrganizationID(
+    organizationId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: BeneficiarySchema[] }>> {
+    return client.request({
+        url: `${PREFIX}/${organizationId}/beneficiaries?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

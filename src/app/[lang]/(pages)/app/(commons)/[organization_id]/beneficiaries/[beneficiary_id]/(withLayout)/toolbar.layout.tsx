@@ -2,15 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoMdMove } from "react-icons/io";
-import { MoveModal } from "../../move.modal";
-import { RemoveModal } from "../../remove.modal";
+import { MoveModal } from "../../_components/move.modal";
+import { RemoveModal } from "../../_components/remove.modal";
 
-const Toolbar = (): ReactNode => {
+type Props = {
+    beneficiary: BeneficiarySchema;
+};
+
+const Toolbar = ({ beneficiary }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
@@ -77,11 +82,13 @@ const Toolbar = (): ReactNode => {
             </div>
 
             <RemoveModal
+                beneficiary={beneficiary}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />
 
             <MoveModal
+                beneficiary={beneficiary}
                 moveDialogOpenState={moveDialogOpenState}
                 setMoveDialogOpenState={setMoveDialogOpenState}
             />

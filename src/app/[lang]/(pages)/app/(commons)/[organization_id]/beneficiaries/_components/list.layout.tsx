@@ -8,16 +8,19 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { findHousingsByOrganizationId } from "@/repository/organization.repository";
-import { HousingSchema } from "@/types/housing.types";
+import { getBeneficiariesByOrganizationID } from "@/repository/beneficiary.repository";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
-import { Card } from "./_components/card.layout";
+import { Card } from "./card.layout";
 
-const HousingList = (): ReactNode => {
-    const [housings, setHousings] = useState<{ count: number; data: HousingSchema[] } | null>(null);
+const BeneficiaryList = (): ReactNode => {
+    const [beneficiaries, setBeneficiaries] = useState<{
+        count: number;
+        data: BeneficiarySchema[];
+    } | null>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
@@ -28,12 +31,12 @@ const HousingList = (): ReactNode => {
             const currentUser: UserSchema = await getFromLocalStorage("r_ud");
 
             if (currentUser.organization_id) {
-                const response = await findHousingsByOrganizationId(
+                const response = await getBeneficiariesByOrganizationID(
                     currentUser.organization_id,
                     offset,
                     LIMIT
                 );
-                setHousings(response.data);
+                setBeneficiaries(response.data);
             } else {
                 throw new Error();
             }
@@ -49,7 +52,7 @@ const HousingList = (): ReactNode => {
         getHousingList();
     }, [offset]);
 
-    const totalPages = housings ? Math.ceil(housings.count / LIMIT) : 0;
+    const totalPages = beneficiaries ? Math.ceil(beneficiaries.count / LIMIT) : 0;
     const currentPage = offset / LIMIT + 1;
 
     const handlePageChange = (newPage: number) => {
@@ -69,15 +72,21 @@ const HousingList = (): ReactNode => {
                 </span>
             )}
 
-            {!isLoading && !error && housings && housings.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">No housings found...</span>
+            {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
+                <span className="text-sm text-slate-900 font-medium p-4">
+                    No beneficiaries found...
+                </span>
             )}
 
-            {!isLoading && !error && housings && housings.data.length > 0 && (
+            {!isLoading && !error && beneficiaries && beneficiaries.data.length > 0 && (
                 <>
                     <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                        {housings?.data.map(housing => (
-                            <Card key={housing.id} {...housing} refreshList={getHousingList} />
+                        {beneficiaries?.data.map(beneficiary => (
+                            <Card
+                                key={beneficiary.id}
+                                {...beneficiary}
+                                refreshList={getHousingList}
+                            />
                         ))}
                     </ul>
                     <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
@@ -117,4 +126,4 @@ const HousingList = (): ReactNode => {
     );
 };
 
-export { HousingList };
+export { BeneficiaryList };

@@ -1,29 +1,29 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import Image from "next/image";
-import Link from "next/link";
+import { getBeneficiaryById } from "@/repository/beneficiary.repository";
 import { ReactNode } from "react";
-import { FaBirthdayCake, FaCity, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCity, FaMapMarkerAlt } from "react-icons/fa";
 import { FaBriefcaseMedical, FaHouseChimneyUser } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
-import { MdContactEmergency, MdOutlineFamilyRestroom, MdSpaceDashboard } from "react-icons/md";
+import { MdContactEmergency, MdMail, MdPhone } from "react-icons/md";
 import { Toolbar } from "./toolbar.layout";
 
-export default function Page({
+export default async function Page({
     params,
 }: {
     params: {
         beneficiary_id: string;
     };
-}): ReactNode {
+}): Promise<ReactNode> {
+    const { data: beneficiary } = await getBeneficiaryById(params.beneficiary_id);
+
     return (
         <div className="w-full h-max flex flex-col gap-2">
-            {/* <h2>Beneficiary {params.beneficiary_id}</h2> */}
             <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
                 <Toolbar />
                 <div className="w-[130px] h-[130px] rounded-full overflow-hidden border-4 border-relif-orange-200">
+                    {/* TODO: IMAGE */}
                     {/* <Image */}
                     {/*    src="https://github.com/anthonyvii27.png" */}
                     {/*    alt="Beneficiary image" */}
@@ -33,9 +33,13 @@ export default function Page({
                     {/* /> */}
                 </div>
                 <div className="flex flex-col items-center">
-                    <h2 className="text-xl font-semibold text-slate-900">John Doe Marks</h2>
+                    <h2 className="text-xl font-semibold text-slate-900">
+                        {beneficiary.full_name}
+                    </h2>
                     <span className="text-sm text-slate-500 flex items-center gap-4">
-                        Registered in February 14, 2023<Badge>Active</Badge>
+                        {/* TODO: Format */}
+                        Registered in {beneficiary.created_at}
+                        <Badge>{beneficiary.status}</Badge>
                     </span>
                 </div>
             </div>
@@ -48,10 +52,12 @@ export default function Page({
                     </h3>
                     <span className="text-xs text-slate-50 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        Abrigo Santo Agostino | Currently in space <strong>QUARTO-02</strong> with 2
-                        members of your family.
+                        {/* TODO */}
+                        {beneficiary.current_room_id} | Currently in space{" "}
+                        <strong>{beneficiary.current_room_id}</strong>.
                     </span>
                     <span className="text-xs text-slate-50 flex items-center gap-1">
+                        {/* TODO */}
                         Since Mar 04, 2023
                     </span>
                 </div>
@@ -71,58 +77,67 @@ export default function Page({
                     </h3>
                     <ul>
                         <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Full name:</strong> John Doe Marks
+                            <strong>Full name:</strong> {beneficiary.full_name}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                            <strong>Birthdate:</strong> February 11, 1968 (24 years old)
+                            {/* TODO: Format */}
+                            <strong>Birthdate:</strong> {beneficiary.birthdate} (24 years old)
                             <span>
                                 <Badge className="bg-yellow-300 text-slate-900">Underage</Badge>
                             </span>
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>E-mail:</strong> john.doe@gmail.com
+                            <strong>E-mail:</strong> {beneficiary.email}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                            {/* TODO: Gender */}
                             <strong>Gender:</strong> Men
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap gap-2">
                             <strong>Phones:</strong>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Click to copy to clipboard</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                            <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
-                            <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
                             <HoverCard>
                                 <HoverCardTrigger>
-                                    <Badge className="bg-relif-orange-400 hover:bg-relif-orange-500">
-                                        +2
-                                    </Badge>
+                                    <span className="text-xs text-slate-500 flex items-center gap-2">
+                                        <MdPhone />
+                                        {beneficiary.phones[0] &&
+                                            beneficiary.phones[0].split("_").join(" ")}
+                                        {beneficiary.phones.length >= 2 && (
+                                            <Badge variant="outline">
+                                                +{beneficiary.phones.length - 1}
+                                            </Badge>
+                                        )}
+                                    </span>
                                 </HoverCardTrigger>
                                 <HoverCardContent>
-                                    <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
-                                    <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
+                                    <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                        Phones
+                                    </h3>
+                                    <ul>
+                                        {beneficiary.phones.map(phone => (
+                                            <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                <MdPhone /> {phone.split("_").join(" ")}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </HoverCardContent>
                             </HoverCard>
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Civil status:</strong> Single
+                            <strong>Civil status:</strong> {beneficiary.civil_status}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
                             <strong>Languages spoken:</strong>{" "}
-                            <Badge className="bg-relif-orange-500">Portuguese</Badge>
-                            <Badge className="bg-relif-orange-500">English</Badge>
+                            {beneficiary.spoken_languages?.map(language => (
+                                <Badge className="bg-relif-orange-500">
+                                    {language.toUpperCase()}
+                                </Badge>
+                            ))}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Education:</strong> Graduation
+                            <strong>Education:</strong> {beneficiary.education}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                            {/* TODO: Backend */}
                             <strong>Occupation:</strong> Bus driver
                         </li>
                     </ul>
@@ -134,22 +149,24 @@ export default function Page({
                     </h3>
                     <ul>
                         <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Address:</strong> Rua de Exemplo, 450 - Bloco 12, Apto 405
+                            {/* TODO: alterar */}
+                            <strong>Address:</strong> {beneficiary.address.street_name} -{" "}
+                            {beneficiary.address.street_number}
                         </li>
                         <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
                             <li className="p-2 text-sm text-slate-900">
-                                <strong>City:</strong> São Paulo
+                                <strong>City:</strong> {beneficiary.address.city}
                             </li>
                             <li className="p-2 text-sm text-slate-900">
-                                <strong>State / Province:</strong> São Paulo
+                                <strong>State / Province:</strong> {beneficiary.address.district}
                             </li>
                         </div>
                         <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
                             <li className="p-2 text-sm text-slate-900">
-                                <strong>Zip / Postal Code:</strong> 12345-123
+                                <strong>Zip / Postal Code:</strong> {beneficiary.address.zip_code}
                             </li>
                             <li className="p-2 text-sm text-slate-900">
-                                <strong>Country:</strong> Brazil
+                                <strong>Country:</strong> {beneficiary.address.country}
                             </li>
                         </div>
                     </ul>
@@ -163,48 +180,59 @@ export default function Page({
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
                             <strong>Email:</strong>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Badge className="cursor-pointer">example@gmail.com</Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Click to copy to clipboard</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
                             <HoverCard>
                                 <HoverCardTrigger>
-                                    <Badge className="bg-relif-orange-400 hover:bg-relif-orange-500">
-                                        +2
-                                    </Badge>
+                                    <span className="text-xs text-slate-500 flex items-center gap-2">
+                                        <MdMail />
+                                        {beneficiary.emergency_contacts.emails[0] &&
+                                            beneficiary.emergency_contacts.emails[0]}
+                                        {beneficiary.emergency_contacts.emails.length >= 2 && (
+                                            <Badge variant="outline">
+                                                +{beneficiary.emergency_contacts.emails.length - 1}
+                                            </Badge>
+                                        )}
+                                    </span>
                                 </HoverCardTrigger>
                                 <HoverCardContent>
-                                    <Badge className="cursor-pointer">example2@gmail.com</Badge>
-                                    <Badge className="cursor-pointer">example3@gmail.com</Badge>
+                                    <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                        E-mails
+                                    </h3>
+                                    <ul>
+                                        {beneficiary.emergency_contacts.emails.map(email => (
+                                            <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                <MdMail /> {email}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </HoverCardContent>
                             </HoverCard>
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
                             <strong>Phones:</strong>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Click to copy to clipboard</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
                             <HoverCard>
                                 <HoverCardTrigger>
-                                    <Badge className="bg-relif-orange-400 hover:bg-relif-orange-500">
-                                        +1
-                                    </Badge>
+                                    <span className="text-xs text-slate-500 flex items-center gap-2">
+                                        <MdPhone />
+                                        {beneficiary.emergency_contacts.phones[0] &&
+                                            beneficiary.phones[0].split("_").join(" ")}
+                                        {beneficiary.emergency_contacts.phones.length >= 2 && (
+                                            <Badge variant="outline">
+                                                +{beneficiary.emergency_contacts.phones.length - 1}
+                                            </Badge>
+                                        )}
+                                    </span>
                                 </HoverCardTrigger>
                                 <HoverCardContent>
-                                    <Badge className="cursor-pointer">+55 21 91234-5678</Badge>
+                                    <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                        Phones
+                                    </h3>
+                                    <ul>
+                                        {beneficiary.emergency_contacts.phones.map(phone => (
+                                            <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                <MdPhone /> {phone.split("_").join(" ")}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </HoverCardContent>
                             </HoverCard>
                         </li>
@@ -219,51 +247,62 @@ export default function Page({
                     </h3>
                     <ul>
                         <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Allergies:</strong> Alergia a penicilina
+                            <strong>Allergies:</strong>{" "}
+                            {beneficiary.medical_information.allergies.join(", ")}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Current medications:</strong> Losartana, Inalador de Salbutamol
+                            <strong>Current medications:</strong>{" "}
+                            {beneficiary.medical_information.current_medications.join(", ")}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Chronic Medical Conditions:</strong> Hipertensão, Asma
+                            <strong>Chronic Medical Conditions:</strong>{" "}
+                            {beneficiary.medical_information.recurrent_medical_conditions.join(
+                                ", "
+                            )}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Health Insurance:</strong> Amil, Plano Gold
+                            <strong>Health Insurance:</strong>{" "}
+                            {beneficiary.medical_information.health_insurance_plans.join(", ")}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Blood Type:</strong> O+
+                            <strong>Blood Type:</strong>{" "}
+                            {beneficiary.medical_information.blood_type}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Vaccinations:</strong> Hepatite B, Gripe, COVID-19
+                            <strong>Vaccinations:</strong>{" "}
+                            {beneficiary.medical_information.taken_vaccines.join(", ")}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Mental Health:</strong> Histórico de ansiedade, em tratamento
-                            com psicólogo
+                            <strong>Mental Health:</strong>{" "}
+                            {beneficiary.medical_information.mental_health_history.join(", ")}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Height:</strong> 170cm
+                            <strong>Height:</strong> {beneficiary.medical_information.height}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Weight:</strong> 70kg
+                            <strong>Weight:</strong> {beneficiary.medical_information.weight}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Smoking and Alcohol Consumption Habits:</strong> Não fuma,
-                            consumo social de álcool
+                            <strong>Smoking and Alcohol Consumption Habits:</strong>{" "}
+                            {beneficiary.medical_information.cigarettes_usage},{" "}
+                            {beneficiary.medical_information.alcohol_consumption}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Disabilities:</strong> Deficiência auditiva, uso de aparelho
-                            auditivo
+                            <strong>Disabilities:</strong>{" "}
+                            {beneficiary.medical_information.disabilities.join(", ")}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                            {/* TODO: backend */}
                             <strong>Use of prosthesics or medical devices:</strong> Uso de
                             marca-passo
                         </li>
+                        {/* TODO: REST... */}
                         <Button variant="link" className="p-0 pl-2">
                             See more
                         </Button>
                     </ul>
                 </div>
-                <div className="w-full grow border-[1px] border-relif-orange-200 rounded-lg overflow-hidden">
+                {/* <div className="w-full grow border-[1px] border-relif-orange-200 rounded-lg overflow-hidden">
                     <h3 className="pt-4 pl-4 pr-4 text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                         <MdOutlineFamilyRestroom />
                         Family
@@ -308,7 +347,7 @@ export default function Page({
                             </li>
                         </Link>
                     </ul>
-                </div>
+                </div> */}
             </div>
         </div>
     );
