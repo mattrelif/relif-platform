@@ -1,10 +1,25 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { ReactNode, useState } from "react";
 import { MdAdd } from "react-icons/md";
 
 const Choose = (): ReactNode => {
+    const router = useRouter();
+    const [token, setToken] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleJoinAnOrganization = async () => {
+        try {
+          // TODO
+        } catch {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="w-[700px] h-max border border-slate-200 rounded-lg">
             <h1 className="text-slate-900 font-bold text-xl flex items-center justify-center w-full border-b-[1px] border-slate-200 p-6">
@@ -23,9 +38,13 @@ const Choose = (): ReactNode => {
                     <h2 className="text-slate-900 text-base font-semibold">Join an organization</h2>
                     <div className="flex items-end gap-2">
                         <div className="w-full flex flex-col gap-3">
-                            <Input placeholder="Enter the organization token" />
+                            <Input
+                                placeholder="Enter the organization token"
+                                value={token}
+                                onChange={e => setToken(e.target.value)}
+                            />
                         </div>
-                        <Button>Enter</Button>
+                        <Button disabled={isLoading}>Enter</Button>
                     </div>
                 </div>
             </div>

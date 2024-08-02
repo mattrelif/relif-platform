@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -8,30 +9,39 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { SpaceSchema } from "@/types/space.types";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
-import { EditSpace } from "./editSpace.layout";
-import { RemoveSpaceModal } from "./removeSpace.modal";
-import { ViewSpace } from "./viewSpace.layout";
+import { EditSpace } from "./edit.layout";
+import { ViewSpace } from "./overview.layout";
+import { RemoveSpaceModal } from "./remove.modal";
 
-type Props = {
-    status: "available" | "full" | "overCrowded";
+type Props = SpaceSchema & {
+    refreshList: () => void;
 };
 
-const SpaceCard = ({ status }: Props): ReactNode => {
+const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     const [viewSheetOpenState, setViewSheetOpenState] = useState(false);
     const [editSheetOpenState, setEditSheetOpenState] = useState(false);
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
-    const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 5).join("/");
+    const getStatus = () => {
+        if (data.available_vacancies < 0) {
+            return "SUPERCROWDED";
+        } else if (data.total_vacancies > data.available_vacancies) {
+            return "AVAILABLE";
+        } else {
+            return "FULL";
+        }
+    };
+
+    const status = getStatus();
 
     const statusColor =
-        status === "available"
+        status === "AVAILABLE"
             ? "border-l-green-500"
-            : status === "full"
+            : status === "FULL"
               ? "border-l-red-600"
               : "border-l-slate-900";
 
@@ -43,10 +53,15 @@ const SpaceCard = ({ status }: Props): ReactNode => {
             )}
         >
             <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">QUARTO-02</span>
-                <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                    2/5 beds available
-                </span>
+                <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                        {data?.available_vacancies || 0}/{data.total_vacancies || 0} beds available
+                    </span>
+                    <span>
+                        <Badge className={`${statusColor}`}>{status}</Badge>
+                    </span>
+                </div>
             </div>
             <div className="flex items-start">
                 <DropdownMenu>
@@ -76,16 +91,21 @@ const SpaceCard = ({ status }: Props): ReactNode => {
             </div>
 
             <ViewSpace
+                space={data}
                 sheetOpenState={viewSheetOpenState}
                 setSheetOpenState={setViewSheetOpenState}
             />
 
             <EditSpace
+                space={data}
+                refreshList={refreshList}
                 sheetOpenState={editSheetOpenState}
                 setSheetOpenState={setEditSheetOpenState}
             />
 
             <RemoveSpaceModal
+                space={data}
+                refreshList={refreshList}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />

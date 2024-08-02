@@ -2,13 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HousingSchema } from "@/types/housing.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { RemoveModal } from "../_components/remove.modal";
 
-const Toolbar = (): ReactNode => {
+type Props = {
+    housing: HousingSchema;
+};
+
+const Toolbar = ({ housing }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
@@ -58,6 +63,7 @@ const Toolbar = (): ReactNode => {
             </div>
 
             <RemoveModal
+                housing={housing}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />

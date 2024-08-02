@@ -5,7 +5,6 @@ import { UserDropdown } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -13,7 +12,6 @@ import { HiMiniBellAlert } from "react-icons/hi2";
 import { MdSettings } from "react-icons/md";
 
 const Header = (): ReactNode => {
-    const withNotifications = true;
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
@@ -25,16 +23,7 @@ const Header = (): ReactNode => {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                            <Button
-                                variant="icon"
-                                asChild
-                                className={cn(
-                                    "w-7 h-7 p-0",
-                                    withNotifications
-                                        ? "border-relif-orange-200 text-relif-orange-200 hover:border-relif-orange-400 hover:text-relif-orange-400"
-                                        : undefined
-                                )}
-                            >
+                            <Button variant="icon" asChild className="w-7 h-7 p-0">
                                 <Link href="#">
                                     <HiMiniBellAlert />
                                 </Link>

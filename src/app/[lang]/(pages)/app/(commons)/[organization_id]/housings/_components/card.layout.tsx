@@ -9,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { HousingSchema } from "@/types/housing.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -16,22 +17,27 @@ import { FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 import { RemoveModal } from "./remove.modal";
 
-const Card = (): ReactNode => {
+type Props = HousingSchema & {
+    refreshList: () => void;
+};
+
+const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
-    const housingId = 123456;
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">Abrigo Santo Agostino</span>
+                <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <FaMapMarkerAlt />
-                    1234 Elm Street, Apt 56B - Springfield, IL 62704 - United States
+                    {/* TODO: Address */}
+                    {`${data?.address.street_name}, ${data?.address.street_number} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
                 <div className="flex flex-col gap-2 mt-4">
+                    {/* TODO: backend */}
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         346 beneficiaries (84% occupied)
                     </span>
@@ -63,11 +69,11 @@ const Card = (): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${housingId}`}>View housing</Link>
+                            <Link href={`${urlPath}/${data?.id}`}>View housing</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${housingId}/edit`}>
+                            <Link href={`${urlPath}/${data?.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
                                     Edit housing
@@ -84,12 +90,15 @@ const Card = (): ReactNode => {
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at Sep 14, 2022
+                        {/* TODO: FORMAT */}
+                        Created at {data.created_at}
                     </span>
                 </div>
             </div>
 
             <RemoveModal
+                housing={data}
+                refreshList={refreshList}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />

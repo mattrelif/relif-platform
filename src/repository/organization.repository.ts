@@ -1,4 +1,5 @@
 import { client } from "@/lib/axios-client";
+import { HousingSchema } from "@/types/housing.types";
 import {
     CreateOrganizationRequest,
     OrganizationDataAccessRequestSchema,
@@ -43,11 +44,12 @@ export async function updateOrganization(
     });
 }
 
-export async function findAllOrganizations(): Promise<
-    AxiosResponse<{ count: number; data: OrganizationSchema[] }>
-> {
+export async function findAllOrganizations(
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: OrganizationSchema[] }>> {
     return client.request({
-        url: `${PREFIX}`,
+        url: `${PREFIX}?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
@@ -105,9 +107,13 @@ export async function findUpdateOrganizationTypeRequestsByOrganizationId(
     });
 }
 
-export async function findHousingsByOrganizationId(orgId: string): Promise<AxiosResponse> {
+export async function findHousingsByOrganizationId(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: HousingSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/housings`,
+        url: `${PREFIX}/${orgId}/housings?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

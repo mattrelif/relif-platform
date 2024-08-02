@@ -9,38 +9,42 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { getHousingById } from "@/repository/housing.repository";
 import { ReactNode } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
 import { MdSearch, MdSpaceDashboard } from "react-icons/md";
-import { CreateSpace } from "./_components/createSpace.layout";
-import { InventoryCard } from "./_components/inventoryCard.layout";
-import { SpaceCard } from "./_components/spaceCard.layout";
-import { BeneficiaryList } from "./beneficiaries/list.layout";
+import { BeneficiaryList } from "./_beneficiaries/list.layout";
+import { InventoryCard } from "./_inventory/inventoryCard.layout";
+import { SpaceList } from "./_spaces/list.layout";
 import { Toolbar } from "./toolbar.layout";
 
-export default function Page({
+export default async function Page({
     params,
 }: {
     params: {
         housing_id: string;
     };
-}): ReactNode {
+}): Promise<ReactNode> {
+    const { data: housingData } = await getHousingById(params.housing_id);
+
     return (
         <div className="p-2 w-full h-max flex flex-col gap-2">
             <div className="w-full h-max p-4 rounded-lg border border-dashed border-relif-orange-200">
                 <div className="flex flex-col w-full">
-                    <Toolbar />
+                    <Toolbar housing={housingData} />
                     <h1 className="text-slate-900 font-bold text-2xl mt-6 pb-6 flex items-center gap-4">
                         <FaHouseChimneyUser />
-                        Abrigo Santo Agostino
+                        {housingData.name}
                     </h1>
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        1234 Elm Street, Apt 56B - Springfield, IL 62704 - United States
+                        {/* TODO: Address */}
+                        {`${housingData?.address.street_name}, ${housingData?.address.street_number} - ${housingData?.address.city}, ${housingData?.address.district} | ${housingData?.address.zip_code} - ${housingData?.address.country}`}
                     </span>
                     <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                        Created at Mar 04, 2023
+                        {/* TODO: Format */}
+                        Created at {housingData.created_at}
                     </span>
                 </div>
             </div>
@@ -50,6 +54,7 @@ export default function Page({
                     <div className="w-ful h-max p-4 rounded-lg bg-relif-orange-500 flex justify-between">
                         <div className="flex flex-col w-full">
                             <h2 className="text-white font-bold text-base">Overview</h2>
+                            {/* TODO: Backend */}
                             <div className="mt-2 pt-2 border-t-[1px] border-relif-orange-400 w-full flex flex-col gap-1">
                                 <span className="text-white text-sm flex items-center gap-2">
                                     <FaUsers /> 343 beneficiaries, 28 slots available
@@ -60,58 +65,11 @@ export default function Page({
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
-                        <div className="w-full flex flex-wrap items-center gap-2 justify-between">
-                            <h3 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                                <MdSpaceDashboard />
-                                Spaces
-                            </h3>
-                            <CreateSpace />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <MdSearch className="text-slate-400 text-2xl" />
-                            <Input type="text" placeholder="Search" className="w-full h-8" />
-                        </div>
-                        <div className="w-full h-[calc(100vh-583px)] border border-slate-200 rounded-md overflow-hidden">
-                            <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
-                                <SpaceCard status="available" />
-                                <SpaceCard status="overCrowded" />
-                                <SpaceCard status="available" />
-                                <SpaceCard status="available" />
-                                <SpaceCard status="available" />
-                                <SpaceCard status="full" />
-                                <SpaceCard status="full" />
-                                <SpaceCard status="overCrowded" />
-                            </div>
-                        </div>
-                        <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <PaginationPrevious href="#" />
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#">1</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#">2</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationEllipsis />
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#">4</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationNext href="#" />
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-                        </div>
-                    </div>
+
+                    <SpaceList housingId={params.housing_id} />
                 </div>
 
-                <BeneficiaryList />
+                <BeneficiaryList housingId={params.housing_id} />
 
                 <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
                     <div className="w-full flex flex-wrap items-center gap-2 justify-between">

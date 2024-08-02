@@ -3,31 +3,61 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FaUsers } from "react-icons/fa";
-import { MdAdd, MdSearch } from "react-icons/md";
+import { MdAdd, MdError, MdSearch } from "react-icons/md";
 import { BeneficiaryCard } from "./card.layout";
 
-const BeneficiaryList = (): ReactNode => {
+type Props = {
+    housingId: string;
+};
+
+const BeneficiaryList = ({ housingId }: Props): ReactNode => {
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
+
+    const [toggle, setToggle] = useState<"current" | "historic">("current");
+    const [beneficiaries, setBeneficiaries] = useState<{
+        count: number;
+        data: BeneficiarySchema[];
+    } | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<boolean>(false);
+    const LIMIT = 9999;
+    const OFFSET = 0;
+
+    const getCurrentBeneficiariesList = async () => {
+        (async () => {
+            try {
+                const response = await getBeneficiariesByHousingId(housingId, OFFSET, LIMIT);
+                setBeneficiaries(response.data);
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    };
+
+    useEffect(() => {
+        setIsLoading(true);
+
+        if (toggle === "current") {
+            getCurrentBeneficiariesList();
+        } else {
+            // TODO: HISTORIC LIST
+        }
+    }, [toggle]);
 
     return (
         <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
@@ -38,7 +68,10 @@ const BeneficiaryList = (): ReactNode => {
                 </h3>
 
                 <div className="flex items-center gap-2">
-                    <Select defaultValue="current">
+                    <Select
+                        value={toggle}
+                        onValueChange={(opt: "current" | "historic") => setToggle(opt)}
+                    >
                         <SelectTrigger className="w-[110px] h-8">
                             <SelectValue />
                         </SelectTrigger>
@@ -59,21 +92,33 @@ const BeneficiaryList = (): ReactNode => {
                 <MdSearch className="text-slate-400 text-2xl" />
                 <Input type="text" placeholder="Search" className="w-full h-8" />
             </div>
-            <div className="w-full h-[calc(100vh-459px)] border border-slate-200 rounded-md overflow-hidden">
-                <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
-                    <BeneficiaryCard type="current" />
-                    <BeneficiaryCard type="historic" />
-                    <BeneficiaryCard type="current" />
-                    <BeneficiaryCard type="historic" />
-                    <BeneficiaryCard type="current" />
-                    <BeneficiaryCard type="historic" />
-                    <BeneficiaryCard type="current" />
-                    <BeneficiaryCard type="current" />
-                    <BeneficiaryCard type="current" />
-                    <BeneficiaryCard type="current" />
-                </div>
+            <div className="w-full h-[calc(100vh-394px)] border border-slate-200 rounded-md overflow-hidden">
+                {isLoading && (
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                )}
+
+                {!isLoading && error && (
+                    <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+                        <MdError />
+                        Something went wrong. Please try again later.
+                    </span>
+                )}
+
+                {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
+                    <span className="text-sm text-slate-900 font-medium p-4">
+                        No beneficiaries found...
+                    </span>
+                )}
+
+                {!isLoading && !error && beneficiaries && beneficiaries.data.length > 0 && (
+                    <ul className="w-full h-full overflow-x-hidden overflow-y-scroll">
+                        {beneficiaries?.data.map(beneficiary => (
+                            <BeneficiaryCard type="current" {...beneficiary} />
+                        ))}
+                    </ul>
+                )}
             </div>
-            <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
+            {/* <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
                 <Pagination>
                     <PaginationContent>
                         <PaginationItem>
@@ -96,7 +141,7 @@ const BeneficiaryList = (): ReactNode => {
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
-            </div>
+            </div> */}
         </div>
     );
 };

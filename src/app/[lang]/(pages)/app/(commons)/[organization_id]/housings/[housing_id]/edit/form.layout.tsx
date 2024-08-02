@@ -52,13 +52,19 @@ const Form = ({ housingId }: Props): ReactNode => {
 
             const organizationId = responseData.organization_id;
 
+            toast({
+                title: "Housing Updated Successfully!",
+                description:
+                    "The housing has been created successfully. You can now view or manage it in your dashboard.",
+            });
+
             router.push(`/app/${organizationId}/housings/${housingId}`);
         } catch {
             setIsLoading(false);
             toast({
                 title: "Housing Update Failed",
                 description:
-                    "An error occurred while attempting to update the housing. Please verify the input data and try again. If the problem persists, contact support for further assistance.",
+                    "An error occurred while attempting to create the housing. Please verify the input data and try again. If the problem persists, contact support for further assistance.",
                 variant: "destructive",
             });
         }

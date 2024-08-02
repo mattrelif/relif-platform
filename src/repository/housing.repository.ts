@@ -1,4 +1,5 @@
 import { client } from "@/lib/axios-client";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { CreateHousingRequest, HousingSchema, UpdateHousingRequest } from "@/types/housing.types";
 import { AxiosResponse } from "axios";
 
@@ -14,7 +15,7 @@ export async function createHousing(
     });
 }
 
-export async function getHousingById(housingId: string): Promise<AxiosResponse> {
+export async function getHousingById(housingId: string): Promise<AxiosResponse<HousingSchema>> {
     return client.request({
         url: `${PREFIX}/${housingId}`,
         method: "GET",
@@ -24,7 +25,7 @@ export async function getHousingById(housingId: string): Promise<AxiosResponse> 
 export async function updateHousing(
     housingId: string,
     data: UpdateHousingRequest
-): Promise<AxiosResponse> {
+): Promise<AxiosResponse<HousingSchema>> {
     return client.request({
         url: `${PREFIX}/${housingId}`,
         method: "PUT",
@@ -39,16 +40,24 @@ export async function deleteHousing(housingId: string): Promise<AxiosResponse> {
     });
 }
 
-export async function getSpacesByHousingId(housingId: string): Promise<AxiosResponse> {
+export async function getSpacesByHousingId(
+    housingId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${housingId}/rooms`,
+        url: `${PREFIX}/${housingId}/rooms?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
 
-export async function getBeneficiariesByHousingId(housingId: string): Promise<AxiosResponse> {
+export async function getBeneficiariesByHousingId(
+    housingId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: BeneficiarySchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${housingId}/beneficiaries`,
+        url: `${PREFIX}/${housingId}/beneficiaries?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

@@ -11,36 +11,33 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { findAllOrganizations } from "@/repository/organization.repository";
+import { OrganizationSchema } from "@/types/organization.types";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage } from "@/utils/localStorage";
 import { Check, ChevronsUpDown } from "lucide-react";
-import * as React from "react";
-import { ReactNode, useState } from "react";
-
-const organizations = [
-    {
-        value: "org1",
-        label: "Organization 1",
-    },
-    {
-        value: "org2",
-        label: "Organization 2",
-    },
-    {
-        value: "org3",
-        label: "Organization 3",
-    },
-    {
-        value: "org4",
-        label: "Organization 4",
-    },
-    {
-        value: "org5",
-        label: "Organization 5",
-    },
-];
+import { ReactNode, useEffect, useState } from "react";
 
 const OrgSelector = (): ReactNode => {
+    const [orgs, setOrgs] = useState<{ count: number; data: OrganizationSchema[] } | null>(null);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState("org1");
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+                const currentOrganization = currentUser.organization_id;
+
+                const OFFSET = 0;
+                const LIMIT = 9999;
+                // TODO: ALTERAR ENDPOINT P/ APENAS AQUELES QUE TEM ACESSO
+                const { data: organizations } = await findAllOrganizations(OFFSET, LIMIT);
+                setOrgs(organizations);
+                setValue(currentOrganization ?? "");
+            } catch {}
+        })();
+    }, []);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -52,7 +49,7 @@ const OrgSelector = (): ReactNode => {
                     className="h-[40px] w-full justify-between "
                 >
                     {value
-                        ? organizations.find(organization => organization.value === value)?.label
+                        ? orgs?.data.find(org => org.id === value)?.name
                         : "Select organization..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -63,10 +60,10 @@ const OrgSelector = (): ReactNode => {
                     <CommandEmpty>No organization found.</CommandEmpty>
                     <CommandList>
                         <CommandGroup>
-                            {organizations.map(organization => (
+                            {orgs?.data?.map(org => (
                                 <CommandItem
-                                    key={organization.value}
-                                    value={organization.value}
+                                    key={org.id}
+                                    value={org.id}
                                     onSelect={currentValue => {
                                         setValue(currentValue === value ? "" : currentValue);
                                         setOpen(false);
@@ -75,12 +72,10 @@ const OrgSelector = (): ReactNode => {
                                     <Check
                                         className={cn(
                                             "mr-2 h-4 w-4",
-                                            value === organization.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
+                                            value === org.id ? "opacity-100" : "opacity-0"
                                         )}
                                     />
-                                    {organization.label}
+                                    {org.name}
                                 </CommandItem>
                             ))}
                         </CommandGroup>
