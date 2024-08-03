@@ -129,13 +129,6 @@ export async function findJoinPlatformInvitesByOrganizationId(
     });
 }
 
-export async function findVoluntaryPeopleByOrganizationID(orgId: string): Promise<AxiosResponse> {
-    return client.request({
-        url: `${PREFIX}/${orgId}/voluntary-people`,
-        method: "GET",
-    });
-}
-
 export async function findProductTypesByOrganizationId(orgId: string): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${orgId}/product-types`,

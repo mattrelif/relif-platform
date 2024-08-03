@@ -27,7 +27,11 @@ type Props = {
     setMoveDialogOpenState: Dispatch<SetStateAction<boolean>>;
 };
 
-const MoveModal = ({ moveDialogOpenState, setMoveDialogOpenState }: Props): ReactNode => {
+const MoveModal = ({
+    beneficiary,
+    moveDialogOpenState,
+    setMoveDialogOpenState,
+}: Props): ReactNode => {
     const { toast } = useToast();
     const [selectedHousing, setSelectedHousing] = useState("");
 
@@ -50,17 +54,22 @@ const MoveModal = ({ moveDialogOpenState, setMoveDialogOpenState }: Props): Reac
         <Dialog open={moveDialogOpenState} onOpenChange={setMoveDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
+                    <DialogTitle className="pb-3">Confirm Beneficiary Move</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This will permanently delete the beneficiary
-                        below.
+                        You are about to move the beneficiary to a different location. Please ensure
+                        that this is the intended action before proceeding, as it may affect their
+                        current housing arrangements.
                     </DialogDescription>
+
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
-                            Anthony Vinicius Mota Silva
+                            {beneficiary.full_name}
                         </span>
                         <span className="text-xs text-slate-500">
-                            <strong>Current:</strong>Abrigo Santo Agostino (housed on QUARTO-02)
+                            <strong>Current:</strong>
+                            {/* TODO: NAMES */}
+                            {beneficiary.current_housing_id} (housed on{" "}
+                            {beneficiary.current_room_id})
                         </span>
                     </div>
                     <div className="pt-4 flex flex-col gap-2">

@@ -22,13 +22,8 @@ export default function Page(): ReactNode {
                 </h1>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="firstName">First name *</Label>
-                    <Input id="firstName" name="firstName" type="text" defaultValue="" />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="lastName">Last name *</Label>
-                    <Input id="lastName" name="lastName" type="text" defaultValue="" />
+                    <Label htmlFor="fullName">Name *</Label>
+                    <Input id="fullName" name="fullName" type="text" defaultValue="" />
                 </div>
 
                 <div className="flex flex-col gap-3">

@@ -17,6 +17,17 @@ export async function getVolunteerById(volunteerId: string): Promise<AxiosRespon
     });
 }
 
+export async function getVoluntariesByOrganizationID(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/voluntary-people?offset=${offset}&limit=${limit}`,
+        method: "GET",
+    });
+}
+
 export async function updateVolunteer(volunteerId: string): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${volunteerId}`,

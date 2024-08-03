@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -9,39 +8,49 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { OrganizationSchema } from "@/types/organization.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import { MdMail } from "react-icons/md";
+import { FaEdit, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
+import { FaHouseChimneyUser } from "react-icons/fa6";
 import { SlOptions } from "react-icons/sl";
-import { RemoveModal } from "./remove.modal";
+import { DisableModal } from "./disable.modal";
 
-const Card = (): ReactNode => {
+type Props = OrganizationSchema & {
+    refreshList: () => void;
+};
+
+const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
-    const userID = 123456;
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">Anthony Silva</span>
+                <span className="text-sm text-slate-900 font-bold">{data.name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    <MdMail />
-                    anthony@example.com
+                    <FaMapMarkerAlt />
+                    {`${data?.address.street_name}, ${data?.address.street_number} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
-                <div className="flex mt-2 gap-2">
-                    <span>
-                        <Badge className="bg-yellow-300 text-slate-900">Dentista</Badge>
+                <div className="flex items-center gap-4">
+                    <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                        {/* TODO: BACKEND */}
+                        <FaUsers /> 6 users
                     </span>
-                    <span>
-                        <Badge className="bg-yellow-300 text-slate-900">Serviços Gerais</Badge>
+                    <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                        {/* TODO: BACKEND */}
+                        <FaHouseChimneyUser /> 8 housings
                     </span>
                 </div>
+                <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                    <FaMapMarkerAlt />
+                    {/* TODO: CREATOR NAME */}
+                    {data.creator_id}
+                </span>
             </div>
-
             <div className="flex flex-col items-end justify-between">
                 <DropdownMenu>
                     <DropdownMenuTrigger>
@@ -51,37 +60,32 @@ const Card = (): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${userID}`}>Profile</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>View housing</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${userID}/edit`}>
-                                <span className="flex items-center gap-2">
-                                    <FaEdit className="text-xs" />
-                                    Edit beneficiary
-                                </span>
+                            <Link href={`/app/admin/organizations/${data.id}`}>
+                                View organization
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaTrash className="text-xs" />
-                                Remove beneficiary
-                            </span>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Link href="#">
+                                <span className="flex items-center gap-2">
+                                    <FaEdit className="text-xs" />
+                                    Disable access
+                                </span>
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at Sep 14, 2022
-                    </span>
-                    <span>
-                        <Badge>Active</Badge>
+                        {/* TODO: FORMAT */}
+                        Created at {data.created_at}
                     </span>
                 </div>
             </div>
 
-            <RemoveModal
+            <DisableModal
+                refreshList={refreshList}
+                organization={data}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />
