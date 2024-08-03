@@ -1,5 +1,5 @@
 import { client } from "@/lib/axios-client";
-import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { BeneficiarySchema, CreateBeneficiaryRequest } from "@/types/beneficiary.types";
 import { HousingSchema } from "@/types/housing.types";
 import {
     CreateOrganizationRequest,
@@ -145,5 +145,16 @@ export async function getBeneficiariesByOrganizationID(
     return client.request({
         url: `${PREFIX}/${organizationId}/beneficiaries?offset=${offset}&limit=${limit}`,
         method: "GET",
+    });
+}
+
+export async function createBeneficiary(
+    organizationId: string,
+    data: CreateBeneficiaryRequest
+): Promise<AxiosResponse> {
+    return client.request({
+        url: `${PREFIX}/${organizationId}/beneficiaries`,
+        method: "POST",
+        data,
     });
 }

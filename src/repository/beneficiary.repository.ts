@@ -1,15 +1,8 @@
 import { client } from "@/lib/axios-client";
-import { BeneficiarySchema, CreateBeneficiaryRequest } from "@/types/beneficiary.types";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "beneficiaries";
-
-export async function createBeneficiary(data: CreateBeneficiaryRequest): Promise<AxiosResponse> {
-    return client.request({
-        url: `${PREFIX}`,
-        method: "POST",
-    });
-}
 
 export async function getBeneficiaryById(
     beneficiaryId: string

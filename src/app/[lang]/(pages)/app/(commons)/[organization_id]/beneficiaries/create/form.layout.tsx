@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { createBeneficiary } from "@/repository/beneficiary.repository";
+import { createBeneficiary } from "@/repository/organization.repository";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
@@ -35,6 +37,8 @@ const Form = (): ReactNode => {
         e.preventDefault();
 
         try {
+            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore
@@ -81,65 +85,69 @@ const Form = (): ReactNode => {
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
 
-            await createBeneficiary({
-                full_name: data.fullName,
-                birthdate: data.birthDate,
-                email: data.email,
-                gender: data.gender === "other" ? data.otherGender : data.gender,
-                civil_status:
-                    data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
-                education: data.education === "other" ? data.otherEducation : data.education,
-                occupation: data.occupation,
-                spoken_languages: data.languages.split(","),
-                phones: [`${data.countryCode}_${data.phone}`],
-                address: {
-                    address_line_1: data.addressLine1,
-                    address_line_2: data.addressLine2,
-                    city: data.city,
-                    district: data.state,
-                    zip_code: data.postalCode,
-                    country: data.country,
-                },
-                medical_information: {
-                    allergies: data.allergies.split(","),
-                    current_medications: data.currentMedications.split(","),
-                    recurrent_medical_conditions: data.chronicMedicalConditions.split(","),
-                    health_insurance_plans: data.healthInsurance.split(","),
-                    blood_type: data.bloodType,
-                    taken_vaccines: data.vaccinations.split(","),
-                    mental_health_history: data.mentalHealth.split(","),
-                    height: data.height,
-                    weight: data.weight,
-                    addictions: data.addictions.split(","),
-                    disabilities: data.disabilities.split(","),
-                    prosthesis_or_medical_devices: data.prosthesisOrMedicalDevices.split(","),
-                },
-                notes: data.notes,
-                document: [
-                    {
-                        type: data.documentType,
-                        value: data.documentValue,
+            if (currentUser.organization_id) {
+                await createBeneficiary(currentUser.organization_id, {
+                    full_name: data.fullName,
+                    birthdate: data.birthDate,
+                    email: data.email,
+                    gender: data.gender === "other" ? data.otherGender : data.gender,
+                    civil_status:
+                        data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
+                    education: data.education === "other" ? data.otherEducation : data.education,
+                    occupation: data.occupation,
+                    spoken_languages: data.languages.split(","),
+                    phones: [`${data.countryCode}_${data.phone}`],
+                    address: {
+                        address_line_1: data.addressLine1,
+                        address_line_2: data.addressLine2,
+                        city: data.city,
+                        district: data.state,
+                        zip_code: data.postalCode,
+                        country: data.country,
                     },
-                ],
-                emergency_contacts: [
-                    {
-                        phones: [`${data.emergencyContryCode}_${data.emergencyPhone}`],
-                        emails: [data.emergencyEmail],
-                        full_name: data.emergencyName,
-                        relationship:
-                            data.emergencyRelationship === "other"
-                                ? data.otherEmergencyRelationship
-                                : data.emergencyRelationship,
+                    medical_information: {
+                        allergies: data.allergies.split(","),
+                        current_medications: data.currentMedications.split(","),
+                        recurrent_medical_conditions: data.chronicMedicalConditions.split(","),
+                        health_insurance_plans: data.healthInsurance.split(","),
+                        blood_type: data.bloodType,
+                        taken_vaccines: data.vaccinations.split(","),
+                        mental_health_history: data.mentalHealth.split(","),
+                        height: Number(data.height),
+                        weight: Number(data.weight),
+                        addictions: data.addictions.split(","),
+                        disabilities: data.disabilities.split(","),
+                        prosthesis_or_medical_devices: data.prosthesisOrMedicalDevices.split(","),
                     },
-                ],
-            });
+                    notes: data.notes,
+                    document: [
+                        {
+                            type: data.documentType,
+                            value: data.documentValue,
+                        },
+                    ],
+                    emergency_contacts: [
+                        {
+                            phones: [`${data.emergencyContryCode}_${data.emergencyPhone}`],
+                            emails: [data.emergencyEmail],
+                            full_name: data.emergencyName,
+                            relationship:
+                                data.emergencyRelationship === "other"
+                                    ? data.otherEmergencyRelationship
+                                    : data.emergencyRelationship,
+                        },
+                    ],
+                });
 
-            toast({
-                title: "Registration successful",
-                description: "Beneficiary registered successfully!",
-            });
+                toast({
+                    title: "Registration successful",
+                    description: "Beneficiary registered successfully!",
+                });
 
-            router.push(urlPath);
+                router.push(urlPath);
+            } else {
+                throw new Error();
+            }
         } catch (err) {
             toast({
                 title: "Registration Error",
