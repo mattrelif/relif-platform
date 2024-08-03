@@ -3,11 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
 import { updateUser } from "@/repository/user.repository";
 import { UserSchema } from "@/types/user.types";
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 import { FaSave } from "react-icons/fa";
 
 type Props = {
@@ -17,33 +24,6 @@ type Props = {
     setEditUserSheetOpenState: Dispatch<SetStateAction<boolean>>;
 };
 
-type PhoneInputProps = {
-    id: number;
-    defaultCode?: string;
-    defaultNumber?: string;
-};
-
-const PhoneInput = ({ id, defaultCode, defaultNumber }: PhoneInputProps): ReactNode => {
-    return (
-        <div className="w-full flex gap-2">
-            <Input
-                id={`countryCode_${id}`}
-                name={`countryCode_${id}`}
-                type="text"
-                placeholder="e.g. +55"
-                className="w-[30%]"
-                defaultValue={defaultCode}
-            />
-            <Input
-                id={`phone_${id}`}
-                name={`phone_${id}`}
-                type="text"
-                defaultValue={defaultNumber}
-            />
-        </div>
-    );
-};
-
 const UserEdit = ({
     user,
     refreshList,
@@ -51,22 +31,6 @@ const UserEdit = ({
     setEditUserSheetOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
-    const [phoneInputs, setPhoneInputs] = useState<ReactNode[] | []>([]);
-
-    const handleAddPhoneInput = (defaultCode?: string, defaultNumber?: string) => {
-        setPhoneInputs(prevState => [
-            ...prevState,
-            <PhoneInput
-                id={prevState.length + 1}
-                defaultCode={defaultCode}
-                defaultNumber={defaultNumber}
-            />,
-        ]);
-    };
-
-    const handleRemovePhoneInput = (id: number) => {
-        setPhoneInputs(prevState => prevState.filter((input: any) => input.props.id !== id));
-    };
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -80,18 +44,20 @@ const UserEdit = ({
                 firstName: string;
                 lastName: string;
                 role: string;
+                platformRole: "ORG_ADMIN" | "ORG_MEMBER";
+                countryCode: string;
+                phone: string;
             } = Object.fromEntries(formData);
 
-            // TODO: Remove country, password and set phones to dynamic
+            // TODO: Remove country, password
             await updateUser(user.id, {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 email: user.email,
-                country: "Brazil",
-                password: "",
-                phones: user.phones,
+                phones: [`${data.countryCode}_${data.phone}`],
                 preferences: user.preferences,
                 role: data.role,
+                platform_role: data.platformRole,
             });
 
             refreshList();
@@ -112,10 +78,6 @@ const UserEdit = ({
             });
         }
     };
-
-    useEffect(() => {
-        user.phones.map(phone => handleAddPhoneInput(phone.split("_")[0], phone.split("_")[1]));
-    }, []);
 
     return (
         <Sheet open={editUserSheetOpenState} onOpenChange={setEditUserSheetOpenState}>
@@ -175,15 +137,37 @@ const UserEdit = ({
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <div className="w-full flex items-center justify-between">
-                                <Label htmlFor="phone">Phones *</Label>
-                                <Button
-                                    size="sm"
-                                    type="button"
-                                    onClick={() => handleAddPhoneInput("", "")}
-                                >
-                                    Add
-                                </Button>
+                            <Label htmlFor="platformRole">Platform Role *</Label>
+                            <Select defaultValue={user.platform_role} name="platformRole">
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="ORG_MEMBER">Member</SelectItem>
+                                    <SelectItem value="ORG_ADMIN">Admin</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="phone">Phone *</Label>
+                            <div className="w-full flex gap-2">
+                                <Input
+                                    id="countryCode"
+                                    name="countryCode"
+                                    type="text"
+                                    placeholder="e.g. +55"
+                                    className="w-[30%]"
+                                    defaultValue={user?.phones[0].split("_")[0]}
+                                    required
+                                />
+                                <Input
+                                    id="phone"
+                                    name="phone"
+                                    type="text"
+                                    defaultValue={user?.phones[0].split("_")[1]}
+                                    required
+                                />
                             </div>
                         </div>
                     </div>

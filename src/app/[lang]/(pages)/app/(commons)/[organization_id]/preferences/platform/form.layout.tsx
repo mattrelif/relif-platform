@@ -10,62 +10,76 @@ import {
 } from "@/components/ui/select";
 import { updateUser } from "@/repository/user.repository";
 import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromLocalStorage, updateLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
+import { MdError } from "react-icons/md";
 
 const Form = (): ReactNode => {
     const [userData, setUserData] = useState<UserSchema | null>(null);
-    const [language, setLanguage] = useState("english");
-    const [timezone, setTimezone] = useState("UTC+00");
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
-        const ud: UserSchema = getFromLocalStorage("r_ud");
-        setUserData(ud);
-        setLanguage(ud.preferences.language);
-        setLanguage(ud.preferences.timezone);
+        setIsLoading(true);
+        setError(false);
+
+        try {
+            const ud: UserSchema = getFromLocalStorage("r_ud");
+            setUserData(ud);
+        } catch {
+            setError(true);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
     const handleLanguage = async (newLanguage: string): Promise<void> => {
-        setLanguage(newLanguage);
-
         if (userData) {
             await updateUser(userData.id, {
-                first_name: userData.first_name,
-                last_name: userData.last_name,
-                email: userData.email,
-                role: userData.role,
-                phones: userData.phones,
-                // TODO: Remove country e password
-                country: userData.country,
-                password: userData.password,
+                ...userData,
+                preferences: { language: newLanguage, timezone: userData.preferences.timezone },
+            });
+
+            updateLocalStorage("r_ud", {
+                ...userData,
                 preferences: { language: newLanguage, timezone: userData.preferences.timezone },
             });
         }
     };
 
     const handleTimezone = async (newTimezone: string): Promise<void> => {
-        setTimezone(newTimezone);
-
         if (userData) {
             await updateUser(userData.id, {
-                first_name: userData.first_name,
-                last_name: userData.last_name,
-                email: userData.email,
-                role: userData.role,
-                phones: userData.phones,
-                // TODO: Remove country e password
-                country: userData.country,
-                password: userData.password,
+                ...userData,
+                preferences: { language: userData.preferences.language, timezone: newTimezone },
+            });
+
+            updateLocalStorage("r_ud", {
+                ...userData,
                 preferences: { language: userData.preferences.language, timezone: newTimezone },
             });
         }
     };
 
+    if (isLoading)
+        return <h2 className="p-2 text-relif-orange-400 text-sm font-medium">Loading...</h2>;
+
+    if (error)
+        return (
+            <span className="text-sm text-red-600 font-medium flex items-center gap-1">
+                <MdError />
+                Something went wrong. Please try again later.
+            </span>
+        );
+
     return (
         <>
             <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
                 <span className="text-sm text-slate-900 font-semibold">Language</span>
-                <Select defaultValue={language} onValueChange={handleLanguage}>
+                <Select
+                    defaultValue={userData?.preferences.language}
+                    onValueChange={handleLanguage}
+                >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select..." />
                     </SelectTrigger>
@@ -78,7 +92,10 @@ const Form = (): ReactNode => {
             </div>
             <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
                 <span className="text-sm text-slate-900 font-semibold">Timezone</span>
-                <Select defaultValue={timezone} onValueChange={handleTimezone}>
+                <Select
+                    defaultValue={userData?.preferences.timezone}
+                    onValueChange={handleTimezone}
+                >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select..." />
                     </SelectTrigger>

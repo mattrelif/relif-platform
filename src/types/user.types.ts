@@ -8,12 +8,10 @@ export type UserSchema = {
     first_name: string;
     last_name: string;
     email: string;
-    password: string;
     phones: Array<string>;
     role: string;
-    platform_role: string;
+    platform_role: "ORG_MEMBER" | "ORG_ADMIN" | "NO_ORG" | "RELIF_MEMBER";
     status: string;
-    country: string;
     preferences: UserPreferencesSchema;
     created_at: string;
     updated_at: string;
@@ -27,7 +25,7 @@ export type CreateUserRequest = Omit<
 
 export type UpdateUserRequest = Omit<
     UserSchema,
-    "id" | "platform_role" | "status" | "created_at" | "updated_at" | "organization_id"
+    "id" | "status" | "created_at" | "updated_at" | "organization_id"
 >;
 
 export type UpdateUserPreferencesRequest = UserPreferencesSchema;

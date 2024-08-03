@@ -103,7 +103,7 @@ const Form = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="phone">Phones *</Label>
+                    <Label htmlFor="phone">Phone *</Label>
                     <div className="w-full flex gap-2">
                         <Input
                             id="countryCode"

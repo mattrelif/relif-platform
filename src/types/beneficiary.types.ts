@@ -9,8 +9,10 @@ export type BeneficiarySchema = {
     id: string;
     full_name: string;
     email: string;
-    document: DocumentSchema;
+    document: DocumentSchema[];
     birthdate: string;
+    gender: string;
+    occupation: string;
     phones: string[];
     civil_status: string;
     spoken_languages: string[];
@@ -20,7 +22,7 @@ export type BeneficiarySchema = {
     current_housing_id: string;
     current_room_id: string;
     medical_information: MedicalInformationSchema;
-    emergency_contacts: EmergencyContactSchema;
+    emergency_contacts: EmergencyContactSchema[];
     created_at: string;
     updated_at: string;
     notes: string;

@@ -111,8 +111,8 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="bloodType">Blood type</Label>
-                    <Select>
+                    <Label htmlFor="bloodType">Blood type *</Label>
+                    <Select name="bloodType" required>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select blood type..." />
                         </SelectTrigger>
@@ -166,13 +166,25 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="height">Height</Label>
-                    <Input id="height" name="height" type="text" placeholder="e.g. 170cm" />
+                    <Label htmlFor="height">Height (cm) *</Label>
+                    <Input
+                        id="height"
+                        name="height"
+                        type="number"
+                        placeholder="e.g. 170cm"
+                        required
+                    />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="weight">Weight</Label>
-                    <Input id="weight" name="weight" type="text" placeholder="e.g. 80kg" />
+                    <Label htmlFor="weight">Weight (kg) *</Label>
+                    <Input
+                        id="weight"
+                        name="weight"
+                        type="number"
+                        placeholder="e.g. 80kg"
+                        required
+                    />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">

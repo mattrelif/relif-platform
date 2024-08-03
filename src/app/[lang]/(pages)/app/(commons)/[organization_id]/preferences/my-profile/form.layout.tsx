@@ -6,10 +6,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { updateUser } from "@/repository/user.repository";
 import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { getFromLocalStorage, updateLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError, MdSave } from "react-icons/md";
-import { Phones } from "./phones.layout";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
@@ -43,19 +42,27 @@ const Form = (): ReactNode => {
                 firstName: string;
                 lastName: string;
                 role: string;
+                countryCode: string;
+                phone: string;
             } = Object.fromEntries(formData);
 
             if (currentUser) {
-                // TO DO: REMOVER COUNTRY, PASSWORD E ACERTAR PHONES
                 await updateUser(currentUser.id, {
                     first_name: data.firstName,
                     last_name: data.lastName,
                     role: data.role,
-                    email: currentUser?.email,
-                    country: "Brasil",
-                    password: "",
-                    phones: currentUser?.phones,
+                    platform_role: currentUser.platform_role,
+                    email: currentUser.email,
+                    phones: [`${data.countryCode}_${data.phone}`],
                     preferences: currentUser?.preferences,
+                });
+
+                updateLocalStorage("r_ud", {
+                    ...currentUser,
+                    first_name: data.firstName,
+                    last_name: data.lastName,
+                    role: data.role,
+                    phones: [`${data.countryCode}_${data.phone}`],
                 });
 
                 toast({
@@ -141,7 +148,27 @@ const Form = (): ReactNode => {
                             />
                         </div>
 
-                        <Phones />
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="phone">Phone *</Label>
+                            <div className="w-full flex gap-2">
+                                <Input
+                                    id="countryCode"
+                                    name="countryCode"
+                                    type="text"
+                                    placeholder="e.g. +55"
+                                    className="w-[30%]"
+                                    defaultValue={currentUser?.phones[0].split("_")[0]}
+                                    required
+                                />
+                                <Input
+                                    id="phone"
+                                    name="phone"
+                                    type="text"
+                                    defaultValue={currentUser?.phones[0].split("_")[1]}
+                                    required
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <Button

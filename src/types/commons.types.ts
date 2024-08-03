@@ -1,6 +1,6 @@
 export type AddressSchema = {
-    street_name: string;
-    street_number: string;
+    address_line_1: string;
+    address_line_2: string;
     city: string;
     zip_code: string;
     district: string;
@@ -22,9 +22,9 @@ export type MedicalInformationSchema = {
     mental_health_history: string[];
     height: number;
     weight: number;
-    cigarettes_usage: boolean;
-    alcohol_consumption: boolean;
+    addictions: string[];
     disabilities: string[];
+    prosthesis_or_medical_devices: string[];
 };
 
 export type EmergencyContactSchema = {

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { findOrganizationByID, updateOrganization } from "@/repository/organization.repository";
 import { OrganizationSchema } from "@/types/organization.types";
+import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError, MdSave } from "react-icons/md";
@@ -21,9 +22,14 @@ const Form = (): ReactNode => {
         setIsLoading(true);
         (async () => {
             try {
-                const user = await getFromLocalStorage("r_ud");
-                const response = await findOrganizationByID(user.organizationId);
-                setOrgData(response.data);
+                const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+
+                if (currentUser.organization_id) {
+                    const response = await findOrganizationByID(currentUser.organization_id);
+                    setOrgData(response.data);
+                } else {
+                    throw new Error();
+                }
             } catch {
                 setError(true);
             } finally {
@@ -55,8 +61,8 @@ const Form = (): ReactNode => {
                     name: orgData.name,
                     // TODO: Remover street_name e street_number
                     address: {
-                        street_name: data.addressLine1,
-                        street_number: data.addressLine2,
+                        address_line_1: data.addressLine1,
+                        address_line_2: data.addressLine2,
                         city: data.city,
                         district: data.state,
                         zip_code: data.zipcode,
@@ -128,7 +134,7 @@ const Form = (): ReactNode => {
                                 name="addressLine1"
                                 type="text"
                                 required
-                                defaultValue={orgData?.address.street_name}
+                                defaultValue={orgData?.address.address_line_1}
                             />
                         </div>
 
@@ -139,7 +145,7 @@ const Form = (): ReactNode => {
                                 name="addressLine2"
                                 type="text"
                                 required
-                                defaultValue={orgData?.address.street_number}
+                                defaultValue={orgData?.address.address_line_2}
                             />
                         </div>
 

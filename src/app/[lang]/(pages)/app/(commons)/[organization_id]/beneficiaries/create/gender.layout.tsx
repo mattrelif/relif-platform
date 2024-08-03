@@ -16,8 +16,8 @@ const Gender = (): ReactNode => {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="gender">Gender</Label>
-            <Select onValueChange={opt => setOption(opt)}>
+            <Label htmlFor="gender">Gender *</Label>
+            <Select name="gender" onValueChange={opt => setOption(opt)}>
                 <SelectTrigger className="w-full" id="gender" defaultValue="male">
                     <SelectValue placeholder="Select..." />
                 </SelectTrigger>
@@ -33,7 +33,7 @@ const Gender = (): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="other-gender" type="text" placeholder="Specify gender" />
+                <Input name="otherGender" type="text" placeholder="Specify gender" />
             )}
         </div>
     );

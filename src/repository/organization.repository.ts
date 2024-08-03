@@ -1,4 +1,5 @@
 import { client } from "@/lib/axios-client";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { HousingSchema } from "@/types/housing.types";
 import {
     CreateOrganizationRequest,
@@ -132,6 +133,17 @@ export async function findJoinPlatformInvitesByOrganizationId(
 export async function findProductTypesByOrganizationId(orgId: string): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${orgId}/product-types`,
+        method: "GET",
+    });
+}
+
+export async function getBeneficiariesByOrganizationID(
+    organizationId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: BeneficiarySchema[] }>> {
+    return client.request({
+        url: `${PREFIX}/${organizationId}/beneficiaries?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

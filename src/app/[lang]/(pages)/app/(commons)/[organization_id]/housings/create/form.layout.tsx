@@ -39,8 +39,8 @@ const Form = (): ReactNode => {
             const { data: responseData } = await createHousing({
                 name: data.name,
                 address: {
-                    street_name: data.addressLine1,
-                    street_number: data.addressLine2,
+                    address_line_1: data.addressLine1,
+                    address_line_2: data.addressLine2,
                     city: data.city,
                     zip_code: data.postalCode,
                     district: data.state,
@@ -51,13 +51,15 @@ const Form = (): ReactNode => {
             const organizationId = responseData.organization_id;
             const housingId = responseData.id;
 
+            console.log(responseData);
+
             toast({
                 title: "Housing Created Successfully!",
                 description:
                     "The housing has been created successfully. You can now view or manage it in your dashboard.",
             });
 
-            router.push(`/app/${organizationId}/housings/${housingId}`);
+            // router.push(`/app/${organizationId}/housings/${housingId}`);
         } catch {
             setIsLoading(false);
             toast({

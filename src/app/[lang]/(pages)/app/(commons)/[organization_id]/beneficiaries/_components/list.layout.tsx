@@ -8,7 +8,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { getBeneficiariesByOrganizationID } from "@/repository/beneficiary.repository";
+import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
@@ -72,13 +72,13 @@ const BeneficiaryList = (): ReactNode => {
                 </span>
             )}
 
-            {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
+            {!isLoading && !error && beneficiaries && beneficiaries.count <= 0 && (
                 <span className="text-sm text-slate-900 font-medium p-4">
                     No beneficiaries found...
                 </span>
             )}
 
-            {!isLoading && !error && beneficiaries && beneficiaries.data.length > 0 && (
+            {!isLoading && !error && beneficiaries && beneficiaries.count > 0 && (
                 <>
                     <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
                         {beneficiaries?.data.map(beneficiary => (
