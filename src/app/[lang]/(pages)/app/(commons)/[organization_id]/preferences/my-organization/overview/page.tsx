@@ -1,5 +1,5 @@
-import { Form } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/overview/form.layout";
 import { ReactNode } from "react";
+import { Form } from "./form.layout";
 
 export default function Page(): ReactNode {
     return (

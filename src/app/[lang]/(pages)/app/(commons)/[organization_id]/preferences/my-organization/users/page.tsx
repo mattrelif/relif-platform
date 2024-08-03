@@ -1,10 +1,10 @@
-import { AddUser } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/users/addUser.layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TabsContent } from "@/components/ui/tabs";
 import { ReactNode } from "react";
 import { MdAdd } from "react-icons/md";
-import { UserList } from "./userList.layout";
+import { AddUser } from "./add.layout";
+import { UserList } from "./list.layout";
 
 export default function Page(): ReactNode {
     return (

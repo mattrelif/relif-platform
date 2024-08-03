@@ -1,7 +1,5 @@
 "use client";
 
-import { UserEdit } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/users/userEdit.layout";
-import { UserRemove } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/users/userRemove.layout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +15,8 @@ import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { MdMail, MdPhone } from "react-icons/md";
 import { SlOptions } from "react-icons/sl";
+import { UserEdit } from "./edit.layout";
+import { UserRemove } from "./remove.layout";
 
 type Props = UserSchema & {
     currentUserId: string;

@@ -61,16 +61,15 @@ const Form = (): ReactNode => {
                 toast({
                     title: "Saved!",
                     description: "The new data was saved successfully.",
-                    variant: "success",
                 });
             } else {
                 throw new Error();
             }
         } catch {
             toast({
-                title: "Invalid entered data",
+                title: "Update Failed",
                 description:
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+                    "An error occurred while attempting to update the data. Please try again later or contact support if the issue persists.",
                 variant: "destructive",
             });
         }

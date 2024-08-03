@@ -16,15 +16,15 @@ import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 type Props = {
     organization: OrganizationSchema;
     refreshList?: () => void;
-    disableDialogOpenState: boolean;
-    setDisableDialogOpenState: Dispatch<SetStateAction<boolean>>;
+    enableDialogOpenState: boolean;
+    setEnableDialogOpenState: Dispatch<SetStateAction<boolean>>;
 };
 
-const DisableModal = ({
+const EnableModal = ({
     organization,
     refreshList,
-    disableDialogOpenState,
-    setDisableDialogOpenState,
+    enableDialogOpenState,
+    setEnableDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
     const router = useRouter();
@@ -43,14 +43,14 @@ const DisableModal = ({
             }
 
             toast({
-                title: "Access Disabled",
+                title: "Access Enabled",
                 description: "Access to the organization was successfully disabled.",
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Disable Access Failed",
+                title: "Enable Access Failed",
                 description:
                     "An error occurred while attempting to disable access to the organization. Please try again later or contact support if the issue persists.",
                 variant: "destructive",
@@ -60,13 +60,13 @@ const DisableModal = ({
 
     if (organization && organization.address) {
         return (
-            <Dialog open={disableDialogOpenState} onOpenChange={setDisableDialogOpenState}>
+            <Dialog open={enableDialogOpenState} onOpenChange={setEnableDialogOpenState}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle className="pb-3">Disable Access?</DialogTitle>
+                        <DialogTitle className="pb-3">Enable Access?</DialogTitle>
                         <DialogDescription>
-                            Are you sure you want to disable access to this housing? This action can
-                            be reversed by re-enabling access later if necessary.
+                            Are you sure you want to re-enable access to this housing? This action
+                            can be reversed by re-enabling access later if necessary.
                         </DialogDescription>
                         <div className="flex flex-col pt-4">
                             <span className="text-sm text-slate-900 font-bold">
@@ -80,7 +80,7 @@ const DisableModal = ({
                         <div className="flex gap-4 pt-5">
                             <Button
                                 variant="outline"
-                                onClick={() => setDisableDialogOpenState(false)}
+                                onClick={() => setEnableDialogOpenState(false)}
                             >
                                 Cancel
                             </Button>
@@ -97,4 +97,4 @@ const DisableModal = ({
     return <div />;
 };
 
-export { DisableModal };
+export { EnableModal };

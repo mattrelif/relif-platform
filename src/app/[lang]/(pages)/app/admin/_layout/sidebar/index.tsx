@@ -17,7 +17,7 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 
 const Sidebar = (): ReactNode => {
     const pathname = usePathname();
-    const activeOption = pathname.split("/")[3] ?? "home";
+    const activeOption = pathname.split("/")[4] ?? "home";
 
     return (
         <nav className="row-span-2 w-[250px] h-[calc(100vh-32px)] bg-slate-50 pr-4 flex flex-col gap-5">

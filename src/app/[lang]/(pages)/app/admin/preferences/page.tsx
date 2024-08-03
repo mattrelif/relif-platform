@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 
 export default function Page(): ReactNode {
     return (
-        <div>
-            <h1>Preferences - Admin</h1>
+        <div className="w-full h-full flex">
+            <h1 className="text-slate-400 font-regular text-base">Choose an option...</h1>
         </div>
     );
 }

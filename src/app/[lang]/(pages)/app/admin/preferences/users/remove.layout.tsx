@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { deleteUser } from "@/repository/user.repository";
@@ -42,9 +42,9 @@ const UserRemove = ({
             });
         } catch {
             toast({
-                title: "Invalid entered data",
+                title: "User Deletion Failed",
                 description:
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+                    "An error occurred while attempting to delete the user. Please try again later or contact support if the issue persists.",
                 variant: "destructive",
             });
         }

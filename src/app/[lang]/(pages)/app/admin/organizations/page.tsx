@@ -9,18 +9,6 @@ import { OrganizationsList } from "./_components/list.layout";
 import { Toolbar } from "./_components/toolbar.layout";
 
 export default function Page(): ReactNode {
-    // const [housings, setHousings] = useState<HousingSchema[] | []>([]);
-
-    // useEffect(() => {
-    //     (async () => {
-    //         try {
-    //           const response = await findHousingsByOrganizationId("");
-    //         } catch(err) {
-
-    //         }
-    //     })()
-    // }, [])
-
     return (
         <div className="p-4 flex flex-col gap-4">
             <div className="flex items-end gap-4 justify-between">

@@ -5,7 +5,7 @@ import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
-import { UserCard } from "./userCard.layout";
+import { UserCard } from "./card.layout";
 
 const UserList = (): ReactNode => {
     const [currentUserId, setCurrentUserId] = useState("");

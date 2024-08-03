@@ -5,7 +5,7 @@ export type OrganizationSchema = {
     name: string;
     description: string;
     address: AddressSchema;
-    Type: string;
+    type: string;
     creator_id: string;
     created_at: string;
     updated_at: string;

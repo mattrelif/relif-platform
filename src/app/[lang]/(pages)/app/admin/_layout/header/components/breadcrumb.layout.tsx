@@ -35,6 +35,7 @@ const LABELS = {
     entry: "Entrypoint",
     admin: "Relif",
     organizations: "Organizations",
+    requests: "Requests",
 };
 
 const Breadcrumb = (): ReactNode => {
