@@ -36,7 +36,8 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
 
             await updateSpace(space.id, {
                 name: data.name,
-                total_vacancies: data.beds,
+                status: space.status,
+                total_vacancies: Number(data.beds),
             });
             refreshList();
 

@@ -27,9 +27,10 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const getStatus = () => {
+        console.log(data.available_vacancies, data.total_vacancies);
         if (data.available_vacancies < 0) {
             return "SUPERCROWDED";
-        } else if (data.total_vacancies > data.available_vacancies) {
+        } else if (data.total_vacancies >= data.available_vacancies) {
             return "AVAILABLE";
         } else {
             return "FULL";
@@ -39,17 +40,13 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     const status = getStatus();
 
     const statusColor =
-        status === "AVAILABLE"
-            ? "border-l-green-500"
-            : status === "FULL"
-              ? "border-l-red-600"
-              : "border-l-slate-900";
+        status === "AVAILABLE" ? "green-500" : status === "FULL" ? "red-600" : "slate-900";
 
     return (
         <li
             className={cn(
                 "w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 border-l-[8px]",
-                statusColor
+                `border-l-${statusColor}`
             )}
         >
             <div className="flex flex-col">
@@ -59,7 +56,7 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
                         {data?.available_vacancies || 0}/{data.total_vacancies || 0} beds available
                     </span>
                     <span>
-                        <Badge className={`${statusColor}`}>{status}</Badge>
+                        <Badge className={`bg-${statusColor}`}>{status}</Badge>
                     </span>
                 </div>
             </div>

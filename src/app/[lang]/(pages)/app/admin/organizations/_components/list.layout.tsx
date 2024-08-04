@@ -88,7 +88,6 @@ const OrganizationsList = (): ReactNode => {
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         // disabled={currentPage === 1}
                                     />
@@ -96,7 +95,6 @@ const OrganizationsList = (): ReactNode => {
                                 {Array.from({ length: totalPages }).map((_, index) => (
                                     <PaginationItem key={index}>
                                         <PaginationLink
-                                            href="#"
                                             onClick={() => handlePageChange(index + 1)}
                                             isActive={index + 1 === currentPage}
                                         >
@@ -106,7 +104,6 @@ const OrganizationsList = (): ReactNode => {
                                 ))}
                                 <PaginationItem>
                                     <PaginationNext
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         // disabled={currentPage === totalPages}
                                     />

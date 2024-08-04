@@ -143,7 +143,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                     </HoverCardContent>
                                 </HoverCard>
                             </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2 flex-wrap">
                                 <strong>Segments:</strong>{" "}
                                 {data.segments?.map(segment => (
                                     <Badge className="bg-relif-orange-500">

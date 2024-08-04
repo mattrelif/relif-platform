@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -31,12 +30,11 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
-                <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                <span className="text-xs text-slate-500 mt-3 flex items-center gap-1">
                     <FaMapMarkerAlt />
                     {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
-                <div className="flex flex-col gap-2 mt-4">
-                    {/* TODO: backend */}
+                {/* <div className="flex flex-col gap-2 mt-4">
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         346 beneficiaries (84% occupied)
                     </span>
@@ -57,7 +55,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             </Badge>
                         </span>
                     </span>
-                </div>
+                </div> */}
             </div>
             <div className="flex flex-col items-end justify-between">
                 <DropdownMenu>

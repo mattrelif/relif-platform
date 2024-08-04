@@ -10,13 +10,13 @@ import {
 } from "@/components/ui/pagination";
 import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
-import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 import { Card } from "./card.layout";
 
 const BeneficiaryList = (): ReactNode => {
+    const pathname = usePathname();
     const [beneficiaries, setBeneficiaries] = useState<{
         count: number;
         data: BeneficiarySchema[];
@@ -28,11 +28,11 @@ const BeneficiaryList = (): ReactNode => {
 
     const getHousingList = async () => {
         try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+            const organizationId = pathname.split("/")[3];
 
-            if (currentUser.organization_id) {
+            if (organizationId) {
                 const response = await getBeneficiariesByOrganizationID(
-                    currentUser.organization_id,
+                    organizationId,
                     offset,
                     LIMIT
                 );
@@ -94,7 +94,6 @@ const BeneficiaryList = (): ReactNode => {
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         // disabled={currentPage === 1}
                                     />
@@ -102,7 +101,6 @@ const BeneficiaryList = (): ReactNode => {
                                 {Array.from({ length: totalPages }).map((_, index) => (
                                     <PaginationItem key={index}>
                                         <PaginationLink
-                                            href="#"
                                             onClick={() => handlePageChange(index + 1)}
                                             isActive={index + 1 === currentPage}
                                         >
@@ -112,7 +110,6 @@ const BeneficiaryList = (): ReactNode => {
                                 ))}
                                 <PaginationItem>
                                     <PaginationNext
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         // disabled={currentPage === totalPages}
                                     />

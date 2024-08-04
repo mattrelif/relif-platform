@@ -10,7 +10,8 @@ export type VoluntarySchema = {
     organization_id: string;
     full_name: string;
     email: string;
-    document: DocumentSchema;
+    gender: string;
+    documents: DocumentSchema[];
     birthdate: string;
     phones: string[];
     address: AddressSchema;

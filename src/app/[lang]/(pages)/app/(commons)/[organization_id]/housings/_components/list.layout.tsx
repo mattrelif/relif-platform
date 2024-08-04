@@ -10,13 +10,13 @@ import {
 } from "@/components/ui/pagination";
 import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { HousingSchema } from "@/types/housing.types";
-import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 import { Card } from "./card.layout";
 
 const HousingList = (): ReactNode => {
+    const pathname = usePathname();
     const [housings, setHousings] = useState<{ count: number; data: HousingSchema[] } | null>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -25,14 +25,10 @@ const HousingList = (): ReactNode => {
 
     const getHousingList = async () => {
         try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+            const organizationId = pathname.split("/")[3];
 
-            if (currentUser.organization_id) {
-                const response = await findHousingsByOrganizationId(
-                    currentUser.organization_id,
-                    offset,
-                    LIMIT
-                );
+            if (organizationId) {
+                const response = await findHousingsByOrganizationId(organizationId, offset, LIMIT);
                 setHousings(response.data);
             } else {
                 throw new Error();
@@ -85,7 +81,6 @@ const HousingList = (): ReactNode => {
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         // disabled={currentPage === 1}
                                     />
@@ -93,7 +88,6 @@ const HousingList = (): ReactNode => {
                                 {Array.from({ length: totalPages }).map((_, index) => (
                                     <PaginationItem key={index}>
                                         <PaginationLink
-                                            href="#"
                                             onClick={() => handlePageChange(index + 1)}
                                             isActive={index + 1 === currentPage}
                                         >
@@ -103,7 +97,6 @@ const HousingList = (): ReactNode => {
                                 ))}
                                 <PaginationItem>
                                     <PaginationNext
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         // disabled={currentPage === totalPages}
                                     />

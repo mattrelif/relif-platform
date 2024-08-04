@@ -4,20 +4,45 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { updateHousing } from "@/repository/housing.repository";
+import { getHousingById, updateHousing } from "@/repository/housing.repository";
 import { HousingSchema } from "@/types/housing.types";
-import { useRouter } from "next/navigation";
-import { ReactNode, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaHouseChimneyUser } from "react-icons/fa6";
-import { MdSave } from "react-icons/md";
+import { MdError, MdSave } from "react-icons/md";
 
-type Props = HousingSchema;
+type Props = {
+    housingId: string;
+};
 
-const Form = (data: Props): ReactNode => {
+const Form = ({ housingId }: Props): ReactNode => {
     const router = useRouter();
+    const pathname = usePathname();
+
     const { toast } = useToast();
-    const [isLoading, setIsLoading] = useState(false);
+    const [data, setData] = useState<HousingSchema | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        setIsLoading(true);
+
+        (async () => {
+            try {
+                if (housingId) {
+                    const response = await getHousingById(housingId);
+                    setData(response.data);
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    }, []);
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -37,7 +62,7 @@ const Form = (data: Props): ReactNode => {
                 country: string;
             } = Object.fromEntries(formData);
 
-            const { data: responseData } = await updateHousing(data.id, {
+            const { data: responseData } = await updateHousing(housingId, {
                 name: data.name,
                 address: {
                     address_line_1: data.addressLine1,
@@ -49,15 +74,14 @@ const Form = (data: Props): ReactNode => {
                 },
             });
 
-            const organizationId = responseData.organization_id;
-
             toast({
                 title: "Housing Updated Successfully!",
                 description:
                     "The housing has been created successfully. You can now view or manage it in your dashboard.",
             });
 
-            router.push(`/app/${organizationId}/housings/${data.id}`);
+            const organizationId = pathname.split("/")[3];
+            router.push(`/app/${organizationId}/housings/${housingId}`);
         } catch {
             setIsLoading(false);
             toast({
@@ -69,100 +93,115 @@ const Form = (data: Props): ReactNode => {
         }
     };
 
-    return (
-        <form className="w-full h-max flex flex-col gap-6" onSubmit={handleSubmit}>
-            <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
-                <FaHouseChimneyUser />
-                Edit housing
-            </h1>
+    if (isLoading)
+        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
 
-            <div className="flex flex-col gap-3">
-                <Label htmlFor="name">Name *</Label>
-                <Input id="name" name="name" type="text" defaultValue={data.name} required />
-            </div>
+    if (!isLoading && error)
+        return (
+            <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+                <MdError />
+                Something went wrong. Please try again later.
+            </span>
+        );
 
-            <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                    <FaMapMarkerAlt /> Address
-                </h2>
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="addressLine1">Address Line 1 *</Label>
-                    <Input
-                        id="addressLine1"
-                        name="addressLine1"
-                        type="text"
-                        required
-                        defaultValue={data.address.address_line_1}
-                    />
-                </div>
+    if (data) {
+        return (
+            <form className="w-full h-max flex flex-col gap-6" onSubmit={handleSubmit}>
+                <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
+                    <FaHouseChimneyUser />
+                    Edit housing
+                </h1>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="addressLine2">Address Line 2</Label>
-                    <Input
-                        id="addressLine2"
-                        name="addressLine2"
-                        type="text"
-                        required
-                        defaultValue={data.address.address_line_2}
-                    />
+                    <Label htmlFor="name">Name *</Label>
+                    <Input id="name" name="name" type="text" defaultValue={data.name} required />
                 </div>
 
-                <div className="w-full flex items-center gap-2">
-                    <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="city">City *</Label>
+                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                        <FaMapMarkerAlt /> Address
+                    </h2>
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="addressLine1">Address Line 1 *</Label>
                         <Input
-                            id="city"
-                            name="city"
+                            id="addressLine1"
+                            name="addressLine1"
                             type="text"
                             required
-                            defaultValue={data.address.city}
+                            defaultValue={data.address.address_line_1}
                         />
                     </div>
 
-                    <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="postalCode">Zip / Postal Code *</Label>
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="addressLine2">Address Line 2</Label>
                         <Input
-                            id="postalCode"
-                            name="postalCode"
+                            id="addressLine2"
+                            name="addressLine2"
                             type="text"
                             required
-                            defaultValue={data.address.zip_code}
+                            defaultValue={data.address.address_line_2}
                         />
+                    </div>
+
+                    <div className="w-full flex items-center gap-2">
+                        <div className="flex flex-col gap-3 w-full">
+                            <Label htmlFor="city">City *</Label>
+                            <Input
+                                id="city"
+                                name="city"
+                                type="text"
+                                required
+                                defaultValue={data.address.city}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-3 w-full">
+                            <Label htmlFor="postalCode">Zip / Postal Code *</Label>
+                            <Input
+                                id="postalCode"
+                                name="postalCode"
+                                type="text"
+                                required
+                                defaultValue={data.address.zip_code}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="w-full flex items-center gap-2">
+                        <div className="flex flex-col gap-3 w-full">
+                            <Label htmlFor="state">State / Province *</Label>
+                            <Input
+                                id="state"
+                                name="state"
+                                type="text"
+                                required
+                                defaultValue={data.address.district}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-3 w-full">
+                            <Label htmlFor="country">Country *</Label>
+                            <Input
+                                id="country"
+                                name="country"
+                                type="text"
+                                required
+                                defaultValue={data.address.country}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <div className="w-full flex items-center gap-2">
-                    <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="state">State / Province *</Label>
-                        <Input
-                            id="state"
-                            name="state"
-                            type="text"
-                            required
-                            defaultValue={data.address.district}
-                        />
-                    </div>
+                <Button className="flex items-center gap-2">
+                    <MdSave size={16} />
+                    Edit housing
+                </Button>
+            </form>
+        );
+    }
 
-                    <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="country">Country *</Label>
-                        <Input
-                            id="country"
-                            name="country"
-                            type="text"
-                            required
-                            defaultValue={data.address.country}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <Button className="flex items-center gap-2">
-                <MdSave size={16} />
-                {!isLoading ? "Edit housing" : "Loading..."}
-            </Button>
-        </form>
-    );
+    return <div />;
 };
 
 export { Form };

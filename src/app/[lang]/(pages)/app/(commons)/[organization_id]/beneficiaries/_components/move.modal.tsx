@@ -23,6 +23,7 @@ import { HousingSchema } from "@/types/housing.types";
 import { SpaceSchema } from "@/types/space.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
+import { usePathname, useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
 type Props = {
@@ -34,10 +35,15 @@ type Props = {
 
 const MoveModal = ({
     beneficiary,
+    refreshList,
     moveDialogOpenState,
     setMoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const router = useRouter();
+    const pathname = usePathname();
+    const backToListPath = pathname.split("/").slice(0, 5).join("/");
+
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
     const [selectedHousing, setSelectedHousing] = useState("");
     const [spaces, setSpaces] = useState<SpaceSchema[] | []>([]);
@@ -84,6 +90,12 @@ const MoveModal = ({
         try {
             // TODO: ENDPOINT
             console.log(selectedHousing, selectedSpace);
+
+            if (refreshList) {
+                refreshList();
+            } else {
+                router.push(backToListPath);
+            }
 
             setMoveDialogOpenState(false);
             toast({
@@ -147,7 +159,7 @@ const MoveModal = ({
                                     <SelectValue placeholder="Select space..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {spaces.map(space => (
+                                    {spaces?.map(space => (
                                         <SelectItem value={space.id}>
                                             {space.name} [{space.available_vacancies} of{" "}
                                             {space.total_vacancies} available]

@@ -16,5 +16,5 @@ export type CreateSpaceRequest = Omit<
 
 export type UpdateSpaceRequest = Omit<
     SpaceSchema,
-    "id" | "housing_id" | "status" | "available_vacancies" | "created_at" | "updated_at"
+    "id" | "housing_id" | "available_vacancies" | "created_at" | "updated_at"
 >;

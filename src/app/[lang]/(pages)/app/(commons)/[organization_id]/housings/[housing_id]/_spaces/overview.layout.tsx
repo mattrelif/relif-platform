@@ -47,7 +47,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
     const getStatus = () => {
         if (space.available_vacancies < 0) {
             return "SUPERCROWDED";
-        } else if (space.total_vacancies > space.available_vacancies) {
+        } else if (space.total_vacancies >= space.available_vacancies) {
             return "AVAILABLE";
         } else {
             return "FULL";
@@ -57,11 +57,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
     const status = getStatus();
 
     const statusColor =
-        status === "AVAILABLE"
-            ? "border-l-green-500"
-            : status === "FULL"
-              ? "border-l-red-600"
-              : "border-l-slate-900";
+        status === "AVAILABLE" ? "green-500" : status === "FULL" ? "red-600" : "slate-900";
 
     return (
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
@@ -71,7 +67,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
                 </SheetHeader>
                 <div className="p-4 rounded-lg border border-relif-orange-200 border-dashed mt-4">
                     <h2 className="w-full text-relif-orange-200 text-xl font-bold flex items-center gap-2">
-                        {space.name} <Badge className={statusColor}>{status}</Badge>
+                        {space.name} <Badge className={`bg-${statusColor}`}>{status}</Badge>
                     </h2>
                     <span className="text-sm text-slate-900">
                         {space.total_vacancies} beds, {space.available_vacancies} available
@@ -80,7 +76,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
                 <h3 className="mt-8 text-slate-900 text-sm font-bold pb-2 flex items-center gap-2">
                     <FaUsers /> Beneficiaries present
                 </h3>
-                <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="border border-slate-200 rounded-lg overflow-hidden h-[calc(100vh-225px)]">
                     {isLoading && (
                         <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                             Loading...

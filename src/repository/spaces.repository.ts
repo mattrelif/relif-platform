@@ -16,6 +16,7 @@ export async function updateSpace(spaceId: string, data: UpdateSpaceRequest): Pr
     return client.request({
         url: `${PREFIX}/${spaceId}`,
         method: "PUT",
+        data,
     });
 }
 

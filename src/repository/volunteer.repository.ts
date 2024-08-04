@@ -16,7 +16,7 @@ export async function getVolunteerById(
 export async function updateVolunteer(
     volunteerId: string,
     data: UpdateVoluntaryRequest
-): Promise<AxiosResponse> {
+): Promise<void> {
     return client.request({
         url: `${PREFIX}/${volunteerId}`,
         method: "PUT",
