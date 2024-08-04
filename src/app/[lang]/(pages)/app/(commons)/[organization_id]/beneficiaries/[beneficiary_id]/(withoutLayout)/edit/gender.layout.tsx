@@ -3,22 +3,47 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
-const Gender = (): ReactNode => {
-    const [option, setOption] = useState("");
+type Props = {
+    defaultValue: string;
+};
+
+const OPTIONS = [
+    "male",
+    "female",
+    "non-binary",
+    "prefer-not-to-say",
+    "transgender",
+    "gender-fluid",
+    "agender",
+    "other",
+];
+
+const Gender = ({ defaultValue }: Props): ReactNode => {
+    const [option, setOption] = useState<string>("other");
+    const [customOption, setCustomOption] = useState<string>("");
+
+    useEffect(() => {
+        if (OPTIONS.includes(defaultValue)) {
+            setOption(defaultValue);
+        } else {
+            setOption("other");
+            setCustomOption(defaultValue);
+        }
+    }, [defaultValue]);
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="gender">Gender</Label>
-            <Select onValueChange={opt => setOption(opt)}>
-                <SelectTrigger className="w-full" id="gender" defaultValue="male">
+            <Label htmlFor="gender">Gender *</Label>
+            <Select name="gender" value={option} onValueChange={opt => setOption(opt)}>
+                <SelectTrigger className="w-full" id="gender">
                     <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -33,7 +58,13 @@ const Gender = (): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="other-gender" type="text" placeholder="Specify gender" />
+                <Input
+                    name="otherGender"
+                    type="text"
+                    placeholder="Specify gender"
+                    value={customOption}
+                    onChange={e => setCustomOption(e.target.value)}
+                />
             )}
         </div>
     );

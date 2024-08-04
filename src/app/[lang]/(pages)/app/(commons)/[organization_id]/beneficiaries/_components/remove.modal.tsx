@@ -12,8 +12,10 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { deleteBeneficiary } from "@/repository/beneficiary.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { usePathname, useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { FaHouseChimneyUser } from "react-icons/fa6";
 
 type Props = {
     beneficiary: BeneficiarySchema;
@@ -73,11 +75,12 @@ const RemoveModal = ({
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
-                            {beneficiary.full_name}
+                            {convertToTitleCase(beneficiary.full_name)}
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                            <FaHouseChimneyUser />
                             {/* TODO: NAME */}
-                            {beneficiary?.current_housing_id}
+                            {beneficiary?.current_housing_id || "Unallocated"}
                         </span>
                     </div>
                     <div className="flex gap-4 pt-5">

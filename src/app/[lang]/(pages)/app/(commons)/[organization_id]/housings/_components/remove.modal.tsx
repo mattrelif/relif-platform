@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { deleteHousing, getBeneficiariesByHousingId } from "@/repository/housing.repository";
@@ -67,6 +67,8 @@ const RemoveModal = ({
                 router.push(backToListPath);
             }
 
+            setRemoveDialogOpenState(false);
+
             toast({
                 title: "Removed!",
                 description: "Housing removed successfully.",
@@ -98,7 +100,7 @@ const RemoveModal = ({
                                 {housing?.name}
                             </span>
                             <span className="text-xs text-slate-500">
-                                {`${housing?.address.street_name}, ${housing?.address.street_number} - ${housing?.address.city}, ${housing?.address.district} | ${housing?.address.zip_code} - ${housing?.address.country}`}
+                                {`${housing?.address.address_line_1}, ${housing?.address.address_line_2} - ${housing?.address.city}, ${housing?.address.district} | ${housing?.address.zip_code} - ${housing?.address.country}`}
                             </span>
                         </div>
 

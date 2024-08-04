@@ -33,8 +33,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <FaMapMarkerAlt />
-                    {/* TODO: Address */}
-                    {`${data?.address.street_name}, ${data?.address.street_number} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
+                    {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
                 <div className="flex flex-col gap-2 mt-4">
                     {/* TODO: backend */}

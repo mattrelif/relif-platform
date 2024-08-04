@@ -31,7 +31,7 @@ const Form = (): ReactNode => {
         };
 
     const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 4).join("/");
+    const urlPath = pathname.split("/").slice(0, 5).join("/");
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -44,7 +44,7 @@ const Form = (): ReactNode => {
             // @ts-ignore
             const data: {
                 fullName: string;
-                birthDate: string;
+                birthdate: string;
                 email: string;
                 gender: string;
                 otherGender: string;
@@ -75,12 +75,12 @@ const Form = (): ReactNode => {
                 weight: number;
                 addictions: string;
                 disabilities: string;
-                prosthesisOrMedicalDevices: string;
+                prothesisOrMedicalDevices: string;
                 notes: string;
                 emergencyName: string;
                 emergencyRelationship: string;
                 otherEmergencyRelationship: string;
-                emergencyContryCode: string;
+                emergencyCountryCode: string;
                 emergencyPhone: string;
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
@@ -88,7 +88,7 @@ const Form = (): ReactNode => {
             if (currentUser.organization_id) {
                 await createBeneficiary(currentUser.organization_id, {
                     full_name: data.fullName,
-                    birthdate: data.birthDate,
+                    birthdate: data.birthdate,
                     email: data.email,
                     gender: data.gender === "other" ? data.otherGender : data.gender,
                     civil_status:
@@ -117,10 +117,10 @@ const Form = (): ReactNode => {
                         weight: Number(data.weight),
                         addictions: data.addictions.split(","),
                         disabilities: data.disabilities.split(","),
-                        prosthesis_or_medical_devices: data.prosthesisOrMedicalDevices.split(","),
+                        prothesis_or_medical_devices: data.prothesisOrMedicalDevices.split(","),
                     },
                     notes: data.notes,
-                    document: [
+                    documents: [
                         {
                             type: data.documentType,
                             value: data.documentValue,
@@ -128,7 +128,7 @@ const Form = (): ReactNode => {
                     ],
                     emergency_contacts: [
                         {
-                            phones: [`${data.emergencyContryCode}_${data.emergencyPhone}`],
+                            phones: [`${data.emergencyCountryCode}_${data.emergencyPhone}`],
                             emails: [data.emergencyEmail],
                             full_name: data.emergencyName,
                             relationship:

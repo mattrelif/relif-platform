@@ -24,7 +24,7 @@ export type MedicalInformationSchema = {
     weight: number;
     addictions: string[];
     disabilities: string[];
-    prosthesis_or_medical_devices: string[];
+    prothesis_or_medical_devices: string[];
 };
 
 export type EmergencyContactSchema = {

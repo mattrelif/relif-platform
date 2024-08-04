@@ -51,15 +51,13 @@ const Form = (): ReactNode => {
             const organizationId = responseData.organization_id;
             const housingId = responseData.id;
 
-            console.log(responseData);
-
             toast({
                 title: "Housing Created Successfully!",
                 description:
                     "The housing has been created successfully. You can now view or manage it in your dashboard.",
             });
 
-            // router.push(`/app/${organizationId}/housings/${housingId}`);
+            router.push(`/app/${organizationId}/housings/${housingId}`);
         } catch {
             setIsLoading(false);
             toast({

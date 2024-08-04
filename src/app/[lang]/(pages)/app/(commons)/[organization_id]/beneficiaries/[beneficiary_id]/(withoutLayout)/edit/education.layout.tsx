@@ -9,15 +9,43 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
-const Education = (): ReactNode => {
-    const [option, setOption] = useState("");
+type Props = {
+    defaultValue: string;
+};
+
+const OPTIONS = [
+    "incomplete-elementary-education",
+    "complete-elementary-education",
+    "incomplete-high-school",
+    "complete-high-school",
+    "vocational-education",
+    "incomplete-higher-education",
+    "complete-higher-education",
+    "postgraduate",
+    "masters-degree",
+    "doctorate",
+    "postdoctorate",
+];
+
+const Education = ({ defaultValue }: Props): ReactNode => {
+    const [option, setOption] = useState<string>("other");
+    const [customOption, setCustomOption] = useState<string>("");
+
+    useEffect(() => {
+        if (OPTIONS.includes(defaultValue)) {
+            setOption(defaultValue);
+        } else {
+            setOption("other");
+            setCustomOption(defaultValue);
+        }
+    }, [defaultValue]);
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="education">Education</Label>
-            <Select onValueChange={opt => setOption(opt)}>
+            <Label htmlFor="education">Education *</Label>
+            <Select name="education" value={option} onValueChange={setOption}>
                 <SelectTrigger className="w-full" id="education">
                     <SelectValue placeholder="Select..." />
                 </SelectTrigger>
@@ -45,7 +73,13 @@ const Education = (): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="other-education" type="text" placeholder="Specify education" />
+                <Input
+                    name="otherEducation"
+                    type="text"
+                    placeholder="Specify education"
+                    value={customOption}
+                    onChange={e => setCustomOption(e.target.value)}
+                />
             )}
         </div>
     );

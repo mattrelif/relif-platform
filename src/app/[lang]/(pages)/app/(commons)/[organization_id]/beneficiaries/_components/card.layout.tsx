@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -52,27 +53,31 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex gap-4">
                 <Avatar className="w-14 h-14">
-                    <AvatarImage src="https://github.com/anthonyvii27.png" />
-                    <AvatarFallback className="bg-relif-orange-200 text-white">AV</AvatarFallback>
+                    <AvatarFallback className="bg-relif-orange-200 text-white">
+                        {data.full_name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="text-sm text-slate-900 font-bold">{data?.full_name}</span>
+                    <span className="text-sm text-slate-900 font-bold">
+                        {convertToTitleCase(data?.full_name)}
+                    </span>
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         <FaMapMarkerAlt />
                         {/* TODO: NAME */}
-                        {data?.current_housing_id}
+                        {data?.current_room_id ? data?.current_room_id : "Unallocated"}
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                         <FaBirthdayCake /> {data.birthdate} ({age} years old)
                     </span>
                     <div className="flex mt-2 gap-2">
+                        <Badge>{convertToTitleCase(data.gender)}</Badge>
                         {isUnderage && (
                             <Badge className="bg-yellow-300 text-slate-900">Underage</Badge>
                         )}
+                        {!data?.current_room_id && (
+                            <Badge className="bg-slate-200 text-slate-900">Unallocated</Badge>
+                        )}
                         {/* TODO: GENDER */}
-                        {/* <Badge className={data.gender === "male" ? "bg-blue-600" : "bg-pink-500"}>
-                            {data.gender === "male" ? "Male" : "Female"}
-                        </Badge> */}
                     </div>
                 </div>
             </div>
@@ -87,7 +92,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         <DropdownMenuItem asChild>
                             <Link href={`${beneficiaryPath}/${data.id}`}>Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild disabled={!data.current_housing_id}>
                             <Link href={`${housingPath}/${data.current_housing_id}`}>
                                 View housing
                             </Link>
@@ -117,7 +122,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at Sep 14, 2022
+                        Created at {data.created_at}
                     </span>
                     <span>
                         <Badge>Active</Badge>

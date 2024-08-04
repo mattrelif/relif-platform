@@ -39,8 +39,7 @@ export default async function Page({
                     </h1>
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        {/* TODO: Address */}
-                        {`${housingData?.address.street_name}, ${housingData?.address.street_number} - ${housingData?.address.city}, ${housingData?.address.district} | ${housingData?.address.zip_code} - ${housingData?.address.country}`}
+                        {`${housingData?.address.address_line_1}, ${housingData?.address.address_line_2} - ${housingData?.address.city}, ${housingData?.address.district} | ${housingData?.address.zip_code} - ${housingData?.address.country}`}
                     </span>
                     <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                         {/* TODO: Format */}

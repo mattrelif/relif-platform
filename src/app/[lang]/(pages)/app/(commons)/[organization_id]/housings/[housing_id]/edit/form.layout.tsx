@@ -5,17 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { updateHousing } from "@/repository/housing.repository";
+import { HousingSchema } from "@/types/housing.types";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaHouseChimneyUser } from "react-icons/fa6";
 import { MdSave } from "react-icons/md";
 
-type Props = {
-    housingId: string;
-};
+type Props = HousingSchema;
 
-const Form = ({ housingId }: Props): ReactNode => {
+const Form = (data: Props): ReactNode => {
     const router = useRouter();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
@@ -38,11 +37,11 @@ const Form = ({ housingId }: Props): ReactNode => {
                 country: string;
             } = Object.fromEntries(formData);
 
-            const { data: responseData } = await updateHousing(housingId, {
+            const { data: responseData } = await updateHousing(data.id, {
                 name: data.name,
                 address: {
-                    street_name: data.addressLine1,
-                    street_number: data.addressLine2,
+                    address_line_1: data.addressLine1,
+                    address_line_2: data.addressLine2,
                     city: data.city,
                     zip_code: data.postalCode,
                     district: data.state,
@@ -58,7 +57,7 @@ const Form = ({ housingId }: Props): ReactNode => {
                     "The housing has been created successfully. You can now view or manage it in your dashboard.",
             });
 
-            router.push(`/app/${organizationId}/housings/${housingId}`);
+            router.push(`/app/${organizationId}/housings/${data.id}`);
         } catch {
             setIsLoading(false);
             toast({
@@ -79,7 +78,7 @@ const Form = ({ housingId }: Props): ReactNode => {
 
             <div className="flex flex-col gap-3">
                 <Label htmlFor="name">Name *</Label>
-                <Input id="name" name="name" type="text" defaultValue="" required />
+                <Input id="name" name="name" type="text" defaultValue={data.name} required />
             </div>
 
             <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
@@ -89,35 +88,71 @@ const Form = ({ housingId }: Props): ReactNode => {
 
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="addressLine1">Address Line 1 *</Label>
-                    <Input id="addressLine1" name="addressLine1" type="text" required />
+                    <Input
+                        id="addressLine1"
+                        name="addressLine1"
+                        type="text"
+                        required
+                        defaultValue={data.address.address_line_1}
+                    />
                 </div>
 
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="addressLine2">Address Line 2</Label>
-                    <Input id="addressLine2" name="addressLine2" type="text" required />
+                    <Input
+                        id="addressLine2"
+                        name="addressLine2"
+                        type="text"
+                        required
+                        defaultValue={data.address.address_line_2}
+                    />
                 </div>
 
                 <div className="w-full flex items-center gap-2">
                     <div className="flex flex-col gap-3 w-full">
                         <Label htmlFor="city">City *</Label>
-                        <Input id="city" name="city" type="text" required />
+                        <Input
+                            id="city"
+                            name="city"
+                            type="text"
+                            required
+                            defaultValue={data.address.city}
+                        />
                     </div>
 
                     <div className="flex flex-col gap-3 w-full">
                         <Label htmlFor="postalCode">Zip / Postal Code *</Label>
-                        <Input id="postalCode" name="postalCode" type="text" required />
+                        <Input
+                            id="postalCode"
+                            name="postalCode"
+                            type="text"
+                            required
+                            defaultValue={data.address.zip_code}
+                        />
                     </div>
                 </div>
 
                 <div className="w-full flex items-center gap-2">
                     <div className="flex flex-col gap-3 w-full">
                         <Label htmlFor="state">State / Province *</Label>
-                        <Input id="state" name="state" type="text" required />
+                        <Input
+                            id="state"
+                            name="state"
+                            type="text"
+                            required
+                            defaultValue={data.address.district}
+                        />
                     </div>
 
                     <div className="flex flex-col gap-3 w-full">
                         <Label htmlFor="country">Country *</Label>
-                        <Input id="country" name="country" type="text" required />
+                        <Input
+                            id="country"
+                            name="country"
+                            type="text"
+                            required
+                            defaultValue={data.address.country}
+                        />
                     </div>
                 </div>
             </div>
