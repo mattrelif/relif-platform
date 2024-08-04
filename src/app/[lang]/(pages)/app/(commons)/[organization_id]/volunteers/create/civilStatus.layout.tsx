@@ -3,11 +3,11 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { ReactNode, useState } from "react";
 
@@ -16,8 +16,8 @@ const CivilStatus = (): ReactNode => {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="civilStatus">Civil Status</Label>
-            <Select onValueChange={opt => setOption(opt)}>
+            <Label htmlFor="civilStatus">Civil Status *</Label>
+            <Select name="civilStatus" onValueChange={opt => setOption(opt)}>
                 <SelectTrigger className="w-full" id="civilStatus">
                     <SelectValue placeholder="Select..." />
                 </SelectTrigger>
@@ -33,7 +33,7 @@ const CivilStatus = (): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="other-civil-status" type="text" placeholder="Specify civil status" />
+                <Input name="otherCivilStatus" type="text" placeholder="Specify civil status" />
             )}
         </div>
     );

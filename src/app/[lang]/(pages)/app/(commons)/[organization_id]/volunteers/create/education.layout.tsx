@@ -16,8 +16,8 @@ const Education = (): ReactNode => {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="education">Education</Label>
-            <Select onValueChange={opt => setOption(opt)}>
+            <Label htmlFor="education">Education *</Label>
+            <Select name="education" onValueChange={setOption}>
                 <SelectTrigger className="w-full" id="education">
                     <SelectValue placeholder="Select..." />
                 </SelectTrigger>
@@ -45,7 +45,7 @@ const Education = (): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="other-education" type="text" placeholder="Specify education" />
+                <Input name="otherEducation" type="text" placeholder="Specify education" />
             )}
         </div>
     );

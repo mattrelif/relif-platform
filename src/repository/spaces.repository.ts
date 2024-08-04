@@ -5,13 +5,6 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "housing-rooms";
 
-export async function createSpace(): Promise<AxiosResponse> {
-    return client.request({
-        url: `${PREFIX}`,
-        method: "POST",
-    });
-}
-
 export async function getSpaceById(spaceId: string): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${spaceId}`,

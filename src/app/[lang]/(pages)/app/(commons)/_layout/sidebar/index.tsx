@@ -2,10 +2,12 @@
 
 import { OrgSelector } from "@/app/[lang]/(pages)/app/(commons)/_layout/sidebar/orgSelector.layout";
 import { cn } from "@/lib/utils";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage } from "@/utils/localStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FaHome, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser, FaUserNurse } from "react-icons/fa6";
 import { MdSettings } from "react-icons/md";
@@ -19,9 +21,19 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 
 const Sidebar = (): ReactNode => {
     const pathname = usePathname();
-    // TODO
-    const organizationID = "123";
+    const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
+
+    const organizationID = pathname.split("/")[3];
     const activeOption = pathname.split("/")[4] ?? "home";
+
+    useEffect(() => {
+        try {
+            const user = getFromLocalStorage("r_ud");
+            setCurrentUser(user);
+        } catch (err) {
+            console.error(err);
+        }
+    }, []);
 
     return (
         <nav className="row-span-2 w-[250px] h-[calc(100vh-32px)] bg-slate-50 pr-4 flex flex-col gap-5">
@@ -34,14 +46,16 @@ const Sidebar = (): ReactNode => {
                 />
             </div>
 
-            <div className="w-full h-max py-4">
-                <div className="flex flex-col">
-                    <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
-                        Current organization
-                    </span>
-                    <OrgSelector />
+            {currentUser && currentUser.platform_role === "ORG_ADMIN" && (
+                <div className="w-full h-max py-4">
+                    <div className="flex flex-col">
+                        <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
+                            Current organization
+                        </span>
+                        <OrgSelector />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <ul className="flex flex-col gap-1">
                 <span className="text-slate-500 font-bold text-sm pl-2 mb-2">Platform</span>

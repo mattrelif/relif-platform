@@ -1,6 +1,7 @@
 import { client } from "@/lib/axios-client";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { CreateHousingRequest, HousingSchema, UpdateHousingRequest } from "@/types/housing.types";
+import { CreateSpaceRequest, SpaceSchema } from "@/types/space.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "housings";
@@ -44,7 +45,7 @@ export async function getSpacesByHousingId(
     housingId: string,
     offset: number,
     limit: number
-): Promise<AxiosResponse> {
+): Promise<AxiosResponse<{ count: number; data: SpaceSchema[] }>> {
     return client.request({
         url: `${PREFIX}/${housingId}/rooms?offset=${offset}&limit=${limit}`,
         method: "GET",
@@ -66,5 +67,16 @@ export async function getAllocationsByHousingId(housingId: string): Promise<Axio
     return client.request({
         url: `${PREFIX}/${housingId}/allocations`,
         method: "GET",
+    });
+}
+
+export async function createSpace(
+    housingId: string,
+    data: CreateSpaceRequest[]
+): Promise<AxiosResponse> {
+    return client.request({
+        url: `${PREFIX}/${housingId}/rooms`,
+        method: "POST",
+        data,
     });
 }

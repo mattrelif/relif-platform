@@ -12,18 +12,19 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { deleteVolunteer } from "@/repository/volunteer.repository";
 import { VoluntarySchema } from "@/types/voluntary.types";
+import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { usePathname, useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
 type Props = {
-    voluntary: VoluntarySchema;
-    refreshList: () => void;
+    volunteer: VoluntarySchema;
+    refreshList?: () => void;
     removeDialogOpenState: boolean;
     setRemoveDialogOpenState: Dispatch<SetStateAction<boolean>>;
 };
 
 const RemoveModal = ({
-    voluntary,
+    volunteer,
     refreshList,
     removeDialogOpenState,
     setRemoveDialogOpenState,
@@ -39,7 +40,7 @@ const RemoveModal = ({
         try {
             setIsLoading(true);
 
-            await deleteVolunteer(voluntary.id);
+            await deleteVolunteer(volunteer.id);
             if (refreshList) {
                 refreshList();
             } else {
@@ -72,9 +73,9 @@ const RemoveModal = ({
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
-                            {voluntary.full_name}
+                            {convertToTitleCase(volunteer.full_name)}
                         </span>
-                        <span className="text-xs text-slate-500">{voluntary.email}</span>
+                        <span className="text-xs text-slate-500">{volunteer.email}</span>
                     </div>
                     <div className="flex gap-4 pt-5">
                         <Button variant="outline" onClick={() => setRemoveDialogOpenState(false)}>

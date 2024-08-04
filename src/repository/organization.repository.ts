@@ -13,6 +13,7 @@ import {
     JoinOrganizationRequestSchema,
 } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
+import { CreateVoluntaryRequest, VoluntarySchema } from "@/types/voluntary.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "organizations";
@@ -154,6 +155,25 @@ export async function createBeneficiary(
 ): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${organizationId}/beneficiaries`,
+        method: "POST",
+        data,
+    });
+}
+
+export async function getVoluntariesByOrganizationID(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: VoluntarySchema[] }>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/voluntary-people?offset=${offset}&limit=${limit}`,
+        method: "GET",
+    });
+}
+
+export async function createVolunteer(orgId: string, data: CreateVoluntaryRequest): Promise<void> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/voluntary-people`,
         method: "POST",
         data,
     });

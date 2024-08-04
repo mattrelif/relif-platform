@@ -7,13 +7,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -26,16 +19,6 @@ const Toolbar = (): ReactNode => {
 
     return (
         <div className="flex items-center gap-4">
-            <Select>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter..." />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="dentist">Dentist</SelectItem>
-                    <SelectItem value="doctor">Doctor</SelectItem>
-                    <SelectItem value="engineer">Engineer</SelectItem>
-                </SelectContent>
-            </Select>
             <Button asChild>
                 <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                     <MdAdd size={16} />

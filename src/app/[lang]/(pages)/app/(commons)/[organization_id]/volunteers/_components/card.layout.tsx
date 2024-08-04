@@ -31,13 +31,13 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">{voluntary.full_name}</span>
+                <span className="text-sm text-slate-900 font-bold">{voluntary?.full_name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <MdMail />
-                    {voluntary.email}
+                    {voluntary?.email}
                 </span>
                 <div className="flex mt-2 gap-2">
-                    {voluntary.segments.map(segment => (
+                    {voluntary?.segments.map(segment => (
                         <span>
                             <Badge className="bg-yellow-300 text-slate-900">{segment}</Badge>
                         </span>
@@ -54,12 +54,11 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${voluntary.id}`}>Profile</Link>
+                            <Link href={`${urlPath}/${voluntary?.id}`}>Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>View housing</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${voluntary.id}/edit`}>
+                            <Link href={`${urlPath}/${voluntary?.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
                                     Edit voluntary
@@ -77,16 +76,13 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {/* TODO: Format */}
-                        Created at {voluntary.created_at}
-                    </span>
-                    <span>
-                        <Badge>{voluntary.status.toUpperCase()}</Badge>
+                        Created at {voluntary?.created_at}
                     </span>
                 </div>
             </div>
 
             <RemoveModal
-                voluntary={voluntary}
+                volunteer={voluntary}
                 refreshList={refreshList}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}

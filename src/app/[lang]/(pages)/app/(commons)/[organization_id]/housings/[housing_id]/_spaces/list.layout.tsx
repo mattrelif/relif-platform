@@ -43,13 +43,13 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
                     <MdSpaceDashboard />
                     Spaces
                 </h3>
-                <CreateSpace />
+                <CreateSpace housingId={housingId} refreshList={getSpaceList} />
             </div>
             <div className="flex items-center gap-2">
                 <MdSearch className="text-slate-400 text-2xl" />
                 <Input type="text" placeholder="Search" className="w-full h-8" />
             </div>
-            <div className="w-full h-[calc(100vh-518px)] border border-slate-200 rounded-md overflow-hidden">
+            <div className="w-full h-[calc(100vh-394px)] border border-slate-200 rounded-md overflow-hidden">
                 {isLoading && (
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
                 )}
@@ -61,13 +61,13 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
                     </span>
                 )}
 
-                {!isLoading && !error && spaces && spaces.data.length <= 0 && (
+                {!isLoading && !error && spaces && spaces.data === null && (
                     <span className="text-sm text-slate-900 font-medium p-4">
                         No spaces found...
                     </span>
                 )}
 
-                {!isLoading && !error && spaces && spaces.data.length > 0 && (
+                {!isLoading && !error && spaces && spaces.data && spaces.data.length > 0 && (
                     <ul className="w-full h-full overflow-x-hidden overflow-y-scroll">
                         {spaces?.data.map(space => (
                             <SpaceCard refreshList={getSpaceList} {...space} />

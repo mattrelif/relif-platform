@@ -5,27 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { getBeneficiaryById, updateBeneficiary } from "@/repository/beneficiary.repository";
-import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { getVolunteerById, updateVolunteer } from "@/repository/volunteer.repository";
+import { VoluntarySchema } from "@/types/voluntary.types";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { MdContacts, MdError, MdSave } from "react-icons/md";
-import { CivilStatus } from "./civilStatus.layout";
-import { Education } from "./education.layout";
 import { Gender } from "./gender.layout";
 import { Medical } from "./medical.layout";
 import { RelationshipDegree } from "./relationship.layout";
 
 type Props = {
-    beneficiaryId: string;
+    volunteerId: string;
 };
 
-const Form = ({ beneficiaryId }: Props): ReactNode => {
+const Form = ({ volunteerId }: Props): ReactNode => {
     const router = useRouter();
     const { toast } = useToast();
 
-    const [data, setData] = useState<BeneficiarySchema | null>(null);
+    const [data, setData] = useState<VoluntarySchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [languages, setLanguages] = useState<string[] | []>([]);
@@ -35,8 +33,8 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
         (async () => {
             try {
-                if (beneficiaryId) {
-                    const response = await getBeneficiaryById(beneficiaryId);
+                if (volunteerId) {
+                    const response = await getVolunteerById(volunteerId);
                     setData(response.data);
                 } else {
                     throw new Error();
@@ -83,16 +81,11 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                 email: string;
                 gender: string;
                 otherGender: string;
-                civilStatus: string;
-                otherCivilStatus: string;
-                education: string;
-                otherEducation: string;
-                occupation: string;
                 documentType: string;
                 documentValue: string;
                 countryCode: string;
                 phone: string;
-                languages: string;
+                segments: string;
                 addressLine1: string;
                 addressLine2: string;
                 city: string;
@@ -120,16 +113,12 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
 
-            await updateBeneficiary(beneficiaryId, {
+            await updateVolunteer(volunteerId, {
                 full_name: data.fullName,
                 birthdate: data.birthdate,
                 email: data.email,
                 gender: data.gender === "other" ? data.otherGender : data.gender,
-                civil_status:
-                    data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
-                education: data.education === "other" ? data.otherEducation : data.education,
-                occupation: data.occupation,
-                spoken_languages: data.languages.split(","),
+                segments: data.segments.split(","),
                 phones: [`${data.countryCode}_${data.phone}`],
                 address: {
                     address_line_1: data.addressLine1,
@@ -175,14 +164,14 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
             toast({
                 title: "Update successful",
-                description: "Beneficiary updated successfully!",
+                description: "Volunteer updated successfully!",
             });
 
             router.push(urlPath);
         } catch (err) {
             toast({
                 title: "Update Error",
-                description: "An error occurred while updating the beneficiary. Please try again.",
+                description: "An error occurred while updating the volunteer. Please try again.",
                 variant: "destructive",
             });
         }
@@ -194,7 +183,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                 <div className="w-full h-max flex flex-col gap-6">
                     <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                         <FaUsers />
-                        Edit beneficiary
+                        Edit volunteer
                     </h1>
 
                     <div className="flex flex-col gap-3">
@@ -257,21 +246,6 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                     <Gender defaultValue={data.gender} />
 
-                    <CivilStatus defaultValue={data.civil_status} />
-
-                    <Education defaultValue={data.education} />
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="occupation">Occupation *</Label>
-                        <Input
-                            id="occupation"
-                            name="occupation"
-                            type="text"
-                            required
-                            defaultValue={data.occupation}
-                        />
-                    </div>
-
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="phone">Phone *</Label>
                         <div className="w-full flex gap-2">
@@ -295,15 +269,15 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="languages">Languages *</Label>
+                        <Label htmlFor="segments">Segments *</Label>
                         <Input
-                            id="languages"
-                            name="languages"
+                            id="segments"
+                            name="segments"
                             type="text"
                             placeholder="Write as much as you want, separated by commas"
                             onChange={handleInputChange(setLanguages)}
                             required
-                            defaultValue={data.spoken_languages.join(",")}
+                            defaultValue={data.segments.join(",")}
                         />
                         <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                             {languages?.map((language, index) => (
@@ -462,7 +436,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                     <Button className="flex items-center gap-2">
                         <MdSave size={16} />
-                        Update beneficiary
+                        Update volunteer
                     </Button>
                 </div>
             </form>

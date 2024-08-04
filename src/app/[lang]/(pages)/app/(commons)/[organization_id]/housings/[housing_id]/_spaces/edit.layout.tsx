@@ -35,9 +35,7 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
             } = Object.fromEntries(formData);
 
             await updateSpace(space.id, {
-                housing_id: space.housing_id,
                 name: data.name,
-                status: space.status,
                 total_vacancies: data.beds,
             });
             refreshList();

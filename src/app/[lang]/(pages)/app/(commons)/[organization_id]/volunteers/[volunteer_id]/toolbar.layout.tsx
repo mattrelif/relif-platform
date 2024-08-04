@@ -2,14 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { VoluntarySchema } from "@/types/voluntary.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { RemoveModal } from "../remove.modal";
+import { RemoveModal } from "../_components/remove.modal";
 
-const Toolbar = (): ReactNode => {
+type Props = {
+    volunteer: VoluntarySchema;
+};
+
+const Toolbar = ({ volunteer }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
+    const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
     const backToListPath = pathname.split("/").slice(0, 5).join("/");
@@ -52,12 +58,13 @@ const Toolbar = (): ReactNode => {
                                 <FaTrash />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Remove Volunteer</TooltipContent>
+                        <TooltipContent>Remove volunteer</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>
 
             <RemoveModal
+                volunteer={volunteer}
                 removeDialogOpenState={removeDialogOpenState}
                 setRemoveDialogOpenState={setRemoveDialogOpenState}
             />

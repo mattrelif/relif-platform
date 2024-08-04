@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogHeader,
@@ -17,8 +16,14 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { getSpacesByHousingId } from "@/repository/housing.repository";
+import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
-import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { HousingSchema } from "@/types/housing.types";
+import { SpaceSchema } from "@/types/space.types";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage } from "@/utils/localStorage";
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
 type Props = {
     beneficiary: BeneficiarySchema;
@@ -33,21 +38,67 @@ const MoveModal = ({
     setMoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const [housings, setHousings] = useState<HousingSchema[] | []>([]);
     const [selectedHousing, setSelectedHousing] = useState("");
+    const [spaces, setSpaces] = useState<SpaceSchema[] | []>([]);
+    const [selectedSpace, setSelectedSpace] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(false);
 
-    const handleDelete = (): void => {
-        toast({
-            title: "Removed!",
-            description: "Beneficiary removed successfully.",
-            variant: "success",
-        });
+    useEffect(() => {
+        setIsLoading(true);
+        (async () => {
+            try {
+                const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+                if (currentUser && currentUser.organization_id) {
+                    const { data: housingResponse } = await findHousingsByOrganizationId(
+                        currentUser.organization_id,
+                        0,
+                        9999
+                    );
+                    setHousings(housingResponse.data);
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    }, []);
 
-        // toast({
-        //     title: "Invalid entered data",
-        //     description:
-        //         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        //     variant: "destructive",
-        // });
+    const getSpaces = async (housingId: string) => {
+        setSpaces([]);
+        setSelectedHousing(housingId);
+
+        try {
+            const { data: spaceResponse } = await getSpacesByHousingId(housingId, 0, 9999);
+            setSpaces(spaceResponse.data);
+        } catch {
+            setError(true);
+        }
+    };
+
+    const handleMove = async (): Promise<void> => {
+        try {
+            // TODO: ENDPOINT
+            console.log(selectedHousing, selectedSpace);
+
+            setMoveDialogOpenState(false);
+            toast({
+                title: "Beneficiary Relocated",
+                description: "The beneficiary has been successfully moved to the new shelter.",
+                variant: "success",
+            });
+        } catch {
+            toast({
+                title: "Error Moving Beneficiary",
+                description:
+                    "An error occurred while attempting to move the beneficiary. Please check the entered data and try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
@@ -66,56 +117,54 @@ const MoveModal = ({
                             {beneficiary.full_name}
                         </span>
                         <span className="text-xs text-slate-500">
-                            <strong>Current:</strong>
-                            {/* TODO: NAMES */}
-                            {beneficiary.current_housing_id} (housed on{" "}
-                            {beneficiary.current_room_id})
+                            <strong>Current:</strong>{" "}
+                            {!beneficiary.current_housing_id
+                                ? "Unallocated"
+                                : `${beneficiary.current_housing_id} (housed on ${beneficiary.current_room_id})`}
                         </span>
                     </div>
-                    <div className="pt-4 flex flex-col gap-2">
-                        <span className="text-xs text-slate-500 font-bold">To:</span>
-                        <Select onValueChange={setSelectedHousing}>
-                            <SelectTrigger className="w-full" id="housing">
-                                <SelectValue placeholder="Select..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="housing-1">Housing 1</SelectItem>
-                                <SelectItem value="housing-2">Housing 2</SelectItem>
-                                <SelectItem value="housing-3">Housing 3</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select>
-                            <SelectTrigger className="w-full" id="space">
-                                <SelectValue placeholder="Select..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {selectedHousing === "housing-1" && (
-                                    <>
-                                        <SelectItem value="space-1">
-                                            Space 1 [8 of 9 occupied]
+                    {housings.length === 0 && (
+                        <span className="text-sm text-red-500 font-medium pt-4">
+                            No housings found...
+                        </span>
+                    )}
+
+                    {housings.length > 0 && (
+                        <div className="pt-4 flex flex-col gap-2">
+                            <span className="text-xs text-slate-500 font-bold">To:</span>
+                            <Select onValueChange={getSpaces} required>
+                                <SelectTrigger className="w-full" id="housing">
+                                    <SelectValue placeholder="Select housing..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {housings.map(housing => (
+                                        <SelectItem value={housing.id}>{housing.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select onValueChange={setSelectedSpace} required>
+                                <SelectTrigger className="w-full" id="space">
+                                    <SelectValue placeholder="Select space..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {spaces.map(space => (
+                                        <SelectItem value={space.id}>
+                                            {space.name} [{space.available_vacancies} of{" "}
+                                            {space.total_vacancies} available]
                                         </SelectItem>
-                                        <SelectItem value="space-2">
-                                            Space 2 [7 of 5 occupied]
-                                        </SelectItem>
-                                        <SelectItem value="space-3">
-                                            Space 3 [5 of 5 occupied]
-                                        </SelectItem>
-                                        <SelectItem value="space-4">
-                                            Space 4 [0 of 5 occupied]
-                                        </SelectItem>
-                                    </>
-                                )}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     <div className="flex gap-4 pt-5">
                         <Button variant="outline" onClick={() => setMoveDialogOpenState(false)}>
                             Cancel
                         </Button>
-                        <DialogClose asChild>
-                            <Button onClick={handleDelete}>Delete</Button>
-                        </DialogClose>
+                        <Button onClick={handleMove} disabled={housings.length === 0}>
+                            Move
+                        </Button>
                     </div>
                 </DialogHeader>
             </DialogContent>

@@ -1,16 +1,13 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { getBeneficiaryById } from "@/repository/beneficiary.repository";
-import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { getVolunteerById } from "@/repository/volunteer.repository";
+import { VoluntarySchema } from "@/types/voluntary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
-import { FaCity, FaMapMarkerAlt } from "react-icons/fa";
-import { FaBriefcaseMedical, FaHouseChimneyUser } from "react-icons/fa6";
+import { FaCity } from "react-icons/fa";
+import { FaBriefcaseMedical } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
 import { MdContactEmergency, MdError, MdMail, MdPhone } from "react-icons/md";
 import { Toolbar } from "./toolbar.layout";
@@ -42,30 +39,6 @@ const RELATIONSHIPS_MAPPING = {
     other: "Other (specify)",
 };
 
-const CIVIL_STATUS_MAPPING = {
-    single: "Single",
-    married: "Married",
-    divorced: "Divorced",
-    widowed: "Widowed",
-    separated: "Separated",
-    "common-law-marriage": "Common-Law Marriage",
-    "in-a-relationship": "In a Relationship",
-};
-
-const EDUCATION_MAPPING = {
-    "incomplete-elementary-education": "Incomplete Elementary Education",
-    "complete-elementary-education": "Complete Elementary Education",
-    "incomplete-high-school": "Incomplete High School",
-    "complete-high-school": "Complete High School",
-    "vocational-education": "Vocational Education",
-    "incomplete-higher-education": "Incomplete Higher Education",
-    "complete-higher-education": "Complete Higher Education",
-    postgraduate: "Postgraduate",
-    "masters-degree": "Master's Degree",
-    doctorate: "Doctorate",
-    postdoctorate: "Postdoctorate",
-};
-
 const GENDER_MAPPING = {
     male: "Male",
     female: "Female",
@@ -77,11 +50,8 @@ const GENDER_MAPPING = {
     other: "Other",
 };
 
-const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
-    const pathname = usePathname();
-    const housingPath = pathname.split("/").slice(0, 4).join("/");
-
-    const [data, setData] = useState<BeneficiarySchema | null>(null);
+const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
+    const [data, setData] = useState<VoluntarySchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
@@ -90,8 +60,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
 
         (async () => {
             try {
-                if (beneficiaryId) {
-                    const response = await getBeneficiaryById(beneficiaryId);
+                if (volunteerId) {
+                    const response = await getVolunteerById(volunteerId);
                     setData(response.data);
                 } else {
                     throw new Error();
@@ -117,55 +87,19 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
 
     if (data) {
         return (
-            <div className="w-full h-max flex flex-col gap-2">
+            <div className="w-full h-max flex flex-col gap-2 p-2">
                 <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
-                    <Toolbar beneficiary={data as BeneficiarySchema} />
+                    <Toolbar volunteer={data as VoluntarySchema} />
                     <div className="flex flex-col items-center">
                         <h2 className="text-xl font-semibold text-slate-900">
                             {convertToTitleCase(data.full_name)}
                         </h2>
                         <span className="text-sm text-slate-500 flex items-center gap-4">
-                            {/* TODO: Format */}
                             Registered in {data.created_at}
                         </span>
                     </div>
                 </div>
-                <div className="w-ful h-max p-4 rounded-lg bg-relif-orange-500 flex justify-between">
-                    <div className="flex flex-col">
-                        <h3 className="text-white font-bold text-base pb-2 flex items-center gap-2">
-                            {" "}
-                            <FaHouseChimneyUser size={15} />
-                            Current housing
-                        </h3>
-                        <span className="text-xs text-slate-50 flex items-center gap-1">
-                            <FaMapMarkerAlt />
-                            {/* TODO */}
-                            {data.current_room_id ? (
-                                <>
-                                    Currently in space <strong>{data.current_room_id}</strong>.
-                                </>
-                            ) : (
-                                "Unallocated"
-                            )}
-                        </span>
 
-                        {/* <span className="text-xs text-slate-50 flex items-center gap-1">
-                            Since Mar 04, 2023
-                        </span> */}
-                    </div>
-
-                    {data.current_housing_id && (
-                        <Button
-                            variant="outline"
-                            className="bg-transparent border-white text-white hover:border-relif-orange-200 hover:text-relif-orange-200"
-                            asChild
-                        >
-                            <Link href={`${housingPath}/housings/${data.current_housing_id}`}>
-                                View housing
-                            </Link>
-                        </Button>
-                    )}
-                </div>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
                         <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
@@ -177,25 +111,15 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>Full name:</strong> {convertToTitleCase(data.full_name)}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                {/* TODO: Format */}
                                 <strong>Birthdate:</strong> {data.birthdate} (
                                 {calculateAge(data.birthdate)} years old)
-                                {calculateAge(data.birthdate) < 18 && (
-                                    <span>
-                                        <Badge className="bg-yellow-300 text-slate-900">
-                                            Underage
-                                        </Badge>
-                                    </span>
-                                )}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>E-mail:</strong> {data.email}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                {/* TODO: Gender */}
-                                <strong>Gender:</strong>{" "}
-                                {GENDER_MAPPING[data.gender as keyof typeof GENDER_MAPPING] ||
-                                    data.gender}
+                                {/* TODO: BACKEND */}
+                                <strong>Gender:</strong> Men
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap gap-2">
                                 <strong>Phones:</strong>
@@ -219,28 +143,13 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                     </HoverCardContent>
                                 </HoverCard>
                             </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Civil status:</strong>{" "}
-                                {CIVIL_STATUS_MAPPING[
-                                    data.civil_status as keyof typeof CIVIL_STATUS_MAPPING
-                                ] || data.civil_status}
-                            </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                <strong>Languages spoken:</strong>{" "}
-                                {data.spoken_languages?.map(language => (
+                                <strong>Segments:</strong>{" "}
+                                {data.segments?.map(segment => (
                                     <Badge className="bg-relif-orange-500">
-                                        {convertToTitleCase(language)}
+                                        {convertToTitleCase(segment)}
                                     </Badge>
                                 ))}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Education:</strong>{" "}
-                                {EDUCATION_MAPPING[
-                                    data.education as keyof typeof EDUCATION_MAPPING
-                                ] || data.education}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Occupation:</strong> {convertToTitleCase(data.occupation)}
                             </li>
                         </ul>
                     </div>
@@ -350,106 +259,69 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                         </ul>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
-                        <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                            <FaBriefcaseMedical />
-                            Medical information
-                        </h3>
-                        <ul>
-                            <li className="w-full p-2 text-sm text-slate-900">
-                                <strong>Allergies:</strong>{" "}
-                                {data.medical_information.allergies.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Current medications:</strong>{" "}
-                                {data.medical_information.current_medications.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Chronic Medical Conditions:</strong>{" "}
-                                {data.medical_information.recurrent_medical_conditions.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Health Insurance:</strong>{" "}
-                                {data.medical_information.health_insurance_plans.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Blood Type:</strong> {data.medical_information.blood_type}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Vaccinations:</strong>{" "}
-                                {data.medical_information.taken_vaccines.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Mental Health:</strong>{" "}
-                                {data.medical_information.mental_health_history.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Height:</strong> {data.medical_information.height}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Weight:</strong> {data.medical_information.weight}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Smoking and Alcohol Consumption Habits:</strong>{" "}
-                                {data.medical_information.addictions}{" "}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Disabilities:</strong>{" "}
-                                {data.medical_information.disabilities.join(", ")}
-                            </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Use of prosthesics or medical devices:</strong>{" "}
-                                {data.medical_information.prothesis_or_medical_devices.join(", ")}
-                            </li>
+                <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
+                    <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
+                        <FaBriefcaseMedical />
+                        Medical information
+                    </h3>
+                    <div>
+                        <ul className="w-full grid grid-cols-2">
+                            <div>
+                                <li className="w-full p-2 text-sm text-slate-900">
+                                    <strong>Allergies:</strong>{" "}
+                                    {data.medical_information.allergies.join(", ")}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Current medications:</strong>{" "}
+                                    {data.medical_information.current_medications.join(", ")}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Chronic Medical Conditions:</strong>{" "}
+                                    {data.medical_information.recurrent_medical_conditions.join(
+                                        ", "
+                                    )}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Health Insurance:</strong>{" "}
+                                    {data.medical_information.health_insurance_plans.join(", ")}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Blood Type:</strong>{" "}
+                                    {data.medical_information.blood_type}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Vaccinations:</strong>{" "}
+                                    {data.medical_information.taken_vaccines.join(", ")}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Mental Health:</strong>{" "}
+                                    {data.medical_information.mental_health_history.join(", ")}
+                                </li>
+                            </div>
+                            <div>
+                                <li className="w-full p-2 text-sm text-slate-900">
+                                    <strong>Height:</strong> {data.medical_information.height}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Weight:</strong> {data.medical_information.weight}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Smoking and Alcohol Consumption Habits:</strong>{" "}
+                                    {data.medical_information.addictions}{" "}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Disabilities:</strong>{" "}
+                                    {data.medical_information.disabilities.join(", ")}
+                                </li>
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Use of prosthesics or medical devices:</strong>{" "}
+                                    {data.medical_information.prothesis_or_medical_devices.join(
+                                        ", "
+                                    )}
+                                </li>
+                            </div>
                         </ul>
                     </div>
-                    {/* <div className="w-full grow border-[1px] border-relif-orange-200 rounded-lg overflow-hidden">
-                      <h3 className="pt-4 pl-4 pr-4 text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                          <MdOutlineFamilyRestroom />
-                          Family
-                      </h3>
-                      <ul className="h-[480px] overflow-y-scroll overflow-x-hidden pt-2 pb-4 pl-4 pr-4 flex flex-col gap-2">
-                          <Link href="#">
-                              <li className="w-full rounded-md bg-relif-orange-200/10 flex gap-4 p-4 hover:bg-relif-orange-200/20 cursor-pointer">
-                                  <div className="w-[80px] h-[80px] rounded-full overflow-hidden">
-                                      <Image
-                                          src="https://github.com/anthonyvii27.png"
-                                          alt="Family image"
-                                          width={80}
-                                          height={80}
-                                          className="p-[1px] border-2 rounded-full border-relif-orange-200"
-                                      />
-                                  </div>
-                                  <div className="h-max w-[calc(100%-80px)] flex flex-col">
-                                      <span className="w-full text-sm text-slate-900 font-bold">
-                                          Samanta Marks Oliver
-                                      </span>
-                                      <span className="w-full text-sm text-slate-500 mt-2 flex items-center gap-1">
-                                          <FaBirthdayCake /> March 24, 1987
-                                      </span>
-                                      <div className="mt-3 flex gap-2">
-                                          <span>
-                                              <Badge className="flex">Wife</Badge>
-                                          </span>
-                                          <span>
-                                              <Badge className="bg-relif-orange-400 flex items-center gap-1">
-                                                  <MdSpaceDashboard />
-                                                  In the same space
-                                              </Badge>
-                                          </span>
-                                          <span>
-                                              <Badge className="bg-relif-orange-400 flex items-center gap-1">
-                                                  <MdSpaceDashboard />
-                                                  In another space
-                                              </Badge>
-                                          </span>
-                                      </div>
-                                  </div>
-                              </li>
-                          </Link>
-                      </ul>
-                  </div> */}
                 </div>
             </div>
         );

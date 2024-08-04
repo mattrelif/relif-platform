@@ -35,7 +35,7 @@ const calculateAge = (birthdate: string): number => {
         age--;
     }
 
-    return age;
+    return age > 0 ? age : 0;
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
@@ -122,6 +122,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                        {/* TODO: FORMAT */}
                         Created at {data.created_at}
                     </span>
                     <span>

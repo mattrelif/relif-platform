@@ -8,7 +8,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { getVoluntariesByOrganizationID } from "@/repository/volunteer.repository";
+import { getVoluntariesByOrganizationID } from "@/repository/organization.repository";
 import { UserSchema } from "@/types/user.types";
 import { VoluntarySchema } from "@/types/voluntary.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
@@ -94,15 +94,12 @@ const VolunteersList = (): ReactNode => {
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage - 1)}
-                                        // disabled={currentPage === 1}
                                     />
                                 </PaginationItem>
                                 {Array.from({ length: totalPages }).map((_, index) => (
                                     <PaginationItem key={index}>
                                         <PaginationLink
-                                            href="#"
                                             onClick={() => handlePageChange(index + 1)}
                                             isActive={index + 1 === currentPage}
                                         >
@@ -112,9 +109,7 @@ const VolunteersList = (): ReactNode => {
                                 ))}
                                 <PaginationItem>
                                     <PaginationNext
-                                        href="#"
                                         onClick={() => handlePageChange(currentPage + 1)}
-                                        // disabled={currentPage === totalPages}
                                     />
                                 </PaginationItem>
                             </PaginationContent>

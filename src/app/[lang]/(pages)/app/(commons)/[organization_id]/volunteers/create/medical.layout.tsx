@@ -35,15 +35,16 @@ const Medical = (): ReactNode => {
         <>
             <div className="w-full h-max flex flex-col gap-6 p-4 border border-slate-200 rounded-lg">
                 <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                    <MdHealthAndSafety /> Medical Information (Optional)
+                    <MdHealthAndSafety /> Medical Information
                 </h2>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="allergies">Allergies</Label>
+                    <Label htmlFor="allergies">Allergies *</Label>
                     <Input
                         id="allergies"
                         name="allergies"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setAllergies)}
                     />
@@ -57,11 +58,12 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="currentMedications">Current medications</Label>
+                    <Label htmlFor="currentMedications">Current medications *</Label>
                     <Input
                         id="currentMedications"
                         name="currentMedications"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setCurrentMedications)}
                     />
@@ -75,11 +77,12 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="chronicMedicalConditions">Chronic medical conditions</Label>
+                    <Label htmlFor="chronicMedicalConditions">Chronic medical conditions *</Label>
                     <Input
                         id="chronicMedicalConditions"
                         name="chronicMedicalConditions"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setChronicMedicalConditions)}
                     />
@@ -93,11 +96,12 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="healthInsurance">Health Insurance</Label>
+                    <Label htmlFor="healthInsurance">Health Insurance *</Label>
                     <Input
                         id="healthInsurance"
                         name="healthInsurance"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setHealthInsurance)}
                     />
@@ -111,8 +115,8 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="bloodType">Blood type</Label>
-                    <Select>
+                    <Label htmlFor="bloodType">Blood type *</Label>
+                    <Select name="bloodType" required>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select blood type..." />
                         </SelectTrigger>
@@ -130,11 +134,12 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="vaccinations">Vaccinations</Label>
+                    <Label htmlFor="vaccinations">Vaccinations *</Label>
                     <Input
                         id="vaccinations"
                         name="vaccinations"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setVaccinations)}
                     />
@@ -148,11 +153,12 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="mentalHealth">Mental health</Label>
+                    <Label htmlFor="mentalHealth">Mental health *</Label>
                     <Input
                         id="mentalHealth"
                         name="mentalHealth"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setMentalHealth)}
                     />
@@ -166,21 +172,34 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="height">Height</Label>
-                    <Input id="height" name="height" type="text" placeholder="e.g. 170cm" />
+                    <Label htmlFor="height">Height (cm) *</Label>
+                    <Input
+                        id="height"
+                        name="height"
+                        type="number"
+                        placeholder="e.g. 170cm"
+                        required
+                    />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="weight">Weight</Label>
-                    <Input id="weight" name="weight" type="text" placeholder="e.g. 80kg" />
+                    <Label htmlFor="weight">Weight (kg) *</Label>
+                    <Input
+                        id="weight"
+                        name="weight"
+                        type="number"
+                        placeholder="e.g. 80kg"
+                        required
+                    />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="addictions">Addictions</Label>
+                    <Label htmlFor="addictions">Addictions *</Label>
                     <Input
                         id="addictions"
                         name="addictions"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setAddictions)}
                     />
@@ -194,11 +213,12 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="disabilities">Disabilities</Label>
+                    <Label htmlFor="disabilities">Disabilities *</Label>
                     <Input
                         id="disabilities"
                         name="disabilities"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setDisabilities)}
                     />
@@ -212,13 +232,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="prosthesisOrMedicalDevices">
-                        Use of prosthesis or medical devices
+                    <Label htmlFor="prothesisOrMedicalDevices">
+                        Use of prosthesis or medical devices *
                     </Label>
                     <Input
-                        id="prosthesisOrMedicalDevices"
-                        name="prosthesisOrMedicalDevices"
+                        id="prothesisOrMedicalDevices"
+                        name="prothesisOrMedicalDevices"
                         type="text"
+                        required
                         placeholder="Write as much as you want, separated by commas"
                         onChange={handleInputChange(setProsthesisOrMedicalDevices)}
                     />

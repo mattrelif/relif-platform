@@ -1,5 +1,5 @@
 import { client } from "@/lib/axios-client";
-import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { BeneficiarySchema, UpdateBeneficiaryRequest } from "@/types/beneficiary.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "beneficiaries";
@@ -13,10 +13,14 @@ export async function getBeneficiaryById(
     });
 }
 
-export async function updateBeneficiary(beneficiaryId: string): Promise<AxiosResponse> {
+export async function updateBeneficiary(
+    beneficiaryId: string,
+    data: UpdateBeneficiaryRequest
+): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${beneficiaryId}`,
         method: "PUT",
+        data,
     });
 }
 

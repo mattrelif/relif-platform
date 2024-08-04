@@ -7,6 +7,6 @@ export default function Page({
     params: {
         beneficiary_id: string;
     };
-}): Promise<ReactNode> {
+}): ReactNode {
     return <Form beneficiaryId={params.beneficiary_id} />;
 }

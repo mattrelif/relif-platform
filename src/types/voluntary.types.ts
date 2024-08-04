@@ -17,7 +17,7 @@ export type VoluntarySchema = {
     status: string;
     segments: string[];
     medical_information: MedicalInformationSchema;
-    emergency_contacts: EmergencyContactSchema;
+    emergency_contacts: EmergencyContactSchema[];
     created_at: string;
     updated_at: string;
     notes: string;

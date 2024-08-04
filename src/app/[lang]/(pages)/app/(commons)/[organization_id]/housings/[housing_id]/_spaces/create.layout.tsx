@@ -5,11 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
+import { createSpace } from "@/repository/housing.repository";
 import { Dispatch, FormEvent, ReactNode, SetStateAction, useState } from "react";
 import { FaSave } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
 
 type Props = {
+    housingId: string;
+    refreshList: () => void;
     sheetOpenState: boolean;
     setSheetOpenState: Dispatch<SetStateAction<boolean>>;
 };
@@ -51,28 +54,41 @@ const SpaceInput = ({ id, removeInput }: SpaceInputProps): ReactNode => {
     );
 };
 
-const CreateSheet = ({ sheetOpenState, setSheetOpenState }: Props): ReactNode => {
+const CreateSheet = ({
+    housingId,
+    refreshList,
+    sheetOpenState,
+    setSheetOpenState,
+}: Props): ReactNode => {
     const { toast } = useToast();
     const [inputs, setInputs] = useState<number[]>([]);
 
-    const handleSubmit = (e: FormEvent): void => {
+    const handleSubmit = async (e: FormEvent): Promise<void> => {
         e.preventDefault();
 
-        toast({
-            title: "Saved!",
-            description: "The new data was saved successfully.",
-            variant: "success",
-        });
+        const formData = new FormData(e.target as HTMLFormElement);
+        const spaces = inputs.map(id => ({
+            name: formData.get(`name_${id}`) as string,
+            total_vacancies: Number(formData.get(`beds_${id}`)),
+        }));
 
-        // toast({
-        //     title: "Invalid entered data",
-        //     description:
-        //         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        //     variant: "destructive",
-        // });
-        //
+        try {
+            await createSpace(housingId, spaces);
+            refreshList();
 
-        setSheetOpenState(false);
+            toast({
+                title: "Saved!",
+                description: "The new data was saved successfully.",
+                variant: "success",
+            });
+            setSheetOpenState(false);
+        } catch (error) {
+            toast({
+                title: "Error Saving Data",
+                description: "An error occurred while saving the data. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     const addNewSpace = () => {
@@ -120,7 +136,13 @@ const CreateSheet = ({ sheetOpenState, setSheetOpenState }: Props): ReactNode =>
     );
 };
 
-const CreateSpace = (): ReactNode => {
+const CreateSpace = ({
+    housingId,
+    refreshList,
+}: {
+    housingId: string;
+    refreshList: () => void;
+}): ReactNode => {
     const [sheetOpenState, setSheetOpenState] = useState(false);
 
     return (
@@ -134,7 +156,12 @@ const CreateSpace = (): ReactNode => {
                 <MdAdd size={16} /> New
             </Button>
 
-            <CreateSheet sheetOpenState={sheetOpenState} setSheetOpenState={setSheetOpenState} />
+            <CreateSheet
+                housingId={housingId}
+                refreshList={refreshList}
+                sheetOpenState={sheetOpenState}
+                setSheetOpenState={setSheetOpenState}
+            />
         </>
     );
 };
