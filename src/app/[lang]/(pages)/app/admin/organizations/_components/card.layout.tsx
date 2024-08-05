@@ -14,7 +14,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
-import { FaHouseChimneyUser } from "react-icons/fa6";
+import { FaHouseChimneyUser, FaUser } from "react-icons/fa6";
 import { SlOptions } from "react-icons/sl";
 import { DisableModal } from "./disable.modal";
 
@@ -29,7 +29,10 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li
+            className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70"
+            key={data.id}
+        >
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{data.name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
@@ -39,17 +42,17 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 <div className="flex items-center gap-4">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {/* TODO: BACKEND */}
-                        <FaUsers /> 6 users
+                        <FaUsers /> 1 user
                     </span>
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {/* TODO: BACKEND */}
-                        <FaHouseChimneyUser /> 8 housings
+                        <FaHouseChimneyUser /> 2 housings
                     </span>
                 </div>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    <FaMapMarkerAlt />
+                    <FaUser />
                     {/* TODO: CREATOR NAME */}
-                    {data.creator_id}
+                    Anthony Silva
                 </span>
             </div>
             <div className="flex flex-col items-end justify-between">

@@ -2,20 +2,11 @@
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { UserSchema } from "@/types/user.types";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { FaTrash } from "react-icons/fa";
 import { MdAccessTime, MdMail } from "react-icons/md";
-import { SlOptions } from "react-icons/sl";
 
 type Props = UserSchema;
 
@@ -51,24 +42,6 @@ const UserCard = (data: Props): ReactNode => {
                 <span>
                     <Badge>{data?.platform_role || "MEMBER"}</Badge>
                 </span>
-            </div>
-
-            <div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="icon" className="w-7 h-7 p-0">
-                            <SlOptions className="text-sm" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem>
-                            <span className="flex items-center gap-2">
-                                <FaTrash className="text-xs" />
-                                Disable Access
-                            </span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
         </li>
     );
