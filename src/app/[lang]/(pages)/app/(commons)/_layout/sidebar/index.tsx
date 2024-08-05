@@ -1,6 +1,7 @@
 "use client";
 
 import { OrgSelector } from "@/app/[lang]/(pages)/app/(commons)/_layout/sidebar/orgSelector.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { cn } from "@/lib/utils";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
@@ -21,6 +22,7 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 
 const Sidebar = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
 
     const organizationID = pathname.split("/")[3];
@@ -50,7 +52,7 @@ const Sidebar = (): ReactNode => {
                 <div className="w-full h-max py-4">
                     <div className="flex flex-col">
                         <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
-                            Current organization
+                            {dict.sidebar.currentOrganization}
                         </span>
                         <OrgSelector />
                     </div>
@@ -69,7 +71,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaHome size={15} />
-                        Home
+                        {dict.sidebar.home}
                     </li>
                 </Link>
 
@@ -83,7 +85,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaHouseChimneyUser size={15} />
-                        Housings
+                        {dict.sidebar.housings}
                     </li>
                 </Link>
 
@@ -97,7 +99,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaUsers size={15} />
-                        Beneficiaries
+                        {dict.sidebar.beneficiaries}
                     </li>
                 </Link>
 
@@ -111,7 +113,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaUserNurse size={15} />
-                        Volunteers
+                        {dict.sidebar.volunteers}
                     </li>
                 </Link>
 
@@ -125,7 +127,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaBoxesPacking size={15} />
-                        Inventory
+                        {dict.sidebar.inventory}
                     </li>
                 </Link>
             </ul>
@@ -143,7 +145,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <MdSettings size={15} />
-                        Preferences
+                        {dict.sidebar.preferences}
                     </li>
                 </Link>
             </ul>

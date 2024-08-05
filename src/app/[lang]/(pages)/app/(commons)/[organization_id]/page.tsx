@@ -17,7 +17,7 @@ export default async function Page({
             <h2>Organization {params.organization_id}</h2>
             Suppliers
             {params.lang}
-            {dict.products.cart}
+            {/* {dict.sidebar.home} */}
         </div>
     );
 }

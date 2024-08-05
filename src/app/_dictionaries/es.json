@@ -1,0 +1,11 @@
+{
+    "sidebar": {
+        "currentOrganization": "Organización Actual",
+        "home": "Inicio",
+        "housings": "Alojamientos",
+        "beneficiaries": "Beneficiarios",
+        "volunteers": "Voluntarios",
+        "inventory": "Inventario",
+        "preferences": "Preferencias"
+    }
+}

@@ -1,5 +1,11 @@
 {
-  "products": {
-    "cart": "Add to Cart"
-  }
+    "sidebar": {
+        "currentOrganization": "Current Organization",
+        "home": "Home",
+        "housings": "Housings",
+        "beneficiaries": "Beneficiaries",
+        "volunteers": "Volunteers",
+        "inventory": "Inventory",
+        "preferences": "Preferences"
+    }
 }

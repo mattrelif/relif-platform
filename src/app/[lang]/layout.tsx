@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import "../globals.css";
-import { Inter as FontSans } from "next/font/google";
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 import { Locale } from "@/app/i18n-config";
 import { Toaster } from "@/components/ui/toaster";
+import { cn } from "@/lib/utils";
+import type { Metadata } from "next";
+import { Inter as FontSans } from "next/font/google";
+import { ReactNode } from "react";
+import "../globals.css";
 
 const fontSans = FontSans({
     subsets: ["latin"],
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export async function generateStaticParams(): Promise<{ lang: string }[]> {
-    return [{ lang: "en-US" }, { lang: "nl" }];
+    return [{ lang: "en-US" }, { lang: "es" }, { lang: "pt-BR" }];
 }
 
 export default function RootLayout({
