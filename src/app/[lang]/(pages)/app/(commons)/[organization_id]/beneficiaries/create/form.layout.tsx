@@ -86,65 +86,69 @@ const Form = (): ReactNode => {
             } = Object.fromEntries(formData);
 
             if (currentUser.organization_id) {
-                await createBeneficiary(currentUser.organization_id, {
-                    full_name: data.fullName,
-                    birthdate: data.birthdate,
-                    email: data.email,
-                    gender: data.gender === "other" ? data.otherGender : data.gender,
-                    civil_status:
-                        data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
-                    education: data.education === "other" ? data.otherEducation : data.education,
-                    occupation: data.occupation,
-                    spoken_languages: data.languages.split(","),
-                    phones: [`${data.countryCode}_${data.phone}`],
-                    address: {
-                        address_line_1: data.addressLine1,
-                        address_line_2: data.addressLine2,
-                        city: data.city,
-                        district: data.state,
-                        zip_code: data.postalCode,
-                        country: data.country,
-                    },
-                    medical_information: {
-                        allergies: data.allergies.split(","),
-                        current_medications: data.currentMedications.split(","),
-                        recurrent_medical_conditions: data.chronicMedicalConditions.split(","),
-                        health_insurance_plans: data.healthInsurance.split(","),
-                        blood_type: data.bloodType,
-                        taken_vaccines: data.vaccinations.split(","),
-                        mental_health_history: data.mentalHealth.split(","),
-                        height: Number(data.height),
-                        weight: Number(data.weight),
-                        addictions: data.addictions.split(","),
-                        disabilities: data.disabilities.split(","),
-                        prothesis_or_medical_devices: data.prothesisOrMedicalDevices.split(","),
-                    },
-                    notes: data.notes,
-                    documents: [
-                        {
-                            type: data.documentType,
-                            value: data.documentValue,
+                const { data: newBeneficiary } = await createBeneficiary(
+                    currentUser.organization_id,
+                    {
+                        full_name: data.fullName,
+                        birthdate: data.birthdate,
+                        email: data.email,
+                        gender: data.gender === "other" ? data.otherGender : data.gender,
+                        civil_status:
+                            data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
+                        education:
+                            data.education === "other" ? data.otherEducation : data.education,
+                        occupation: data.occupation,
+                        spoken_languages: data.languages.split(","),
+                        phones: [`${data.countryCode}_${data.phone}`],
+                        address: {
+                            address_line_1: data.addressLine1,
+                            address_line_2: data.addressLine2,
+                            city: data.city,
+                            district: data.state,
+                            zip_code: data.postalCode,
+                            country: data.country,
                         },
-                    ],
-                    emergency_contacts: [
-                        {
-                            phones: [`${data.emergencyCountryCode}_${data.emergencyPhone}`],
-                            emails: [data.emergencyEmail],
-                            full_name: data.emergencyName,
-                            relationship:
-                                data.emergencyRelationship === "other"
-                                    ? data.otherEmergencyRelationship
-                                    : data.emergencyRelationship,
+                        medical_information: {
+                            allergies: data.allergies.split(","),
+                            current_medications: data.currentMedications.split(","),
+                            recurrent_medical_conditions: data.chronicMedicalConditions.split(","),
+                            health_insurance_plans: data.healthInsurance.split(","),
+                            blood_type: data.bloodType,
+                            taken_vaccines: data.vaccinations.split(","),
+                            mental_health_history: data.mentalHealth.split(","),
+                            height: Number(data.height),
+                            weight: Number(data.weight),
+                            addictions: data.addictions.split(","),
+                            disabilities: data.disabilities.split(","),
+                            prothesis_or_medical_devices: data.prothesisOrMedicalDevices.split(","),
                         },
-                    ],
-                });
+                        notes: data.notes,
+                        documents: [
+                            {
+                                type: data.documentType,
+                                value: data.documentValue,
+                            },
+                        ],
+                        emergency_contacts: [
+                            {
+                                phones: [`${data.emergencyCountryCode}_${data.emergencyPhone}`],
+                                emails: [data.emergencyEmail],
+                                full_name: data.emergencyName,
+                                relationship:
+                                    data.emergencyRelationship === "other"
+                                        ? data.otherEmergencyRelationship
+                                        : data.emergencyRelationship,
+                            },
+                        ],
+                    }
+                );
 
                 toast({
                     title: "Registration successful",
                     description: "Beneficiary registered successfully!",
                 });
 
-                router.push(urlPath);
+                router.push(`${urlPath}/create/${newBeneficiary.id}/allocate`);
             } else {
                 throw new Error();
             }

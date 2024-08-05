@@ -1,6 +1,8 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -15,8 +17,11 @@ import { HousingSchema } from "@/types/housing.types";
 import { SpaceSchema } from "@/types/space.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
+import { FaHouseChimneyUser } from "react-icons/fa6";
+import { IoMdAlert } from "react-icons/io";
 
 type Props = {
     beneficiaryId: string;
@@ -92,53 +97,80 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
 
     return (
         <div>
+            <h1 className="text-relif-orange-200 text-xl font-bold flex items-center gap-2 p-4">
+                <FaHouseChimneyUser />
+                Allocate beneficiary
+            </h1>
+
             {housings.length === 0 && (
-                <span className="text-sm text-red-500 font-medium pt-4">No housings found...</span>
+                <div className="p-4">
+                    <Alert>
+                        <IoMdAlert className="h-4 w-4" />
+                        <AlertTitle>Important</AlertTitle>
+                        <AlertDescription className="text-slate-500">
+                            You cannot associate the beneficiary with a housing at this moment
+                            because there are no housing registered yet. To associate, please return
+                            to the beneficiaries listing and, either from the list or the
+                            beneficiary's profile, go to "Move" and associate them with a new
+                            housing after creating it.
+                        </AlertDescription>
+                    </Alert>
+                </div>
             )}
 
-            {housings.length > 0 && (
-                <div className="pt-4 flex flex-col gap-2">
-                    <span className="text-xs text-slate-500 font-bold">To:</span>
-                    <Select onValueChange={getSpaces} required>
-                        <SelectTrigger className="w-full" id="housing">
-                            <SelectValue placeholder="Select housing..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {housings.map(housing => (
-                                <SelectItem value={housing.id}>{housing.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <Select onValueChange={setSelectedSpace} required>
-                        <SelectTrigger className="w-full" id="space">
-                            <SelectValue placeholder="Select space..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {spaces?.map(space => (
-                                <SelectItem value={space.id}>
-                                    {space.name} [{space.available_vacancies} of{" "}
-                                    {space.total_vacancies} available]
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+            {housings.length !== 0 && (
+                <div className="p-4 flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="housing">Housing *</Label>
+                        <Select onValueChange={getSpaces} required>
+                            <SelectTrigger className="w-full" id="housing">
+                                <SelectValue
+                                    placeholder={!isLoading ? "Select housing..." : "Loading..."}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {housings.map(housing => (
+                                    <SelectItem value={housing.id}>{housing.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="space">Space *</Label>
+                        <Select onValueChange={setSelectedSpace} required>
+                            <SelectTrigger className="w-full" id="space">
+                                <SelectValue placeholder="Select space..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {spaces?.map(space => (
+                                    <SelectItem value={space.id}>
+                                        {space.name} [{space.available_vacancies} of{" "}
+                                        {space.total_vacancies} available]
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             )}
 
             {housings.length !== 0 ? (
-                <div className="flex gap-4 pt-5">
+                <div className="flex gap-4 p-4">
                     <Button variant="outline" onClick={() => router.push(backToListPath)}>
                         Do this later
                     </Button>
                     <Button onClick={handleMove}>Allocate</Button>
                 </div>
             ) : (
-                <div className="flex gap-4 pt-5">
-                    <Button variant="outline" onClick={() => router.push(backToListPath)}>
-                        Back to beneficiary list
+                <div className="flex gap-4 p-4">
+                    <Button variant="outline" asChild>
+                        <Link href={backToListPath}>Back to beneficiary list</Link>
                     </Button>
                 </div>
             )}
         </div>
     );
 };
+
+export { Content };

@@ -154,7 +154,7 @@ export async function getBeneficiariesByOrganizationID(
 export async function createBeneficiary(
     organizationId: string,
     data: CreateBeneficiaryRequest
-): Promise<AxiosResponse> {
+): Promise<AxiosResponse<BeneficiarySchema>> {
     return client.request({
         url: `${PREFIX}/${organizationId}/beneficiaries`,
         method: "POST",
