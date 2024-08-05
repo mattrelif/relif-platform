@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
+import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -123,7 +124,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {/* TODO: FORMAT */}
-                        Created at {data.created_at}
+                        Created at {formatDate(data.created_at, "en")}
                     </span>
                     <span>
                         <Badge>Active</Badge>

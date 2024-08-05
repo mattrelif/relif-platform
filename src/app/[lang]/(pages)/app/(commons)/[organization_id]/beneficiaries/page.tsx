@@ -12,7 +12,6 @@ export default function Page(): ReactNode {
                     <MdSearch className="text-slate-400 text-2xl" />
                     <Input type="text" placeholder="Search" className="w-[300px]" />
                 </div>
-
                 <Toolbar />
             </div>
             <BeneficiaryList />

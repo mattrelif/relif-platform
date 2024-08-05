@@ -1,5 +1,6 @@
 "use client";
 
+import { PDFDocument } from "@/components/reports/beneficiaries";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -7,6 +8,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -16,6 +20,23 @@ import { MdAdd } from "react-icons/md";
 const Toolbar = (): ReactNode => {
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
+    const organizationId = pathname.split("/")[3];
+
+    const handleDownloadPDF = async () => {
+        try {
+            if (organizationId) {
+                const response = await getBeneficiariesByOrganizationID(organizationId, 0, 99999);
+                const blob = await pdf(
+                    <PDFDocument title="Beneficiários" beneficiaries={response.data.data} />
+                ).toBlob();
+                saveAs(blob, "beneficiarios.pdf");
+            } else {
+                throw new Error();
+            }
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+        }
+    };
 
     return (
         <div className="flex items-center gap-4">
@@ -36,7 +57,7 @@ const Toolbar = (): ReactNode => {
                         <FaFileCsv />
                         Download CSV
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
+                    <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
                         <FaFilePdf />
                         Download PDF
                     </DropdownMenuItem>
