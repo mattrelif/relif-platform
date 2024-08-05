@@ -27,9 +27,9 @@ const Toolbar = (): ReactNode => {
             if (organizationId) {
                 const response = await getBeneficiariesByOrganizationID(organizationId, 0, 99999);
                 const blob = await pdf(
-                    <PDFDocument title="Beneficiários" beneficiaries={response.data.data} />
+                    <PDFDocument title="beneficiaries" beneficiaries={response.data.data} />
                 ).toBlob();
-                saveAs(blob, "beneficiarios.pdf");
+                saveAs(blob, "beneficiaries.pdf");
             } else {
                 throw new Error();
             }

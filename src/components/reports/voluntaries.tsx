@@ -1,6 +1,6 @@
 "use client";
 
-import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { VoluntarySchema } from "@/types/voluntary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
@@ -40,16 +40,6 @@ const styles = StyleSheet.create({
     },
 });
 
-const CIVIL_STATUS_MAPPING = {
-    single: "Single",
-    married: "Married",
-    divorced: "Divorced",
-    widowed: "Widowed",
-    separated: "Separated",
-    "common-law-marriage": "Common-Law Marriage",
-    "in-a-relationship": "In a Relationship",
-};
-
 const GENDER_MAPPING = {
     male: "Male",
     female: "Female",
@@ -63,10 +53,10 @@ const GENDER_MAPPING = {
 
 type MyDocumentProps = {
     title: string;
-    beneficiaries: BeneficiarySchema[];
+    volunteers: VoluntarySchema[];
 };
 
-const PDFDocument = ({ title, beneficiaries }: MyDocumentProps) => {
+const PDFDocument = ({ title, volunteers }: MyDocumentProps) => {
     const date = new Date();
     const datetime = `${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`;
 
@@ -75,27 +65,19 @@ const PDFDocument = ({ title, beneficiaries }: MyDocumentProps) => {
             <Page size="A4" style={styles.page}>
                 <Text style={styles.header}>{title}</Text>
                 <View>
-                    {beneficiaries?.map(beneficiary => (
-                        <View style={styles.listItem} key={beneficiary.id}>
+                    {volunteers?.map(volunteer => (
+                        <View style={styles.listItem} key={volunteer.id}>
                             <Text style={styles.itemHeader}>
-                                Name: {convertToTitleCase(beneficiary.full_name)}
+                                Name: {convertToTitleCase(volunteer.full_name)}
                             </Text>
-                            <Text style={styles.itemText}>E-mail: {beneficiary.email}</Text>
-                            <Text style={styles.itemText}>Birthdate: {beneficiary.birthdate}</Text>
-                            <Text style={styles.itemText}>
-                                Civil Status:{" "}
-                                {
-                                    CIVIL_STATUS_MAPPING[
-                                        beneficiary.civil_status as keyof typeof CIVIL_STATUS_MAPPING
-                                    ]
-                                }
-                            </Text>
+                            <Text style={styles.itemText}>E-mail: {volunteer.email}</Text>
+                            <Text style={styles.itemText}>Birthdate: {volunteer.birthdate}</Text>
                             <Text style={styles.itemText}>
                                 Gender:{" "}
-                                {GENDER_MAPPING[beneficiary.gender as keyof typeof GENDER_MAPPING]}
+                                {GENDER_MAPPING[volunteer.gender as keyof typeof GENDER_MAPPING]}
                             </Text>
                             <Text style={styles.itemText}>
-                                Occupation: {beneficiary.occupation}
+                                Segments: {volunteer.segments.join(", ")}
                             </Text>
                         </View>
                     ))}
