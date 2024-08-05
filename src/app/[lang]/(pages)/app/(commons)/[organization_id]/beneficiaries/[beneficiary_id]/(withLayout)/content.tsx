@@ -6,6 +6,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { getBeneficiaryById } from "@/repository/beneficiary.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
+import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -80,6 +81,7 @@ const GENDER_MAPPING = {
 const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
     const pathname = usePathname();
     const housingPath = pathname.split("/").slice(0, 4).join("/");
+    const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
     const [data, setData] = useState<BeneficiarySchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -125,8 +127,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                             {convertToTitleCase(data.full_name)}
                         </h2>
                         <span className="text-sm text-slate-500 flex items-center gap-4">
-                            {/* TODO: Format */}
-                            Registered in {data.created_at}
+                            Registered in {formatDate(data.created_at, locale || "en")}
                         </span>
                     </div>
                 </div>
@@ -139,19 +140,14 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                         </h3>
                         <span className="text-xs text-slate-50 flex items-center gap-1">
                             <FaMapMarkerAlt />
-                            {/* TODO */}
                             {data.current_room_id ? (
                                 <>
-                                    Currently in space <strong>{data.current_room_id}</strong>.
+                                    Currently in space <strong>{data.current_room.name}</strong>.
                                 </>
                             ) : (
                                 "Unallocated"
                             )}
                         </span>
-
-                        {/* <span className="text-xs text-slate-50 flex items-center gap-1">
-                            Since Mar 04, 2023
-                        </span> */}
                     </div>
 
                     {data.current_housing_id && (
@@ -177,8 +173,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>Full name:</strong> {convertToTitleCase(data.full_name)}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                {/* TODO: Format */}
-                                <strong>Birthdate:</strong> {data.birthdate} (
+                                <strong>Birthdate:</strong>{" "}
+                                {formatDate(data.birthdate, locale || "en")} (
                                 {calculateAge(data.birthdate)} years old)
                                 {calculateAge(data.birthdate) < 18 && (
                                     <span>
@@ -192,7 +188,6 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>E-mail:</strong> {data.email}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                {/* TODO: Gender */}
                                 <strong>Gender:</strong>{" "}
                                 {GENDER_MAPPING[data.gender as keyof typeof GENDER_MAPPING] ||
                                     data.gender}

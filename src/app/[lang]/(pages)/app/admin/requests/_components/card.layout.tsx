@@ -9,7 +9,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
+import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaUser } from "react-icons/fa6";
@@ -21,15 +23,18 @@ type Props = UpdateOrganizationTypeRequestSchema & {
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+
     const [disableDialogOpenState, setDisableDialogOpenState] = useState(false);
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">{data.organization_id}</span>
+                <span className="text-sm text-slate-900 font-bold">{data?.organization_id}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <FaUser />
-                    {data.creator_id}
+                    {data?.creator_id}
                 </span>
             </div>
             <div className="flex flex-col items-end justify-between">
@@ -41,7 +46,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`/app/admin/organizations/${data.id}`}>
+                            <Link href={`/app/admin/organizations/${data?.id}`}>
                                 View organization
                             </Link>
                         </DropdownMenuItem>
@@ -58,8 +63,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        {/* TODO: FORMAT */}
-                        Created at {data.created_at}
+                        Created at {formatDate(data?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>

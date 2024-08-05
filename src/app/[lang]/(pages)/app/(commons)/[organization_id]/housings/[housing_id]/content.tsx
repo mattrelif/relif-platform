@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/pagination";
 import { getHousingById } from "@/repository/housing.repository";
 import { HousingSchema } from "@/types/housing.types";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
@@ -23,6 +25,9 @@ import { SpaceList } from "./_spaces/list.layout";
 import { Toolbar } from "./toolbar.layout";
 
 const Content = ({ housingId }: { housingId: string }): ReactNode => {
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+
     const [data, setData] = useState<HousingSchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
@@ -65,15 +70,14 @@ const Content = ({ housingId }: { housingId: string }): ReactNode => {
                         <Toolbar housing={data} />
                         <h1 className="text-slate-900 font-bold text-2xl mt-6 pb-6 flex items-center gap-4">
                             <FaHouseChimneyUser />
-                            {data.name}
+                            {data?.name}
                         </h1>
                         <span className="text-xs text-slate-500 flex items-center gap-1">
                             <FaMapMarkerAlt />
                             {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                         </span>
                         <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                            {/* TODO: Format */}
-                            Created at {data.created_at}
+                            Created at {formatDate(data?.created_at, locale || "en")}
                         </span>
                     </div>
                 </div>

@@ -4,6 +4,8 @@ import {
     EmergencyContactSchema,
     MedicalInformationSchema,
 } from "./commons.types";
+import { HousingSchema } from "./housing.types";
+import { SpaceSchema } from "./space.types";
 
 export type BeneficiarySchema = {
     id: string;
@@ -19,7 +21,9 @@ export type BeneficiarySchema = {
     education: string;
     address: AddressSchema;
     status: string;
+    current_housing: HousingSchema;
     current_housing_id: string;
+    current_room: SpaceSchema;
     current_room_id: string;
     medical_information: MedicalInformationSchema;
     emergency_contacts: EmergencyContactSchema[];

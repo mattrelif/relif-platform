@@ -2,9 +2,11 @@
 
 import { Breadcrumb } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/components/breadcrumb.layout";
 import { UserDropdown } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/components/userDropdown.layout";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage } from "@/utils/localStorage";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -14,6 +16,8 @@ import { MdSettings } from "react-icons/md";
 const Header = (): ReactNode => {
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
+
+    const currentUser: UserSchema = getFromLocalStorage("r_ud");
 
     return (
         <header className="col-span-1 w-full h-max border-b-[1px] border-slate-200 flex items-center justify-between py-2 px-4">
@@ -51,12 +55,26 @@ const Header = (): ReactNode => {
                 </TooltipProvider>
 
                 <div className="flex items-center justify-center pl-2">
-                    <UserDropdown>
-                        <Avatar className="w-8 h-8">
-                            <AvatarImage src="https://github.com/anthonyvii27.png" />
-                            <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                    </UserDropdown>
+                    {currentUser ? (
+                        <UserDropdown>
+                            <Avatar className="w-8 h-8">
+                                <AvatarFallback className="bg-relif-orange-200 text-white">
+                                    {currentUser.first_name
+                                        .charAt(0)
+                                        .concat(currentUser.last_name.charAt(0))
+                                        .toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
+                        </UserDropdown>
+                    ) : (
+                        <UserDropdown>
+                            <Avatar className="w-8 h-8">
+                                <AvatarFallback className="bg-relif-orange-200 text-white">
+                                    US
+                                </AvatarFallback>
+                            </Avatar>
+                        </UserDropdown>
+                    )}
                 </div>
             </div>
         </header>

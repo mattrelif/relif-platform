@@ -10,6 +10,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserSchema } from "@/types/user.types";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { FaTrash } from "react-icons/fa";
 import { MdAccessTime, MdMail } from "react-icons/md";
@@ -18,7 +20,9 @@ import { SlOptions } from "react-icons/sl";
 type Props = UserSchema;
 
 const UserCard = (data: Props): ReactNode => {
-    const initials = data.first_name.charAt(0).concat(data.last_name.charAt(0));
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+    const initials = data?.first_name?.charAt(0)?.concat(data?.last_name?.charAt(0));
 
     return (
         <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
@@ -30,23 +34,22 @@ const UserCard = (data: Props): ReactNode => {
                 </Avatar>
                 <div className="flex flex-col">
                     <span className="text-sm text-slate-900 font-bold">
-                        {data.first_name} {data.last_name}
+                        {data?.first_name} {data?.last_name}
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-2">
                         <MdMail />
-                        {data.email}
+                        {data?.email}
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-2">
                         <MdAccessTime />
-                        {/* TODO: FORMAT */}
-                        Created at {data.created_at}
+                        Created at {formatDate(data?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>
 
             <div className="flex flex-col">
                 <span>
-                    <Badge>{data.platform_role || "MEMBER"}</Badge>
+                    <Badge>{data?.platform_role || "MEMBER"}</Badge>
                 </span>
             </div>
 

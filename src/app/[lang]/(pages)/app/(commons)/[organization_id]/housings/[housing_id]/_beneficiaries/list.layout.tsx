@@ -3,13 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
+    getAllocationsByHousingId,
+    getBeneficiariesByHousingId,
+} from "@/repository/housing.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -49,13 +45,26 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
         })();
     };
 
+    const getHistoricBeneficiariesList = async () => {
+        (async () => {
+            try {
+                const response = await getAllocationsByHousingId(housingId, OFFSET, LIMIT);
+                console.log(response.data);
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    };
+
     useEffect(() => {
         setIsLoading(true);
 
         if (toggle === "current") {
             getCurrentBeneficiariesList();
         } else {
-            // TODO: HISTORIC LIST
+            getHistoricBeneficiariesList();
         }
     }, [toggle]);
 
@@ -68,7 +77,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                 </h3>
 
                 <div className="flex items-center gap-2">
-                    <Select
+                    {/* <Select
                         value={toggle}
                         onValueChange={(opt: "current" | "historic") => setToggle(opt)}
                     >
@@ -79,7 +88,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                             <SelectItem value="current">Current</SelectItem>
                             <SelectItem value="historic">Historic</SelectItem>
                         </SelectContent>
-                    </Select>
+                    </Select> */}
 
                     <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
                         <Link href={`${urlPath}/beneficiaries/create`}>

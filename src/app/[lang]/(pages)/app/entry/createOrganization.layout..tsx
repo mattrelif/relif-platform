@@ -36,8 +36,8 @@ const CreateOrganization = (): ReactNode => {
                 name: data.name,
                 description: "teste",
                 address: {
-                    street_name: data.addressLine1,
-                    street_number: data.addressLine2,
+                    address_line_1: data.addressLine1,
+                    address_line_2: data.addressLine2,
                     city: data.city,
                     zip_code: data.postalCode,
                     district: data.state,
@@ -51,9 +51,9 @@ const CreateOrganization = (): ReactNode => {
         } catch {
             setIsLoading(false);
             toast({
-                title: "Invalid credentials",
+                title: "Organization Creation Failed",
                 description:
-                    "The email address or password you entered is incorrect. Please try again.",
+                    "There was an error creating the organization. Please check the details and try again.",
                 variant: "destructive",
             });
         }

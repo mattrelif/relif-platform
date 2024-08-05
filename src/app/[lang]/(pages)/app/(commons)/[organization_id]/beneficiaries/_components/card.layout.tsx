@@ -22,6 +22,17 @@ import { SlOptions } from "react-icons/sl";
 import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
 
+const GENDER_MAPPING = {
+    male: "Male",
+    female: "Female",
+    "non-binary": "Non-Binary",
+    "prefer-not-to-say": "Prefer Not to Say",
+    transgender: "Transgender",
+    "gender-fluid": "Gender Fluid",
+    agender: "Agender",
+    other: "Other",
+};
+
 type Props = BeneficiarySchema & {
     refreshList: () => void;
 };
@@ -46,6 +57,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const pathname = usePathname();
     const beneficiaryPath = pathname.split("/").slice(0, 5).join("/");
     const housingPath = pathname.split("/").slice(0, 4).join("/");
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const age = calculateAge(data.birthdate);
     const isUnderage = age < 18;
@@ -55,7 +67,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
             <div className="flex gap-4">
                 <Avatar className="w-14 h-14">
                     <AvatarFallback className="bg-relif-orange-200 text-white">
-                        {data.full_name.charAt(0).toUpperCase()}
+                        {data?.full_name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
@@ -64,21 +76,26 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </span>
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        {/* TODO: NAME */}
-                        {data?.current_room_id ? data?.current_room_id : "Unallocated"}
+                        {data?.current_housing.name
+                            ? convertToTitleCase(data?.current_housing.name)
+                            : "Unallocated"}
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                        <FaBirthdayCake /> {data.birthdate} ({age} years old)
+                        <FaBirthdayCake /> {formatDate(data?.birthdate, locale || "en")} ({age}{" "}
+                        years old)
                     </span>
                     <div className="flex mt-2 gap-2">
-                        <Badge>{convertToTitleCase(data.gender)}</Badge>
+                        {data.gender && (
+                            <Badge>
+                                {GENDER_MAPPING[data?.gender as keyof typeof GENDER_MAPPING]}
+                            </Badge>
+                        )}
                         {isUnderage && (
                             <Badge className="bg-yellow-300 text-slate-900">Underage</Badge>
                         )}
                         {!data?.current_room_id && (
                             <Badge className="bg-slate-200 text-slate-900">Unallocated</Badge>
                         )}
-                        {/* TODO: GENDER */}
                     </div>
                 </div>
             </div>
@@ -91,16 +108,16 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${beneficiaryPath}/${data.id}`}>Profile</Link>
+                            <Link href={`${beneficiaryPath}/${data?.id}`}>Profile</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild disabled={!data.current_housing_id}>
-                            <Link href={`${housingPath}/${data.current_housing_id}`}>
+                        <DropdownMenuItem asChild disabled={!data?.current_housing_id}>
+                            <Link href={`${housingPath}/${data?.current_housing_id}`}>
                                 View housing
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href={`${beneficiaryPath}/${data.id}/edit`}>
+                            <Link href={`${beneficiaryPath}/${data?.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
                                     Edit beneficiary
@@ -123,8 +140,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        {/* TODO: FORMAT */}
-                        Created at {formatDate(data.created_at, "en")}
+                        Created at {formatDate(data?.created_at, locale || "en")}
                     </span>
                     <span>
                         <Badge>Active</Badge>

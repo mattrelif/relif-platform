@@ -12,6 +12,8 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { deleteSpace, getBeneficiariesBySpaceId } from "@/repository/spaces.repository";
 import { SpaceSchema } from "@/types/space.types";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
 type Props = {
@@ -28,6 +30,8 @@ const RemoveSpaceModal = ({
     setRemoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [allowToRemove, setAllowToRemove] = useState<
@@ -85,10 +89,9 @@ const RemoveSpaceModal = ({
                         This action cannot be undone. This will permanently delete the space below.
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
-                        <span className="text-sm text-slate-900 font-bold">{space.name}</span>
-                        {/* TODO: Format */}
+                        <span className="text-sm text-slate-900 font-bold">{space?.name}</span>
                         <span className="text-xs text-slate-500">
-                            Created at {space?.created_at}
+                            Created at {formatDate(space?.created_at, locale || "en")}
                         </span>
                     </div>
 

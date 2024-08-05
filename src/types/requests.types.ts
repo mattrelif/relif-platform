@@ -10,13 +10,18 @@ export type JoinOrganizationInviteSchema = {
 export type JoinOrganizationRequestSchema = {
     id: string;
     user_id: string;
+    auditor_id: string;
     organization_id: string;
     created_at: string;
     expires_at: string;
+    status: "PENDING" | "ACCEPTED" | "REJECTED";
+    accepted_at: string;
+    rejected_at: string;
+    rejected_reason: string;
 };
 
 export type JoinPlatformInviteSchema = {
-    id: string; //invited_email
+    id: string;
     code: string;
     organization_id: string;
     inviter_id: string;

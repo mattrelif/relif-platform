@@ -1,5 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { findOrganizationByID } from "@/repository/organization.repository";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaHouseChimneyUser, FaUsers } from "react-icons/fa6";
@@ -15,6 +17,8 @@ export default async function Page({
         organization_id: string;
     };
 }): Promise<ReactNode> {
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
     const { data } = await findOrganizationByID(params.organization_id);
 
     return (
@@ -28,11 +32,10 @@ export default async function Page({
                     </h1>
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        {`${data?.address.street_name}, ${data?.address.street_number} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
+                        {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                     </span>
                     <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                        {/* TODO: FORMAT */}
-                        Created at {data?.created_at}
+                        Created at {formatDate(data?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>

@@ -5,6 +5,8 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { getVolunteerById } from "@/repository/volunteer.repository";
 import { VoluntarySchema } from "@/types/voluntary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCity } from "react-icons/fa";
 import { FaBriefcaseMedical } from "react-icons/fa6";
@@ -51,6 +53,9 @@ const GENDER_MAPPING = {
 };
 
 const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+
     const [data, setData] = useState<VoluntarySchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
@@ -95,7 +100,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                             {convertToTitleCase(data.full_name)}
                         </h2>
                         <span className="text-sm text-slate-500 flex items-center gap-4">
-                            Registered in {data.created_at}
+                            Registered in {formatDate(data.created_at, locale || "en")}
                         </span>
                     </div>
                 </div>
@@ -111,15 +116,16 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                 <strong>Full name:</strong> {convertToTitleCase(data.full_name)}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                <strong>Birthdate:</strong> {data.birthdate} (
+                                <strong>Birthdate:</strong>{" "}
+                                {formatDate(data.birthdate, locale || "en")} (
                                 {calculateAge(data.birthdate)} years old)
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>E-mail:</strong> {data.email}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                {/* TODO: BACKEND */}
-                                <strong>Gender:</strong> Men
+                                <strong>Gender:</strong>{" "}
+                                {GENDER_MAPPING[data.gender as keyof typeof GENDER_MAPPING]}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap gap-2">
                                 <strong>Phones:</strong>

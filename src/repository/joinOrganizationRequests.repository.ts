@@ -3,23 +3,22 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "join-organization-requests";
 
-export async function createRequest(): Promise<AxiosResponse> {
-    return client.request({
-        url: `${PREFIX}`,
-        method: "POST",
-    });
-}
-
 export async function acceptRequest(requestId: string): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${requestId}`,
-        method: "DELETE",
+        url: `${PREFIX}/${requestId}/accept`,
+        method: "PUT",
     });
 }
 
-export async function rejectRequest(requestId: string): Promise<AxiosResponse> {
+export async function rejectRequest(
+    requestId: string,
+    rejectReason: string
+): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${requestId}`,
-        method: "DELETE",
+        url: `${PREFIX}/${requestId}/reject`,
+        method: "PUT",
+        data: {
+            reject_reason: rejectReason,
+        },
     });
 }

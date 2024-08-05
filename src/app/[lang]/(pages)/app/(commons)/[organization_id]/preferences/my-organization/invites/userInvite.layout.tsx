@@ -7,6 +7,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/components/ui/use-toast";
 import { rejectRequest } from "@/repository/joinOrganizationRequests.repository";
 import { JoinOrganizationRequestSchema } from "@/types/requests.types";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { MdCheck, MdClose } from "react-icons/md";
 
@@ -15,11 +17,14 @@ type Props = JoinOrganizationRequestSchema & {
 };
 
 const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
+    const pathname = usePathname();
     const { toast } = useToast();
+
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const handleReject = async () => {
         try {
-            await rejectRequest(data.id);
+            await rejectRequest(data.id, "n quis");
             refreshList();
             toast({
                 title: "Request Rejected!",
@@ -39,13 +44,15 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
             <div className="flex gap-4">
                 <Avatar>
                     <AvatarFallback className="bg-relif-orange-400 text-white font-semibold text-sm">
-                        AV
+                        US
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="text-sm text-slate-900 font-bold">Anthony Vinicius</span>
-                    <span className="text-xs text-slate-500">anthony.vii27@gmail.com</span>
-                    <span className="text-xs text-slate-400 mt-2">7 days ago</span>
+                    <span className="text-sm text-slate-900 font-bold">{data.user_id}</span>
+                    <span className="text-xs text-slate-500">TODO: User e-mail</span>
+                    <span className="text-xs text-slate-400 mt-2">
+                        Created at {formatDate(data.created_at, locale)}
+                    </span>
                 </div>
             </div>
 

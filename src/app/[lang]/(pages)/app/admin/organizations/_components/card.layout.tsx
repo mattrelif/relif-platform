@@ -9,6 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { OrganizationSchema } from "@/types/organization.types";
+import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -22,10 +23,10 @@ type Props = OrganizationSchema & {
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
-    const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
+    const [disableDialogOpenState, setDisableDialogOpenState] = useState(false);
 
     const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 5).join("/");
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
@@ -33,7 +34,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 <span className="text-sm text-slate-900 font-bold">{data.name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <FaMapMarkerAlt />
-                    {`${data?.address.street_name}, ${data?.address.street_number} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
+                    {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
                 <div className="flex items-center gap-4">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
@@ -77,8 +78,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        {/* TODO: FORMAT */}
-                        Created at {data.created_at}
+                        Created at {formatDate(data?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>
@@ -86,8 +86,8 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
             <DisableModal
                 refreshList={refreshList}
                 organization={data}
-                removeDialogOpenState={removeDialogOpenState}
-                setRemoveDialogOpenState={setRemoveDialogOpenState}
+                disableDialogOpenState={disableDialogOpenState}
+                setDisableDialogOpenState={setDisableDialogOpenState}
             />
         </li>
     );

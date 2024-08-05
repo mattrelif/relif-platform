@@ -18,7 +18,9 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "organizations";
 
-export async function createOrganization(data: CreateOrganizationRequest): Promise<void> {
+export async function createOrganization(
+    data: CreateOrganizationRequest
+): Promise<AxiosResponse<OrganizationSchema>> {
     return client.request({
         url: `${PREFIX}`,
         method: "POST",
@@ -176,5 +178,12 @@ export async function createVolunteer(orgId: string, data: CreateVoluntaryReques
         url: `${PREFIX}/${orgId}/voluntary-people`,
         method: "POST",
         data,
+    });
+}
+
+export async function createJoinOrganizationRequest(orgId: string): Promise<AxiosResponse> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/join-organization-requests`,
+        method: "POST",
     });
 }

@@ -63,9 +63,13 @@ export async function getBeneficiariesByHousingId(
     });
 }
 
-export async function getAllocationsByHousingId(housingId: string): Promise<AxiosResponse> {
+export async function getAllocationsByHousingId(
+    housingId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${housingId}/allocations`,
+        url: `${PREFIX}/${housingId}/allocations?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

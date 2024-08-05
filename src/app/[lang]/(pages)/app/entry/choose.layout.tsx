@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { createJoinOrganizationRequest } from "@/repository/organization.repository";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -9,14 +11,27 @@ import { MdAdd } from "react-icons/md";
 
 const Choose = (): ReactNode => {
     const router = useRouter();
+    const { toast } = useToast();
+
     const [token, setToken] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     const handleJoinAnOrganization = async () => {
         try {
-          // TODO
+            await createJoinOrganizationRequest(token);
+            toast({
+                title: "Request Sent",
+                description: "Your request to join the organization was sent successfully.",
+                variant: "success",
+            });
         } catch {
             setIsLoading(false);
+            toast({
+                title: "Request Failed",
+                description:
+                    "There was an error sending your request to join the organization. Please try again later.",
+                variant: "destructive",
+            });
         }
     };
 
@@ -44,7 +59,9 @@ const Choose = (): ReactNode => {
                                 onChange={e => setToken(e.target.value)}
                             />
                         </div>
-                        <Button disabled={isLoading}>Enter</Button>
+                        <Button disabled={isLoading} onClick={handleJoinAnOrganization}>
+                            Enter
+                        </Button>
                     </div>
                 </div>
             </div>
