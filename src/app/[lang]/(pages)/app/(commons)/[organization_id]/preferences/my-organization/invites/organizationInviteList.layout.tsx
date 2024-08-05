@@ -41,6 +41,7 @@ const OrganizationInviteList = (): ReactNode => {
     useEffect(() => {
         (async () => {
             try {
+                setIsLoading(true);
                 await getRequests();
             } catch {
                 setError(true);

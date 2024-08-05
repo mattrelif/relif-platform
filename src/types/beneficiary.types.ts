@@ -48,7 +48,14 @@ export type BeneficiaryAllocationSchema = {
 
 export type CreateBeneficiaryRequest = Omit<
     BeneficiarySchema,
-    "id" | "status" | "current_housing_id" | "current_room_id" | "created_at" | "updated_at"
+    | "id"
+    | "status"
+    | "current_housing_id"
+    | "current_housing"
+    | "current_room_id"
+    | "current_room"
+    | "created_at"
+    | "updated_at"
 >;
 
 export type UpdateBeneficiaryRequest = Omit<

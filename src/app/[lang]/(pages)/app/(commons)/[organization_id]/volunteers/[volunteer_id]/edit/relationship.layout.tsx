@@ -29,15 +29,13 @@ const OPTIONS = [
 ];
 
 const RelationshipDegree = ({ defaultValue }: Props): ReactNode => {
-    const [option, setOption] = useState<string>("other");
-    const [customOption, setCustomOption] = useState<string>("");
+    const [option, setOption] = useState<string>(defaultValue);
 
     useEffect(() => {
         if (OPTIONS.includes(defaultValue)) {
             setOption(defaultValue);
         } else {
             setOption("other");
-            setCustomOption(defaultValue);
         }
     }, [defaultValue]);
 
@@ -64,11 +62,10 @@ const RelationshipDegree = ({ defaultValue }: Props): ReactNode => {
             </Select>
             {option === "other" && (
                 <Input
+                    id="otherEmergencyRelationship"
                     name="otherEmergencyRelationship"
                     type="text"
                     placeholder="Specify relationship"
-                    value={customOption}
-                    onChange={e => setCustomOption(e.target.value)}
                 />
             )}
         </div>

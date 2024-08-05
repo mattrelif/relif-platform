@@ -1,5 +1,9 @@
 import { client } from "@/lib/axios-client";
-import { BeneficiarySchema, UpdateBeneficiaryRequest } from "@/types/beneficiary.types";
+import {
+    BeneficiaryAllocationSchema,
+    BeneficiarySchema,
+    UpdateBeneficiaryRequest,
+} from "@/types/beneficiary.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "beneficiaries";
@@ -45,9 +49,13 @@ export async function reallocateBeneficiary(beneficiaryId: string): Promise<Axio
     });
 }
 
-export async function getAllocationByBeneficiaryId(beneficiaryId: string): Promise<AxiosResponse> {
+export async function getAllocationByBeneficiaryId(
+    beneficiaryId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: BeneficiaryAllocationSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${beneficiaryId}/allocations`,
+        url: `${PREFIX}/${beneficiaryId}/allocations?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

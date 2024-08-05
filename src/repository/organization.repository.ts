@@ -97,7 +97,7 @@ export async function findDataAccessRequestsByOrganizationId(
     limit: number
 ): Promise<AxiosResponse<{ count: number; data: OrganizationDataAccessRequestSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/data-accesses-requests?offset=${offset}&limit=${limit}`,
+        url: `${PREFIX}/${orgId}/targeted-data-access-requests?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }

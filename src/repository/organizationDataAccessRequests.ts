@@ -22,14 +22,15 @@ export async function findRequests(): Promise<
 
 export async function acceptRequest(requestId: string): Promise<void> {
     return client.request({
-        url: `${PREFIX}/${requestId}`,
-        method: "DELETE",
+        url: `${PREFIX}/${requestId}/accept`,
+        method: "PUT",
     });
 }
 
-export async function rejectRequest(requestId: string): Promise<void> {
+export async function rejectRequest(requestId: string, rejectReason: string): Promise<void> {
     return client.request({
-        url: `${PREFIX}/${requestId}`,
-        method: "DELETE",
+        url: `${PREFIX}/${requestId}/reject`,
+        method: "PUT",
+        data: { reject_reason: rejectReason },
     });
 }

@@ -91,10 +91,14 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             </Badge>
                         )}
                         {isUnderage && (
-                            <Badge className="bg-yellow-300 text-slate-900">Underage</Badge>
+                            <Badge className="bg-yellow-300 text-slate-900 hover:bg-yellow-500">
+                                Underage
+                            </Badge>
                         )}
                         {!data?.current_room_id && (
-                            <Badge className="bg-slate-200 text-slate-900">Unallocated</Badge>
+                            <Badge className="bg-slate-200 text-slate-900 hover:bg-slate-400">
+                                Unallocated
+                            </Badge>
                         )}
                     </div>
                 </div>

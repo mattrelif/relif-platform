@@ -5,6 +5,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/components/ui/use-toast";
 import { rejectRequest } from "@/repository/organizationDataAccessRequests";
 import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { MdCheck, MdClose, MdInfo, MdPhone } from "react-icons/md";
 
@@ -40,10 +42,13 @@ type Props = OrganizationDataAccessRequestSchema & {
 
 const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
     const { toast } = useToast();
+    const pathname = usePathname();
+
+    const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
     const handleReject = async () => {
         try {
-            await rejectRequest(data.id);
+            await rejectRequest(data.id, "");
             refreshList();
             toast({
                 title: "Request Rejected!",
@@ -67,13 +72,17 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
                     </div>
                 </OrganizationInfoCard>
                 <div className="flex flex-col">
+                    {/* TODO */}
                     <span className="text-sm text-slate-900 font-bold">
-                        Prefeitura do Rio de Janeiro
+                        {data.requester_organization_id}
                     </span>
                     <span className="text-xs text-slate-500">
-                        <strong>By: </strong>anthony.vinicius@example.com
+                        <strong>By: </strong>
+                        {data.requester_id}
                     </span>
-                    <span className="text-xs text-slate-400 mt-2">2 days ago</span>
+                    <span className="text-xs text-slate-400 mt-2">
+                        {formatDate(data.created_at, locale)}
+                    </span>
                 </div>
             </div>
 

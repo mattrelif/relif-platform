@@ -108,7 +108,7 @@ const Form = ({ volunteerId }: Props): ReactNode => {
                 emergencyName: string;
                 emergencyRelationship: string;
                 otherEmergencyRelationship: string;
-                emergencyContryCode: string;
+                emergencyCountryCode: string;
                 emergencyPhone: string;
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
@@ -151,7 +151,7 @@ const Form = ({ volunteerId }: Props): ReactNode => {
                 ],
                 emergency_contacts: [
                     {
-                        phones: [`${data.emergencyContryCode}_${data.emergencyPhone}`],
+                        phones: [`${data.emergencyCountryCode}_${data.emergencyPhone}`],
                         emails: [data.emergencyEmail],
                         full_name: data.emergencyName,
                         relationship:
