@@ -11,6 +11,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { allocateBeneficiary } from "@/repository/beneficiary.repository";
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { HousingSchema } from "@/types/housing.types";
@@ -77,15 +78,14 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
 
     const handleMove = async (): Promise<void> => {
         try {
-            // TODO: ENDPOINT
-            console.log(selectedHousing, selectedSpace);
-
-            router.push(backToListPath);
+            await allocateBeneficiary(beneficiaryId, selectedHousing, selectedSpace);
 
             toast({
                 title: "Beneficiary allocated",
                 description: "The beneficiary has been successfully moved to the new shelter.",
             });
+
+            router.push(backToListPath);
         } catch {
             toast({
                 title: "Error Moving Beneficiary",
@@ -145,7 +145,8 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                             <SelectContent>
                                 {spaces?.map(space => (
                                     <SelectItem value={space.id}>
-                                        {space.name} [{space.available_vacancies} of{" "}
+                                        {space.name} [
+                                        {space.total_vacancies - space.occupied_vacancies} of{" "}
                                         {space.total_vacancies} available]
                                     </SelectItem>
                                 ))}

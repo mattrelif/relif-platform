@@ -27,15 +27,13 @@ const OPTIONS = [
 ];
 
 const Gender = ({ defaultValue }: Props): ReactNode => {
-    const [option, setOption] = useState<string>("other");
-    const [customOption, setCustomOption] = useState<string>("");
+    const [option, setOption] = useState<string>(defaultValue);
 
     useEffect(() => {
         if (OPTIONS.includes(defaultValue)) {
             setOption(defaultValue);
         } else {
             setOption("other");
-            setCustomOption(defaultValue);
         }
     }, [defaultValue]);
 
@@ -58,14 +56,7 @@ const Gender = ({ defaultValue }: Props): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input
-                    name="otherGender"
-                    type="text"
-                    placeholder="Specify gender"
-                    value={customOption}
-                    onChange={e => setCustomOption(e.target.value)}
-                    required
-                />
+                <Input name="otherGender" type="text" placeholder="Specify gender" required />
             )}
         </div>
     );

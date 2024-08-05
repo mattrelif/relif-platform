@@ -27,10 +27,11 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const getStatus = () => {
-        console.log(data.available_vacancies, data.total_vacancies);
-        if (data.available_vacancies < 0) {
+        const available_vacancies = data.total_vacancies - data.occupied_vacancies;
+
+        if (available_vacancies < 0) {
             return "SUPERCROWDED";
-        } else if (data.total_vacancies >= data.available_vacancies) {
+        } else if (available_vacancies > 0) {
             return "AVAILABLE";
         } else {
             return "FULL";
@@ -45,7 +46,7 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     return (
         <li
             className={cn(
-                "w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 border-l-[8px]",
+                "w-full h-max p-4 border-b-[1px] border-b-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 border-l-[8px]",
                 `border-l-${statusColor}`
             )}
         >
@@ -53,7 +54,7 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                 <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                        {data?.available_vacancies || 0}/{data.total_vacancies || 0} beds available
+                        {data?.occupied_vacancies || 0}/{data.total_vacancies || 0} beds occupied
                     </span>
                     <span>
                         <Badge className={`bg-${statusColor}`}>{status}</Badge>

@@ -26,15 +26,13 @@ const OPTIONS = [
 ];
 
 const CivilStatus = ({ defaultValue }: Props): ReactNode => {
-    const [option, setOption] = useState<string>("other");
-    const [customOption, setCustomOption] = useState<string>("");
+    const [option, setOption] = useState<string>(defaultValue);
 
     useEffect(() => {
         if (OPTIONS.includes(defaultValue)) {
             setOption(defaultValue);
         } else {
             setOption("other");
-            setCustomOption(defaultValue);
         }
     }, [defaultValue]);
 
@@ -57,13 +55,7 @@ const CivilStatus = ({ defaultValue }: Props): ReactNode => {
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input
-                    name="otherCivilStatus"
-                    type="text"
-                    placeholder="Specify civil status"
-                    value={customOption}
-                    onChange={e => setCustomOption(e.target.value)}
-                />
+                <Input name="otherCivilStatus" type="text" placeholder="Specify civil status" />
             )}
         </div>
     );

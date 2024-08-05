@@ -35,17 +35,33 @@ export async function deleteBeneficiary(beneficiaryId: string): Promise<AxiosRes
     });
 }
 
-export async function allocateBeneficiary(beneficiaryId: string): Promise<AxiosResponse> {
+export async function allocateBeneficiary(
+    beneficiaryId: string,
+    housingId: string,
+    roomId: string
+): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${beneficiaryId}/allocate`,
         method: "POST",
+        data: {
+            housing_id: housingId,
+            room_id: roomId,
+        },
     });
 }
 
-export async function reallocateBeneficiary(beneficiaryId: string): Promise<AxiosResponse> {
+export async function reallocateBeneficiary(
+    beneficiaryId: string,
+    housingId: string,
+    roomId: string
+): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${beneficiaryId}/reallocate`,
         method: "POST",
+        data: {
+            housing_id: housingId,
+            room_id: roomId,
+        },
     });
 }
 

@@ -76,7 +76,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </span>
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         <FaMapMarkerAlt />
-                        {data?.current_housing.name
+                        {data?.current_housing_id
                             ? convertToTitleCase(data?.current_housing.name)
                             : "Unallocated"}
                     </span>

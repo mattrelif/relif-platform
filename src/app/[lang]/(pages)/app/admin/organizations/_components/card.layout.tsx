@@ -69,13 +69,11 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href="#">
-                                <span className="flex items-center gap-2">
-                                    <FaEdit className="text-xs" />
-                                    Disable access
-                                </span>
-                            </Link>
+                        <DropdownMenuItem onClick={() => setDisableDialogOpenState(true)}>
+                            <span className="flex items-center gap-2">
+                                <FaEdit className="text-xs" />
+                                Disable access
+                            </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { reallocateBeneficiary } from "@/repository/beneficiary.repository";
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
@@ -88,8 +89,7 @@ const MoveModal = ({
 
     const handleMove = async (): Promise<void> => {
         try {
-            // TODO: ENDPOINT
-            console.log(selectedHousing, selectedSpace);
+            await reallocateBeneficiary(beneficiary.id, selectedHousing, selectedSpace);
 
             if (refreshList) {
                 refreshList();
@@ -100,7 +100,7 @@ const MoveModal = ({
             setMoveDialogOpenState(false);
             toast({
                 title: "Beneficiary Relocated",
-                description: "The beneficiary has been successfully moved to the new shelter.",
+                description: "The beneficiary has been successfully moved to the new housing.",
                 variant: "success",
             });
         } catch {
@@ -161,8 +161,9 @@ const MoveModal = ({
                                 <SelectContent>
                                     {spaces?.map(space => (
                                         <SelectItem value={space.id}>
-                                            {space.name} [{space.available_vacancies} of{" "}
-                                            {space.total_vacancies} available]
+                                            {space.name} [
+                                            {space.total_vacancies - space.occupied_vacancies} of{" "}
+                                            {space.total_vacancies} occupied]
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

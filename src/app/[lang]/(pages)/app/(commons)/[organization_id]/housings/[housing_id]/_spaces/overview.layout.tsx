@@ -45,9 +45,11 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
     }, []);
 
     const getStatus = () => {
-        if (space.available_vacancies < 0) {
+        const available_vacancies = space.total_vacancies - space.occupied_vacancies;
+
+        if (available_vacancies < 0) {
             return "SUPERCROWDED";
-        } else if (space.total_vacancies >= space.available_vacancies) {
+        } else if (available_vacancies > 0) {
             return "AVAILABLE";
         } else {
             return "FULL";
@@ -70,7 +72,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
                         {space.name} <Badge className={`bg-${statusColor}`}>{status}</Badge>
                     </h2>
                     <span className="text-sm text-slate-900">
-                        {space.total_vacancies} beds, {space.available_vacancies} available
+                        {space.total_vacancies} beds, {space.occupied_vacancies} occupied
                     </span>
                 </div>
                 <h3 className="mt-8 text-slate-900 text-sm font-bold pb-2 flex items-center gap-2">
@@ -91,7 +93,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
                     )}
 
                     {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
-                        <span className="text-sm text-slate-900 font-medium p-4">
+                        <span className="text-sm text-slate-900 font-medium p-4 block">
                             No beneficiaries found...
                         </span>
                     )}

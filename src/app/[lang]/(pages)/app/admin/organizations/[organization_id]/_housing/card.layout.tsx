@@ -26,8 +26,7 @@ const HousingCard = (data: Props): ReactNode => {
                     {/* TODO: BACKEND */}
                     <FaPeopleGroup /> -- beneficiaries
                 </span>
-            </div>
-            <div className="flex flex-col items-end justify-between">
+
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     Created at {formatDate(data.created_at, locale || "en")}
                 </span>

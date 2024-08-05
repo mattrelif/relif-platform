@@ -114,7 +114,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                 )}
 
                 {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
-                    <span className="text-sm text-slate-900 font-medium p-4">
+                    <span className="block text-sm text-slate-900 font-medium p-4">
                         No beneficiaries found...
                     </span>
                 )}

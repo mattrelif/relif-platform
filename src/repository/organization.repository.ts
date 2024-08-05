@@ -11,6 +11,7 @@ import {
 import {
     JoinOrganizationInviteSchema,
     JoinOrganizationRequestSchema,
+    UpdateOrganizationTypeRequestSchema,
 } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
 import { CreateVoluntaryRequest, VoluntarySchema } from "@/types/voluntary.types";
@@ -103,10 +104,12 @@ export async function findDataAccessRequestsByOrganizationId(
 }
 
 export async function findUpdateOrganizationTypeRequestsByOrganizationId(
-    orgId: string
-): Promise<AxiosResponse> {
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: UpdateOrganizationTypeRequestSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/update-organization-type-requests`,
+        url: `${PREFIX}/${orgId}/update-organization-type-requests?offset=${offset}&limit=${limit}`,
         method: "GET",
     });
 }
