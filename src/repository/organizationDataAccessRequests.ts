@@ -4,13 +4,6 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "organization-data-access-requests";
 
-export async function createRequest(): Promise<void> {
-    return client.request({
-        url: `${PREFIX}`,
-        method: "POST",
-    });
-}
-
 export async function findRequests(): Promise<
     AxiosResponse<OrganizationDataAccessRequestSchema[]>
 > {

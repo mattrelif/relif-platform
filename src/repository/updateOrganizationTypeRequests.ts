@@ -23,14 +23,18 @@ export async function findRequests(
 
 export async function acceptRequest(requestId: string): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${requestId}`,
-        method: "DELETE",
+        url: `${PREFIX}/${requestId}/accept`,
+        method: "PUT",
     });
 }
 
-export async function rejectRequest(requestId: string): Promise<AxiosResponse> {
+export async function rejectRequest(
+    requestId: string,
+    rejectReason: string
+): Promise<AxiosResponse> {
     return client.request({
-        url: `${PREFIX}/${requestId}`,
-        method: "DELETE",
+        url: `${PREFIX}/${requestId}/reject`,
+        method: "PUT",
+        data: { reject_reason: rejectReason },
     });
 }

@@ -1,3 +1,6 @@
+import { OrganizationSchema } from "./organization.types";
+import { UserSchema } from "./user.types";
+
 export type JoinOrganizationInviteSchema = {
     id: string;
     user_id: string;
@@ -32,10 +35,14 @@ export type JoinPlatformInviteSchema = {
 export type UpdateOrganizationTypeRequestSchema = {
     id: string;
     organization_id: string;
+    organization: OrganizationSchema;
     creator_id: string;
+    creator: UserSchema;
     auditor_id: string;
+    auditor: UserSchema;
     status: string;
     created_at: string;
+    accepted_at: string;
     reject_reason: string;
     rejected_at: string;
 };
