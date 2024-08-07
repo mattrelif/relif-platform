@@ -13,6 +13,7 @@ import { SpaceSchema } from "@/types/space.types";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
+
 import { EditSpace } from "./edit.layout";
 import { ViewSpace } from "./overview.layout";
 import { RemoveSpaceModal } from "./remove.modal";
@@ -27,20 +28,21 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const getStatus = () => {
-        const available_vacancies = data.total_vacancies - data.occupied_vacancies;
+        const availableVacancies = data.total_vacancies - data.occupied_vacancies;
 
-        if (available_vacancies < 0) {
+        if (availableVacancies < 0) {
             return "SUPERCROWDED";
-        } else if (available_vacancies > 0) {
-            return "AVAILABLE";
-        } else {
-            return "FULL";
         }
+        if (availableVacancies > 0) {
+            return "AVAILABLE";
+        }
+        return "FULL";
     };
 
     const status = getStatus();
 
     const statusColor =
+        // eslint-disable-next-line no-nested-ternary
         status === "AVAILABLE" ? "green-500" : status === "FULL" ? "red-600" : "slate-900";
 
     return (

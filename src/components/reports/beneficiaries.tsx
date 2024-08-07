@@ -3,6 +3,7 @@
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { ReactNode } from "react";
 
 const styles = StyleSheet.create({
     page: {
@@ -66,7 +67,7 @@ type MyDocumentProps = {
     beneficiaries: BeneficiarySchema[];
 };
 
-const PDFDocument = ({ title, beneficiaries }: MyDocumentProps) => {
+const PDFDocument = ({ title, beneficiaries }: MyDocumentProps): ReactNode => {
     const date = new Date();
     const datetime = `${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`;
 

@@ -3,6 +3,7 @@
 import { VoluntarySchema } from "@/types/voluntary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { ReactNode } from "react";
 
 const styles = StyleSheet.create({
     page: {
@@ -56,7 +57,7 @@ type MyDocumentProps = {
     volunteers: VoluntarySchema[];
 };
 
-const PDFDocument = ({ title, volunteers }: MyDocumentProps) => {
+const PDFDocument = ({ title, volunteers }: MyDocumentProps): ReactNode => {
     const date = new Date();
     const datetime = `${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`;
 

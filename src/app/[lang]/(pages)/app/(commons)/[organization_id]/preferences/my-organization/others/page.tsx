@@ -9,6 +9,7 @@ import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+
 import { CoordinationRequestDialog } from "./coordinationRequestDialog.layout";
 import { CoordinationRequestHistoric } from "./coordinationRequestHistoric.layout";
 import OrganizationToken from "./organizationToken.layout";

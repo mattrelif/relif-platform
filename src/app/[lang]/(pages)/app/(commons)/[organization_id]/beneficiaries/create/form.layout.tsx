@@ -12,6 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { MdAdd, MdContacts } from "react-icons/md";
+
 import { CivilStatus } from "./civilStatus.layout";
 import { Education } from "./education.layout";
 import { Gender } from "./gender.layout";

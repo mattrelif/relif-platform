@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
 import * as React from "react";
+import { ReactNode } from "react";
 
 const Breadcrumb = React.forwardRef<
     HTMLElement,
@@ -64,7 +65,11 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
 );
 BreadcrumbPage.displayName = "BreadcrumbPage";
 
-const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentProps<"li">) => (
+const BreadcrumbSeparator = ({
+    children,
+    className,
+    ...props
+}: React.ComponentProps<"li">): ReactNode => (
     <li
         role="presentation"
         aria-hidden="true"
@@ -76,7 +81,7 @@ const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentP
 );
 BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
-const BreadcrumbEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
+const BreadcrumbEllipsis = ({ className, ...props }: React.ComponentProps<"span">): ReactNode => (
     <span
         role="presentation"
         aria-hidden="true"

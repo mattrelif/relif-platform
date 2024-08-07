@@ -19,6 +19,7 @@ import { ReactNode, useState } from "react";
 import { FaBirthdayCake, FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { IoMdMove } from "react-icons/io";
 import { SlOptions } from "react-icons/sl";
+
 import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
 
@@ -44,6 +45,7 @@ const calculateAge = (birthdate: string): number => {
     const monthDifference = today.getMonth() - birthDate.getMonth();
 
     if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        // eslint-disable-next-line no-plusplus
         age--;
     }
 

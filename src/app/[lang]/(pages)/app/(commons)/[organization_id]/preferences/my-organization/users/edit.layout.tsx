@@ -39,9 +39,9 @@ const UserEdit = ({
 
     useEffect(() => {
         setIsLoading(true);
-        const user = getFromLocalStorage("r_ud");
-        if (user) {
-            setCurrentUser(user);
+        const currUser: UserSchema = getFromLocalStorage("r_ud");
+        if (currUser) {
+            setCurrentUser(currUser);
         } else {
             setError(true);
         }

@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { MdContacts, MdError, MdSave } from "react-icons/md";
+
 import { Gender } from "./gender.layout";
 import { Medical } from "./medical.layout";
 import { RelationshipDegree } from "./relationship.layout";
@@ -21,12 +22,15 @@ type Props = {
 
 const Form = ({ volunteerId }: Props): ReactNode => {
     const router = useRouter();
+    const pathname = usePathname();
     const { toast } = useToast();
 
     const [data, setData] = useState<VoluntarySchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [languages, setLanguages] = useState<string[] | []>([]);
+
+    const urlPath = pathname.split("/").slice(0, 5).join("/");
 
     useEffect(() => {
         setIsLoading(true);
@@ -65,9 +69,6 @@ const Form = ({ volunteerId }: Props): ReactNode => {
             setter(values);
         };
 
-    const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 5).join("/");
-
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
 
@@ -75,6 +76,7 @@ const Form = ({ volunteerId }: Props): ReactNode => {
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-shadow
             const data: {
                 fullName: string;
                 birthdate: string;

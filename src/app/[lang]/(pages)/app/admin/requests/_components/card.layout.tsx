@@ -17,6 +17,7 @@ import { ReactNode, useState } from "react";
 import { FaUser } from "react-icons/fa6";
 import { MdCheck, MdClose, MdMail, MdPhone } from "react-icons/md";
 import { SlOptions } from "react-icons/sl";
+
 import { AcceptModal } from "./accept.modal";
 import { RejectModal } from "./reject.modal";
 
@@ -30,9 +31,10 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
 
     const [acceptDialogOpenState, setAcceptDialogOpenState] = useState(false);
     const [rejectDialogOpenState, setRejectDialogOpenState] = useState(false);
-    const [countryCode, phone] = data?.creator.phones[0].split("_");
+    const [countryCode, phone] = data.creator.phones[0].split("_");
 
     const statusColor =
+        // eslint-disable-next-line no-nested-ternary
         data.status === "ACCEPTED"
             ? "bg-green-500 text-white hover:bg-green-600"
             : data.status === "REJECTED"

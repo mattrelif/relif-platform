@@ -38,8 +38,12 @@ const PhoneInput = ({ id, onRemove }: PhoneInputProps) => {
     );
 };
 
-const Phones = () => {
+const Phones = (): ReactNode => {
     const [inputs, setInputs] = useState<{ id: number; component: ReactNode }[]>([]);
+
+    const removePhoneInput = (id: number) => {
+        setInputs(prevInputs => prevInputs.filter(input => input.id !== id));
+    };
 
     const addPhoneInput = () => {
         const newId = inputs.length + 1;
@@ -50,10 +54,6 @@ const Phones = () => {
                 component: <PhoneInput key={newId} id={newId} onRemove={removePhoneInput} />,
             },
         ]);
-    };
-
-    const removePhoneInput = (id: number) => {
-        setInputs(prevInputs => prevInputs.filter(input => input.id !== id));
     };
 
     return (

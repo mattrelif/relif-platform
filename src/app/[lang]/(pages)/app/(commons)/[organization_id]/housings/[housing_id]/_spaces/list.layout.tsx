@@ -5,6 +5,7 @@ import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { SpaceSchema } from "@/types/space.types";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError, MdSearch, MdSpaceDashboard } from "react-icons/md";
+
 import { SpaceCard } from "./card.layout";
 import { CreateSpace } from "./create.layout";
 

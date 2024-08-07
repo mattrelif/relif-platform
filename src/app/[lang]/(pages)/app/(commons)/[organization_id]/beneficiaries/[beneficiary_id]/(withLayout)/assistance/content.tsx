@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { getBeneficiaryById } from "@/repository/beneficiary.repository";
-import { BeneficiaryAllocationSchema, BeneficiarySchema } from "@/types/beneficiary.types";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCartPlus, FaMapMarkerAlt } from "react-icons/fa";
@@ -16,21 +16,18 @@ type Props = {
 
 const Content = ({ beneficiaryId }: Props): ReactNode => {
     const [beneficiary, setBeneficiary] = useState<BeneficiarySchema | null>(null);
-    const [assistances, setAssistances] = useState<{
-        data: BeneficiaryAllocationSchema[];
-        count: number;
-    } | null>(null);
+    // const [assistances, setAssistances] = useState<{
+    //     data: BeneficiaryAllocationSchema[];
+    //     count: number;
+    // } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
 
     const getBeneficiariesAllocations = async () => {
         try {
             if (beneficiaryId) {
-                const OFFSET = 0;
-                const LIMIT = 9999;
                 const responseBeneficiary = await getBeneficiaryById(beneficiaryId);
                 setBeneficiary(responseBeneficiary.data);
-
                 // TODO: ASSISTANCE BACKEND
             } else {
                 throw new Error();
@@ -44,7 +41,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
 
     useEffect(() => {
         setIsLoading(true);
-        (async () => await getBeneficiariesAllocations())();
+        (async () => getBeneficiariesAllocations())();
     }, []);
 
     if (isLoading)

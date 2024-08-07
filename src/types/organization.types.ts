@@ -1,4 +1,5 @@
 import { AddressSchema } from "./commons.types";
+import { UserSchema } from "./user.types";
 
 export type OrganizationSchema = {
     id: string;
@@ -22,8 +23,11 @@ export type OrganizationDataAccessSchema = {
 export type OrganizationDataAccessRequestSchema = {
     id: string;
     requester_id: string;
+    requester: UserSchema;
     requester_organization_id: string;
+    requester_organization: OrganizationSchema;
     target_organization_id: string;
+    target_organization: OrganizationSchema;
     auditor_id: string;
     status: string;
     created_at: string;

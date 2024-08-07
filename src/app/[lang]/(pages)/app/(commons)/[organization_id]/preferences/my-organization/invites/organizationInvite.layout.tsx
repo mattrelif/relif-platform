@@ -5,33 +5,38 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/components/ui/use-toast";
 import { rejectRequest } from "@/repository/organizationDataAccessRequests";
 import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
+import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { MdCheck, MdClose, MdInfo, MdPhone } from "react-icons/md";
 
-// TODO
-const OrganizationInfoCard = ({ children }: { children: Readonly<ReactNode> }): ReactNode => (
+type InfoCardProps = OrganizationDataAccessRequestSchema & {
+    children: Readonly<ReactNode>;
+};
+
+const OrganizationInfoCard = ({ children, ...data }: InfoCardProps): ReactNode => (
     <HoverCard>
         <HoverCardTrigger>{children}</HoverCardTrigger>
         <HoverCardContent>
-            <h3 className="text-sm text-slate-900 font-bold">Prefeitura do Rio de Janeiro</h3>
-            <span className="text-xs text-slate-600 font-medium">123.456.789/1000-28</span>
+            <h3 className="text-sm text-slate-900 font-bold">
+                {data?.requester_organization?.name}
+            </h3>
             <span className="flex w-full pt-3 border-b-[1px] border-slate-200" />
             <h4 className="text-relif-orange-200 text-xs font-bold pt-3 pb-1 flex items-center gap-1">
                 <MdPhone />
-                Contact List
+                Requester Contact
             </h4>
             <div className="w-full flex items-center justify-between">
-                <span className="text-xs text-slate-500">anthony@example.com</span>
+                <span className="text-xs text-slate-500">{data?.requester?.email}</span>
             </div>
             <div className="w-full flex items-center justify-between">
-                <span className="text-xs text-slate-500">anthony@test.com</span>
+                <span className="text-xs text-slate-500">
+                    {data.requester?.phones[0]
+                        .split("_")[0]
+                        .concat(data?.requester?.phones[0].split("_")[1])}
+                </span>
             </div>
-            <span className="flex text-xs text-slate-400 pt-1">+4 others</span>
-            <Button variant="outline" size="sm" className="mt-3">
-                Copy list of contacts
-            </Button>
         </HoverCardContent>
     </HoverCard>
 );
@@ -53,6 +58,7 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
             toast({
                 title: "Request Rejected!",
                 description: "You have successfully rejected the request.",
+                variant: "success",
             });
         } catch {
             toast({
@@ -66,19 +72,22 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
     return (
         <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
             <div className="flex gap-4">
-                <OrganizationInfoCard>
+                <OrganizationInfoCard {...data}>
                     <div className="w-8 h-8 rounded-md bg-relif-orange-500 text-white text-xl flex items-center justify-center">
                         <MdInfo />
                     </div>
                 </OrganizationInfoCard>
                 <div className="flex flex-col">
-                    {/* TODO */}
                     <span className="text-sm text-slate-900 font-bold">
-                        {data.requester_organization_id}
+                        {convertToTitleCase(data.requester_organization.name)}
                     </span>
                     <span className="text-xs text-slate-500">
                         <strong>By: </strong>
-                        {data.requester_id}
+                        {data.requester.first_name} {data.requester.last_name}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                        <strong>E-mail: </strong>
+                        {data.requester.email}
                     </span>
                     <span className="text-xs text-slate-400 mt-2">
                         {formatDate(data.created_at, locale)}

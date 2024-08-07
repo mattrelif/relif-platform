@@ -2,16 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    getAllocationsByHousingId,
-    getBeneficiariesByHousingId,
-} from "@/repository/housing.repository";
+import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaUsers } from "react-icons/fa";
 import { MdAdd, MdError, MdSearch } from "react-icons/md";
+
 import { BeneficiaryCard } from "./card.layout";
 
 type Props = {
@@ -22,7 +20,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
-    const [toggle, setToggle] = useState<"current" | "historic">("current");
+    // const [toggle, setToggle] = useState<"current" | "historic">("current");
     const [beneficiaries, setBeneficiaries] = useState<{
         count: number;
         data: BeneficiarySchema[];
@@ -45,28 +43,27 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
         })();
     };
 
-    const getHistoricBeneficiariesList = async () => {
-        (async () => {
-            try {
-                const response = await getAllocationsByHousingId(housingId, OFFSET, LIMIT);
-                console.log(response.data);
-            } catch {
-                setError(true);
-            } finally {
-                setIsLoading(false);
-            }
-        })();
-    };
+    // const getHistoricBeneficiariesList = async () => {
+    //     (async () => {
+    //         try {
+    //             const response = await getAllocationsByHousingId(housingId, OFFSET, LIMIT);
+    //         } catch {
+    //             setError(true);
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     })();
+    // };
 
     useEffect(() => {
         setIsLoading(true);
 
-        if (toggle === "current") {
-            getCurrentBeneficiariesList();
-        } else {
-            getHistoricBeneficiariesList();
-        }
-    }, [toggle]);
+        // if (toggle === "current") {
+        getCurrentBeneficiariesList();
+        // } else {
+        //     getHistoricBeneficiariesList();
+        // }
+    }, []);
 
     return (
         <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
@@ -122,7 +119,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                 {!isLoading && !error && beneficiaries && beneficiaries.data.length > 0 && (
                     <ul className="w-full h-full overflow-x-hidden overflow-y-scroll">
                         {beneficiaries?.data.map(beneficiary => (
-                            <BeneficiaryCard type="current" {...beneficiary} />
+                            <BeneficiaryCard {...beneficiary} />
                         ))}
                     </ul>
                 )}

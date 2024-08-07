@@ -73,7 +73,7 @@ const EnableModal = ({
                                 {organization?.name}
                             </span>
                             <span className="text-xs text-slate-500">
-                                {`${organization?.address.street_name}, ${organization?.address.street_number} - ${organization?.address.city}, ${organization?.address.district} | ${organization?.address.zip_code} - ${organization?.address.country}`}
+                                {`${organization?.address.address_line_1}, ${organization?.address.address_line_2} - ${organization?.address.city}, ${organization?.address.district} | ${organization?.address.zip_code} - ${organization?.address.country}`}
                             </span>
                         </div>
 

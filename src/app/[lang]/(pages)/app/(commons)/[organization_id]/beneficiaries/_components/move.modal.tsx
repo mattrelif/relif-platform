@@ -26,6 +26,7 @@ import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { MdError } from "react-icons/md";
 
 type Props = {
     beneficiary: BeneficiarySchema;
@@ -112,6 +113,17 @@ const MoveModal = ({
             });
         }
     };
+
+    if (isLoading)
+        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+
+    if (error)
+        return (
+            <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+                <MdError />
+                Something went wrong. Please try again later.
+            </span>
+        );
 
     return (
         <Dialog open={moveDialogOpenState} onOpenChange={setMoveDialogOpenState}>

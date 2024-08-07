@@ -4,6 +4,7 @@ import { findHousingsByOrganizationId } from "@/repository/organization.reposito
 import { HousingSchema } from "@/types/housing.types";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+
 import { HousingCard } from "./card.layout";
 
 type Props = {

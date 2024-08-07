@@ -2,16 +2,16 @@ import { client } from "@/lib/axios-client";
 import { BeneficiarySchema, CreateBeneficiaryRequest } from "@/types/beneficiary.types";
 import { HousingSchema } from "@/types/housing.types";
 import {
-  CreateOrganizationRequest,
-  OrganizationDataAccessRequestSchema,
-  OrganizationDataAccessSchema,
-  OrganizationSchema,
-  UpdateOrganizationRequest,
+    CreateOrganizationRequest,
+    OrganizationDataAccessRequestSchema,
+    OrganizationDataAccessSchema,
+    OrganizationSchema,
+    UpdateOrganizationRequest,
 } from "@/types/organization.types";
 import {
-  JoinOrganizationInviteSchema,
-  JoinOrganizationRequestSchema,
-  UpdateOrganizationTypeRequestSchema,
+    JoinOrganizationInviteSchema,
+    JoinOrganizationRequestSchema,
+    UpdateOrganizationTypeRequestSchema,
 } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
 import { CreateVoluntaryRequest, VoluntarySchema } from "@/types/voluntary.types";
@@ -193,7 +193,7 @@ export async function createJoinOrganizationRequest(orgId: string): Promise<Axio
 
 export async function createDataAccessRequest(orgId: string): Promise<void> {
     return client.request({
-      url: `${PREFIX}/${orgId}/request-organization-data-access`,
+        url: `${PREFIX}/${orgId}/request-organization-data-access`,
         method: "POST",
     });
 }

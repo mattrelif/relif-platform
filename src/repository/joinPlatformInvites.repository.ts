@@ -3,15 +3,15 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "join-platform-invites";
 
-export async function createInvite(invited_email: string): Promise<AxiosResponse> {
+export async function createInvite(invitedEmail: string): Promise<AxiosResponse<void>> {
     return client.request({
         url: `${PREFIX}`,
         method: "POST",
-        data: { invited_email },
+        data: { invited_email: invitedEmail },
     });
 }
 
-export async function consumeInvite(code: string): Promise<AxiosResponse> {
+export async function consumeInvite(code: string): Promise<AxiosResponse<void>> {
     return client.request({
         url: `${PREFIX}/${code}/consume`,
         method: "DELETE",

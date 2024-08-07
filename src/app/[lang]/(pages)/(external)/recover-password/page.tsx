@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
+
 import { Form } from "./form.layout";
 
 export default function Page(): ReactNode {
@@ -17,7 +18,9 @@ export default function Page(): ReactNode {
                 <p className="text-base text-slate-600">Must be at least 8 characters</p>
             </div>
 
-            <Form />
+            <Suspense>
+                <Form />
+            </Suspense>
         </div>
     );
 }

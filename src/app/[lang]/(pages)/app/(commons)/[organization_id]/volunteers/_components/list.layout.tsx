@@ -14,6 +14,7 @@ import { VoluntarySchema } from "@/types/voluntary.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+
 import { Card } from "./card.layout";
 
 const VolunteersList = (): ReactNode => {

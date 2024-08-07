@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { createJoinOrganizationRequest } from "@/repository/organization.repository";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { MdAdd } from "react-icons/md";
 
 const Choose = (): ReactNode => {
-    const router = useRouter();
     const { toast } = useToast();
 
     const [token, setToken] = useState("");

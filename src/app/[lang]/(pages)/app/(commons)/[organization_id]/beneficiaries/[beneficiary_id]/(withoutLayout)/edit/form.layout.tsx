@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { MdContacts, MdError, MdSave } from "react-icons/md";
+
 import { CivilStatus } from "./civilStatus.layout";
 import { Education } from "./education.layout";
 import { Gender } from "./gender.layout";
@@ -25,6 +26,8 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
     const router = useRouter();
     const { toast } = useToast();
 
+    const pathname = usePathname();
+    const urlPath = pathname.split("/").slice(0, 5).join("/");
     const [data, setData] = useState<BeneficiarySchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
@@ -67,9 +70,6 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
             setter(values);
         };
 
-    const pathname = usePathname();
-    const urlPath = pathname.split("/").slice(0, 5).join("/");
-
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
 
@@ -77,7 +77,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore
-            const data: {
+            const fData: {
                 fullName: string;
                 birthdate: string;
                 email: string;
@@ -121,54 +121,54 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
             } = Object.fromEntries(formData);
 
             await updateBeneficiary(beneficiaryId, {
-                full_name: data.fullName,
-                birthdate: data.birthdate,
-                email: data.email,
-                gender: data.gender === "other" ? data.otherGender : data.gender,
+                full_name: fData.fullName,
+                birthdate: fData.birthdate,
+                email: fData.email,
+                gender: fData.gender === "other" ? fData.otherGender : fData.gender,
                 civil_status:
-                    data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
-                education: data.education === "other" ? data.otherEducation : data.education,
-                occupation: data.occupation,
-                spoken_languages: data.languages.split(","),
-                phones: [`${data.countryCode}_${data.phone}`],
+                    fData.civilStatus === "other" ? fData.otherCivilStatus : fData.civilStatus,
+                education: fData.education === "other" ? fData.otherEducation : fData.education,
+                occupation: fData.occupation,
+                spoken_languages: fData.languages.split(","),
+                phones: [`${fData.countryCode}_${fData.phone}`],
                 address: {
-                    address_line_1: data.addressLine1,
-                    address_line_2: data.addressLine2,
-                    city: data.city,
-                    district: data.state,
-                    zip_code: data.postalCode,
-                    country: data.country,
+                    address_line_1: fData.addressLine1,
+                    address_line_2: fData.addressLine2,
+                    city: fData.city,
+                    district: fData.state,
+                    zip_code: fData.postalCode,
+                    country: fData.country,
                 },
                 medical_information: {
-                    allergies: data.allergies.split(","),
-                    current_medications: data.currentMedications.split(","),
-                    recurrent_medical_conditions: data.chronicMedicalConditions.split(","),
-                    health_insurance_plans: data.healthInsurance.split(","),
-                    blood_type: data.bloodType,
-                    taken_vaccines: data.vaccinations.split(","),
-                    mental_health_history: data.mentalHealth.split(","),
-                    height: Number(data.height),
-                    weight: Number(data.weight),
-                    addictions: data.addictions.split(","),
-                    disabilities: data.disabilities.split(","),
-                    prothesis_or_medical_devices: data.prothesisOrMedicalDevices.split(","),
+                    allergies: fData.allergies.split(","),
+                    current_medications: fData.currentMedications.split(","),
+                    recurrent_medical_conditions: fData.chronicMedicalConditions.split(","),
+                    health_insurance_plans: fData.healthInsurance.split(","),
+                    blood_type: fData.bloodType,
+                    taken_vaccines: fData.vaccinations.split(","),
+                    mental_health_history: fData.mentalHealth.split(","),
+                    height: Number(fData.height),
+                    weight: Number(fData.weight),
+                    addictions: fData.addictions.split(","),
+                    disabilities: fData.disabilities.split(","),
+                    prothesis_or_medical_devices: fData.prothesisOrMedicalDevices.split(","),
                 },
-                notes: data.notes,
+                notes: fData.notes,
                 documents: [
                     {
-                        type: data.documentType,
-                        value: data.documentValue,
+                        type: fData.documentType,
+                        value: fData.documentValue,
                     },
                 ],
                 emergency_contacts: [
                     {
-                        phones: [`${data.emergencyContryCode}_${data.emergencyPhone}`],
-                        emails: [data.emergencyEmail],
-                        full_name: data.emergencyName,
+                        phones: [`${fData.emergencyContryCode}_${fData.emergencyPhone}`],
+                        emails: [fData.emergencyEmail],
+                        full_name: fData.emergencyName,
                         relationship:
-                            data.emergencyRelationship === "other"
-                                ? data.otherEmergencyRelationship
-                                : data.emergencyRelationship,
+                            fData.emergencyRelationship === "other"
+                                ? fData.otherEmergencyRelationship
+                                : fData.emergencyRelationship,
                     },
                 ],
             });

@@ -14,6 +14,7 @@ import { FaCity, FaMapMarkerAlt } from "react-icons/fa";
 import { FaBriefcaseMedical, FaHouseChimneyUser } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
 import { MdContactEmergency, MdError, MdMail, MdPhone } from "react-icons/md";
+
 import { Toolbar } from "./toolbar.layout";
 
 const calculateAge = (birthdate: string): number => {
@@ -23,6 +24,7 @@ const calculateAge = (birthdate: string): number => {
     const monthDifference = today.getMonth() - birthDate.getMonth();
 
     if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        // eslint-disable-next-line no-plusplus
         age--;
     }
 

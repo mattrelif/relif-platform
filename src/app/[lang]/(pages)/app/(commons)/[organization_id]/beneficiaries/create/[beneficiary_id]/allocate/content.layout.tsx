@@ -23,6 +23,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaHouseChimneyUser } from "react-icons/fa6";
 import { IoMdAlert } from "react-icons/io";
+import { MdError } from "react-icons/md";
 
 type Props = {
     beneficiaryId: string;
@@ -94,6 +95,15 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
             });
         }
     };
+
+    if (error) {
+        return (
+            <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+                <MdError />
+                Something went wrong. Please try again later.
+            </span>
+        );
+    }
 
     return (
         <div>

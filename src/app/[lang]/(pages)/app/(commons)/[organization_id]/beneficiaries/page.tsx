@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { ReactNode } from "react";
 import { MdSearch } from "react-icons/md";
+
 import { BeneficiaryList } from "./_components/list.layout";
 import { Toolbar } from "./_components/toolbar.layout";
 

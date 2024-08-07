@@ -52,6 +52,7 @@ const Form = ({ housingId }: Props): ReactNode => {
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-shadow
             const data: {
                 name: string;
                 addressLine1: string;
@@ -62,14 +63,14 @@ const Form = ({ housingId }: Props): ReactNode => {
                 country: string;
             } = Object.fromEntries(formData);
 
-            const { data: responseData } = await updateHousing(housingId, {
+            await updateHousing(housingId, {
                 name: data.name,
                 address: {
                     address_line_1: data.addressLine1,
                     address_line_2: data.addressLine2,
                     city: data.city,
-                    zip_code: data.postalCode,
                     district: data.state,
+                    zip_code: data.postalCode,
                     country: data.country,
                 },
             });

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
+
 import { RemoveModal } from "../_components/remove.modal";
 
 type Props = {
@@ -15,7 +16,6 @@ type Props = {
 
 const Toolbar = ({ volunteer }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
-    const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
     const backToListPath = pathname.split("/").slice(0, 5).join("/");

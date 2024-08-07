@@ -16,13 +16,16 @@ import { ReactNode, useState } from "react";
 import { FaEdit, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { FaHouseChimneyUser, FaUser } from "react-icons/fa6";
 import { SlOptions } from "react-icons/sl";
+
 import { DisableModal } from "./disable.modal";
+import { EnableModal } from "./enable.modal";
 
 type Props = OrganizationSchema & {
     refreshList: () => void;
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
+    const [enableDialogOpenState, setEnableDialogOpenState] = useState(false);
     const [disableDialogOpenState, setDisableDialogOpenState] = useState(false);
 
     const pathname = usePathname();
@@ -89,6 +92,13 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 organization={data}
                 disableDialogOpenState={disableDialogOpenState}
                 setDisableDialogOpenState={setDisableDialogOpenState}
+            />
+
+            <EnableModal
+                refreshList={refreshList}
+                organization={data}
+                enableDialogOpenState={enableDialogOpenState}
+                setEnableDialogOpenState={setEnableDialogOpenState}
             />
         </li>
     );

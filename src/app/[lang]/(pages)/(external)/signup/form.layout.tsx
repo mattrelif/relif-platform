@@ -50,13 +50,11 @@ const Form = (): ReactNode => {
                 last_name: data.lastName,
                 email: data.email,
                 password: data.password,
-                // TODO: Remove country
-                country: "Brazil",
                 phones: [`${data.countryCode}_${data.phone}`],
                 role: data.role,
                 preferences: {
                     language: "english",
-                    timezone: timezone,
+                    timezone,
                 },
             });
 

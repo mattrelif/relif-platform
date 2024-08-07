@@ -13,6 +13,7 @@ const CoordinationRequestCard = (request: Props): ReactNode => {
     const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
     const statusColor =
+        // eslint-disable-next-line no-nested-ternary
         request.status === "ACCEPTED"
             ? "bg-green-500 text-white hover:bg-green-600"
             : request.status === "REJECTED"

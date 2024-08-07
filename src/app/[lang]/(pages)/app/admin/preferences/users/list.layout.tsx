@@ -5,6 +5,7 @@ import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+
 import { UserCard } from "./card.layout";
 
 const UserList = (): ReactNode => {
@@ -39,7 +40,7 @@ const UserList = (): ReactNode => {
 
     useEffect(() => {
         setIsLoading(true);
-        (async () => await getUserList())();
+        (async () => getUserList())();
     }, []);
 
     return (

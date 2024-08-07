@@ -9,6 +9,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaHouseChimneyUser, FaUsers } from "react-icons/fa6";
 import { MdError, MdSearch } from "react-icons/md";
+
 import { HousingList } from "./_housing/list.layout";
 import { UserList } from "./_users/list.layout";
 import { Toolbar } from "./toolbar.layout";

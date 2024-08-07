@@ -11,6 +11,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa6";
 import { IoMdMove } from "react-icons/io";
 import { MdError } from "react-icons/md";
+
 import { Card } from "./card";
 
 type Props = {
@@ -52,7 +53,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
 
     useEffect(() => {
         setIsLoading(true);
-        (async () => await getBeneficiariesAllocations())();
+        (async () => getBeneficiariesAllocations())();
     }, []);
 
     if (isLoading)

@@ -19,7 +19,7 @@ export type UserSchema = {
 };
 
 export type CreateUserRequest = Omit<
-    UserSchema,
+    UserSchema | "password",
     "id" | "platform_role" | "status" | "created_at" | "updated_at" | "organization_id"
 >;
 

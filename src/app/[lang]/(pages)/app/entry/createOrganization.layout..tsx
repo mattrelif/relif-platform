@@ -111,7 +111,7 @@ const CreateOrganization = (): ReactNode => {
                         </div>
                     </div>
                 </div>
-                <Button type="submit">Create</Button>
+                <Button type="submit">{!isLoading ? "Create" : "Loading..."}</Button>
             </form>
         </div>
     );

@@ -8,6 +8,7 @@ import { SpaceSchema } from "@/types/space.types";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { FaUsers } from "react-icons/fa";
 import { MdError } from "react-icons/md";
+
 import { BeneficiaryCard } from "../_beneficiaries/card.layout";
 
 type Props = {
@@ -45,20 +46,21 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
     }, []);
 
     const getStatus = () => {
-        const available_vacancies = space.total_vacancies - space.occupied_vacancies;
+        const availableVacancies = space.total_vacancies - space.occupied_vacancies;
 
-        if (available_vacancies < 0) {
+        if (availableVacancies < 0) {
             return "SUPERCROWDED";
-        } else if (available_vacancies > 0) {
-            return "AVAILABLE";
-        } else {
-            return "FULL";
         }
+        if (availableVacancies > 0) {
+            return "AVAILABLE";
+        }
+        return "FULL";
     };
 
     const status = getStatus();
 
     const statusColor =
+        // eslint-disable-next-line no-nested-ternary
         status === "AVAILABLE" ? "green-500" : status === "FULL" ? "red-600" : "slate-900";
 
     return (
@@ -101,7 +103,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
                     {!isLoading && !error && beneficiaries && beneficiaries.data.length > 0 && (
                         <ul className="w-full h-[calc(100vh-225px)] overflow-x-hidden overflow-y-scroll">
                             {beneficiaries?.data.map(beneficiary => (
-                                <BeneficiaryCard type="current" {...beneficiary} />
+                                <BeneficiaryCard {...beneficiary} />
                             ))}
                         </ul>
                     )}

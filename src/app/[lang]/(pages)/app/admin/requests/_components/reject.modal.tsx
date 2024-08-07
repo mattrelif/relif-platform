@@ -93,6 +93,7 @@ const RejectModal = ({
                             placeholder="Max 250 characters"
                             onChange={e => setRejectReason(e.target.value)}
                             maxLength={250}
+                            required
                         />
                     </div>
                     <div className="flex gap-4 pt-5">

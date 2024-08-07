@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { MdSettings } from "react-icons/md";
+
 import { Menu } from "./menu.layout";
 
 export default function Layout({ children }: { children: ReactNode }): ReactNode {

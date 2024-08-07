@@ -6,6 +6,7 @@ import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+
 import { OrganizationInvite } from "./organizationInvite.layout";
 
 const OrganizationInviteList = (): ReactNode => {

@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
+
 import { RemoveModal } from "./remove.modal";
 
 type Props = HousingSchema & {

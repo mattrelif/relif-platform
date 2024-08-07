@@ -19,6 +19,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
 import { MdError, MdSearch } from "react-icons/md";
+
 import { BeneficiaryList } from "./_beneficiaries/list.layout";
 import { InventoryCard } from "./_inventory/inventoryCard.layout";
 import { SpaceList } from "./_spaces/list.layout";

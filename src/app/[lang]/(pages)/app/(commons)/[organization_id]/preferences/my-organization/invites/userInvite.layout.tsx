@@ -24,7 +24,7 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
 
     const handleReject = async () => {
         try {
-            await rejectRequest(data.id, "n quis");
+            await rejectRequest(data.id, "");
             refreshList();
             toast({
                 title: "Request Rejected!",

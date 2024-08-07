@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-
 import { ReactNode } from "react";
 import { MdSearch } from "react-icons/md";
 

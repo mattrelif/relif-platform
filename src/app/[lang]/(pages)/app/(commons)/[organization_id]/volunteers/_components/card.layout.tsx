@@ -17,6 +17,7 @@ import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
 import { SlOptions } from "react-icons/sl";
+
 import { RemoveModal } from "./remove.modal";
 
 type Props = VoluntarySchema & {

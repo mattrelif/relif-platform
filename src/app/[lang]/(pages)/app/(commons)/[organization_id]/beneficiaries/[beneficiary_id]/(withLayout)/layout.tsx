@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+
 import { TabsLayout } from "./tabs.layout";
 
 export default function Layout({ children }: { children: ReactNode }): ReactNode {

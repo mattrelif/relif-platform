@@ -34,10 +34,8 @@ const Form = (): ReactNode => {
                 last_name: userData.last_name,
                 email: userData.email,
                 role: userData.role,
+                platform_role: "RELIF_MEMBER",
                 phones: userData.phones,
-                // TODO: Remove country e password
-                country: userData.country,
-                password: userData.password,
                 preferences: { language: newLanguage, timezone: userData.preferences.timezone },
             });
         }
@@ -52,10 +50,8 @@ const Form = (): ReactNode => {
                 last_name: userData.last_name,
                 email: userData.email,
                 role: userData.role,
+                platform_role: "RELIF_MEMBER",
                 phones: userData.phones,
-                // TODO: Remove country e password
-                country: userData.country,
-                password: userData.password,
                 preferences: { language: userData.preferences.language, timezone: newTimezone },
             });
         }

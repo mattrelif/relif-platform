@@ -13,6 +13,7 @@ import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
+
 import { Card } from "./card.layout";
 
 const BeneficiaryList = (): ReactNode => {

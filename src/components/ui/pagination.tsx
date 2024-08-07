@@ -2,8 +2,9 @@ import { IButtonProps, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import * as React from "react";
+import { ReactNode } from "react";
 
-const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
+const Pagination = ({ className, ...props }: React.ComponentProps<"nav">): ReactNode => (
     <nav
         role="navigation"
         aria-label="pagination"
@@ -30,7 +31,12 @@ type PaginationLinkProps = {
 } & Pick<IButtonProps, "size"> &
     React.ComponentProps<"a">;
 
-const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
+const PaginationLink = ({
+    className,
+    isActive,
+    size = "icon",
+    ...props
+}: PaginationLinkProps): ReactNode => (
     <a
         aria-current={isActive ? "page" : undefined}
         className={cn(
@@ -48,7 +54,7 @@ PaginationLink.displayName = "PaginationLink";
 const PaginationPrevious = ({
     className,
     ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
+}: React.ComponentProps<typeof PaginationLink>): ReactNode => (
     <PaginationLink
         aria-label="Go to previous page"
         size="default"
@@ -61,7 +67,10 @@ const PaginationPrevious = ({
 );
 PaginationPrevious.displayName = "PaginationPrevious";
 
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
+const PaginationNext = ({
+    className,
+    ...props
+}: React.ComponentProps<typeof PaginationLink>): ReactNode => (
     <PaginationLink
         aria-label="Go to next page"
         size="default"
@@ -74,7 +83,7 @@ const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof Pag
 );
 PaginationNext.displayName = "PaginationNext";
 
-const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
+const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span">): ReactNode => (
     <span
         aria-hidden
         className={cn("flex h-9 w-9 items-center justify-center", className)}
