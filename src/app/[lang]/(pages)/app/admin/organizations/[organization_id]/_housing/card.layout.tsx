@@ -23,8 +23,7 @@ const HousingCard = (data: Props): ReactNode => {
                 </span>
 
                 <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                    {/* TODO: BACKEND */}
-                    <FaPeopleGroup /> -- beneficiaries
+                    <FaPeopleGroup /> {data.occupied_vacancies} beneficiaries
                 </span>
 
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">

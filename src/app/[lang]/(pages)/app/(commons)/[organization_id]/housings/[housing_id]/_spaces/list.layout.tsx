@@ -1,11 +1,21 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
-import { Input } from "@/components/ui/input";
+import { PDFDocument } from "@/components/reports/spaces";
+import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { SpaceSchema } from "@/types/space.types";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import { ReactNode, useEffect, useState } from "react";
-import { MdError, MdSearch, MdSpaceDashboard } from "react-icons/md";
+import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
+import { MdError, MdSpaceDashboard } from "react-icons/md";
 
 import { SpaceCard } from "./card.layout";
 import { CreateSpace } from "./create.layout";
@@ -35,6 +45,18 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
         })();
     };
 
+    const handleDownloadPDF = async (): Promise<void> => {
+        try {
+            const response = await getSpacesByHousingId(housingId, 0, 99999);
+            const blob = await pdf(
+                <PDFDocument title="Spaces" spaces={response.data.data} />
+            ).toBlob();
+            saveAs(blob, `spaces_${housingId}.pdf`);
+        } catch {
+            console.error("Error generating PDF");
+        }
+    };
+
     useEffect(() => {
         setIsLoading(true);
         getSpaceList();
@@ -47,17 +69,36 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
                     <MdSpaceDashboard />
                     {dict.housingOverview.spacesTitle}
                 </h3>
-                <CreateSpace housingId={housingId} refreshList={getSpaceList} />
+                <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button variant="icon" className="w-8 h-8 p-0">
+                                <FaDownload />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem className="flex gap-2">
+                                <FaFileCsv />
+                                {dict.housingOverview.downloadCsv}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
+                                <FaFilePdf />
+                                {dict.housingOverview.downloadPdf}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <CreateSpace housingId={housingId} refreshList={getSpaceList} />
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-                <MdSearch className="text-slate-400 text-2xl" />
-                <Input
-                    type="text"
-                    placeholder={dict.housingOverview.searchSpacePlaceholder}
-                    className="w-full h-8"
-                />
-            </div>
-            <div className="w-full h-[calc(100vh-520px)] border border-slate-200 rounded-md overflow-hidden">
+            {/* <div className="flex items-center gap-2"> */}
+            {/*    <MdSearch className="text-slate-400 text-2xl" /> */}
+            {/*    <Input */}
+            {/*        type="text" */}
+            {/*        placeholder={dict.housingOverview.searchSpacePlaceholder} */}
+            {/*        className="w-full h-8" */}
+            {/*    /> */}
+            {/* </div> */}
+            <div className="w-full h-[calc(100vh-480px)] border border-slate-200 rounded-md overflow-hidden">
                 {isLoading && (
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                         {dict.housingOverview.loading}

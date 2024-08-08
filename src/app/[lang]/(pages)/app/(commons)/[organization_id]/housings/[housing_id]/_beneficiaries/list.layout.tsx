@@ -1,14 +1,23 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { PDFDocument } from "@/components/reports/beneficiaries";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
-import { FaUsers } from "react-icons/fa";
+import { ReactNode, useEffect, useState, useCallback, ChangeEvent } from "react";
+import { FaDownload, FaFileCsv, FaFilePdf, FaUsers } from "react-icons/fa";
 import { MdAdd, MdError, MdSearch } from "react-icons/md";
 
 import { BeneficiaryCard } from "./card.layout";
@@ -22,50 +31,62 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
     const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
-    // const [toggle, setToggle] = useState<"current" | "historic">("current");
     const [beneficiaries, setBeneficiaries] = useState<{
         count: number;
         data: BeneficiarySchema[];
     } | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const LIMIT = 9999;
     const OFFSET = 0;
 
-    const getCurrentBeneficiariesList = async () => {
-        (async () => {
+    const getBeneficiaryList = useCallback(
+        async (filter: string = "") => {
             try {
-                const response = await getBeneficiariesByHousingId(housingId, OFFSET, LIMIT);
+                const response = await getBeneficiariesByHousingId(
+                    housingId,
+                    OFFSET,
+                    LIMIT,
+                    filter
+                );
                 setBeneficiaries(response.data);
             } catch {
                 setError(true);
             } finally {
                 setIsLoading(false);
             }
-        })();
+        },
+        [housingId]
+    );
+
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
 
-    // const getHistoricBeneficiariesList = async () => {
-    //     (async () => {
-    //         try {
-    //             const response = await getAllocationsByHousingId(housingId, OFFSET, LIMIT);
-    //         } catch {
-    //             setError(true);
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     })();
-    // };
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            getBeneficiaryList(searchTerm);
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, getBeneficiaryList]);
+
+    const handleDownloadPDF = async () => {
+        try {
+            const response = await getBeneficiariesByHousingId(housingId, 0, 99999, "Lucas");
+            const blob = await pdf(
+                <PDFDocument title="Housing beneficiaries" beneficiaries={response.data.data} />
+            ).toBlob();
+            saveAs(blob, `beneficiaries_${housingId}.pdf`);
+        } catch {
+            console.error("Error generating PDF");
+        }
+    };
 
     useEffect(() => {
-        setIsLoading(true);
-
-        // if (toggle === "current") {
-        getCurrentBeneficiariesList();
-        // } else {
-        //     getHistoricBeneficiariesList();
-        // }
-    }, []);
+        getBeneficiaryList();
+    }, [getBeneficiaryList]);
 
     return (
         <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
@@ -76,18 +97,23 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                 </h3>
 
                 <div className="flex items-center gap-2">
-                    {/* <Select
-                        value={toggle}
-                        onValueChange={(opt: "current" | "historic") => setToggle(opt)}
-                    >
-                        <SelectTrigger className="w-[110px] h-8">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="current">Current</SelectItem>
-                            <SelectItem value="historic">Historic</SelectItem>
-                        </SelectContent>
-                    </Select> */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button variant="icon" className="w-8 h-8 p-0">
+                                <FaDownload />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem className="flex gap-2">
+                                <FaFileCsv />
+                                {dict.housingOverview.downloadCsv}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
+                                <FaFilePdf />
+                                {dict.housingOverview.downloadPdf}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
                         <Link href={`${urlPath}/beneficiaries/create`}>
@@ -98,7 +124,13 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
             </div>
             <div className="flex items-center gap-2">
                 <MdSearch className="text-slate-400 text-2xl" />
-                <Input type="text" placeholder="Search" className="w-full h-8" />
+                <Input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder={dict.housingOverview.searchBeneficiaryPlaceholder || "Search"}
+                    className="w-full h-8"
+                />
             </div>
             <div className="w-full h-[calc(100vh-394px)] border border-slate-200 rounded-md overflow-hidden">
                 {isLoading && (
@@ -123,35 +155,11 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                 {!isLoading && !error && beneficiaries && beneficiaries.data.length > 0 && (
                     <ul className="w-full h-full overflow-x-hidden overflow-y-scroll">
                         {beneficiaries?.data.map(beneficiary => (
-                            <BeneficiaryCard {...beneficiary} />
+                            <BeneficiaryCard key={beneficiary.id} {...beneficiary} />
                         ))}
                     </ul>
                 )}
             </div>
-            {/* <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">2</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">4</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext href="#" />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div> */}
         </div>
     );
 };

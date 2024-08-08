@@ -37,7 +37,6 @@ const Toolbar = (organization: Props): ReactNode => {
                                 <MdBlock />
                             </Button>
                         </TooltipTrigger>
-                        {/* TODO: DISABLE ACCESS */}
                         <TooltipContent>Disable access</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

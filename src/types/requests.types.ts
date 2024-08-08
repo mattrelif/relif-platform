@@ -13,8 +13,11 @@ export type JoinOrganizationInviteSchema = {
 export type JoinOrganizationRequestSchema = {
     id: string;
     user_id: string;
+    user: UserSchema;
     auditor_id: string;
+    auditor: UserSchema;
     organization_id: string;
+    organization: OrganizationSchema;
     created_at: string;
     expires_at: string;
     status: "PENDING" | "ACCEPTED" | "REJECTED";

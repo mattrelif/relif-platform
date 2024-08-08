@@ -52,9 +52,10 @@ const UserInviteDialogLayout = ({ request, refreshList, children }: Props): Reac
                         organization.
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
-                        {/* TODO */}
-                        <span className="text-sm text-slate-900 font-bold">Anthony Vinicius</span>
-                        <span className="text-xs text-slate-500">anthony.vii27@gmail.com</span>
+                        <span className="text-sm text-slate-900 font-bold">
+                            {request.user.first_name} {request.user.last_name}
+                        </span>
+                        <span className="text-xs text-slate-500">{request.user.email}</span>
                     </div>
                     <div className="flex gap-4 pt-5">
                         <DialogClose asChild>

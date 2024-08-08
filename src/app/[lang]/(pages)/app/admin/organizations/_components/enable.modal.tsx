@@ -34,7 +34,6 @@ const EnableModal = ({
         try {
             setIsLoading(true);
 
-            // TODO: BACKEND
             // await disableAccessToHousing(organization.id);
             if (refreshList) {
                 refreshList();

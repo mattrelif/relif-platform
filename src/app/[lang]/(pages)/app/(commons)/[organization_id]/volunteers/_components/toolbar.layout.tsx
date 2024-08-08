@@ -25,7 +25,7 @@ const Toolbar = (): ReactNode => {
     const handleDownloadPDF = async () => {
         try {
             if (organizationId) {
-                const response = await getVoluntariesByOrganizationID(organizationId, 0, 99999);
+                const response = await getVoluntariesByOrganizationID(organizationId, 0, 99999, "");
                 const blob = await pdf(
                     <PDFDocument title="Volunteers" volunteers={response.data.data} />
                 ).toBlob();

@@ -55,10 +55,11 @@ export async function getSpacesByHousingId(
 export async function getBeneficiariesByHousingId(
     housingId: string,
     offset: number,
-    limit: number
+    limit: number,
+    search: string
 ): Promise<AxiosResponse<{ count: number; data: BeneficiarySchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${housingId}/beneficiaries?offset=${offset}&limit=${limit}`,
+        url: `${PREFIX}/${housingId}/beneficiaries?offset=${offset}&limit=${limit}&search=${search}`,
         method: "GET",
     });
 }

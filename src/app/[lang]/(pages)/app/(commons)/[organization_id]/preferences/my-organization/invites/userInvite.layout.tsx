@@ -44,12 +44,14 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
             <div className="flex gap-4">
                 <Avatar>
                     <AvatarFallback className="bg-relif-orange-400 text-white font-semibold text-sm">
-                        US
+                        {`${data.user.first_name.charAt(0)}${data.user.last_name.charAt(0)}`}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="text-sm text-slate-900 font-bold">{data.user_id}</span>
-                    <span className="text-xs text-slate-500">TODO: User e-mail</span>
+                    <span className="text-sm text-slate-900 font-bold">
+                        {data.user.first_name} {data.user.last_name}
+                    </span>
+                    <span className="text-xs text-slate-500">{data.user.email}</span>
                     <span className="text-xs text-slate-400 mt-2">
                         Created at {formatDate(data.created_at, locale)}
                     </span>

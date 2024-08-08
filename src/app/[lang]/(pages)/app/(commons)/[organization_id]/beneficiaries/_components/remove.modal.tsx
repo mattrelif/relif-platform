@@ -79,8 +79,7 @@ const RemoveModal = ({
                         </span>
                         <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                             <FaHouseChimneyUser />
-                            {/* TODO: NAME */}
-                            {beneficiary?.current_housing_id || "Unallocated"}
+                            {beneficiary?.current_housing.name || "Unallocated"}
                         </span>
                     </div>
                     <div className="flex gap-4 pt-5">

@@ -65,6 +65,8 @@
         "overviewTitle": "Visão geral",
         "beneficiaries": "beneficiários",
         "bedsAvailable": "camas disponíveis",
+        "downloadCsv": "Baixar CSV",
+        "downloadPdf": "Baixar PDF",
         "of": "de",
         "spacesOccupied": "espaços ocupados",
         "beneficiaryList": {

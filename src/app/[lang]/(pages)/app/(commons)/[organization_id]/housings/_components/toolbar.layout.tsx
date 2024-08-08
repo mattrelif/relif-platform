@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { PDFDocument } from "@/components/reports/housings";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -8,16 +9,31 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { findHousingsByOrganizationId } from "@/repository/organization.repository";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
 
-const Toolbar = (): ReactNode => {
+const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
+
+    const handleDownloadPDF = async () => {
+        try {
+            const response = await findHousingsByOrganizationId(organizationId, 0, 99999, "");
+            const blob = await pdf(
+                <PDFDocument title="Housings" housings={response.data.data} />
+            ).toBlob();
+            saveAs(blob, "housings.pdf");
+        } catch {
+            console.error("Error generating PDF");
+        }
+    };
 
     return (
         <div className="flex items-center gap-4">
@@ -38,7 +54,7 @@ const Toolbar = (): ReactNode => {
                         <FaFileCsv />
                         {dict.housingList.downloadCsv}
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
+                    <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
                         <FaFilePdf />
                         {dict.housingList.downloadPdf}
                     </DropdownMenuItem>

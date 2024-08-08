@@ -28,7 +28,6 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
             if (beneficiaryId) {
                 const responseBeneficiary = await getBeneficiaryById(beneficiaryId);
                 setBeneficiary(responseBeneficiary.data);
-                // TODO: ASSISTANCE BACKEND
             } else {
                 throw new Error();
             }

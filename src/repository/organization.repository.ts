@@ -117,10 +117,11 @@ export async function findUpdateOrganizationTypeRequestsByOrganizationId(
 export async function findHousingsByOrganizationId(
     orgId: string,
     offset: number,
-    limit: number
+    limit: number,
+    search: string
 ): Promise<AxiosResponse<{ count: number; data: HousingSchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/housings?offset=${offset}&limit=${limit}`,
+        url: `${PREFIX}/${orgId}/housings?offset=${offset}&limit=${limit}&search=${search}`,
         method: "GET",
     });
 }
@@ -146,10 +147,11 @@ export async function findProductTypesByOrganizationId(orgId: string): Promise<A
 export async function getBeneficiariesByOrganizationID(
     organizationId: string,
     offset: number,
-    limit: number
+    limit: number,
+    search: string
 ): Promise<AxiosResponse<{ count: number; data: BeneficiarySchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${organizationId}/beneficiaries?offset=${offset}&limit=${limit}`,
+        url: `${PREFIX}/${organizationId}/beneficiaries?offset=${offset}&limit=${limit}&search=${search}`,
         method: "GET",
     });
 }
@@ -168,10 +170,11 @@ export async function createBeneficiary(
 export async function getVoluntariesByOrganizationID(
     orgId: string,
     offset: number,
-    limit: number
+    limit: number,
+    search: string
 ): Promise<AxiosResponse<{ count: number; data: VoluntarySchema[] }>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/voluntary-people?offset=${offset}&limit=${limit}`,
+        url: `${PREFIX}/${orgId}/voluntary-people?offset=${offset}&limit=${limit}&search=${search}`,
         method: "GET",
     });
 }
@@ -195,5 +198,16 @@ export async function createDataAccessRequest(orgId: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/${orgId}/request-organization-data-access`,
         method: "POST",
+    });
+}
+
+export async function getDataAccessGrants(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: OrganizationSchema[] }>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/data-access-grants?offset=${offset}&limit=${limit}`,
+        method: "GET",
     });
 }

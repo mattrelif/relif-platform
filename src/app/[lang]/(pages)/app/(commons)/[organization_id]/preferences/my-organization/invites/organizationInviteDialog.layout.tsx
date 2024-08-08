@@ -53,12 +53,14 @@ const OrganizationInviteDialog = ({ request, refreshList, children }: Props): Re
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
-                            Prefeitura do Rio de Janeiro
+                            {request.requester_organization.name}
                         </span>
-                        {/* TODO */}
-                        <span className="text-xs text-slate-500">123.456.789/1000-12</span>
                         <span className="text-xs text-slate-500">
-                            <strong>By:</strong> anthony.vii27@gmail.com
+                            <strong>Requester: </strong>
+                            {request.requester.first_name} {request.requester.last_name}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                            <strong>By:</strong> {request.requester.email}
                         </span>
                     </div>
                     <div className="flex gap-4 pt-5">

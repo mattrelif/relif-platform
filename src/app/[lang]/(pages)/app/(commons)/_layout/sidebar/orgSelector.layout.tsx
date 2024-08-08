@@ -7,7 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { findAllOrganizations } from "@/repository/organization.repository";
+import { getDataAccessGrants } from "@/repository/organization.repository";
 import { OrganizationSchema } from "@/types/organization.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
@@ -25,14 +25,16 @@ const OrgSelector = (): ReactNode => {
     useEffect(() => {
         (async () => {
             try {
-                const user = await getFromLocalStorage("r_ud");
-                console.log(user);
-                if (user) {
+                const user: UserSchema = await getFromLocalStorage("r_ud");
+                if (user && user.organization_id) {
                     setCurrentUser(user);
                     const OFFSET = 0;
                     const LIMIT = 9999;
-                    // TODO: ALTERAR ENDPOINT P/ APENAS AQUELES QUE TEM ACESSO
-                    const { data: organizations } = await findAllOrganizations(OFFSET, LIMIT);
+                    const { data: organizations } = await getDataAccessGrants(
+                        user.organization_id,
+                        OFFSET,
+                        LIMIT
+                    );
                     setOrgs(organizations);
                 } else {
                     throw new Error();

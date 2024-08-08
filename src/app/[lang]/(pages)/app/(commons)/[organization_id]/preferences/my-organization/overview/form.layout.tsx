@@ -59,7 +59,6 @@ const Form = (): ReactNode => {
                 await updateOrganization(orgData.id, {
                     description: data.description,
                     name: orgData.name,
-                    // TODO: Remover street_name e street_number
                     address: {
                         address_line_1: data.addressLine1,
                         address_line_2: data.addressLine2,

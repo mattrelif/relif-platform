@@ -13,8 +13,7 @@ import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaEdit, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
-import { FaHouseChimneyUser, FaUser } from "react-icons/fa6";
+import { FaEdit, FaMapMarkerAlt } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 
 import { DisableModal } from "./disable.modal";
@@ -41,21 +40,6 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <FaMapMarkerAlt />
                     {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
-                </span>
-                <div className="flex items-center gap-4">
-                    <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        {/* TODO: BACKEND */}
-                        <FaUsers /> 1 user
-                    </span>
-                    <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        {/* TODO: BACKEND */}
-                        <FaHouseChimneyUser /> 2 housings
-                    </span>
-                </div>
-                <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    <FaUser />
-                    {/* TODO: CREATOR NAME */}
-                    Anthony Silva
                 </span>
             </div>
             <div className="flex flex-col items-end justify-between">

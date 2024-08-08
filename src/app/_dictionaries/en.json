@@ -65,6 +65,8 @@
         "overviewTitle": "Overview",
         "beneficiaries": "beneficiaries",
         "bedsAvailable": "beds available",
+        "downloadCsv": "Download CSV",
+        "downloadPdf": "Download PDF",
         "of": "of",
         "spacesOccupied": "spaces occupied",
         "beneficiaryList": {

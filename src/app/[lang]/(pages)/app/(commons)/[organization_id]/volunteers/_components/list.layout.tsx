@@ -1,5 +1,7 @@
 "use client";
 
+import { Toolbar } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/volunteers/_components/toolbar.layout";
+import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
@@ -12,8 +14,8 @@ import { getVoluntariesByOrganizationID } from "@/repository/organization.reposi
 import { UserSchema } from "@/types/user.types";
 import { VoluntarySchema } from "@/types/voluntary.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
-import { ReactNode, useEffect, useState } from "react";
-import { MdError } from "react-icons/md";
+import { ReactNode, useEffect, useState, useCallback, ChangeEvent } from "react";
+import { MdError, MdSearch } from "react-icons/md";
 
 import { Card } from "./card.layout";
 
@@ -25,33 +27,50 @@ const VolunteersList = (): ReactNode => {
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const LIMIT = 20;
 
-    const getVoluntaryList = async () => {
-        try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+    const getVoluntaryList = useCallback(
+        async (filter: string = "") => {
+            try {
+                const currentUser: UserSchema = await getFromLocalStorage("r_ud");
 
-            if (currentUser.organization_id) {
-                const response = await getVoluntariesByOrganizationID(
-                    currentUser.organization_id,
-                    offset,
-                    LIMIT
-                );
-                setVolunteers(response.data);
-            } else {
-                throw new Error();
+                if (currentUser.organization_id) {
+                    const response = await getVoluntariesByOrganizationID(
+                        currentUser.organization_id,
+                        offset,
+                        LIMIT,
+                        filter
+                    );
+                    setVolunteers(response.data);
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
             }
-        } catch {
-            setError(true);
-        } finally {
-            setIsLoading(false);
-        }
+        },
+        [offset]
+    );
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            getVoluntaryList(searchTerm);
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, getVoluntaryList]);
+
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
 
     useEffect(() => {
         setIsLoading(true);
         getVoluntaryList();
-    }, [offset]);
+    }, [offset, getVoluntaryList]);
 
     const totalPages = volunteers ? Math.ceil(volunteers.count / LIMIT) : 0;
     const currentPage = offset / LIMIT + 1;
@@ -61,64 +80,80 @@ const VolunteersList = (): ReactNode => {
     };
 
     return (
-        <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
-            {isLoading && (
-                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
-            )}
+        <>
+            <div className="flex items-end gap-4 justify-between">
+                <div className="flex items-center gap-3">
+                    <MdSearch className="text-slate-400 text-2xl" />
+                    <Input
+                        type="text"
+                        placeholder="Search"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="w-[300px]"
+                    />
+                </div>
+                <Toolbar />
+            </div>
 
-            {!isLoading && error && (
-                <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
-                    <MdError />
-                    Something went wrong. Please try again later.
-                </span>
-            )}
+            <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+                {isLoading && (
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                )}
 
-            {!isLoading && !error && volunteers && volunteers.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">
-                    No beneficiaries found...
-                </span>
-            )}
+                {!isLoading && error && (
+                    <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+                        <MdError />
+                        Something went wrong. Please try again later.
+                    </span>
+                )}
 
-            {!isLoading && !error && volunteers && volunteers.data.length > 0 && (
-                <>
-                    <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                        {volunteers?.data.map(voluntary => (
-                            <Card
-                                key={voluntary.id}
-                                {...voluntary}
-                                refreshList={getVoluntaryList}
-                            />
-                        ))}
-                    </ul>
-                    <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                    />
-                                </PaginationItem>
-                                {Array.from({ length: totalPages }).map((_, index) => (
-                                    <PaginationItem key={index}>
-                                        <PaginationLink
-                                            onClick={() => handlePageChange(index + 1)}
-                                            isActive={index + 1 === currentPage}
-                                        >
-                                            {index + 1}
-                                        </PaginationLink>
+                {!isLoading && !error && volunteers && volunteers.data.length <= 0 && (
+                    <span className="text-sm text-slate-900 font-medium p-4">
+                        No beneficiaries found...
+                    </span>
+                )}
+
+                {!isLoading && !error && volunteers && volunteers.data.length > 0 && (
+                    <>
+                        <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
+                            {volunteers?.data.map(voluntary => (
+                                <Card
+                                    key={voluntary.id}
+                                    {...voluntary}
+                                    refreshList={getVoluntaryList}
+                                />
+                            ))}
+                        </ul>
+                        <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                        />
                                     </PaginationItem>
-                                ))}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
-                </>
-            )}
-        </div>
+                                    {Array.from({ length: totalPages }).map((_, index) => (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink
+                                                onClick={() => handlePageChange(index + 1)}
+                                                isActive={index + 1 === currentPage}
+                                            >
+                                                {index + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    <PaginationItem>
+                                        <PaginationNext
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
+                    </>
+                )}
+            </div>
+        </>
     );
 };
 
