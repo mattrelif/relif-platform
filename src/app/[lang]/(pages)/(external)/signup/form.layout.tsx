@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,9 @@ import { ReactNode, useState } from "react";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const router = useRouter();
+
     const [checkState, setCheckState] = useState<boolean>(false);
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -36,8 +39,8 @@ const Form = (): ReactNode => {
 
             if (data.password !== data.confirmPassword) {
                 toast({
-                    title: "Registration Error",
-                    description: "Passwords do not match.",
+                    title: dict.signup.toastErrorTitle,
+                    description: dict.signup.toastErrorPasswordsDescription,
                     variant: "destructive",
                 });
                 return;
@@ -59,15 +62,15 @@ const Form = (): ReactNode => {
             });
 
             toast({
-                title: "Registration successful",
-                description: "User registered successfully!",
+                title: dict.signup.toastSuccessTitle,
+                description: dict.signup.toastSuccessDescription,
             });
 
             router.push("/");
         } catch (err) {
             toast({
-                title: "Registration Error",
-                description: "An error occurred while registering the user. Please try again.",
+                title: dict.signup.toastErrorTitle,
+                description: dict.signup.toastErrorGenericDescription,
                 variant: "destructive",
             });
         }
@@ -76,21 +79,21 @@ const Form = (): ReactNode => {
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-medium text-sm text-relif-orange-200 mb-6">
-                Your personal data
+                {dict.signup.yourPersonalData}
             </h2>
             <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="firstName">First name *</Label>
+                    <Label htmlFor="firstName">{dict.signup.firstName} *</Label>
                     <Input id="firstName" name="firstName" type="text" required />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="lastName">Last name *</Label>
+                    <Label htmlFor="lastName">{dict.signup.lastName} *</Label>
                     <Input id="lastName" name="lastName" type="text" required />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="role">Role *</Label>
+                    <Label htmlFor="role">{dict.signup.role} *</Label>
                     <Input
                         id="role"
                         name="role"
@@ -101,7 +104,7 @@ const Form = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="phone">Phone *</Label>
+                    <Label htmlFor="phone">{dict.signup.phone} *</Label>
                     <div className="w-full flex gap-2">
                         <Input
                             id="countryCode"
@@ -117,21 +120,21 @@ const Form = (): ReactNode => {
             </div>
 
             <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-medium text-sm text-relif-orange-200 mt-10 mb-6">
-                Your credentials
+                {dict.signup.yourCredentials}
             </h2>
             <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="email">E-mail *</Label>
+                    <Label htmlFor="email">{dict.signup.email} *</Label>
                     <Input id="email" name="email" type="email" required />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="password">Password *</Label>
+                    <Label htmlFor="password">{dict.signup.password} *</Label>
                     <Input id="password" name="password" type="password" required minLength={8} />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="confirmPassword">Confirm password *</Label>
+                    <Label htmlFor="confirmPassword">{dict.signup.confirmPassword} *</Label>
                     <Input
                         id="confirmPassword"
                         name="confirmPassword"
@@ -152,22 +155,22 @@ const Form = (): ReactNode => {
                             htmlFor="terms"
                             className="text-sm text-slate-900 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                            Accept terms and conditions
+                            {dict.signup.checkboxLabel}
                         </label>
                         <p className="text-sm text-slate-600">
-                            You agree to our{" "}
+                            {dict.signup.checkboxDescription}{" "}
                             <Link
                                 href="/terms/terms-of-service"
                                 className="underline hover:text-relif-orange-200 underline-offset-4"
                             >
-                                Terms of Service
+                                {dict.signup.terms}
                             </Link>{" "}
-                            and{" "}
+                            {dict.signup.and}{" "}
                             <Link
                                 href="/terms/privacy-policy"
                                 className="underline hover:text-relif-orange-200 underline-offset-4"
                             >
-                                Privacy Policy
+                                {dict.signup.privacyPolicy}
                             </Link>
                             .
                         </p>
@@ -182,12 +185,12 @@ const Form = (): ReactNode => {
                     className="mt-[43px] w-full"
                     disabled={!checkState}
                 >
-                    Sign up
+                    {dict.signup.btnSignUp}
                 </Button>
                 <span className="text-sm text-gray-900">
-                    Already have an account?
+                    {dict.signup.alreadyHaveAnAccount}
                     <Button variant="link" asChild>
-                        <Link href="/">Log in</Link>
+                        <Link href="/">{dict.signup.login}</Link>
                     </Button>
                 </span>
             </div>

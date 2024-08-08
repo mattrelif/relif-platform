@@ -2,6 +2,7 @@
 
 import { Breadcrumb } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/components/breadcrumb.layout";
 import { UserDropdown } from "@/app/[lang]/(pages)/app/(commons)/_layout/header/components/userDropdown.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import { HiMiniBellAlert } from "react-icons/hi2";
 import { MdSettings } from "react-icons/md";
 
 const Header = (): ReactNode => {
+    const dict = useDictionary();
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
@@ -34,7 +36,7 @@ const Header = (): ReactNode => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Notifications</p>
+                            <p>{dict.commons.notifications}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -49,7 +51,7 @@ const Header = (): ReactNode => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Preferences</p>
+                            <p>{dict.commons.header.preferences}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

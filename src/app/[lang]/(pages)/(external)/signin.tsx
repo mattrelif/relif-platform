@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,8 @@ import { ReactNode, useState } from "react";
 const SignInForm = (): ReactNode => {
     const { toast } = useToast();
     const router = useRouter();
+    const dict = useDictionary();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -43,9 +46,8 @@ const SignInForm = (): ReactNode => {
             console.warn(err);
             setIsLoading(false);
             toast({
-                title: "Invalid credentials",
-                description:
-                    "The email address or password you entered is incorrect. Please try again.",
+                title: dict.root.toastErrorTitle,
+                description: dict.root.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -56,15 +58,15 @@ const SignInForm = (): ReactNode => {
             <div>
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="email">E-mail</Label>
+                        <Label htmlFor="email">{dict.root.email}</Label>
                         <Input id="email" name="email" type="email" required />
                     </div>
 
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{dict.root.password}</Label>
                             <Button variant="link" className="p-0 h-max no-underline" asChild>
-                                <Link href="/forgot-password">Forgot password?</Link>
+                                <Link href="/forgot-password">{dict.root.forgotPassword}</Link>
                             </Button>
                         </div>
                         <Input id="password" name="password" type="password" required />
@@ -78,12 +80,12 @@ const SignInForm = (): ReactNode => {
                         className="mt-[43px] w-full"
                         disabled={isLoading}
                     >
-                        {!isLoading ? "Sign in" : "Loading..."}
+                        {!isLoading ? dict.root.btnSignIn : dict.root.loading}
                     </Button>
                     <span className="text-sm text-slate-900">
-                        Need an account?
+                        {dict.root.needAnAccount}
                         <Button variant="link" asChild>
-                            <Link href="/signup">Sign up here</Link>
+                            <Link href="/signup">{dict.root.signUpHere}</Link>
                         </Button>
                     </span>
                 </div>

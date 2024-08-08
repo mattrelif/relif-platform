@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,8 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
+
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -29,16 +32,14 @@ const Form = (): ReactNode => {
 
             setIsLoading(false);
             toast({
-                title: "Password reset requested",
-                description:
-                    "A password reset link has been sent to your email. Please check your inbox.",
+                title: dict.forgotPassword.toastSuccessTitle,
+                description: dict.forgotPassword.toastSuccessDescription,
             });
         } catch (err) {
             setIsLoading(false);
             toast({
-                title: "Password reset failed",
-                description:
-                    "There was an error requesting the password reset. Please try again later.",
+                title: dict.forgotPassword.toastErrorTitle,
+                description: dict.forgotPassword.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -48,13 +49,13 @@ const Form = (): ReactNode => {
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div>
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="email">E-mail</Label>
+                    <Label htmlFor="email">{dict.forgotPassword.email}</Label>
                     <Input
                         id="email"
                         name="email"
                         type="email"
                         required
-                        placeholder="Enter your e-mail"
+                        placeholder={dict.forgotPassword.fieldPlaceholder}
                     />
                 </div>
                 <div className="w-full flex flex-col items-center">
@@ -64,12 +65,14 @@ const Form = (): ReactNode => {
                         className="mt-[43px] w-full"
                         disabled={isLoading}
                     >
-                        {!isLoading ? "Reset password" : "Loading..."}
+                        {!isLoading
+                            ? dict.forgotPassword.btnSendEmail
+                            : dict.forgotPassword.loading}
                     </Button>
                     <Button variant="link" className="no-underline mt-[20px]" asChild>
                         <Link href="/" className="flex items-center gap-2">
                             <FaArrowLeftLong />
-                            Back to log in
+                            {dict.forgotPassword.btnBack}
                         </Link>
                     </Button>
                 </div>

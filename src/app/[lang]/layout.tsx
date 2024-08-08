@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import { ReactNode } from "react";
 import "../globals.css";
+import { getDictionary } from "@/app/dictionaries";
+import { DictionaryProvider } from "@/app/context/dictionaryContext";
 
 const fontSans = FontSans({
     subsets: ["latin"],
@@ -22,18 +24,22 @@ export async function generateStaticParams(): Promise<{ lang: string }[]> {
     return [{ lang: "en-US" }, { lang: "es" }, { lang: "pt-BR" }];
 }
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
     params,
 }: Readonly<{
     children: ReactNode;
     params: { lang: Locale };
-}>): ReactNode {
+}>): Promise<ReactNode> {
+    const dict = await getDictionary(params.lang);
+
     return (
         <html lang={params.lang}>
             <body className={cn("min-h-screen bg-white font-sans antialiased", fontSans.variable)}>
-                <main>{children}</main>
-                <Toaster />
+                <DictionaryProvider dict={dict}>
+                    <main>{children}</main>
+                    <Toaster />
+                </DictionaryProvider>
             </body>
         </html>
     );

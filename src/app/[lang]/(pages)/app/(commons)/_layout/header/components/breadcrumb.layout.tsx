@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -12,34 +13,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
-const LABELS = {
-    app: "Home",
-    housing: "Housing",
-    beneficiaries: "Beneficiaries",
-    volunteers: "Volunteers",
-    inventory: "Inventory",
-    preferences: "Preferences",
-    platform: "Platform",
-    "my-organization": "My Organization",
-    "my-profile": "My Profile",
-    support: "Support",
-    users: "Users",
-    overview: "Overview",
-    invites: "Invites",
-    others: "Others",
-    housings: "Housings",
-    assistance: "Assistance",
-    movements: "Movements",
-    create: "Create",
-    edit: "Edit",
-    entry: "Entrypoint",
-    admin: "Relif",
-    organizations: "Organizations",
-    requests: "Requests",
-};
-
 const Breadcrumb = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const splittedPathname = pathname.split("/");
 
     const pages = splittedPathname.slice(2);
@@ -54,6 +30,32 @@ const Breadcrumb = (): ReactNode => {
         }
 
         return `${splittedPathname.slice(0, index + 1).join("/")}`;
+    };
+
+    const LABELS = {
+        app: dict.commons.header.breadcrumb.app,
+        housing: dict.commons.header.breadcrumb.housing,
+        beneficiaries: dict.commons.header.breadcrumb.beneficiaries,
+        volunteers: dict.commons.header.breadcrumb.volunteers,
+        inventory: dict.commons.header.breadcrumb.inventory,
+        preferences: dict.commons.header.breadcrumb.preferences,
+        platform: dict.commons.header.breadcrumb.platform,
+        "my-organization": dict.commons.header.breadcrumb.myOrganization,
+        "my-profile": dict.commons.header.breadcrumb.myProfile,
+        support: dict.commons.header.breadcrumb.support,
+        users: dict.commons.header.breadcrumb.users,
+        overview: dict.commons.header.breadcrumb.overview,
+        invites: dict.commons.header.breadcrumb.invites,
+        others: dict.commons.header.breadcrumb.others,
+        housings: dict.commons.header.breadcrumb.housings,
+        assistance: dict.commons.header.breadcrumb.assistance,
+        movements: dict.commons.header.breadcrumb.movements,
+        create: dict.commons.header.breadcrumb.create,
+        edit: dict.commons.header.breadcrumb.edit,
+        entry: dict.commons.header.breadcrumb.entry,
+        admin: dict.commons.header.breadcrumb.admin,
+        organizations: dict.commons.header.breadcrumb.organizations,
+        requests: dict.commons.header.breadcrumb.requests,
     };
 
     return (

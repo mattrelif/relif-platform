@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     Select,
     SelectContent,
@@ -18,6 +19,8 @@ import { FaCircle } from "react-icons/fa6";
 const OrgSelector = (): ReactNode => {
     const pathname = usePathname();
     const router = useRouter();
+    const dict = useDictionary();
+
     const [orgs, setOrgs] = useState<{ count: number; data: OrganizationSchema[] } | null>(null);
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const organizationId = pathname.split("/")[3];
@@ -53,7 +56,7 @@ const OrgSelector = (): ReactNode => {
         return (
             <Select defaultValue={organizationId} onValueChange={handleSetOrganization}>
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select..." />
+                    <SelectValue placeholder={dict.sidebar.orgPlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                     {orgs.data.map(org => (

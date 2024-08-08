@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 const Form = (): ReactNode => {
     const params = useSearchParams();
     const router = useRouter();
+    const dict = useDictionary();
     const { toast } = useToast();
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -34,8 +36,8 @@ const Form = (): ReactNode => {
 
             if (data.password !== data.confirmPassword) {
                 toast({
-                    title: "Registration Error",
-                    description: "Passwords do not match.",
+                    title: dict.recoverPassword.toastErrorTitle,
+                    description: dict.recoverPassword.toastErrorPasswordsDescription,
                     variant: "destructive",
                 });
                 return;
@@ -44,15 +46,15 @@ const Form = (): ReactNode => {
             await updatePassword(code, data.password);
 
             toast({
-                title: "Password Changed",
-                description: "Your password has been successfully updated.",
+                title: dict.recoverPassword.toastSuccessTitle,
+                description: dict.recoverPassword.toastSuccessDescription,
             });
 
             setTimeout(() => router.push("/"), 1000);
         } catch (err) {
             toast({
-                title: "Password Change Failed",
-                description: "There was an error changing your password. Please try again.",
+                title: dict.recoverPassword.toastErrorTitle,
+                description: dict.recoverPassword.toastErrorGenericDescription,
                 variant: "destructive",
             });
         }
@@ -63,7 +65,7 @@ const Form = (): ReactNode => {
             <div>
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{dict.recoverPassword.password}</Label>
                         <Input
                             id="password"
                             name="password"
@@ -73,7 +75,9 @@ const Form = (): ReactNode => {
                         />
                     </div>
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="confirmPassword">Confirm password</Label>
+                        <Label htmlFor="confirmPassword">
+                            {dict.recoverPassword.confirmPassword}
+                        </Label>
                         <Input
                             id="confirmPassword"
                             name="confirmPassword"
@@ -85,12 +89,12 @@ const Form = (): ReactNode => {
                 </div>
                 <div className="w-full flex flex-col items-center">
                     <Button type="submit" variant="default" className="mt-[43px] w-full">
-                        Reset password
+                        {dict.recoverPassword.btnReset}
                     </Button>
                     <Button variant="link" className="no-underline mt-[20px]" asChild>
                         <Link href="/" className="flex items-center gap-2">
                             <FaArrowLeftLong />
-                            Back to log in
+                            {dict.recoverPassword.btnBack}
                         </Link>
                     </Button>
                 </div>
