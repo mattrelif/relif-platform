@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -30,6 +31,7 @@ const OPTIONS = [
 
 const RelationshipDegree = ({ defaultValue }: Props): ReactNode => {
     const [option, setOption] = useState<string>(defaultValue);
+    const dict = useDictionary();
 
     useEffect(() => {
         if (OPTIONS.includes(defaultValue)) {
@@ -41,30 +43,56 @@ const RelationshipDegree = ({ defaultValue }: Props): ReactNode => {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="emergencyRelationship">Relationship Degree *</Label>
+            <Label htmlFor="emergencyRelationship">
+                {dict.commons.beneficiaries.edit.relationship.label}
+            </Label>
             <Select name="emergencyRelationship" value={option} onValueChange={setOption}>
                 <SelectTrigger className="w-full" id="emergencyRelationship">
-                    <SelectValue placeholder="Select..." />
+                    <SelectValue
+                        placeholder={dict.commons.beneficiaries.edit.relationship.placeholder}
+                    />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="parent">Parent</SelectItem>
-                    <SelectItem value="child">Child</SelectItem>
-                    <SelectItem value="sibling">Sibling</SelectItem>
-                    <SelectItem value="spouse">Spouse</SelectItem>
-                    <SelectItem value="grandparent">Grandparent</SelectItem>
-                    <SelectItem value="grandchild">Grandchild</SelectItem>
-                    <SelectItem value="aunt-uncle">Aunt/Uncle</SelectItem>
-                    <SelectItem value="niece-nephew">Niece/Nephew</SelectItem>
-                    <SelectItem value="cousin">Cousin</SelectItem>
-                    <SelectItem value="guardian">Guardian</SelectItem>
-                    <SelectItem value="other">Other (specify)</SelectItem>
+                    <SelectItem value="parent">
+                        {dict.commons.beneficiaries.edit.relationship.parent}
+                    </SelectItem>
+                    <SelectItem value="child">
+                        {dict.commons.beneficiaries.edit.relationship.child}
+                    </SelectItem>
+                    <SelectItem value="sibling">
+                        {dict.commons.beneficiaries.edit.relationship.sibling}
+                    </SelectItem>
+                    <SelectItem value="spouse">
+                        {dict.commons.beneficiaries.edit.relationship.spouse}
+                    </SelectItem>
+                    <SelectItem value="grandparent">
+                        {dict.commons.beneficiaries.edit.relationship.grandparent}
+                    </SelectItem>
+                    <SelectItem value="grandchild">
+                        {dict.commons.beneficiaries.edit.relationship.grandchild}
+                    </SelectItem>
+                    <SelectItem value="aunt-uncle">
+                        {dict.commons.beneficiaries.edit.relationship.auntUncle}
+                    </SelectItem>
+                    <SelectItem value="niece-nephew">
+                        {dict.commons.beneficiaries.edit.relationship.nieceNephew}
+                    </SelectItem>
+                    <SelectItem value="cousin">
+                        {dict.commons.beneficiaries.edit.relationship.cousin}
+                    </SelectItem>
+                    <SelectItem value="guardian">
+                        {dict.commons.beneficiaries.edit.relationship.guardian}
+                    </SelectItem>
+                    <SelectItem value="other">
+                        {dict.commons.beneficiaries.edit.relationship.other}
+                    </SelectItem>
                 </SelectContent>
             </Select>
             {option === "other" && (
                 <Input
                     name="otherEmergencyRelationship"
                     type="text"
-                    placeholder="Specify relationship"
+                    placeholder={dict.commons.beneficiaries.edit.relationship.otherPlaceholder}
                 />
             )}
         </div>

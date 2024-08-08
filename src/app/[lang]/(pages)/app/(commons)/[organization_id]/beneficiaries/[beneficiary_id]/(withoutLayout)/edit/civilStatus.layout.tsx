@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,6 +27,7 @@ const OPTIONS = [
 ];
 
 const CivilStatus = ({ defaultValue }: Props): ReactNode => {
+    const dict = useDictionary();
     const [option, setOption] = useState<string>(defaultValue);
 
     useEffect(() => {
@@ -38,24 +40,52 @@ const CivilStatus = ({ defaultValue }: Props): ReactNode => {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="civilStatus">Civil Status *</Label>
-            <Select name="civilStatus" value={option} onValueChange={setOption}>
+            <Label htmlFor="civilStatus">
+                {dict.commons.beneficiaries.create.civilStatus.label} *
+            </Label>
+            <Select
+                name="civilStatus"
+                onValueChange={opt => setOption(opt)}
+                defaultValue={defaultValue}
+            >
                 <SelectTrigger className="w-full" id="civilStatus">
-                    <SelectValue placeholder="Select..." />
+                    <SelectValue
+                        placeholder={dict.commons.beneficiaries.create.civilStatus.placeholder}
+                    />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="single">Single</SelectItem>
-                    <SelectItem value="married">Married</SelectItem>
-                    <SelectItem value="divorced">Divorced</SelectItem>
-                    <SelectItem value="widowed">Widowed</SelectItem>
-                    <SelectItem value="separated">Separated</SelectItem>
-                    <SelectItem value="common-law-marriage">Common-Law Marriage</SelectItem>
-                    <SelectItem value="in-a-relationship">In a Relationship</SelectItem>
-                    <SelectItem value="other">Other (specify)</SelectItem>
+                    <SelectItem value="single">
+                        {dict.commons.beneficiaries.create.civilStatus.single}
+                    </SelectItem>
+                    <SelectItem value="married">
+                        {dict.commons.beneficiaries.create.civilStatus.married}
+                    </SelectItem>
+                    <SelectItem value="divorced">
+                        {dict.commons.beneficiaries.create.civilStatus.divorced}
+                    </SelectItem>
+                    <SelectItem value="widowed">
+                        {dict.commons.beneficiaries.create.civilStatus.widowed}
+                    </SelectItem>
+                    <SelectItem value="separated">
+                        {dict.commons.beneficiaries.create.civilStatus.separated}
+                    </SelectItem>
+                    <SelectItem value="common-law-marriage">
+                        {dict.commons.beneficiaries.create.civilStatus.commonLawMarriage}
+                    </SelectItem>
+                    <SelectItem value="in-a-relationship">
+                        {dict.commons.beneficiaries.create.civilStatus.inARelationship}
+                    </SelectItem>
+                    <SelectItem value="other">
+                        {dict.commons.beneficiaries.create.civilStatus.other}
+                    </SelectItem>
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="otherCivilStatus" type="text" placeholder="Specify civil status" />
+                <Input
+                    name="otherCivilStatus"
+                    type="text"
+                    placeholder={dict.commons.beneficiaries.create.civilStatus.otherPlaceholder}
+                />
             )}
         </div>
     );

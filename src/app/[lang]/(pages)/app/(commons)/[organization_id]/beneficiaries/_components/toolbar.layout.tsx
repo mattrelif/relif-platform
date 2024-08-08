@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { PDFDocument } from "@/components/reports/beneficiaries";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ const Toolbar = (): ReactNode => {
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const organizationId = pathname.split("/")[3];
+    const dict = useDictionary();
 
     const handleDownloadPDF = async () => {
         try {
@@ -39,7 +41,7 @@ const Toolbar = (): ReactNode => {
                 throw new Error();
             }
         } catch (error) {
-            console.error("Error generating PDF:", error);
+            console.error(dict.commons.beneficiaries.toolbar.errorGeneratingPDF, error);
         }
     };
 
@@ -48,7 +50,7 @@ const Toolbar = (): ReactNode => {
             <Button asChild>
                 <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                     <MdAdd size={16} />
-                    Create beneficiary
+                    {dict.commons.beneficiaries.toolbar.createBeneficiary}
                 </Link>
             </Button>
             <DropdownMenu>
@@ -60,11 +62,11 @@ const Toolbar = (): ReactNode => {
                 <DropdownMenuContent>
                     <DropdownMenuItem className="flex gap-2">
                         <FaFileCsv />
-                        Download CSV
+                        {dict.commons.beneficiaries.toolbar.downloadCSV}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
                         <FaFilePdf />
-                        Download PDF
+                        {dict.commons.beneficiaries.toolbar.downloadPDF}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

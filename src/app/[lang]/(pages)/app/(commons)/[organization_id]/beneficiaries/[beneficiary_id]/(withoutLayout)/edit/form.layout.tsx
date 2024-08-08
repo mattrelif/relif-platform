@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { getBeneficiaryById, updateBeneficiary } from "@/repository/beneficiary.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { MdContacts, MdError, MdSave } from "react-icons/md";
 
@@ -24,6 +25,7 @@ type Props = {
 
 const Form = ({ beneficiaryId }: Props): ReactNode => {
     const router = useRouter();
+    const dict = useDictionary();
     const { toast } = useToast();
 
     const pathname = usePathname();
@@ -53,19 +55,22 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
     }, []);
 
     if (isLoading)
-        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                {dict.commons.beneficiaries.edit.loading}
+            </h2>
+        );
 
     if (!isLoading && error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.beneficiaries.edit.somethingWentWrong}
             </span>
         );
 
     const handleInputChange =
-        (setter: React.Dispatch<React.SetStateAction<string[]>>) =>
-        (event: ChangeEvent<HTMLInputElement>) => {
+        (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
             const values = event.target.value.split(",").map(value => value.trim());
             setter(values);
         };
@@ -174,15 +179,15 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
             });
 
             toast({
-                title: "Update successful",
-                description: "Beneficiary updated successfully!",
+                title: dict.commons.beneficiaries.edit.toastSuccessTitle,
+                description: dict.commons.beneficiaries.edit.toastSuccessDescription,
             });
 
             router.push(urlPath);
         } catch (err) {
             toast({
-                title: "Update Error",
-                description: "An error occurred while updating the beneficiary. Please try again.",
+                title: dict.commons.beneficiaries.edit.toastErrorTitle,
+                description: dict.commons.beneficiaries.edit.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -194,11 +199,13 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                 <div className="w-full h-max flex flex-col gap-6">
                     <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                         <FaUsers />
-                        Edit beneficiary
+                        {dict.commons.beneficiaries.edit.title}
                     </h1>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="fullName">Full name *</Label>
+                        <Label htmlFor="fullName">
+                            {dict.commons.beneficiaries.edit.fullName} *
+                        </Label>
                         <Input
                             id="fullName"
                             name="fullName"
@@ -209,7 +216,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="birthdate">Birthdate *</Label>
+                        <Label htmlFor="birthdate">
+                            {dict.commons.beneficiaries.edit.birthdate} *
+                        </Label>
                         <input
                             id="birthdate"
                             name="birthdate"
@@ -221,13 +230,17 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="document">Document *</Label>
+                        <Label htmlFor="document">
+                            {dict.commons.beneficiaries.edit.document} *
+                        </Label>
                         <div className="w-full flex gap-2">
                             <Input
                                 id="documentType"
                                 name="documentType"
                                 type="text"
-                                placeholder="Type: e.g. CPF"
+                                placeholder={
+                                    dict.commons.beneficiaries.edit.documentTypePlaceholder
+                                }
                                 className="w-[50%]"
                                 required
                                 defaultValue={data.documents[0].type}
@@ -237,7 +250,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                                 name="documentValue"
                                 type="text"
                                 className="w-[50%]"
-                                placeholder="Value: e.g. 123.456.789-00"
+                                placeholder={
+                                    dict.commons.beneficiaries.edit.documentValuePlaceholder
+                                }
                                 required
                                 defaultValue={data.documents[0].value}
                             />
@@ -245,7 +260,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="email">E-mail *</Label>
+                        <Label htmlFor="email">{dict.commons.beneficiaries.edit.email} *</Label>
                         <Input
                             id="email"
                             name="email"
@@ -262,7 +277,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     <Education defaultValue={data.education} />
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="occupation">Occupation *</Label>
+                        <Label htmlFor="occupation">
+                            {dict.commons.beneficiaries.edit.occupation} *
+                        </Label>
                         <Input
                             id="occupation"
                             name="occupation"
@@ -273,13 +290,13 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="phone">Phone *</Label>
+                        <Label htmlFor="phone">{dict.commons.beneficiaries.edit.phone} *</Label>
                         <div className="w-full flex gap-2">
                             <Input
                                 id="countryCode"
                                 name="countryCode"
                                 type="text"
-                                placeholder="e.g. +55"
+                                placeholder={dict.commons.beneficiaries.edit.countryCodePlaceholder}
                                 className="w-[30%]"
                                 required
                                 defaultValue={data.phones[0].split("_")[0]}
@@ -295,12 +312,14 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="languages">Languages *</Label>
+                        <Label htmlFor="languages">
+                            {dict.commons.beneficiaries.edit.languages} *
+                        </Label>
                         <Input
                             id="languages"
                             name="languages"
                             type="text"
-                            placeholder="Write as much as you want, separated by commas"
+                            placeholder={dict.commons.beneficiaries.edit.languagesPlaceholder}
                             onChange={handleInputChange(setLanguages)}
                             required
                             defaultValue={data.spoken_languages.join(",")}
@@ -316,11 +335,13 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                     <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                         <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                            <FaMapMarkerAlt /> Last address
+                            <FaMapMarkerAlt /> {dict.commons.beneficiaries.edit.lastAddress}
                         </h2>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="addressLine1">Address Line 1 *</Label>
+                            <Label htmlFor="addressLine1">
+                                {dict.commons.beneficiaries.edit.addressLine} 1 *
+                            </Label>
                             <Input
                                 id="addressLine1"
                                 name="addressLine1"
@@ -331,7 +352,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="addressLine2">Address Line 2</Label>
+                            <Label htmlFor="addressLine2">
+                                {dict.commons.beneficiaries.edit.addressLine} 2
+                            </Label>
                             <Input
                                 id="addressLine2"
                                 name="addressLine2"
@@ -342,7 +365,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                         <div className="w-full flex items-center gap-2">
                             <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="city">City *</Label>
+                                <Label htmlFor="city">
+                                    {dict.commons.beneficiaries.edit.city} *
+                                </Label>
                                 <Input
                                     id="city"
                                     name="city"
@@ -353,7 +378,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="postalCode">Zip / Postal Code *</Label>
+                                <Label htmlFor="postalCode">
+                                    {dict.commons.beneficiaries.edit.postalCode} *
+                                </Label>
                                 <Input
                                     id="postalCode"
                                     name="postalCode"
@@ -366,7 +393,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                         <div className="w-full flex items-center gap-2">
                             <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="state">State / Province *</Label>
+                                <Label htmlFor="state">
+                                    {dict.commons.beneficiaries.edit.state} *
+                                </Label>
                                 <Input
                                     id="state"
                                     name="state"
@@ -377,7 +406,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="country">Country *</Label>
+                                <Label htmlFor="country">
+                                    {dict.commons.beneficiaries.edit.country} *
+                                </Label>
                                 <Input
                                     id="country"
                                     name="country"
@@ -391,11 +422,13 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                     <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                         <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                            <MdContacts /> Emergency Contact
+                            <MdContacts /> {dict.commons.beneficiaries.edit.emergencyContact}
                         </h2>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="emergencyName">Name *</Label>
+                            <Label htmlFor="emergencyName">
+                                {dict.commons.beneficiaries.edit.emergencyName} *
+                            </Label>
                             <Input
                                 id="emergencyName"
                                 name="emergencyName"
@@ -410,7 +443,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                         />
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="emergencyPhone">Phone *</Label>
+                            <Label htmlFor="emergencyPhone">
+                                {dict.commons.beneficiaries.edit.emergencyPhone} *
+                            </Label>
                             <div className="w-full flex gap-2">
                                 <Input
                                     id="emergencyCountryCode"
@@ -436,7 +471,9 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="emergencyEmail">E-mail *</Label>
+                            <Label htmlFor="emergencyEmail">
+                                {dict.commons.beneficiaries.edit.emergencyEmail} *
+                            </Label>
                             <Input
                                 id="emergencyEmail"
                                 name="emergencyEmail"
@@ -451,7 +488,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     <Medical defaultValue={data.medical_information} />
 
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="notes">Notes</Label>
+                        <Label htmlFor="notes">{dict.commons.beneficiaries.edit.notes}</Label>
                         <textarea
                             className="flex min-h-32 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             id="notes"
@@ -462,7 +499,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
                     <Button className="flex items-center gap-2">
                         <MdSave size={16} />
-                        Update beneficiary
+                        {dict.commons.beneficiaries.edit.updateBeneficiaryButton}
                     </Button>
                 </div>
             </form>

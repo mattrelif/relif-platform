@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
@@ -17,6 +18,8 @@ type Props = {
 };
 
 const Toolbar = ({ beneficiary }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
@@ -27,7 +30,9 @@ const Toolbar = ({ beneficiary }: Props): ReactNode => {
     return (
         <div className="w-full h-max flex justify-between items-center">
             <Button size="sm" variant="secondary" asChild>
-                <Link href={backToListPath}>Back to list</Link>
+                <Link href={backToListPath}>
+                    {dict.commons.beneficiaries.beneficiaryId.toolbar.backToListButton}
+                </Link>
             </Button>
 
             <div className="flex items-center gap-2">
@@ -45,7 +50,12 @@ const Toolbar = ({ beneficiary }: Props): ReactNode => {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Edit beneficiary</TooltipContent>
+                        <TooltipContent>
+                            {
+                                dict.commons.beneficiaries.beneficiaryId.toolbar
+                                    .editBeneficiaryTooltip
+                            }
+                        </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
 
@@ -61,7 +71,12 @@ const Toolbar = ({ beneficiary }: Props): ReactNode => {
                                 <IoMdMove />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Move beneficiary to other housing or space</TooltipContent>
+                        <TooltipContent>
+                            {
+                                dict.commons.beneficiaries.beneficiaryId.toolbar
+                                    .moveBeneficiaryTooltip
+                            }
+                        </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
 
@@ -77,7 +92,12 @@ const Toolbar = ({ beneficiary }: Props): ReactNode => {
                                 <FaTrash />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Remove beneficiary</TooltipContent>
+                        <TooltipContent>
+                            {
+                                dict.commons.beneficiaries.beneficiaryId.toolbar
+                                    .removeBeneficiaryTooltip
+                            }
+                        </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>

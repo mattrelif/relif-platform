@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,17 +23,6 @@ import { SlOptions } from "react-icons/sl";
 
 import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
-
-const GENDER_MAPPING = {
-    male: "Male",
-    female: "Female",
-    "non-binary": "Non-Binary",
-    "prefer-not-to-say": "Prefer Not to Say",
-    transgender: "Transgender",
-    "gender-fluid": "Gender Fluid",
-    agender: "Agender",
-    other: "Other",
-};
 
 type Props = BeneficiarySchema & {
     refreshList: () => void;
@@ -64,6 +54,19 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const age = calculateAge(data.birthdate);
     const isUnderage = age < 18;
 
+    const dict = useDictionary();
+
+    const GENDER_MAPPING = {
+        male: dict.commons.beneficiaries.card.gender.male,
+        female: dict.commons.beneficiaries.card.gender.female,
+        "non-binary": dict.commons.beneficiaries.card.gender.nonBinary,
+        "prefer-not-to-say": dict.commons.beneficiaries.card.gender.preferNotToSay,
+        transgender: dict.commons.beneficiaries.card.gender.transgender,
+        "gender-fluid": dict.commons.beneficiaries.card.gender.genderFluid,
+        agender: dict.commons.beneficiaries.card.gender.agender,
+        other: dict.commons.beneficiaries.card.gender.other,
+    };
+
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
             <div className="flex gap-4">
@@ -80,11 +83,11 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         <FaMapMarkerAlt />
                         {data?.current_housing_id
                             ? convertToTitleCase(data?.current_housing.name)
-                            : "Unallocated"}
+                            : dict.commons.beneficiaries.card.unallocated}
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                         <FaBirthdayCake /> {formatDate(data?.birthdate, locale || "en")} ({age}{" "}
-                        years old)
+                        {dict.commons.beneficiaries.card.yearsOld})
                     </span>
                     <div className="flex mt-2 gap-2">
                         {data.gender && (
@@ -94,12 +97,12 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         )}
                         {isUnderage && (
                             <Badge className="bg-yellow-300 text-slate-900 hover:bg-yellow-500">
-                                Underage
+                                {dict.commons.beneficiaries.card.underage}
                             </Badge>
                         )}
                         {!data?.current_room_id && (
                             <Badge className="bg-slate-200 text-slate-900 hover:bg-slate-400">
-                                Unallocated
+                                {dict.commons.beneficiaries.card.unallocated}
                             </Badge>
                         )}
                     </div>
@@ -114,11 +117,13 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${beneficiaryPath}/${data?.id}`}>Profile</Link>
+                            <Link href={`${beneficiaryPath}/${data?.id}`}>
+                                {dict.commons.beneficiaries.card.dropdownMenu.profile}
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild disabled={!data?.current_housing_id}>
-                            <Link href={`${housingPath}/${data?.current_housing_id}`}>
-                                View housing
+                            <Link href={`${housingPath}/housings/${data?.current_housing_id}`}>
+                                {dict.commons.beneficiaries.card.dropdownMenu.viewHousing}
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -126,30 +131,31 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             <Link href={`${beneficiaryPath}/${data?.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
-                                    Edit beneficiary
+                                    {dict.commons.beneficiaries.card.dropdownMenu.editBeneficiary}
                                 </span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaTrash className="text-xs" />
-                                Remove beneficiary
+                                {dict.commons.beneficiaries.card.dropdownMenu.removeBeneficiary}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setMoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <IoMdMove className="text-xs" />
-                                Move to other housing
+                                {dict.commons.beneficiaries.card.dropdownMenu.moveToOtherHousing}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at {formatDate(data?.created_at, locale || "en")}
+                        {dict.commons.beneficiaries.card.createdAt}{" "}
+                        {formatDate(data?.created_at, locale || "en")}
                     </span>
                     <span>
-                        <Badge>Active</Badge>
+                        <Badge>{dict.commons.beneficiaries.card.active}</Badge>
                     </span>
                 </div>
             </div>

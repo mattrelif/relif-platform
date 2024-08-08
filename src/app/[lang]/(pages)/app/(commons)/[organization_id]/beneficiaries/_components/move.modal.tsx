@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -42,6 +43,7 @@ const MoveModal = ({
     setMoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const router = useRouter();
     const pathname = usePathname();
     const backToListPath = pathname.split("/").slice(0, 5).join("/");
@@ -62,7 +64,8 @@ const MoveModal = ({
                     const { data: housingResponse } = await findHousingsByOrganizationId(
                         currentUser.organization_id,
                         0,
-                        9999
+                        9999,
+                        ""
                     );
                     setHousings(housingResponse.data);
                 } else {
@@ -100,28 +103,31 @@ const MoveModal = ({
 
             setMoveDialogOpenState(false);
             toast({
-                title: "Beneficiary Relocated",
-                description: "The beneficiary has been successfully moved to the new housing.",
+                title: dict.commons.beneficiaries.moveModal.toastSuccessTitle,
+                description: dict.commons.beneficiaries.moveModal.toastSuccessDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Error Moving Beneficiary",
-                description:
-                    "An error occurred while attempting to move the beneficiary. Please check the entered data and try again.",
+                title: dict.commons.beneficiaries.moveModal.toastErrorTitle,
+                description: dict.commons.beneficiaries.moveModal.toastErrorDescription,
                 variant: "destructive",
             });
         }
     };
 
     if (isLoading)
-        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                {dict.commons.beneficiaries.moveModal.loading}
+            </h2>
+        );
 
     if (error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.beneficiaries.moveModal.error}
             </span>
         );
 
@@ -129,11 +135,11 @@ const MoveModal = ({
         <Dialog open={moveDialogOpenState} onOpenChange={setMoveDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Confirm Beneficiary Move</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.commons.beneficiaries.moveModal.confirmMoveTitle}
+                    </DialogTitle>
                     <DialogDescription>
-                        You are about to move the beneficiary to a different location. Please ensure
-                        that this is the intended action before proceeding, as it may affect their
-                        current housing arrangements.
+                        {dict.commons.beneficiaries.moveModal.confirmMoveDescription}
                     </DialogDescription>
 
                     <div className="flex flex-col pt-4">
@@ -143,22 +149,29 @@ const MoveModal = ({
                         <span className="text-xs text-slate-500">
                             <strong>Current:</strong>{" "}
                             {!beneficiary.current_housing_id
-                                ? "Unallocated"
-                                : `${beneficiary.current_housing_id} (housed on ${beneficiary.current_room_id})`}
+                                ? dict.commons.beneficiaries.moveModal.unallocated
+                                : `${beneficiary.current_housing.name} (housed on ${beneficiary.current_room.name})`}
                         </span>
                     </div>
                     {housings.length === 0 && (
                         <span className="text-sm text-red-500 font-medium pt-4">
-                            No housings found...
+                            {dict.commons.beneficiaries.moveModal.noHousingsFound}
                         </span>
                     )}
 
                     {housings.length > 0 && (
                         <div className="pt-4 flex flex-col gap-2">
-                            <span className="text-xs text-slate-500 font-bold">To:</span>
+                            <span className="text-xs text-slate-500 font-bold">
+                                {dict.commons.beneficiaries.moveModal.to}:
+                            </span>
                             <Select onValueChange={getSpaces} required>
                                 <SelectTrigger className="w-full" id="housing">
-                                    <SelectValue placeholder="Select housing..." />
+                                    <SelectValue
+                                        placeholder={
+                                            dict.commons.beneficiaries.moveModal
+                                                .selectHousingPlaceholder
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {housings.map(housing => (
@@ -168,7 +181,12 @@ const MoveModal = ({
                             </Select>
                             <Select onValueChange={setSelectedSpace} required>
                                 <SelectTrigger className="w-full" id="space">
-                                    <SelectValue placeholder="Select space..." />
+                                    <SelectValue
+                                        placeholder={
+                                            dict.commons.beneficiaries.moveModal
+                                                .selectSpacePlaceholder
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {spaces?.map(space => (
@@ -185,10 +203,10 @@ const MoveModal = ({
 
                     <div className="flex gap-4 pt-5">
                         <Button variant="outline" onClick={() => setMoveDialogOpenState(false)}>
-                            Cancel
+                            {dict.commons.beneficiaries.moveModal.cancel}
                         </Button>
                         <Button onClick={handleMove} disabled={housings.length === 0}>
-                            Move
+                            {dict.commons.beneficiaries.moveModal.move}
                         </Button>
                     </div>
                 </DialogHeader>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
     const router = useRouter();
     const pathname = usePathname();
     const backToListPath = pathname.split("/").slice(0, 5).join("/");
+    const dict = useDictionary();
 
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
     const [selectedHousing, setSelectedHousing] = useState("");
@@ -51,7 +53,8 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                     const { data: housingResponse } = await findHousingsByOrganizationId(
                         currentUser.organization_id,
                         0,
-                        9999
+                        9999,
+                        ""
                     );
                     setHousings(housingResponse.data);
                 } else {
@@ -82,15 +85,15 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
             await allocateBeneficiary(beneficiaryId, selectedHousing, selectedSpace);
 
             toast({
-                title: "Beneficiary allocated",
-                description: "The beneficiary has been successfully moved to the new shelter.",
+                title: dict.commons.beneficiaries.create.allocate.toastSuccessTitle,
+                description: dict.commons.beneficiaries.create.allocate.toastSuccessDescription,
             });
 
             router.push(backToListPath);
         } catch {
             toast({
-                title: "Error Moving Beneficiary",
-                description: "An error occurred while attempting to allocate the beneficiary.",
+                title: dict.commons.beneficiaries.create.allocate.toastErrorTitle,
+                description: dict.commons.beneficiaries.create.allocate.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -100,7 +103,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.beneficiaries.create.allocate.errorText}
             </span>
         );
     }
@@ -109,20 +112,18 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
         <div>
             <h1 className="text-relif-orange-200 text-xl font-bold flex items-center gap-2 p-4">
                 <FaHouseChimneyUser />
-                Allocate beneficiary
+                {dict.commons.beneficiaries.create.allocate.title}
             </h1>
 
             {housings.length === 0 && (
                 <div className="p-4">
                     <Alert>
                         <IoMdAlert className="h-4 w-4" />
-                        <AlertTitle>Important</AlertTitle>
+                        <AlertTitle>
+                            {dict.commons.beneficiaries.create.allocate.noHousingAlertTitle}
+                        </AlertTitle>
                         <AlertDescription className="text-slate-500">
-                            You cannot associate the beneficiary with a housing at this moment
-                            because there are no housing registered yet. To associate, please return
-                            to the beneficiaries listing and, either from the list or the
-                            beneficiary's profile, go to "Move" and associate them with a new
-                            housing after creating it.
+                            {dict.commons.beneficiaries.create.allocate.noHousingAlertDescription}
                         </AlertDescription>
                     </Alert>
                 </div>
@@ -131,11 +132,19 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
             {housings.length !== 0 && (
                 <div className="p-4 flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="housing">Housing *</Label>
+                        <Label htmlFor="housing">
+                            {dict.commons.beneficiaries.create.allocate.housingLabel}
+                        </Label>
                         <Select onValueChange={getSpaces} required>
                             <SelectTrigger className="w-full" id="housing">
                                 <SelectValue
-                                    placeholder={!isLoading ? "Select housing..." : "Loading..."}
+                                    placeholder={
+                                        !isLoading
+                                            ? dict.commons.beneficiaries.create.allocate
+                                                  .selectHousingPlaceholder
+                                            : dict.commons.beneficiaries.create.allocate
+                                                  .loadingPlaceholder
+                                    }
                                 />
                             </SelectTrigger>
                             <SelectContent>
@@ -147,10 +156,17 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="space">Space *</Label>
+                        <Label htmlFor="space">
+                            {dict.commons.beneficiaries.create.allocate.spaceLabel}
+                        </Label>
                         <Select onValueChange={setSelectedSpace} required>
                             <SelectTrigger className="w-full" id="space">
-                                <SelectValue placeholder="Select space..." />
+                                <SelectValue
+                                    placeholder={
+                                        dict.commons.beneficiaries.create.allocate
+                                            .selectSpacePlaceholder
+                                    }
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {spaces?.map(space => (
@@ -169,14 +185,18 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
             {housings.length !== 0 ? (
                 <div className="flex gap-4 p-4">
                     <Button variant="outline" onClick={() => router.push(backToListPath)}>
-                        Do this later
+                        {dict.commons.beneficiaries.create.allocate.doThisLaterButton}
                     </Button>
-                    <Button onClick={handleMove}>Allocate</Button>
+                    <Button onClick={handleMove}>
+                        {dict.commons.beneficiaries.create.allocate.allocateButton}
+                    </Button>
                 </div>
             ) : (
                 <div className="flex gap-4 p-4">
                     <Button variant="outline" asChild>
-                        <Link href={backToListPath}>Back to beneficiary list</Link>
+                        <Link href={backToListPath}>
+                            {dict.commons.beneficiaries.create.allocate.backToListButton}
+                        </Link>
                     </Button>
                 </div>
             )}

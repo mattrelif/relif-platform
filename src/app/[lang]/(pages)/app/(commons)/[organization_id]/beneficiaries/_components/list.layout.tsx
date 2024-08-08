@@ -1,6 +1,7 @@
 "use client";
 
 import { Toolbar } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/beneficiaries/_components/toolbar.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Input } from "@/components/ui/input";
 import {
     Pagination,
@@ -20,6 +21,8 @@ import { Card } from "./card.layout";
 
 const BeneficiaryList = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
+
     const [beneficiaries, setBeneficiaries] = useState<{
         count: number;
         data: BeneficiarySchema[];
@@ -86,7 +89,7 @@ const BeneficiaryList = (): ReactNode => {
                     <MdSearch className="text-slate-400 text-2xl" />
                     <Input
                         type="text"
-                        placeholder="Search"
+                        placeholder={dict.commons.beneficiaries.list.searchPlaceholder}
                         value={searchTerm}
                         onChange={handleSearchChange}
                         className="w-[300px]"
@@ -96,19 +99,21 @@ const BeneficiaryList = (): ReactNode => {
             </div>
             <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
-                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                        {dict.commons.beneficiaries.list.loading}
+                    </h2>
                 )}
 
                 {!isLoading && error && (
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                         <MdError />
-                        Something went wrong. Please try again later.
+                        {dict.commons.beneficiaries.list.error}
                     </span>
                 )}
 
                 {!isLoading && !error && beneficiaries && beneficiaries.count <= 0 && (
                     <span className="text-sm text-slate-900 font-medium p-4">
-                        No beneficiaries found...
+                        {dict.commons.beneficiaries.list.noBeneficiariesFound}
                     </span>
                 )}
 

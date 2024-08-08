@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,8 @@ import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState } from "reac
 import { MdHealthAndSafety } from "react-icons/md";
 
 const Medical = (): ReactNode => {
+    const dict = useDictionary();
+
     const [allergies, setAllergies] = useState<string[]>([]);
     const [currentMedications, setCurrentMedications] = useState<string[]>([]);
     const [chronicMedicalConditions, setChronicMedicalConditions] = useState<string[]>([]);
@@ -34,16 +37,18 @@ const Medical = (): ReactNode => {
         <>
             <div className="w-full h-max flex flex-col gap-6 p-4 border border-slate-200 rounded-lg">
                 <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                    <MdHealthAndSafety /> Medical Information
+                    <MdHealthAndSafety /> {dict.commons.beneficiaries.create.medical.title}
                 </h2>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="allergies">Allergies</Label>
+                    <Label htmlFor="allergies">
+                        {dict.commons.beneficiaries.create.medical.allergies}
+                    </Label>
                     <Input
                         id="allergies"
                         name="allergies"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setAllergies)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -56,12 +61,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="currentMedications">Current medications</Label>
+                    <Label htmlFor="currentMedications">
+                        {dict.commons.beneficiaries.create.medical.currentMedications}
+                    </Label>
                     <Input
                         id="currentMedications"
                         name="currentMedications"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setCurrentMedications)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -74,12 +81,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="chronicMedicalConditions">Chronic medical conditions</Label>
+                    <Label htmlFor="chronicMedicalConditions">
+                        {dict.commons.beneficiaries.create.medical.chronicMedicalConditions}
+                    </Label>
                     <Input
                         id="chronicMedicalConditions"
                         name="chronicMedicalConditions"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setChronicMedicalConditions)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -92,12 +101,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="healthInsurance">Health Insurance</Label>
+                    <Label htmlFor="healthInsurance">
+                        {dict.commons.beneficiaries.create.medical.healthInsurance}
+                    </Label>
                     <Input
                         id="healthInsurance"
                         name="healthInsurance"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setHealthInsurance)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -110,10 +121,16 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="bloodType">Blood type</Label>
+                    <Label htmlFor="bloodType">
+                        {dict.commons.beneficiaries.create.medical.bloodType}
+                    </Label>
                     <Select name="bloodType">
                         <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select blood type..." />
+                            <SelectValue
+                                placeholder={
+                                    dict.commons.beneficiaries.create.medical.bloodTypePlaceholder
+                                }
+                            />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="A-positive">A+</SelectItem>
@@ -129,12 +146,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="vaccinations">Vaccinations</Label>
+                    <Label htmlFor="vaccinations">
+                        {dict.commons.beneficiaries.create.medical.vaccinations}
+                    </Label>
                     <Input
                         id="vaccinations"
                         name="vaccinations"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setVaccinations)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -147,12 +166,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="mentalHealth">Mental health</Label>
+                    <Label htmlFor="mentalHealth">
+                        {dict.commons.beneficiaries.create.medical.mentalHealth}
+                    </Label>
                     <Input
                         id="mentalHealth"
                         name="mentalHealth"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setMentalHealth)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -165,22 +186,28 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="height">Height (cm)</Label>
+                    <Label htmlFor="height">
+                        {dict.commons.beneficiaries.create.medical.height}
+                    </Label>
                     <Input id="height" name="height" type="number" placeholder="e.g. 170cm" />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="weight">Weight (kg)</Label>
+                    <Label htmlFor="weight">
+                        {dict.commons.beneficiaries.create.medical.weight}
+                    </Label>
                     <Input id="weight" name="weight" type="number" placeholder="e.g. 80kg" />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="addictions">Addictions</Label>
+                    <Label htmlFor="addictions">
+                        {dict.commons.beneficiaries.create.medical.addictions}
+                    </Label>
                     <Input
                         id="addictions"
                         name="addictions"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setAddictions)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -193,12 +220,14 @@ const Medical = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="disabilities">Disabilities</Label>
+                    <Label htmlFor="disabilities">
+                        {dict.commons.beneficiaries.create.medical.disabilities}
+                    </Label>
                     <Input
                         id="disabilities"
                         name="disabilities"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setDisabilities)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -212,13 +241,13 @@ const Medical = (): ReactNode => {
 
                 <div className="flex flex-col gap-3 w-full">
                     <Label htmlFor="prothesisOrMedicalDevices">
-                        Use of prosthesis or medical devices
+                        {dict.commons.beneficiaries.create.medical.prothesisOrMedicalDevices}
                     </Label>
                     <Input
                         id="prothesisOrMedicalDevices"
                         name="prothesisOrMedicalDevices"
                         type="text"
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.beneficiaries.create.medical.writeAsMuch}
                         onChange={handleInputChange(setProsthesisOrMedicalDevices)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -31,6 +32,7 @@ const OPTIONS = [
 
 const Education = ({ defaultValue }: Props): ReactNode => {
     const [option, setOption] = useState<string>(defaultValue);
+    const dict = useDictionary();
 
     useEffect(() => {
         if (OPTIONS.includes(defaultValue)) {
@@ -42,36 +44,58 @@ const Education = ({ defaultValue }: Props): ReactNode => {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="education">Education *</Label>
+            <Label htmlFor="education">{dict.commons.beneficiaries.edit.education.label}</Label>
             <Select name="education" value={option} onValueChange={setOption}>
                 <SelectTrigger className="w-full" id="education">
-                    <SelectValue placeholder="Select..." />
+                    <SelectValue
+                        placeholder={dict.commons.beneficiaries.edit.education.placeholder}
+                    />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="incomplete-elementary-education">
-                        Incomplete Elementary Education
+                        {dict.commons.beneficiaries.edit.education.incompleteElementaryEducation}
                     </SelectItem>
                     <SelectItem value="complete-elementary-education">
-                        Complete Elementary Education
+                        {dict.commons.beneficiaries.edit.education.completeElementaryEducation}
                     </SelectItem>
-                    <SelectItem value="incomplete-high-school">Incomplete High School</SelectItem>
-                    <SelectItem value="complete-high-school">Complete High School</SelectItem>
-                    <SelectItem value="vocational-education">Vocational Education</SelectItem>
+                    <SelectItem value="incomplete-high-school">
+                        {dict.commons.beneficiaries.edit.education.incompleteHighSchool}
+                    </SelectItem>
+                    <SelectItem value="complete-high-school">
+                        {dict.commons.beneficiaries.edit.education.completeHighSchool}
+                    </SelectItem>
+                    <SelectItem value="vocational-education">
+                        {dict.commons.beneficiaries.edit.education.vocationalEducation}
+                    </SelectItem>
                     <SelectItem value="incomplete-higher-education">
-                        Incomplete Higher Education
+                        {dict.commons.beneficiaries.edit.education.incompleteHigherEducation}
                     </SelectItem>
                     <SelectItem value="complete-higher-education">
-                        Complete Higher Education
+                        {dict.commons.beneficiaries.edit.education.completeHigherEducation}
                     </SelectItem>
-                    <SelectItem value="postgraduate">Postgraduate</SelectItem>
-                    <SelectItem value="masters-degree">Master's Degree</SelectItem>
-                    <SelectItem value="doctorate">Doctorate</SelectItem>
-                    <SelectItem value="postdoctorate">Postdoctorate</SelectItem>
-                    <SelectItem value="other">Other (specify)</SelectItem>
+                    <SelectItem value="postgraduate">
+                        {dict.commons.beneficiaries.edit.education.postgraduate}
+                    </SelectItem>
+                    <SelectItem value="masters-degree">
+                        {dict.commons.beneficiaries.edit.education.mastersDegree}
+                    </SelectItem>
+                    <SelectItem value="doctorate">
+                        {dict.commons.beneficiaries.edit.education.doctorate}
+                    </SelectItem>
+                    <SelectItem value="postdoctorate">
+                        {dict.commons.beneficiaries.edit.education.postdoctorate}
+                    </SelectItem>
+                    <SelectItem value="other">
+                        {dict.commons.beneficiaries.edit.education.other}
+                    </SelectItem>
                 </SelectContent>
             </Select>
             {option === "other" && (
-                <Input name="otherEducation" type="text" placeholder="Specify education" />
+                <Input
+                    name="otherEducation"
+                    type="text"
+                    placeholder={dict.commons.beneficiaries.edit.education.otherPlaceholder}
+                />
             )}
         </div>
     );

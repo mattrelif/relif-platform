@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -33,6 +34,7 @@ const RemoveModal = ({
     const { toast } = useToast();
     const router = useRouter();
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const [isLoading, setIsLoading] = useState(false);
     const backToListPath = pathname.split("/").slice(0, 5).join("/");
@@ -49,16 +51,15 @@ const RemoveModal = ({
             }
 
             toast({
-                title: "Removed!",
-                description: "Beneficiary removed successfully.",
+                title: dict.commons.beneficiaries.removeModal.toastSuccessTitle,
+                description: dict.commons.beneficiaries.removeModal.toastSuccessDescription,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Beneficiary Removal Failed",
-                description:
-                    "An error occurred while attempting to remove the beneficiary. Please try again later or contact support if the issue persists.",
+                title: dict.commons.beneficiaries.removeModal.toastErrorTitle,
+                description: dict.commons.beneficiaries.removeModal.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -68,10 +69,11 @@ const RemoveModal = ({
         <Dialog open={removeDialogOpenState} onOpenChange={setRemoveDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.commons.beneficiaries.removeModal.confirmRemoveTitle}
+                    </DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This will permanently delete the beneficiary
-                        below.
+                        {dict.commons.beneficiaries.removeModal.confirmRemoveDescription}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
@@ -79,16 +81,19 @@ const RemoveModal = ({
                         </span>
                         <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                             <FaHouseChimneyUser />
-                            {beneficiary?.current_housing.name || "Unallocated"}
+                            {beneficiary?.current_housing.name ||
+                                dict.commons.beneficiaries.removeModal.unallocated}
                         </span>
                     </div>
                     <div className="flex gap-4 pt-5">
                         <Button variant="outline" onClick={() => setRemoveDialogOpenState(false)}>
-                            Cancel
+                            {dict.commons.beneficiaries.removeModal.cancel}
                         </Button>
                         <DialogClose asChild>
                             <Button onClick={handleDelete}>
-                                {!isLoading ? "Delete" : "Loading..."}
+                                {!isLoading
+                                    ? dict.commons.beneficiaries.removeModal.delete
+                                    : dict.commons.beneficiaries.removeModal.loading}
                             </Button>
                         </DialogClose>
                     </div>
