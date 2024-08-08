@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Input } from "@/components/ui/input";
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { SpaceSchema } from "@/types/space.types";
@@ -10,6 +11,8 @@ import { SpaceCard } from "./card.layout";
 import { CreateSpace } from "./create.layout";
 
 const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
+    const dict = useDictionary();
+
     const [spaces, setSpaces] = useState<{
         count: number;
         data: SpaceSchema[];
@@ -42,29 +45,35 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
             <div className="w-full flex flex-wrap items-center gap-2 justify-between">
                 <h3 className="text-relif-orange-200 font-bold flex items-center gap-2">
                     <MdSpaceDashboard />
-                    Spaces
+                    {dict.housingOverview.spacesTitle}
                 </h3>
                 <CreateSpace housingId={housingId} refreshList={getSpaceList} />
             </div>
             <div className="flex items-center gap-2">
                 <MdSearch className="text-slate-400 text-2xl" />
-                <Input type="text" placeholder="Search" className="w-full h-8" />
+                <Input
+                    type="text"
+                    placeholder={dict.housingOverview.searchSpacePlaceholder}
+                    className="w-full h-8"
+                />
             </div>
-            <div className="w-full h-[calc(100vh-394px)] border border-slate-200 rounded-md overflow-hidden">
+            <div className="w-full h-[calc(100vh-520px)] border border-slate-200 rounded-md overflow-hidden">
                 {isLoading && (
-                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                        {dict.housingOverview.loading}
+                    </h2>
                 )}
 
                 {!isLoading && error && (
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                         <MdError />
-                        Something went wrong. Please try again later.
+                        {dict.housingOverview.error}
                     </span>
                 )}
 
                 {!isLoading && !error && spaces && spaces.data === null && (
                     <span className="text-sm text-slate-900 font-medium p-4">
-                        No spaces found...
+                        {dict.housingOverview.noSpacesFound}
                     </span>
                 )}
 

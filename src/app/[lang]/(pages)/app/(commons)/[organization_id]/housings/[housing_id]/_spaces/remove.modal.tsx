@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -30,6 +31,7 @@ const RemoveSpaceModal = ({
     setRemoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const pathname = usePathname();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
@@ -65,16 +67,15 @@ const RemoveSpaceModal = ({
             refreshList();
 
             toast({
-                title: "Removed!",
-                description: "Space removed successfully.",
+                title: dict.housingOverview.removeSpaceModal.toastSuccessTitle,
+                description: dict.housingOverview.removeSpaceModal.toastSuccessDescription,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Space Removal Failed",
-                description:
-                    "An error occurred while attempting to remove the space. Please try again later or contact support if the issue persists.",
+                title: dict.housingOverview.removeSpaceModal.toastErrorTitle,
+                description: dict.housingOverview.removeSpaceModal.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -84,24 +85,28 @@ const RemoveSpaceModal = ({
         <Dialog open={removeDialogOpenState} onOpenChange={setRemoveDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.housingOverview.removeSpaceModal.title}
+                    </DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This will permanently delete the space below.
+                        {dict.housingOverview.removeSpaceModal.description}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">{space?.name}</span>
                         <span className="text-xs text-slate-500">
-                            Created at {formatDate(space?.created_at, locale || "en")}
+                            {dict.housingOverview.removeSpaceModal.createdAt}{" "}
+                            {formatDate(space?.created_at, locale || "en")}
                         </span>
                     </div>
 
                     {allowToRemove === "LOADING" && (
                         <div className="flex flex-col gap-4 pt-10">
                             <span className="text-xs text-blue-500">
-                                Loading data: Please wait while we retrieve the information. This
-                                may take a moment.
+                                {dict.housingOverview.removeSpaceModal.loadingMessage}
                             </span>
-                            <Button disabled>Loading...</Button>
+                            <Button disabled>
+                                {dict.housingOverview.removeSpaceModal.loading}
+                            </Button>
                         </div>
                     )}
 
@@ -111,11 +116,13 @@ const RemoveSpaceModal = ({
                                 variant="outline"
                                 onClick={() => setRemoveDialogOpenState(false)}
                             >
-                                Cancel
+                                {dict.housingOverview.removeSpaceModal.btnCancel}
                             </Button>
                             <DialogClose asChild>
                                 <Button onClick={handleDelete}>
-                                    {!isLoading ? "Delete" : "Loading..."}
+                                    {!isLoading
+                                        ? dict.housingOverview.removeSpaceModal.btnRemove
+                                        : dict.housingOverview.removeSpaceModal.loading}
                                 </Button>
                             </DialogClose>
                         </div>
@@ -124,20 +131,22 @@ const RemoveSpaceModal = ({
                     {allowToRemove === "UNAVAILABLE" && (
                         <div className="flex flex-col gap-4 pt-10">
                             <span className="text-xs text-red-500">
-                                You have beneficiaries associated with this space. Move or remove
-                                them before removing this housing.
+                                {dict.housingOverview.removeSpaceModal.alertStatusUnavailable}
                             </span>
-                            <Button onClick={() => setRemoveDialogOpenState(false)}>Close</Button>
+                            <Button onClick={() => setRemoveDialogOpenState(false)}>
+                                {dict.housingOverview.removeSpaceModal.btnClose}
+                            </Button>
                         </div>
                     )}
 
                     {allowToRemove === "ERROR" && (
                         <div className="flex flex-col gap-4 pt-10">
                             <span className="text-xs text-red-500">
-                                Error: Unable to complete the action. Please try again later or
-                                contact support if the issue persists.
+                                {dict.housingOverview.removeSpaceModal.alertStatusError}
                             </span>
-                            <Button onClick={() => setRemoveDialogOpenState(false)}>Close</Button>
+                            <Button onClick={() => setRemoveDialogOpenState(false)}>
+                                {dict.housingOverview.removeSpaceModal.btnClose}
+                            </Button>
                         </div>
                     )}
                 </DialogHeader>

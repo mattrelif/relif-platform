@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,8 @@ type Props = SpaceSchema & {
 };
 
 const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [viewSheetOpenState, setViewSheetOpenState] = useState(false);
     const [editSheetOpenState, setEditSheetOpenState] = useState(false);
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
@@ -31,7 +34,7 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
         const availableVacancies = data.total_vacancies - data.occupied_vacancies;
 
         if (availableVacancies < 0) {
-            return "SUPERCROWDED";
+            return "OVERCROWDED";
         }
         if (availableVacancies > 0) {
             return "AVAILABLE";
@@ -56,7 +59,8 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                 <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                        {data?.occupied_vacancies || 0}/{data.total_vacancies || 0} beds occupied
+                        {data?.occupied_vacancies || 0}/{data.total_vacancies || 0}{" "}
+                        {dict.housingOverview.occupiedBeds}
                     </span>
                     <span>
                         <Badge className={`bg-${statusColor}`}>{status}</Badge>
@@ -72,18 +76,18 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem onClick={() => setViewSheetOpenState(true)}>
-                            View space
+                            {dict.housingOverview.dropdownViewSpace}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setEditSheetOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaEdit className="text-xs" />
-                                Edit
+                                {dict.housingOverview.dropdownEditSpace}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaTrash className="text-xs" />
-                                Remove
+                                {dict.housingOverview.dropdownRemoveSpace}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { getBeneficiariesBySpaceId } from "@/repository/spaces.repository";
@@ -18,6 +19,8 @@ type Props = {
 };
 
 const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [beneficiaries, setBeneficiaries] = useState<{
         count: number;
         data: BeneficiarySchema[];
@@ -28,7 +31,7 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
     const OFFSET = 0;
 
     const getBeneficiariesList = async () => {
-        (async () => {
+        (async (): Promise<void> => {
             try {
                 const response = await getBeneficiariesBySpaceId(space.id, OFFSET, LIMIT);
                 setBeneficiaries(response.data);
@@ -67,36 +70,37 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
             <SheetContent className="py-4 px-4">
                 <SheetHeader>
-                    <SheetTitle>View space</SheetTitle>
+                    <SheetTitle>{dict.housingOverview.spacesOverview.title}</SheetTitle>
                 </SheetHeader>
                 <div className="p-4 rounded-lg border border-relif-orange-200 border-dashed mt-4">
                     <h2 className="w-full text-relif-orange-200 text-xl font-bold flex items-center gap-2">
                         {space.name} <Badge className={`bg-${statusColor}`}>{status}</Badge>
                     </h2>
                     <span className="text-sm text-slate-900">
-                        {space.total_vacancies} beds, {space.occupied_vacancies} occupied
+                        {space.total_vacancies} {dict.housingOverview.spacesOverview.beds},{" "}
+                        {space.occupied_vacancies} {dict.housingOverview.spacesOverview.occupied}
                     </span>
                 </div>
                 <h3 className="mt-8 text-slate-900 text-sm font-bold pb-2 flex items-center gap-2">
-                    <FaUsers /> Beneficiaries present
+                    <FaUsers /> {dict.housingOverview.spacesOverview.beneficiariesPresent}
                 </h3>
                 <div className="border border-slate-200 rounded-lg overflow-hidden h-[calc(100vh-225px)]">
                     {isLoading && (
                         <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                            Loading...
+                            {dict.housingOverview.spacesOverview.loading}
                         </h2>
                     )}
 
                     {!isLoading && error && (
                         <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                             <MdError />
-                            Something went wrong. Please try again later.
+                            {dict.housingOverview.spacesOverview.error}
                         </span>
                     )}
 
                     {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
                         <span className="text-sm text-slate-900 font-medium p-4 block">
-                            No beneficiaries found...
+                            {dict.housingOverview.spacesOverview.noBeneficiariesFound}
                         </span>
                     )}
 

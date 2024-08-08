@@ -1,6 +1,5 @@
 "use client";
 
-import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -16,7 +15,6 @@ import { MdAdd } from "react-icons/md";
 
 const Toolbar = (): ReactNode => {
     const pathname = usePathname();
-    const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
 
     return (
@@ -24,7 +22,7 @@ const Toolbar = (): ReactNode => {
             <Button asChild>
                 <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                     <MdAdd size={16} />
-                    {dict.housingList.btnCreate}
+                    Create product
                 </Link>
             </Button>
             <DropdownMenu>
@@ -36,11 +34,11 @@ const Toolbar = (): ReactNode => {
                 <DropdownMenuContent>
                     <DropdownMenuItem className="flex gap-2">
                         <FaFileCsv />
-                        {dict.housingList.downloadCsv}
+                        Download CSV
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex gap-2">
                         <FaFilePdf />
-                        {dict.housingList.downloadPdf}
+                        Download PDF
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

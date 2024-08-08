@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,8 @@ type Props = BeneficiarySchema;
 
 const BeneficiaryCard = (data: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
+
     const urlPath = pathname.split("/").slice(0, 4).join("/");
     const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
@@ -49,7 +52,9 @@ const BeneficiaryCard = (data: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/beneficiaries/${data.id}`}>View profile</Link>
+                            <Link href={`${urlPath}/beneficiaries/${data.id}`}>
+                                {dict.housingOverview.dropdownViewProfile}
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

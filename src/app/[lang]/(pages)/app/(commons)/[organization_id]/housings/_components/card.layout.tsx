@@ -1,5 +1,7 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -26,8 +28,23 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
+    const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+
+    const getStatus = () => {
+        const availableVacancies = data.total_vacancies - data.occupied_vacancies;
+
+        if (availableVacancies < 0) {
+            return "OVERCROWDED";
+        }
+        if (availableVacancies > 0) {
+            return "AVAILABLE";
+        }
+        return "FULL";
+    };
+
+    const status = getStatus();
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
@@ -37,28 +54,39 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     <FaMapMarkerAlt />
                     {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
-                {/* <div className="flex flex-col gap-2 mt-4">
+                <div className="flex flex-col gap-2 mt-4">
                     <span className="text-xs text-slate-500 flex items-center gap-1">
-                        346 beneficiaries (84% occupied)
+                        {data.occupied_vacancies} {dict.housingList.beneficiaries} (
+                        {(data.occupied_vacancies * 100) / data.total_vacancies}%{" "}
+                        {dict.housingList.occupied})
                     </span>
                     <span className="text-xs text-slate-500 flex items-center gap-2">
-                        <span>
-                            <Badge className="bg-green-500 text-slate-50 hover:bg-green-600">
-                                Available (25 available spaces)
-                            </Badge>
-                        </span>
-                        <span>
-                            <Badge className="bg-slate-900 text-slate-50 hover:bg-slate-950">
-                                Full
-                            </Badge>
-                        </span>
-                        <span>
-                            <Badge className="bg-red-600 text-slate-50 hover:bg-red-700">
-                                Over crowded
-                            </Badge>
-                        </span>
+                        {status === "FULL" && (
+                            <span>
+                                <Badge className="bg-slate-900 text-slate-50 hover:bg-slate-950">
+                                    {dict.housingList.statusFull}
+                                </Badge>
+                            </span>
+                        )}
+                        {status === "AVAILABLE" && (
+                            <span>
+                                <Badge className="bg-green-500 text-slate-50 hover:bg-green-600">
+                                    {dict.housingList.statusAvailable} (
+                                    {data.total_vacancies - data.occupied_vacancies}{" "}
+                                    {dict.housingList.availableBeds})
+                                </Badge>
+                            </span>
+                        )}
+
+                        {status === "OVERCROWDED" && (
+                            <span>
+                                <Badge className="bg-red-600 text-slate-50 hover:bg-red-700">
+                                    {dict.housingList.statusOvercrowded}
+                                </Badge>
+                            </span>
+                        )}
                     </span>
-                </div> */}
+                </div>
             </div>
             <div className="flex flex-col items-end justify-between">
                 <DropdownMenu>
@@ -69,28 +97,30 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${data?.id}`}>View housing</Link>
+                            <Link href={`${urlPath}/${data?.id}`}>
+                                {dict.housingList.dropdownViewHousing}
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`${urlPath}/${data?.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
-                                    Edit housing
+                                    {dict.housingList.dropdownEditHousing}
                                 </span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaTrash className="text-xs" />
-                                Remove housing
+                                {dict.housingList.dropdownRemoveHousing}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at {formatDate(data.created_at, locale || "en")}
+                        {dict.housingList.createdAt} {formatDate(data.created_at, locale || "en")}
                     </span>
                 </div>
             </div>

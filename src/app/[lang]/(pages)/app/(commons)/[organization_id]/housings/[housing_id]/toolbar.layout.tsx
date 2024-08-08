@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HousingSchema } from "@/types/housing.types";
@@ -18,13 +19,15 @@ const Toolbar = ({ housing }: Props): ReactNode => {
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
+    const dict = useDictionary();
+
     const backToListPath = pathname.split("/").slice(0, 5).join("/");
     const editPath = pathname.split("/").slice(0, 6).join("/");
 
     return (
         <div className="w-full h-max flex justify-between items-center">
             <Button size="sm" variant="secondary" asChild>
-                <Link href={backToListPath}>Back to list</Link>
+                <Link href={backToListPath}>{dict.housingOverview.btnBack}</Link>
             </Button>
 
             <div className="flex items-center gap-2">
@@ -42,7 +45,7 @@ const Toolbar = ({ housing }: Props): ReactNode => {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Edit housing</TooltipContent>
+                        <TooltipContent>{dict.housingOverview.tooltipEdit}</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
 
@@ -58,7 +61,7 @@ const Toolbar = ({ housing }: Props): ReactNode => {
                                 <FaTrash />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Remove housing</TooltipContent>
+                        <TooltipContent>{dict.housingOverview.tooltipRemove}</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>

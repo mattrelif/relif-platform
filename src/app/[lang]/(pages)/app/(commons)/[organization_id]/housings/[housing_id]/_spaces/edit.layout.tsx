@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,7 @@ type Props = {
 
 const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -42,17 +44,16 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
             refreshList();
 
             toast({
-                title: "Saved!",
-                description: "The space data was updated successfully.",
+                title: dict.housingOverview.editSpaceDrawer.toastSuccessTitle,
+                description: dict.housingOverview.editSpaceDrawer.toastSuccessDescription,
                 variant: "success",
             });
             setIsLoading(false);
         } catch {
             setIsLoading(false);
             toast({
-                title: "Update Failed",
-                description:
-                    "An error occurred while trying to save the data. Please check the input and try again.",
+                title: dict.housingOverview.editSpaceDrawer.toastErrorTitle,
+                description: dict.housingOverview.editSpaceDrawer.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -62,12 +63,14 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
             <SheetContent>
                 <SheetHeader>
-                    <SheetTitle>Edit space information</SheetTitle>
+                    <SheetTitle>{dict.housingOverview.editSpaceDrawer.title}</SheetTitle>
                 </SheetHeader>
                 <form className="flex flex-col pt-9" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="name">Name *</Label>
+                            <Label htmlFor="name">
+                                {dict.housingOverview.editSpaceDrawer.name} *
+                            </Label>
                             <Input
                                 id="name"
                                 name="name"
@@ -77,7 +80,9 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
                             />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="beds">Beds *</Label>
+                            <Label htmlFor="beds">
+                                {dict.housingOverview.editSpaceDrawer.beds} *
+                            </Label>
                             <Input
                                 id="beds"
                                 name="beds"
@@ -96,7 +101,9 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
                             className="mt-[43px] w-full flex items-center gap-1"
                         >
                             <FaSave />
-                            {!isLoading ? "Save" : "Loading..."}
+                            {!isLoading
+                                ? dict.housingOverview.editSpaceDrawer.btnSave
+                                : dict.housingOverview.editSpaceDrawer.loading}
                         </Button>
                     </div>
                 </form>

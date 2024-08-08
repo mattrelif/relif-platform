@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,7 @@ type Props = {
 const Form = ({ housingId }: Props): ReactNode => {
     const router = useRouter();
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const { toast } = useToast();
     const [data, setData] = useState<HousingSchema | null>(null);
@@ -76,9 +78,8 @@ const Form = ({ housingId }: Props): ReactNode => {
             });
 
             toast({
-                title: "Housing Updated Successfully!",
-                description:
-                    "The housing has been created successfully. You can now view or manage it in your dashboard.",
+                title: dict.housingOverview.editHousing.toastSuccessTitle,
+                description: dict.housingOverview.editHousing.toastSuccessDescription,
             });
 
             const organizationId = pathname.split("/")[3];
@@ -86,22 +87,25 @@ const Form = ({ housingId }: Props): ReactNode => {
         } catch {
             setIsLoading(false);
             toast({
-                title: "Housing Update Failed",
-                description:
-                    "An error occurred while attempting to create the housing. Please verify the input data and try again. If the problem persists, contact support for further assistance.",
+                title: dict.housingOverview.editHousing.toastErrorTitle,
+                description: dict.housingOverview.editHousing.toastErrorDescription,
                 variant: "destructive",
             });
         }
     };
 
     if (isLoading)
-        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                {dict.housingOverview.editHousing.loading}
+            </h2>
+        );
 
     if (!isLoading && error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.housingOverview.editHousing.error}
             </span>
         );
 
@@ -110,21 +114,23 @@ const Form = ({ housingId }: Props): ReactNode => {
             <form className="w-full h-max flex flex-col gap-6" onSubmit={handleSubmit}>
                 <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                     <FaHouseChimneyUser />
-                    Edit housing
+                    {dict.housingOverview.editHousing.title}
                 </h1>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="name">Name *</Label>
+                    <Label htmlFor="name">{dict.housingOverview.editHousing.name} *</Label>
                     <Input id="name" name="name" type="text" defaultValue={data.name} required />
                 </div>
 
                 <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                     <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                        <FaMapMarkerAlt /> Address
+                        <FaMapMarkerAlt /> {dict.housingOverview.editHousing.address}
                     </h2>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="addressLine1">Address Line 1 *</Label>
+                        <Label htmlFor="addressLine1">
+                            {dict.housingOverview.editHousing.addressLine} 1 *
+                        </Label>
                         <Input
                             id="addressLine1"
                             name="addressLine1"
@@ -135,7 +141,9 @@ const Form = ({ housingId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="addressLine2">Address Line 2</Label>
+                        <Label htmlFor="addressLine2">
+                            {dict.housingOverview.editHousing.addressLine} 2
+                        </Label>
                         <Input
                             id="addressLine2"
                             name="addressLine2"
@@ -147,7 +155,7 @@ const Form = ({ housingId }: Props): ReactNode => {
 
                     <div className="w-full flex items-center gap-2">
                         <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="city">City *</Label>
+                            <Label htmlFor="city">{dict.housingOverview.editHousing.city} *</Label>
                             <Input
                                 id="city"
                                 name="city"
@@ -158,7 +166,9 @@ const Form = ({ housingId }: Props): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="postalCode">Zip / Postal Code *</Label>
+                            <Label htmlFor="postalCode">
+                                {dict.housingOverview.editHousing.zipCode} *
+                            </Label>
                             <Input
                                 id="postalCode"
                                 name="postalCode"
@@ -171,7 +181,9 @@ const Form = ({ housingId }: Props): ReactNode => {
 
                     <div className="w-full flex items-center gap-2">
                         <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="state">State / Province *</Label>
+                            <Label htmlFor="state">
+                                {dict.housingOverview.editHousing.state} *
+                            </Label>
                             <Input
                                 id="state"
                                 name="state"
@@ -182,7 +194,9 @@ const Form = ({ housingId }: Props): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="country">Country *</Label>
+                            <Label htmlFor="country">
+                                {dict.housingOverview.editHousing.country} *
+                            </Label>
                             <Input
                                 id="country"
                                 name="country"
@@ -196,7 +210,7 @@ const Form = ({ housingId }: Props): ReactNode => {
 
                 <Button className="flex items-center gap-2">
                     <MdSave size={16} />
-                    Edit housing
+                    {dict.housingOverview.editHousing.btnEdit}
                 </Button>
             </form>
         );

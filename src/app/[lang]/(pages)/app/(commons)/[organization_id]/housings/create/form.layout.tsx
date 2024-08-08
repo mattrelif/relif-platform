@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ const Form = (): ReactNode => {
     const router = useRouter();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
+    const dict = useDictionary();
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -52,18 +54,16 @@ const Form = (): ReactNode => {
             const housingId = responseData.id;
 
             toast({
-                title: "Housing Created Successfully!",
-                description:
-                    "The housing has been created successfully. You can now view or manage it in your dashboard.",
+                title: dict.createHousing.toastSuccessTitle,
+                description: dict.createHousing.toastSuccessDescription,
             });
 
             router.push(`/app/${organizationId}/housings/${housingId}`);
         } catch {
             setIsLoading(false);
             toast({
-                title: "Housing Creation Failed",
-                description:
-                    "An error occurred while attempting to create the housing. Please verify the input data and try again. If the problem persists, contact support for further assistance.",
+                title: dict.createHousing.toastErrorTitle,
+                description: dict.createHousing.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -73,49 +73,49 @@ const Form = (): ReactNode => {
         <form className="w-full h-max flex flex-col gap-6" onSubmit={handleSubmit}>
             <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                 <FaHouseChimneyUser />
-                Create housing
+                {dict.createHousing.title}
             </h1>
 
             <div className="flex flex-col gap-3">
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">{dict.createHousing.name} *</Label>
                 <Input id="name" name="name" type="text" required />
             </div>
 
             <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                 <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                    <FaMapMarkerAlt /> Address
+                    <FaMapMarkerAlt /> {dict.createHousing.address}
                 </h2>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="addressLine1">Address Line 1 *</Label>
+                    <Label htmlFor="addressLine1">{dict.createHousing.addressLine} 1 *</Label>
                     <Input id="addressLine1" name="addressLine1" type="text" required />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="addressLine2">Address Line 2</Label>
+                    <Label htmlFor="addressLine2">{dict.createHousing.addressLine} 2</Label>
                     <Input id="addressLine2" name="addressLine2" type="text" />
                 </div>
 
                 <div className="w-full flex items-center gap-2">
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="city">City *</Label>
+                        <Label htmlFor="city">{dict.createHousing.city} *</Label>
                         <Input id="city" name="city" type="text" required />
                     </div>
 
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="postalCode">Zip / Postal Code *</Label>
+                        <Label htmlFor="postalCode">{dict.createHousing.zipCode} *</Label>
                         <Input id="postalCode" name="postalCode" type="text" required />
                     </div>
                 </div>
 
                 <div className="w-full flex items-center gap-2">
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="state">State / Province *</Label>
+                        <Label htmlFor="state">{dict.createHousing.state} *</Label>
                         <Input id="state" name="state" type="text" required />
                     </div>
 
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="country">Country *</Label>
+                        <Label htmlFor="country">{dict.createHousing.country} *</Label>
                         <Input id="country" name="country" type="text" required />
                     </div>
                 </div>
@@ -123,16 +123,15 @@ const Form = (): ReactNode => {
 
             <Alert>
                 <IoMdAlert className="h-4 w-4" />
-                <AlertTitle>Important</AlertTitle>
+                <AlertTitle>{dict.createHousing.alertTitle}</AlertTitle>
                 <AlertDescription className="text-slate-500">
-                    You will be able to create spaces for beneficiary accommodation within the page
-                    of the created shelter.
+                    {dict.createHousing.alertDescription}
                 </AlertDescription>
             </Alert>
 
             <Button className="flex items-center gap-2">
                 <MdAdd size={16} />
-                {!isLoading ? "Create housing" : "Loading..."}
+                {!isLoading ? dict.createHousing.btnCreate : dict.createHousing.btnLoading}
             </Button>
         </form>
     );

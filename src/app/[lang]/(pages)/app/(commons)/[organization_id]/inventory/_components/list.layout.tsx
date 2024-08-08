@@ -1,6 +1,5 @@
 "use client";
 
-import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     Pagination,
     PaginationContent,
@@ -19,8 +18,6 @@ import { Card } from "./card.layout";
 
 const HousingList = (): ReactNode => {
     const pathname = usePathname();
-    const dict = useDictionary();
-
     const [housings, setHousings] = useState<{ count: number; data: HousingSchema[] } | null>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,22 +56,18 @@ const HousingList = (): ReactNode => {
     return (
         <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
             {isLoading && (
-                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                    {dict.housingList.loading}
-                </h2>
+                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                     <MdError />
-                    {dict.housingList.error}
+                    Something went wrong. Please try again later.
                 </span>
             )}
 
             {!isLoading && !error && housings && housings.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">
-                    {dict.housingList.notFound}
-                </span>
+                <span className="text-sm text-slate-900 font-medium p-4">No housings found...</span>
             )}
 
             {!isLoading && !error && housings && housings.data.length > 0 && (
@@ -90,6 +83,7 @@ const HousingList = (): ReactNode => {
                                 <PaginationItem>
                                     <PaginationPrevious
                                         onClick={() => handlePageChange(currentPage - 1)}
+                                        // disabled={currentPage === 1}
                                     />
                                 </PaginationItem>
                                 {Array.from({ length: totalPages }).map((_, index) => (
@@ -105,6 +99,7 @@ const HousingList = (): ReactNode => {
                                 <PaginationItem>
                                     <PaginationNext
                                         onClick={() => handlePageChange(currentPage + 1)}
+                                        // disabled={currentPage === totalPages}
                                     />
                                 </PaginationItem>
                             </PaginationContent>

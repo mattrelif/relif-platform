@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
@@ -18,6 +19,7 @@ type Props = {
 
 const BeneficiaryList = ({ housingId }: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
     // const [toggle, setToggle] = useState<"current" | "historic">("current");
@@ -70,7 +72,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
             <div className="w-full flex flex-wrap items-center gap-2 justify-between">
                 <h3 className="text-relif-orange-200 font-bold flex items-center gap-2">
                     <FaUsers />
-                    Beneficiaries
+                    {dict.housingOverview.beneficiaryList.title}
                 </h3>
 
                 <div className="flex items-center gap-2">
@@ -89,7 +91,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
 
                     <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
                         <Link href={`${urlPath}/beneficiaries/create`}>
-                            <MdAdd size={16} /> New
+                            <MdAdd size={16} /> {dict.housingOverview.beneficiaryList.btnNew}
                         </Link>
                     </Button>
                 </div>
@@ -100,19 +102,21 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
             </div>
             <div className="w-full h-[calc(100vh-394px)] border border-slate-200 rounded-md overflow-hidden">
                 {isLoading && (
-                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                        {dict.housingOverview.beneficiaryList.loading}
+                    </h2>
                 )}
 
                 {!isLoading && error && (
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                         <MdError />
-                        Something went wrong. Please try again later.
+                        {dict.housingOverview.beneficiaryList.error}
                     </span>
                 )}
 
                 {!isLoading && !error && beneficiaries && beneficiaries.data.length <= 0 && (
                     <span className="block text-sm text-slate-900 font-medium p-4">
-                        No beneficiaries found...
+                        {dict.housingOverview.beneficiaryList.notFound}
                     </span>
                 )}
 

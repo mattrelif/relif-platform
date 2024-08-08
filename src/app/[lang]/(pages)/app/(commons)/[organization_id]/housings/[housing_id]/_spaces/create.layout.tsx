@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,10 +24,14 @@ type SpaceInputProps = {
 };
 
 const SpaceInput = ({ id, removeInput }: SpaceInputProps): ReactNode => {
+    const dict = useDictionary();
+
     return (
         <li className="flex border border-slate-200 rounded-md items-end gap-2 p-2" key={id}>
             <div className="w-full flex flex-col gap-3">
-                <Label htmlFor={`name_${id}`}>Name *</Label>
+                <Label htmlFor={`name_${id}`}>
+                    {dict.housingOverview.createSpaceDrawer.name} *
+                </Label>
                 <Input
                     id={`name_${id}`}
                     name={`name_${id}`}
@@ -36,7 +41,9 @@ const SpaceInput = ({ id, removeInput }: SpaceInputProps): ReactNode => {
                 />
             </div>
             <div className="w-[80px] flex flex-col gap-3">
-                <Label htmlFor={`beds_${id}`}>Beds *</Label>
+                <Label htmlFor={`beds_${id}`}>
+                    {dict.housingOverview.createSpaceDrawer.beds} *
+                </Label>
                 <Input
                     id={`beds_${id}`}
                     name={`beds_${id}`}
@@ -48,7 +55,7 @@ const SpaceInput = ({ id, removeInput }: SpaceInputProps): ReactNode => {
                 />
             </div>
             <Button variant="ghost" type="button" onClick={() => removeInput(id)}>
-                Remove
+                {dict.housingOverview.createSpaceDrawer.btnRemove}
             </Button>
         </li>
     );
@@ -61,6 +68,7 @@ const CreateSheet = ({
     setSheetOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const [inputs, setInputs] = useState<number[]>([]);
 
     const handleSubmit = async (e: FormEvent): Promise<void> => {
@@ -77,15 +85,15 @@ const CreateSheet = ({
             refreshList();
 
             toast({
-                title: "Saved!",
-                description: "The new data was saved successfully.",
+                title: dict.housingOverview.createSpaceDrawer.toastSuccessTitle,
+                description: dict.housingOverview.createSpaceDrawer.toastSuccessDescription,
                 variant: "success",
             });
             setSheetOpenState(false);
         } catch (error) {
             toast({
-                title: "Error Saving Data",
-                description: "An error occurred while saving the data. Please try again.",
+                title: dict.housingOverview.createSpaceDrawer.toastErrorTitle,
+                description: dict.housingOverview.createSpaceDrawer.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -103,7 +111,7 @@ const CreateSheet = ({
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
             <SheetContent className="py-4 px-4">
                 <SheetHeader>
-                    <SheetTitle>Create space</SheetTitle>
+                    <SheetTitle>{dict.housingOverview.createSpaceDrawer.title}</SheetTitle>
                 </SheetHeader>
                 <form className="flex flex-col w-full" onSubmit={handleSubmit}>
                     <Button
@@ -113,7 +121,7 @@ const CreateSheet = ({
                         className="mt-5 mb-5 flex items-center gap-2"
                     >
                         <MdAdd size={16} />
-                        Add new space
+                        {dict.housingOverview.createSpaceDrawer.btnAdd}
                     </Button>
                     <div className="border border-slate-200 rounded-lg overflow-hidden">
                         <ul className="flex flex-col h-[calc(100vh-205px)] gap-2 overflow-x-hidden overflow-y-scroll p-2">
@@ -128,7 +136,7 @@ const CreateSheet = ({
                         className="mt-5 w-full flex items-center gap-1"
                     >
                         <FaSave />
-                        Save
+                        {dict.housingOverview.createSpaceDrawer.btnSave}
                     </Button>
                 </form>
             </SheetContent>
@@ -143,6 +151,7 @@ const CreateSpace = ({
     housingId: string;
     refreshList: () => void;
 }): ReactNode => {
+    const dict = useDictionary();
     const [sheetOpenState, setSheetOpenState] = useState(false);
 
     return (
@@ -153,7 +162,7 @@ const CreateSpace = ({
                 className="flex items-center gap-2"
                 onClick={() => setSheetOpenState(true)}
             >
-                <MdAdd size={16} /> New
+                <MdAdd size={16} /> {dict.housingOverview.createSpaceDrawer.btnNew}
             </Button>
 
             <CreateSheet

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -30,6 +31,7 @@ const RemoveModal = ({
     const { toast } = useToast();
     const router = useRouter();
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [allowToRemove, setAllowToRemove] = useState<
@@ -70,16 +72,15 @@ const RemoveModal = ({
             setRemoveDialogOpenState(false);
 
             toast({
-                title: "Removed!",
-                description: "Housing removed successfully.",
+                title: dict.removeHousing.toastSuccessTitle,
+                description: dict.removeHousing.toastSuccessDescription,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Housing Removal Failed",
-                description:
-                    "An error occurred while attempting to remove the housing. Please try again later or contact support if the issue persists.",
+                title: dict.removeHousing.toastErrorTitle,
+                description: dict.removeHousing.toastErrorDescription,
                 variant: "destructive",
             });
         }
@@ -90,11 +91,8 @@ const RemoveModal = ({
             <Dialog open={removeDialogOpenState} onOpenChange={setRemoveDialogOpenState}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
-                        <DialogDescription>
-                            This action cannot be undone. This will permanently delete the housing
-                            below.
-                        </DialogDescription>
+                        <DialogTitle className="pb-3">{dict.removeHousing.title}</DialogTitle>
+                        <DialogDescription>{dict.removeHousing.description}</DialogDescription>
                         <div className="flex flex-col pt-4">
                             <span className="text-sm text-slate-900 font-bold">
                                 {housing?.name}
@@ -107,10 +105,9 @@ const RemoveModal = ({
                         {allowToRemove === "LOADING" && (
                             <div className="flex flex-col gap-4 pt-10">
                                 <span className="text-xs text-blue-500">
-                                    Loading data: Please wait while we retrieve the information.
-                                    This may take a moment.
+                                    {dict.removeHousing.statusLoadingMessage}
                                 </span>
-                                <Button disabled>Loading...</Button>
+                                <Button disabled>{dict.removeHousing.loading}</Button>
                             </div>
                         )}
 
@@ -120,10 +117,12 @@ const RemoveModal = ({
                                     variant="outline"
                                     onClick={() => setRemoveDialogOpenState(false)}
                                 >
-                                    Cancel
+                                    {dict.removeHousing.btnCancel}
                                 </Button>
                                 <Button onClick={handleDelete}>
-                                    {!isLoading ? "Delete" : "Loading..."}
+                                    {!isLoading
+                                        ? dict.removeHousing.btnRemove
+                                        : dict.removeHousing.loading}
                                 </Button>
                             </div>
                         )}
@@ -131,11 +130,10 @@ const RemoveModal = ({
                         {allowToRemove === "UNAVAILABLE" && (
                             <div className="flex flex-col gap-4 pt-10">
                                 <span className="text-xs text-red-500">
-                                    You have beneficiaries associated with this housing. Move or
-                                    remove them before removing this housing.
+                                    {dict.removeHousing.statusUnavailableMessage}
                                 </span>
                                 <Button onClick={() => setRemoveDialogOpenState(false)}>
-                                    Close
+                                    {dict.removeHousing.btnClose}
                                 </Button>
                             </div>
                         )}
@@ -143,11 +141,10 @@ const RemoveModal = ({
                         {allowToRemove === "ERROR" && (
                             <div className="flex flex-col gap-4 pt-10">
                                 <span className="text-xs text-red-500">
-                                    Error: Unable to complete the action. Please try again later or
-                                    contact support if the issue persists.
+                                    {dict.removeHousing.statusErrorMessage}
                                 </span>
                                 <Button onClick={() => setRemoveDialogOpenState(false)}>
-                                    Close
+                                    {dict.removeHousing.btnClose}
                                 </Button>
                             </div>
                         )}
