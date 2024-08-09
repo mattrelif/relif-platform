@@ -36,14 +36,30 @@ const SignInForm = (): ReactNode => {
             const { data: responseData } = await getMe();
             saveToLocalStorage("r_ud", responseData);
 
+            const LANGUAGES = {
+                english: "en",
+                portuguese: "pt",
+                spanish: "es",
+            };
+
             if (!responseData.organization_id) {
-                router.push("/app/entry");
+                router.push(
+                    `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/entry`
+                );
                 return;
             }
 
-            router.push(`/app/${responseData.organization_id}`);
+            if (responseData.platform_role === "RELIF_MEMBER") {
+                router.push(
+                    `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/admin/organizations`
+                );
+                return;
+            }
+
+            router.push(
+                `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/${responseData.organization_id}`
+            );
         } catch (err) {
-            console.warn(err);
             setIsLoading(false);
             toast({
                 title: dict.root.toastErrorTitle,
