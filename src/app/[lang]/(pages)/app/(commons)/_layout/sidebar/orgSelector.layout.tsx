@@ -30,7 +30,6 @@ const OrgSelector = (): ReactNode => {
             try {
                 const user: UserSchema = await getFromLocalStorage("r_ud");
                 if (user && user.organization_id) {
-                    setCurrentUser(user);
                     const OFFSET = 0;
                     const LIMIT = 9999;
                     const { data: organizations } = await getDataAccessGrants(
@@ -38,6 +37,7 @@ const OrgSelector = (): ReactNode => {
                         OFFSET,
                         LIMIT
                     );
+                    setCurrentUser(user);
                     setOrgs(organizations);
                 } else {
                     throw new Error();
@@ -54,23 +54,32 @@ const OrgSelector = (): ReactNode => {
 
     if (currentUser && currentUser.organization_id && orgs && orgs.count > 0) {
         return (
-            <Select defaultValue={organizationId} onValueChange={handleSetOrganization}>
-                <SelectTrigger className="w-full">
-                    <SelectValue placeholder={dict.sidebar.orgPlaceholder} />
-                </SelectTrigger>
-                <SelectContent>
-                    {orgs.data.map(org => (
-                        <SelectItem value={org.id}>
-                            <span className="flex items-center gap-2">
-                                {org.name}
-                                {currentUser?.organization_id === org.id ? (
-                                    <FaCircle size={5} className="text-relif-orange-200" />
-                                ) : undefined}
-                            </span>
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            <>
+                <div className="w-full h-max py-4">
+                    <div className="flex flex-col">
+                        <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
+                            {dict.sidebar.currentOrganization}
+                        </span>
+                    </div>
+                </div>
+                <Select defaultValue={organizationId} onValueChange={handleSetOrganization}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder={dict.sidebar.orgPlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {orgs.data.map(org => (
+                            <SelectItem value={org.id}>
+                                <span className="flex items-center gap-2">
+                                    {org.name}
+                                    {currentUser?.organization_id === org.id ? (
+                                        <FaCircle size={5} className="text-relif-orange-200" />
+                                    ) : undefined}
+                                </span>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </>
         );
     }
 

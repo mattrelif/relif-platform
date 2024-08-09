@@ -39,16 +39,7 @@ const Sidebar = (): ReactNode => {
                 />
             </div>
 
-            {platformRole === "ORG_ADMIN" && (
-                <div className="w-full h-max py-4">
-                    <div className="flex flex-col">
-                        <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
-                            {dict.sidebar.currentOrganization}
-                        </span>
-                        <OrgSelector />
-                    </div>
-                </div>
-            )}
+            {platformRole === "ORG_ADMIN" && <OrgSelector />}
 
             <ul className="flex flex-col gap-1">
                 <span className="text-slate-500 font-bold text-sm pl-2 mb-2">Platform</span>

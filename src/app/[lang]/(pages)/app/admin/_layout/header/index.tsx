@@ -20,9 +20,9 @@ const Header = (): ReactNode => {
 
     return (
         <header className="col-span-1 w-full h-max border-b-[1px] border-slate-200 flex items-center justify-between py-2 px-4">
-            {/* <div className="min-custom:hidden"> */}
-            <MobileSidebar />
-            {/* </div> */}
+            <div className="min-custom:hidden">
+                <MobileSidebar />
+            </div>
             <Breadcrumb />
 
             <div className="flex items-center gap-2">

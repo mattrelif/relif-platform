@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { createOrganization } from "@/repository/organization.repository";
+import { getFromLocalStorage, updateLocalStorage } from "@/utils/localStorage";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaMapMarkerAlt, FaRegBuilding } from "react-icons/fa";
@@ -49,6 +50,9 @@ const CreateOrganization = (): ReactNode => {
             });
 
             const organizationID = responseData.id;
+
+            const currentUser = await getFromLocalStorage("r_ud");
+            updateLocalStorage("r_ud", { ...currentUser, platform_role: "ORG_ADMIN" });
 
             router.push(`/app/${organizationID}`);
         } catch {

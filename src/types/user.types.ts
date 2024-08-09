@@ -1,3 +1,5 @@
+import { OrganizationSchema } from "@/types/organization.types";
+
 export type UserPreferencesSchema = {
     language: string;
     timezone: string;
@@ -16,16 +18,21 @@ export type UserSchema = {
     created_at: string;
     updated_at: string;
     organization_id: string | null;
+    organization: OrganizationSchema;
 };
 
 export type CreateUserRequest = Omit<
     UserSchema | "password",
-    "id" | "platform_role" | "status" | "created_at" | "updated_at" | "organization_id"
+    | "id"
+    | "platform_role"
+    | "status"
+    | "created_at"
+    | "updated_at"
+    | "organization_id"
+    | "organization"
 >;
 
 export type UpdateUserRequest = Omit<
     UserSchema,
-    "id" | "status" | "created_at" | "updated_at" | "organization_id"
+    "id" | "status" | "created_at" | "updated_at" | "organization_id" | "organization"
 >;
-
-export type UpdateUserPreferencesRequest = UserPreferencesSchema;

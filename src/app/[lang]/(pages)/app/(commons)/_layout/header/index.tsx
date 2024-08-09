@@ -33,6 +33,7 @@ const Header = (): ReactNode => {
             ) : (
                 <div />
             )}
+
             <Breadcrumb />
 
             <div className="flex items-center gap-2">
