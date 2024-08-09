@@ -70,7 +70,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     };
 
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
             <div className="flex gap-4">
                 <Avatar className="w-14 h-14">
                     <AvatarFallback className="bg-relif-orange-200 text-white">
@@ -91,7 +91,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         <FaBirthdayCake /> {formatDate(data?.birthdate, locale || "en")} ({age}{" "}
                         {dict.commons.beneficiaries.card.yearsOld})
                     </span>
-                    <div className="flex mt-2 gap-2">
+                    <div className="flex flex-wrap mt-2 gap-2">
                         {data.gender && (
                             <Badge>
                                 {GENDER_MAPPING[data?.gender as keyof typeof GENDER_MAPPING]}
@@ -164,7 +164,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end lg:items-start lg:hidden">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {dict.commons.beneficiaries.card.createdAt}{" "}
                         {formatDate(data?.created_at, locale || "en")}

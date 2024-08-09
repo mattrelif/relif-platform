@@ -29,7 +29,7 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
     const initials = data.first_name.charAt(0).concat(data.last_name.charAt(0));
 
     return (
-        <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
+        <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md lg:flex-col lg:relative">
             <div className="flex gap-4">
                 <Avatar>
                     <AvatarFallback className="bg-relif-orange-400 text-white font-semibold text-sm">
@@ -51,7 +51,7 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                 </div>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex flex-col lg:mt-5">
                 <span className="text-xs text-slate-500">
                     {data?.role || dict.admin.preferences.users.card.colaborator}
                 </span>
@@ -60,7 +60,7 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                 </span>
             </div>
 
-            <div>
+            <div className="lg:absolute lg:top-4 lg:right-4">
                 <DropdownMenu>
                     <DropdownMenuTrigger>
                         <Button variant="icon" className="w-7 h-7 p-0">

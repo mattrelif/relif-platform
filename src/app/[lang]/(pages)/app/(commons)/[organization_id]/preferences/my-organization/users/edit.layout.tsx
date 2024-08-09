@@ -126,7 +126,7 @@ const UserEdit = ({
     if (currentUser)
         return (
             <Sheet open={editUserSheetOpenState} onOpenChange={setEditUserSheetOpenState}>
-                <SheetContent className="p-2">
+                <SheetContent className="p-2 lg:w-full">
                     <SheetHeader className="p-4">
                         <SheetTitle>
                             {dict.commons.preferences.myOrganization.users.edit.editUserInformation}

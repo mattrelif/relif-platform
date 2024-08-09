@@ -22,7 +22,7 @@ const CoordinationRequestHistoric = ({
 
     return (
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
-            <SheetContent className="py-4 px-4">
+            <SheetContent className="py-4 px-4 lg:w-full">
                 <SheetHeader>
                     <SheetTitle>
                         {

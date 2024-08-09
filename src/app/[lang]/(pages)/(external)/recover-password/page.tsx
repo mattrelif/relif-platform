@@ -15,7 +15,7 @@ export default async function Page({
     const dict = await getDictionary(params.lang);
 
     return (
-        <div className="w-full max-w-[500px] py-[90px]">
+        <div className="w-full max-w-[500px] py-[90px] sm:p-5 xl:p-4 xl:h-[calc(100vh-2rem)] xl:flex xl:flex-col xl:justify-center">
             <div className="flex flex-col mb-10">
                 <Image
                     src="/images/logo-relif.svg"

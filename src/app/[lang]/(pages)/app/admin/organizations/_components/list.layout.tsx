@@ -64,7 +64,7 @@ const OrganizationsList = (): ReactNode => {
     if (platformRole !== "RELIF_MEMBER") return <div />;
 
     return (
-        <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+        <div className="h-[calc(100vh-172px)] lg:h-[calc(100vh-122px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
             {isLoading && (
                 <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                     {dict.admin.organizations.list.loading}

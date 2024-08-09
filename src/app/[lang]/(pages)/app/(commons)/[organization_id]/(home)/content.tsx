@@ -60,9 +60,9 @@ const Content = (): ReactNode => {
     }, []);
 
     return (
-        <div className="p-4">
-            <div className="flex flex-col gap-4 p-6 border border-slate-200 rounded-xl">
-                <div className="w-full h-max p-6 border border-dashed border-relif-orange-200 rounded-lg">
+        <div className="p-4 lg:p-2">
+            <div className="flex flex-col gap-4 p-6 border border-slate-200 rounded-xl lg:p-3">
+                <div className="w-full h-max p-6 border border-dashed border-relif-orange-200 rounded-lg lg:p-3">
                     <h1 className="text-3xl text-center text-relif-orange-200 font-bold">
                         {dict.commons.home.welcomeToRelif}
                     </h1>
@@ -70,46 +70,48 @@ const Content = (): ReactNode => {
                         {dict.commons.home.briefOverview}
                     </h2>
                 </div>
-                <div className="w-full grid grid-cols-4 gap-4">
+                <div className="w-full grid grid-cols-4 gap-4 lg:flex lg:flex-wrap">
                     <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300">
+                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
                             <span className="h-full text-white font-bold flex items-center gap-3">
                                 <FaHouseChimneyUser />
                                 {dict.commons.home.housings}
                             </span>
                         </div>
                         <div className="flex items-center justify-center">
-                            <span className="text-3xl text-white font-bold">
+                            <span className="text-3xl text-white font-bold lg:text-2xl">
                                 {housings.length || 0}
                             </span>
                         </div>
                     </div>
                     <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300">
+                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
                             <span className="h-full text-white font-bold flex items-center gap-3">
                                 <FaUsers />
                                 {convertToTitleCase(dict.commons.home.beneficiaries)}
                             </span>
                         </div>
                         <div className="flex items-center justify-center">
-                            <span className="text-3xl text-white font-bold">
+                            <span className="text-3xl text-white font-bold lg:text-2xl">
                                 {beneficiaries || 0}
                             </span>
                         </div>
                     </div>
                     <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300">
+                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
                             <span className="h-full text-white font-bold flex items-center gap-3">
                                 <FaUserNurse />
                                 {dict.commons.home.volunteers}
                             </span>
                         </div>
                         <div className="flex items-center justify-center">
-                            <span className="text-3xl text-white font-bold">{volunteers || 0}</span>
+                            <span className="text-3xl text-white font-bold lg:text-2xl">
+                                {volunteers || 0}
+                            </span>
                         </div>
                     </div>
                     <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300">
+                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
                             <span className="h-full text-white font-bold flex items-center gap-3">
                                 <FaBoxes />
                                 {dict.commons.home.products}
@@ -117,7 +119,7 @@ const Content = (): ReactNode => {
                         </div>
                         {/* TODO: BACKEND */}
                         <div className="flex items-center justify-center">
-                            <span className="text-3xl text-white font-bold">0</span>
+                            <span className="text-3xl text-white font-bold lg:text-2xl">0</span>
                         </div>
                     </div>
                 </div>

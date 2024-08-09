@@ -14,15 +14,25 @@ import { ReactNode } from "react";
 import { HiMiniBellAlert } from "react-icons/hi2";
 import { MdSettings } from "react-icons/md";
 
+import { SidebarMobile } from "./components/sidebar";
+
 const Header = (): ReactNode => {
     const dict = useDictionary();
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
+    const isEntry = pathname.split("/")[3] === "entry";
 
     const currentUser: UserSchema = getFromLocalStorage("r_ud");
 
     return (
         <header className="col-span-1 w-full h-max border-b-[1px] border-slate-200 flex items-center justify-between py-2 px-4">
+            {!isEntry ? (
+                <div className="min-custom:hidden">
+                    <SidebarMobile />
+                </div>
+            ) : (
+                <div />
+            )}
             <Breadcrumb />
 
             <div className="flex items-center gap-2">

@@ -21,7 +21,7 @@ const Menu = (): ReactNode => {
     const activeOption = pathname.split("/")[5] ?? "platform";
 
     return (
-        <div className="w-full h-full rounded-md border-[1px] border-slate-200 bg-slate-50 p-2">
+        <div className="w-full h-full rounded-md border-[1px] border-slate-200 bg-slate-50 p-2 lg:h-max">
             {platformRole === "RELIF_MEMBER" && (
                 <ul className="flex flex-col gap-1">
                     <Link href="/app/admin/preferences/platform">

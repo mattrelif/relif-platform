@@ -18,7 +18,7 @@ const UserCard = (data: Props): ReactNode => {
     const initials = data?.first_name?.charAt(0)?.concat(data?.last_name?.charAt(0));
 
     return (
-        <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md">
+        <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md lg:flex-col">
             <div className="flex gap-4">
                 <Avatar>
                     <AvatarFallback className="bg-relif-orange-400 text-white font-semibold text-sm">
@@ -41,7 +41,7 @@ const UserCard = (data: Props): ReactNode => {
                 </div>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex flex-col lg:mt-3">
                 <span>
                     <Badge>
                         {data?.platform_role ||

@@ -19,7 +19,7 @@ const HousingCard = (data: Props): ReactNode => {
         <li className="w-full h-max flex flex-wrap justify-between p-4 border-[1px] border-slate-200 rounded-md cursor-pointer hover:bg-slate-50/70">
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{data.name}</span>
-                <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                <span className="text-xs text-slate-500 mt-1 flex items-center gap-1 lg:gap-2">
                     <FaMapMarkerAlt />
                     {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>

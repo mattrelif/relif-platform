@@ -52,8 +52,8 @@ const UserList = (): ReactNode => {
 
     return (
         <>
-            <div className="w-full h-max pt-2 px-3 gap-4 flex items-center justify-between">
-                <div className="h-10" />
+            <div className="w-full h-max pt-2 px-3 gap-4 flex items-center justify-between lg:justify-end lg:gap-0 lg:p-0 lg:pt-3">
+                <div className="h-10 lg:hidden" />
                 <AddUser>
                     <Button
                         className="flex items-center gap-2"

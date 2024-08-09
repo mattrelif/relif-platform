@@ -35,7 +35,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
 
     return (
         <li
-            className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70"
+            className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4"
             key={data.id}
         >
             <div className="flex flex-col">
@@ -67,7 +67,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end lg:hidden">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {dict.admin.organizations.list.card.createdAt}{" "}
                         {formatDate(data?.created_at, locale || "en")}

@@ -4,9 +4,9 @@ import { ReactNode } from "react";
 
 export default function Layout({ children }: { children: ReactNode }): ReactNode {
     return (
-        <div className="w-full min-h-screen p-4 bg-slate-50 grid grid-cols-[250px_1fr]">
+        <div className="w-full min-h-screen p-4 bg-slate-50 grid grid-cols-[250px_1fr] lg:flex lg:flex-col lg:p-0">
             <Sidebar />
-            <div className="rounded-lg bg-white min-h-[calc(100vh-32px)] border-[1px] border-slate-300">
+            <div className="rounded-lg bg-white min-h-[calc(100vh-32px)] border-[1px] border-slate-300 lg:border-none lg:h-screen">
                 <Header />
                 <div className="col-span-1">{children}</div>
             </div>

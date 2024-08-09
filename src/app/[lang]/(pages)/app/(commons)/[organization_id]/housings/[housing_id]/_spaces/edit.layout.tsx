@@ -61,7 +61,7 @@ const EditSpace = ({ space, refreshList, sheetOpenState, setSheetOpenState }: Pr
 
     return (
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
-            <SheetContent>
+            <SheetContent className="lg:w-full">
                 <SheetHeader>
                     <SheetTitle>{dict.housingOverview.editSpaceDrawer.title}</SheetTitle>
                 </SheetHeader>

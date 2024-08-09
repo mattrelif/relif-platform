@@ -84,7 +84,7 @@ const Content = ({ organizationId }: Props): ReactNode => {
                     </div>
                 </div>
 
-                <div className="w-full grid grid-cols-2 gap-2">
+                <div className="w-full grid grid-cols-2 gap-2 lg:flex lg:flex-col">
                     <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
                         <h3 className="text-relif-orange-200 font-bold flex items-center gap-2">
                             <FaUsers />

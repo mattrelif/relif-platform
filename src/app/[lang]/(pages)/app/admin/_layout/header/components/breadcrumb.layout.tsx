@@ -59,7 +59,7 @@ const Breadcrumb = (): ReactNode => {
     };
 
     return (
-        <UIBreadcrumb>
+        <UIBreadcrumb className="lg:hidden">
             <BreadcrumbList>
                 {pages?.map(page => (
                     <div key={page} className="flex items-center gap-3">

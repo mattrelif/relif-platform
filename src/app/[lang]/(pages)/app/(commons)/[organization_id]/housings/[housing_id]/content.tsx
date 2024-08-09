@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
@@ -22,7 +21,6 @@ import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
 import { MdError, MdSearch, MdSpaceDashboard } from "react-icons/md";
 
 import { BeneficiaryList } from "./_beneficiaries/list.layout";
-import { InventoryCard } from "./_inventory/inventoryCard.layout";
 import { SpaceList } from "./_spaces/list.layout";
 import { Toolbar } from "./toolbar.layout";
 
@@ -90,7 +88,7 @@ const Content = ({ housingId }: { housingId: string }): ReactNode => {
                     </div>
                 </div>
 
-                <div className="w-full grid grid-cols-3 gap-2">
+                <div className="w-full grid grid-cols-3 gap-2 lg:flex lg:flex-col">
                     <div className="flex flex-col gap-2">
                         <div className="w-ful h-max p-4 rounded-lg bg-relif-orange-500 flex justify-between">
                             <div className="flex flex-col w-full">
@@ -138,7 +136,7 @@ const Content = ({ housingId }: { housingId: string }): ReactNode => {
                         </div>
                         <div className="w-full h-[calc(100vh-459px)] border border-slate-200 rounded-md overflow-hidden">
                             <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
-                                <InventoryCard />
+                                {/* <InventoryCard /> */}
                             </div>
                         </div>
                         <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
@@ -149,15 +147,6 @@ const Content = ({ housingId }: { housingId: string }): ReactNode => {
                                     </PaginationItem>
                                     <PaginationItem>
                                         <PaginationLink href="#">1</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#">2</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationEllipsis />
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#">4</PaginationLink>
                                     </PaginationItem>
                                     <PaginationItem>
                                         <PaginationNext href="#" />

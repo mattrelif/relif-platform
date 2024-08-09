@@ -49,7 +49,7 @@ const RequestList = (): ReactNode => {
     if (platformRole !== "RELIF_MEMBER") return <div />;
 
     return (
-        <div className="h-[calc(100vh-115px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+        <div className="h-[calc(100vh-115px)] lg:h-[calc(100vh-83px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
             {isLoading && (
                 <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                     {dict.admin.requests.list.loading}

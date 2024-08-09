@@ -29,7 +29,7 @@ const Sidebar = (): ReactNode => {
     const currentLanguage = pathname.split("/")[1];
 
     return (
-        <nav className="row-span-2 w-[250px] h-[calc(100vh-32px)] bg-slate-50 pr-4 flex flex-col gap-5">
+        <nav className="row-span-2 w-[250px] h-[calc(100vh-32px)] bg-slate-50 pr-4 flex flex-col gap-5 lg:hidden">
             <div className="h-[49px] p-2">
                 <Image
                     src="/images/logo-relif-black.svg"

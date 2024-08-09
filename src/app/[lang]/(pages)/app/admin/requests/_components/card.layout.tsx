@@ -51,7 +51,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
 
     return (
         <>
-            <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+            <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
                 <div className="flex flex-col">
                     <span className="text-sm text-slate-900 font-bold">
                         {data?.organization.name}
@@ -84,7 +84,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         <DropdownMenuContent>
                             <DropdownMenuItem asChild>
                                 <Link
-                                    href={`${locale || "en"}/app/admin/organizations/${data?.organization_id}`}
+                                    href={`/${locale || "en"}/app/admin/organizations/${data?.organization_id}`}
                                 >
                                     {dict.admin.requests.card.viewOrganization}
                                 </Link>
@@ -112,7 +112,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             )}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col items-end lg:hidden">
                         <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                             {dict.admin.requests.card.requestedAt}{" "}
                             {formatDate(data?.created_at, locale || "en")}

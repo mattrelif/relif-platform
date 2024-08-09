@@ -53,14 +53,14 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     return (
         <li
             className={cn(
-                "w-full h-max p-4 border-b-[1px] border-b-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 border-l-[8px]",
+                "w-full h-max p-4 border-b-[1px] border-b-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 border-l-[8px] lg:gap-4",
                 `border-l-${statusColor}`
             )}
         >
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                 <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                    <span className="text-xs text-slate-500 mt-1 flex items-center gap-1 flex-wrap">
                         {data?.occupied_vacancies || 0}/{data.total_vacancies || 0}{" "}
                         {dict.housingOverview.occupiedBeds}
                     </span>

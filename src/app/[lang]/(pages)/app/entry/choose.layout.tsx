@@ -55,7 +55,7 @@ const Choose = (): ReactNode => {
             <h1 className="text-slate-900 font-bold text-xl flex items-center justify-center w-full border-b-[1px] border-slate-200 p-6">
                 {dict.entryChoose.welcome}, {user?.first_name}!
             </h1>
-            <div className="bg-slate-200 overflow-hidden grid grid-cols-2 gap-[1px]">
+            <div className="bg-slate-200 overflow-hidden grid grid-cols-2 gap-[1px] lg:flex lg:flex-col">
                 <div className="w-full h-full bg-white p-6 flex flex-col gap-3">
                     <h2 className="text-slate-900 text-base font-semibold flex items-center gap-2">
                         <MdAdd size={20} /> {dict.entryChoose.createAnOrganization}

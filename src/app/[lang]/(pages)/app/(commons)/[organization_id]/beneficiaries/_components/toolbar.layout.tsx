@@ -76,7 +76,7 @@ const Toolbar = (): ReactNode => {
     };
 
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
             {platformRole === "ORG_ADMIN" && (
                 <Button asChild>
                     <Link href={`${urlPath}/create`} className="flex items-center gap-2">

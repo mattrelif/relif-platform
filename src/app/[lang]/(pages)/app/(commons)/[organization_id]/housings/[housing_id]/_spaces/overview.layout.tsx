@@ -68,12 +68,12 @@ const ViewSpace = ({ space, sheetOpenState, setSheetOpenState }: Props): ReactNo
 
     return (
         <Sheet open={sheetOpenState} onOpenChange={setSheetOpenState}>
-            <SheetContent className="py-4 px-4">
+            <SheetContent className="py-4 px-4 lg:w-full">
                 <SheetHeader>
                     <SheetTitle>{dict.housingOverview.spacesOverview.title}</SheetTitle>
                 </SheetHeader>
                 <div className="p-4 rounded-lg border border-relif-orange-200 border-dashed mt-4">
-                    <h2 className="w-full text-relif-orange-200 text-xl font-bold flex items-center gap-2">
+                    <h2 className="w-full text-relif-orange-200 text-xl font-bold flex flex-wrap items-center gap-2">
                         {space.name} <Badge className={`bg-${statusColor}`}>{status}</Badge>
                     </h2>
                     <span className="text-sm text-slate-900">

@@ -135,7 +135,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                         <h2 className="text-xl font-semibold text-slate-900">
                             {convertToTitleCase(data.full_name)}
                         </h2>
-                        <span className="text-sm text-slate-500 flex items-center gap-4">
+                        <span className="text-sm text-slate-500 flex flex-wrap items-center gap-4">
                             {dict.commons.beneficiaries.beneficiaryId.registeredIn}{" "}
                             {formatDate(data.created_at, locale || "en")}
                         </span>
@@ -143,12 +143,12 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                 </div>
                 <div className="w-ful h-max p-4 rounded-lg bg-relif-orange-500 flex justify-between">
                     <div className="flex flex-col">
-                        <h3 className="text-white font-bold text-base pb-2 flex items-center gap-2">
+                        <h3 className="text-white font-bold text-base pb-2 flex flex-wrap items-center gap-2">
                             {" "}
                             <FaHouseChimneyUser size={15} />
                             {dict.commons.beneficiaries.beneficiaryId.currentHousing}
                         </h3>
-                        <span className="text-xs text-slate-50 flex items-center gap-1">
+                        <span className="text-xs text-slate-50 flex flex-wrap items-center gap-1">
                             <FaMapMarkerAlt />
                             {data.current_room_id ? (
                                 <>
@@ -173,7 +173,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                         </Button>
                     )}
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col">
                     <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
                         <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                             <IoPerson />
@@ -186,7 +186,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 </strong>{" "}
                                 {convertToTitleCase(data.full_name)}
                             </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap items-center gap-2">
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.birthdate}:
                                 </strong>{" "}
@@ -276,28 +276,28 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 {convertToTitleCase(data.address.address_line_1)} -{" "}
                                 {convertToTitleCase(data.address.address_line_2)}
                             </li>
-                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
-                                <li className="p-2 text-sm text-slate-900">
+                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100 lg:flex-col lg:gap-0">
+                                <li className="p-2 text-sm text-slate-900 lg:w-full lg:text-start">
                                     <strong>
                                         {dict.commons.beneficiaries.beneficiaryId.city}:
                                     </strong>{" "}
                                     {convertToTitleCase(data.address.city)}
                                 </li>
-                                <li className="p-2 text-sm text-slate-900">
+                                <li className="p-2 text-sm text-slate-900 lg:border-t-[1px] lg:border-slate-100 lg:w-full lg:text-start">
                                     <strong>
                                         {dict.commons.beneficiaries.beneficiaryId.state}:
                                     </strong>{" "}
                                     {convertToTitleCase(data.address.district)}
                                 </li>
                             </div>
-                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
-                                <li className="p-2 text-sm text-slate-900">
+                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100 lg:flex-col lg:gap-0">
+                                <li className="p-2 text-sm text-slate-900 lg:w-full lg:text-start">
                                     <strong>
                                         {dict.commons.beneficiaries.beneficiaryId.zipCode}:
                                     </strong>{" "}
                                     {convertToTitleCase(data.address.zip_code)}
                                 </li>
-                                <li className="p-2 text-sm text-slate-900">
+                                <li className="p-2 text-sm text-slate-900 lg:border-t-[1px] lg:border-slate-100 lg:w-full lg:text-start">
                                     <strong>
                                         {dict.commons.beneficiaries.beneficiaryId.country}:
                                     </strong>{" "}
@@ -305,7 +305,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 </li>
                             </div>
                         </ul>
-                        <h3 className="text-relif-orange-200 font-bold text-base py-4 border-t-[1px] border-slate-200 mt-4 flex items-center gap-2">
+                        <h3 className="text-relif-orange-200 font-bold text-base py-4 border-t-[1px] border-slate-200 mt-4 flex flex-wrap items-center gap-2">
                             <MdContactEmergency />
                             {dict.commons.beneficiaries.beneficiaryId.emergencyContacts}
                         </h3>
@@ -326,7 +326,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                         .relationship as keyof typeof RELATIONSHIPS_MAPPING
                                 ] || data.emergency_contacts[0].relationship}
                             </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap items-center gap-2">
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.emergencyEmail}:
                                 </strong>
@@ -348,7 +348,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                         </h3>
                                         <ul>
                                             {data.emergency_contacts[0].emails.map(email => (
-                                                <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                <li className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
                                                     <MdMail /> {email}
                                                 </li>
                                             ))}
@@ -356,7 +356,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                     </HoverCardContent>
                                 </HoverCard>
                             </li>
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap items-center gap-2">
                                 <strong>{dict.commons.beneficiaries.beneficiaryId.phone}:</strong>
                                 <HoverCard>
                                     <HoverCardTrigger>
@@ -376,7 +376,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                         </h3>
                                         <ul>
                                             {data.emergency_contacts[0].phones.map(phone => (
-                                                <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                <li className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
                                                     <MdPhone /> {phone.split("_").join(" ")}
                                                 </li>
                                             ))}
@@ -387,9 +387,9 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                         </ul>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col">
                     <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
-                        <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
+                        <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex flex-wrap items-center gap-2">
                             <FaBriefcaseMedical />
                             {dict.commons.beneficiaries.create.medical.title}
                         </h3>
@@ -442,11 +442,11 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>{dict.commons.beneficiaries.create.medical.height}:</strong>{" "}
-                                {data.medical_information.height}
+                                {data.medical_information.height}cm
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>{dict.commons.beneficiaries.create.medical.weight}:</strong>{" "}
-                                {data.medical_information.weight}
+                                {data.medical_information.weight}kg
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>

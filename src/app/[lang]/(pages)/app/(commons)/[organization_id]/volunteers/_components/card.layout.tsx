@@ -36,14 +36,14 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{voluntary?.full_name}</span>
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                     <MdMail />
                     {voluntary?.email}
                 </span>
-                <div className="flex mt-2 gap-2">
+                <div className="flex mt-2 gap-2 flex-wrap">
                     {voluntary?.segments.map(segment => (
                         <span>
                             <Badge className="bg-yellow-300 text-slate-900">{segment}</Badge>
@@ -86,7 +86,7 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end lg:hidden">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {dict.commons.volunteers.list.card.createdAt}{" "}
                         {formatDate(voluntary?.created_at, locale || "en")}

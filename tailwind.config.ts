@@ -11,6 +11,14 @@ const config = {
     prefix: "",
     theme: {
         extend: {
+            screens: {
+                "2xl": { max: "1535px" },
+                xl: { max: "1279px" },
+                lg: { max: "1023px" },
+                md: { max: "767px" },
+                sm: { max: "639px" },
+                "min-custom": { min: "1024px" },
+            },
             colors: {
                 "relif-orange-100": "#ED8A5f",
                 "relif-orange-200": "#E5855B",

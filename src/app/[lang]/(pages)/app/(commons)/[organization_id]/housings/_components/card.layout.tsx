@@ -49,10 +49,10 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const status = getStatus();
 
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
-                <span className="text-xs text-slate-500 mt-3 flex items-center gap-1">
+                <span className="text-xs text-slate-500 mt-3 flex items-center gap-1 lg:gap-2">
                     <FaMapMarkerAlt />
                     {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                 </span>
@@ -124,7 +124,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end lg:hidden">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                         {dict.housingList.createdAt} {formatDate(data.created_at, locale || "en")}
                     </span>

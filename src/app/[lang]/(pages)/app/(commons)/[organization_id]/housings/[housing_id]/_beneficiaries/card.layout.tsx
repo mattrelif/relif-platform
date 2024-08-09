@@ -27,7 +27,7 @@ const BeneficiaryCard = (data: Props): ReactNode => {
     const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
             <div className="flex gap-4">
                 <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-relif-orange-200 text-white">

@@ -83,7 +83,7 @@ const VolunteersList = (): ReactNode => {
 
     return (
         <>
-            <div className="flex items-end gap-4 justify-between">
+            <div className="flex items-end gap-4 justify-between lg:flex-col lg:items-start">
                 <div className="flex items-center gap-3">
                     <MdSearch className="text-slate-400 text-2xl" />
                     <Input
@@ -97,7 +97,7 @@ const VolunteersList = (): ReactNode => {
                 <Toolbar />
             </div>
 
-            <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+            <div className="h-[calc(100vh-172px)] lg:h-[calc(100vh-195px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                         {dict.commons.volunteers.list.loading}

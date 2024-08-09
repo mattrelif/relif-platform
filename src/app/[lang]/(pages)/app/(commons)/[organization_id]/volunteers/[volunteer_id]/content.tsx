@@ -114,7 +114,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col">
                     <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
                         <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                             <IoPerson />
@@ -195,28 +195,28 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                 {convertToTitleCase(data.address.address_line_1)} -{" "}
                                 {convertToTitleCase(data.address.address_line_2)}
                             </li>
-                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
-                                <li className="p-2 text-sm text-slate-900">
+                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100 lg:gap-0 lg:flex-col">
+                                <li className="p-2 text-sm text-slate-900 lg:w-full lg:text-start">
                                     <strong>
                                         {dict.commons.volunteers.volunteerId.content.city}:
                                     </strong>{" "}
                                     {convertToTitleCase(data.address.city)}
                                 </li>
-                                <li className="p-2 text-sm text-slate-900">
+                                <li className="p-2 text-sm text-slate-900 lg:w-full lg:text-start lg:border-t-[1px] lg:border-slate-100">
                                     <strong>
                                         {dict.commons.volunteers.volunteerId.content.state}:
                                     </strong>{" "}
                                     {convertToTitleCase(data.address.district)}
                                 </li>
                             </div>
-                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
-                                <li className="p-2 text-sm text-slate-900">
+                            <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100 lg:gap-0 lg:flex-col">
+                                <li className="p-2 text-sm text-slate-900 lg:w-full lg:text-start">
                                     <strong>
                                         {dict.commons.volunteers.volunteerId.content.postalCode}:
                                     </strong>{" "}
                                     {convertToTitleCase(data.address.zip_code)}
                                 </li>
-                                <li className="p-2 text-sm text-slate-900">
+                                <li className="p-2 text-sm text-slate-900 lg:w-full lg:text-start lg:border-t-[1px] lg:border-slate-100">
                                     <strong>
                                         {dict.commons.volunteers.volunteerId.content.country}:
                                     </strong>{" "}
@@ -312,7 +312,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                         {dict.commons.volunteers.volunteerId.content.medicalInformation}
                     </h3>
                     <div>
-                        <ul className="w-full grid grid-cols-2">
+                        <ul className="w-full grid grid-cols-2 lg:flex lg:flex-col">
                             <div>
                                 <li className="w-full p-2 text-sm text-slate-900">
                                     <strong>
@@ -371,7 +371,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                     {data.medical_information.mental_health_history.join(", ")}
                                 </li>
                             </div>
-                            <div>
+                            <div className="lg:border-t-[1px] lg:border-slate-100">
                                 <li className="w-full p-2 text-sm text-slate-900">
                                     <strong>
                                         {dict.commons.volunteers.volunteerId.content.height}:

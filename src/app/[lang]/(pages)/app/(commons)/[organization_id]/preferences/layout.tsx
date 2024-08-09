@@ -25,8 +25,8 @@ export default async function Layout({
                     {dict.commons.preferences.title}
                 </h1>
             </div>
-            <div className="grid grid-cols-[350px_auto]">
-                <div className="w-full h-[calc(100vh-188px)] p-2">
+            <div className="grid grid-cols-[350px_auto] lg:flex lg:flex-col">
+                <div className="w-full h-[calc(100vh-188px)] p-2 lg:h-max">
                     <Menu />
                 </div>
                 <div className="w-full h-full p-2">{children}</div>

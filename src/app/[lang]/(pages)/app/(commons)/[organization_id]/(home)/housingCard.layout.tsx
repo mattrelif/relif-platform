@@ -39,7 +39,7 @@ const HousingCard = ({ refreshList, ...data }: Props): ReactNode => {
     const status = getStatus();
 
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 gap-4">
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                 <div className="flex flex-wrap gap-2 mt-2">

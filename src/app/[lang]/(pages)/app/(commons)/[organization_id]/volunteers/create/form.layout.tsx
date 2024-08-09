@@ -149,7 +149,10 @@ const Form = (): ReactNode => {
     };
 
     return (
-        <form className="w-full h-max p-4 grid grid-cols-2 gap-4" onSubmit={handleSubmit}>
+        <form
+            className="w-full h-max p-4 grid grid-cols-2 gap-4 lg:flex lg:flex-col"
+            onSubmit={handleSubmit}
+        >
             <div className="w-full h-max flex flex-col gap-6">
                 <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                     <FaUsers />
