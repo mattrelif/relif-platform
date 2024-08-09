@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ import { MdError, MdSave } from "react-icons/md";
 const Form = (): ReactNode => {
     const { toast } = useToast();
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [orgData, setOrgData] = useState<OrganizationSchema | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +27,6 @@ const Form = (): ReactNode => {
         (async () => {
             try {
                 const currentUser: UserSchema = await getFromLocalStorage("r_ud");
-
                 if (currentUser.organization_id) {
                     const response = await findOrganizationByID(currentUser.organization_id);
                     setOrgData(response.data);
@@ -134,6 +135,7 @@ const Form = (): ReactNode => {
                                 id="description"
                                 name="description"
                                 defaultValue={orgData?.description}
+                                readOnly={platformRole !== "ORG_ADMIN"}
                             />
                         </div>
 
@@ -147,6 +149,7 @@ const Form = (): ReactNode => {
                                 type="text"
                                 required
                                 defaultValue={orgData?.address.address_line_1}
+                                readOnly={platformRole !== "ORG_ADMIN"}
                             />
                         </div>
 
@@ -160,6 +163,7 @@ const Form = (): ReactNode => {
                                 type="text"
                                 required
                                 defaultValue={orgData?.address.address_line_2}
+                                readOnly={platformRole !== "ORG_ADMIN"}
                             />
                         </div>
 
@@ -174,6 +178,7 @@ const Form = (): ReactNode => {
                                     type="text"
                                     required
                                     defaultValue={orgData?.address.city}
+                                    readOnly={platformRole !== "ORG_ADMIN"}
                                 />
                             </div>
 
@@ -187,6 +192,7 @@ const Form = (): ReactNode => {
                                     type="text"
                                     required
                                     defaultValue={orgData?.address.district}
+                                    readOnly={platformRole !== "ORG_ADMIN"}
                                 />
                             </div>
 
@@ -200,6 +206,7 @@ const Form = (): ReactNode => {
                                     type="text"
                                     required
                                     defaultValue={orgData?.address.zip_code}
+                                    readOnly={platformRole !== "ORG_ADMIN"}
                                 />
                             </div>
 
@@ -213,19 +220,22 @@ const Form = (): ReactNode => {
                                     type="text"
                                     required
                                     defaultValue={orgData?.address.country}
+                                    readOnly={platformRole !== "ORG_ADMIN"}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <Button
-                        type="submit"
-                        variant="default"
-                        className="mt-[43px] w-full flex items-center gap-1"
-                    >
-                        <MdSave size={14} />
-                        {dict.commons.preferences.myOrganization.overview.save}
-                    </Button>
+                    {platformRole === "ORG_ADMIN" && (
+                        <Button
+                            type="submit"
+                            variant="default"
+                            className="mt-[43px] w-full flex items-center gap-1"
+                        >
+                            <MdSave size={14} />
+                            {dict.commons.preferences.myOrganization.overview.save}
+                        </Button>
+                    )}
                 </form>
             )}
         </>

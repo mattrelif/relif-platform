@@ -1,5 +1,5 @@
 import { client } from "@/lib/axios-client";
-import { SignUpRequest } from "@/types/auth.types";
+import { SignUpByInviteRequest, SignUpRequest } from "@/types/auth.types";
 import { UserSchema } from "@/types/user.types";
 import { AxiosResponse } from "axios";
 
@@ -28,10 +28,11 @@ export async function signUp(data: SignUpRequest): Promise<void> {
     });
 }
 
-export async function orgSignUp(): Promise<void> {
+export async function orgSignUp(data: SignUpByInviteRequest): Promise<void> {
     return client.request({
-        url: `${PREFIX}/orgSignUp`,
+        url: `${PREFIX}/org-sign-up`,
         method: "POST",
+        data,
     });
 }
 

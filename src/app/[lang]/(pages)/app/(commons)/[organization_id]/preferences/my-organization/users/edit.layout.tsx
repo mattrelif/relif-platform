@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,7 @@ const UserEdit = ({
     setEditUserSheetOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const platformRole = usePlatformRole();
     const dict = useDictionary();
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
@@ -55,6 +57,10 @@ const UserEdit = ({
         e.preventDefault();
 
         try {
+            if (platformRole !== "ORG_ADMIN") {
+                throw new Error();
+            }
+
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore

@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import {
     Pagination,
     PaginationContent,
@@ -20,6 +21,7 @@ import { Card } from "./card.layout";
 
 const OrganizationsList = (): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [organizations, setOrganizations] = useState<{
         count: number;
@@ -58,6 +60,8 @@ const OrganizationsList = (): ReactNode => {
     const handlePageChange = (newPage: number) => {
         setOffset((newPage - 1) * LIMIT);
     };
+
+    if (platformRole !== "RELIF_MEMBER") return <div />;
 
     return (
         <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">

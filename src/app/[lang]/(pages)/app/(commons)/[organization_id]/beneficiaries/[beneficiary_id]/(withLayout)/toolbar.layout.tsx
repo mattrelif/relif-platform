@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
@@ -19,6 +20,7 @@ type Props = {
 
 const Toolbar = ({ beneficiary }: Props): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
@@ -35,84 +37,88 @@ const Toolbar = ({ beneficiary }: Props): ReactNode => {
                 </Link>
             </Button>
 
-            <div className="flex items-center gap-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button
-                                size="sm"
-                                variant="icon"
-                                className="w-7 h-7 p-0 flex items-center justify-center"
-                                asChild
-                            >
-                                <Link href={`${editPath}/edit`}>
-                                    <FaEdit />
-                                </Link>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {
-                                dict.commons.beneficiaries.beneficiaryId.toolbar
-                                    .editBeneficiaryTooltip
-                            }
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+            {platformRole === "ORG_ADMIN" && (
+                <>
+                    <div className="flex items-center gap-2">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-7 h-7 p-0 flex items-center justify-center"
+                                        asChild
+                                    >
+                                        <Link href={`${editPath}/edit`}>
+                                            <FaEdit />
+                                        </Link>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {
+                                        dict.commons.beneficiaries.beneficiaryId.toolbar
+                                            .editBeneficiaryTooltip
+                                    }
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
 
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button
-                                size="sm"
-                                variant="icon"
-                                className="w-7 h-7 p-0 flex items-center justify-center"
-                                onClick={() => setMoveDialogOpenState(true)}
-                            >
-                                <IoMdMove />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {
-                                dict.commons.beneficiaries.beneficiaryId.toolbar
-                                    .moveBeneficiaryTooltip
-                            }
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-7 h-7 p-0 flex items-center justify-center"
+                                        onClick={() => setMoveDialogOpenState(true)}
+                                    >
+                                        <IoMdMove />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {
+                                        dict.commons.beneficiaries.beneficiaryId.toolbar
+                                            .moveBeneficiaryTooltip
+                                    }
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
 
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button
-                                size="sm"
-                                variant="icon"
-                                className="w-7 h-7 p-0 flex items-center justify-center"
-                                onClick={() => setRemoveDialogOpenState(true)}
-                            >
-                                <FaTrash />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {
-                                dict.commons.beneficiaries.beneficiaryId.toolbar
-                                    .removeBeneficiaryTooltip
-                            }
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-7 h-7 p-0 flex items-center justify-center"
+                                        onClick={() => setRemoveDialogOpenState(true)}
+                                    >
+                                        <FaTrash />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {
+                                        dict.commons.beneficiaries.beneficiaryId.toolbar
+                                            .removeBeneficiaryTooltip
+                                    }
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
 
-            <RemoveModal
-                beneficiary={beneficiary}
-                removeDialogOpenState={removeDialogOpenState}
-                setRemoveDialogOpenState={setRemoveDialogOpenState}
-            />
+                    <RemoveModal
+                        beneficiary={beneficiary}
+                        removeDialogOpenState={removeDialogOpenState}
+                        setRemoveDialogOpenState={setRemoveDialogOpenState}
+                    />
 
-            <MoveModal
-                beneficiary={beneficiary}
-                moveDialogOpenState={moveDialogOpenState}
-                setMoveDialogOpenState={setMoveDialogOpenState}
-            />
+                    <MoveModal
+                        beneficiary={beneficiary}
+                        moveDialogOpenState={moveDialogOpenState}
+                        setMoveDialogOpenState={setMoveDialogOpenState}
+                    />
+                </>
+            )}
         </div>
     );
 };

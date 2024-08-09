@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -30,9 +31,14 @@ const UserRemove = ({
 }: Props): ReactNode => {
     const { toast } = useToast();
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const handleDelete = async (): Promise<void> => {
         try {
+            if (platformRole === "ORG_ADMIN") {
+                throw new Error();
+            }
+
             await deleteUser(user.id);
             refreshList();
 

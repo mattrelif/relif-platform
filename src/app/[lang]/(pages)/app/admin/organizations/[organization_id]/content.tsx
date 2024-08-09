@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { findOrganizationByID } from "@/repository/organization.repository";
 import { OrganizationSchema } from "@/types/organization.types";
 import { formatDate } from "@/utils/formatDate";
@@ -21,6 +22,8 @@ type Props = {
 const Content = ({ organizationId }: Props): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
+
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const [data, setData] = useState<OrganizationSchema | null>(null);
@@ -42,6 +45,8 @@ const Content = ({ organizationId }: Props): ReactNode => {
             }
         })();
     }, []);
+
+    if (platformRole !== "RELIF_MEMBER") return <div />;
 
     if (isLoading)
         return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { PDFDocument } from "@/components/reports/organizations";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
 
 const Toolbar = (): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const handleDownloadPDF = async () => {
         try {
@@ -47,6 +49,8 @@ const Toolbar = (): ReactNode => {
             console.error("Error generating CSV");
         }
     };
+
+    if (platformRole !== "RELIF_MEMBER") return <div />;
 
     return (
         <div className="flex items-center gap-4">

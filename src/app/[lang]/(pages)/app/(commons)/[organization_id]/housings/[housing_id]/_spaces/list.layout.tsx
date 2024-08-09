@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { PDFDocument } from "@/components/reports/spaces";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,7 @@ import { CreateSpace } from "./create.layout";
 
 const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [spaces, setSpaces] = useState<{
         count: number;
@@ -105,7 +107,9 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <CreateSpace housingId={housingId} refreshList={getSpaceList} />
+                    {platformRole === "ORG_ADMIN" && (
+                        <CreateSpace housingId={housingId} refreshList={getSpaceList} />
+                    )}
                 </div>
             </div>
             {/* <div className="flex items-center gap-2"> */}

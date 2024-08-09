@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,10 +26,11 @@ type Props = HousingSchema & {
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
-    const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
-
+    const platformRole = usePlatformRole();
     const pathname = usePathname();
     const dict = useDictionary();
+
+    const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
@@ -101,21 +103,25 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                                 {dict.housingList.dropdownViewHousing}
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${data?.id}/edit`}>
-                                <span className="flex items-center gap-2">
-                                    <FaEdit className="text-xs" />
-                                    {dict.housingList.dropdownEditHousing}
-                                </span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaTrash className="text-xs" />
-                                {dict.housingList.dropdownRemoveHousing}
-                            </span>
-                        </DropdownMenuItem>
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href={`${urlPath}/${data?.id}/edit`}>
+                                        <span className="flex items-center gap-2">
+                                            <FaEdit className="text-xs" />
+                                            {dict.housingList.dropdownEditHousing}
+                                        </span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <FaTrash className="text-xs" />
+                                        {dict.housingList.dropdownRemoveHousing}
+                                    </span>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
@@ -125,12 +131,14 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 </div>
             </div>
 
-            <RemoveModal
-                housing={data}
-                refreshList={refreshList}
-                removeDialogOpenState={removeDialogOpenState}
-                setRemoveDialogOpenState={setRemoveDialogOpenState}
-            />
+            {platformRole === "ORG_ADMIN" && (
+                <RemoveModal
+                    housing={data}
+                    refreshList={refreshList}
+                    removeDialogOpenState={removeDialogOpenState}
+                    setRemoveDialogOpenState={setRemoveDialogOpenState}
+                />
+            )}
         </li>
     );
 };

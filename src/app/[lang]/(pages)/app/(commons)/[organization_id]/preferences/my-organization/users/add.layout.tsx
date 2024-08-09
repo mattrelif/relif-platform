@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -19,12 +20,17 @@ import { ReactNode } from "react";
 
 const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {
     const { toast } = useToast();
+    const platformRole = usePlatformRole();
     const dict = useDictionary();
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
 
         try {
+            if (platformRole !== "ORG_ADMIN") {
+                throw new Error();
+            }
+
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore

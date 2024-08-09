@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { PDFDocument } from "@/components/reports/housings";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import { MdAdd } from "react-icons/md";
 
 const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
     const pathname = usePathname();
+    const platformRole = usePlatformRole();
     const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
 
@@ -59,12 +61,14 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
 
     return (
         <div className="flex items-center gap-4">
-            <Button asChild>
-                <Link href={`${urlPath}/create`} className="flex items-center gap-2">
-                    <MdAdd size={16} />
-                    {dict.housingList.btnCreate}
-                </Link>
-            </Button>
+            {platformRole === "ORG_ADMIN" && (
+                <Button asChild>
+                    <Link href={`${urlPath}/create`} className="flex items-center gap-2">
+                        <MdAdd size={16} />
+                        {dict.housingList.btnCreate}
+                    </Link>
+                </Button>
+            )}
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Button variant="icon" className="w-[40px] h-[40px] p-0">

@@ -83,7 +83,9 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuItem asChild>
-                                <Link href={`/app/admin/organizations/${data?.organization_id}`}>
+                                <Link
+                                    href={`${locale || "en"}/app/admin/organizations/${data?.organization_id}`}
+                                >
                                     {dict.admin.requests.card.viewOrganization}
                                 </Link>
                             </DropdownMenuItem>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { findRequests } from "@/repository/updateOrganizationTypeRequests";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
@@ -12,6 +13,7 @@ import { Card } from "./card.layout";
 
 const RequestList = (): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [requests, setRequests] = useState<{
         count: number;
@@ -43,6 +45,8 @@ const RequestList = (): ReactNode => {
         setIsLoading(true);
         getOrganizationList();
     }, []);
+
+    if (platformRole !== "RELIF_MEMBER") return <div />;
 
     return (
         <div className="h-[calc(100vh-115px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">

@@ -1,4 +1,4 @@
-import { CreateUserRequest } from "./user.types";
+import { CreateUserRequest, UserPreferencesSchema } from "./user.types";
 
 export type SignInRequest = {
     email: string;
@@ -6,6 +6,17 @@ export type SignInRequest = {
 };
 
 export type SignUpRequest = CreateUserRequest;
+
+export type SignUpByInviteRequest = {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    phones: Array<string>;
+    role: string;
+    organization_id: string;
+    preferences: UserPreferencesSchema;
+};
 
 export type PasswordChangeRequestSchema = {
     user_id: string;

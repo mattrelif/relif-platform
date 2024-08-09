@@ -12,11 +12,14 @@ import {
 import { updateUser } from "@/repository/user.repository";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage, updateLocalStorage } from "@/utils/localStorage";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 
 const Form = (): ReactNode => {
     const dict = useDictionary();
+    const pathname = usePathname();
+    const router = useRouter();
 
     const [userData, setUserData] = useState<UserSchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -47,6 +50,19 @@ const Form = (): ReactNode => {
                 ...userData,
                 preferences: { language: newLanguage, timezone: userData.preferences.timezone },
             });
+
+            const LANGUAGES = {
+                portuguese: "pt",
+                english: "en",
+                spanish: "es",
+            };
+
+            router.replace(
+                pathname.replace(
+                    /\/[a-z]{2}\//,
+                    `/${LANGUAGES[newLanguage as keyof typeof LANGUAGES]}/`
+                )
+            );
         }
     };
 

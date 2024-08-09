@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { PDFDocument } from "@/components/reports/beneficiaries";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,8 @@ type Props = {
 const BeneficiaryList = ({ housingId }: Props): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
+
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
     const [beneficiaries, setBeneficiaries] = useState<{
@@ -133,11 +136,18 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
-                        <Link href={`${urlPath}/beneficiaries/create`}>
-                            <MdAdd size={16} /> {dict.housingOverview.beneficiaryList.btnNew}
-                        </Link>
-                    </Button>
+                    {platformRole === "ORG_ADMIN" && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-2"
+                            asChild
+                        >
+                            <Link href={`${urlPath}/beneficiaries/create`}>
+                                <MdAdd size={16} /> {dict.housingOverview.beneficiaryList.btnNew}
+                            </Link>
+                        </Button>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-2">

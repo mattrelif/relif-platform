@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,7 +20,9 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 const Sidebar = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
     const activeOption = pathname.split("/")[4] ?? "home";
+    const currentLanguage = pathname.split("/")[1];
 
     return (
         <nav className="row-span-2 w-[250px] h-[calc(100vh-32px)] bg-slate-50 pr-4 flex flex-col gap-5">
@@ -32,57 +35,61 @@ const Sidebar = (): ReactNode => {
                 />
             </div>
 
-            <ul className="flex flex-col gap-1">
-                <span className="text-slate-500 font-bold text-sm pl-2 mb-2">
-                    {dict.admin.sidebar.admin}
-                </span>
+            {platformRole === "RELIF_MEMBER" && (
+                <>
+                    <ul className="flex flex-col gap-1">
+                        <span className="text-slate-500 font-bold text-sm pl-2 mb-2">
+                            {dict.admin.sidebar.admin}
+                        </span>
 
-                <Link href={`/app/admin/organizations`}>
-                    <li
-                        className={cn(
-                            BASE_LIST_ITEM_CLASSES,
-                            activeOption !== "organizations"
-                                ? BASE_LIST_ITEM_HOVER_CLASSES
-                                : BASE_LIST_ITEM_ACTIVE_CLASSES
-                        )}
-                    >
-                        <FaBuilding size={15} />
-                        {dict.admin.sidebar.organizations}
-                    </li>
-                </Link>
+                        <Link href={`/${currentLanguage || "en"}/app/admin/organizations`}>
+                            <li
+                                className={cn(
+                                    BASE_LIST_ITEM_CLASSES,
+                                    activeOption !== "organizations"
+                                        ? BASE_LIST_ITEM_HOVER_CLASSES
+                                        : BASE_LIST_ITEM_ACTIVE_CLASSES
+                                )}
+                            >
+                                <FaBuilding size={15} />
+                                {dict.admin.sidebar.organizations}
+                            </li>
+                        </Link>
 
-                <Link href={`/app/admin/requests`}>
-                    <li
-                        className={cn(
-                            BASE_LIST_ITEM_CLASSES,
-                            activeOption !== "requests"
-                                ? BASE_LIST_ITEM_HOVER_CLASSES
-                                : BASE_LIST_ITEM_ACTIVE_CLASSES
-                        )}
-                    >
-                        <FaUsers size={15} />
-                        {dict.admin.sidebar.requests}
-                    </li>
-                </Link>
-            </ul>
+                        <Link href={`/${currentLanguage || "en"}/app/admin/requests`}>
+                            <li
+                                className={cn(
+                                    BASE_LIST_ITEM_CLASSES,
+                                    activeOption !== "requests"
+                                        ? BASE_LIST_ITEM_HOVER_CLASSES
+                                        : BASE_LIST_ITEM_ACTIVE_CLASSES
+                                )}
+                            >
+                                <FaUsers size={15} />
+                                {dict.admin.sidebar.requests}
+                            </li>
+                        </Link>
+                    </ul>
 
-            <span className="w-full border-b-[1px] border-slate-200" />
+                    <span className="w-full border-b-[1px] border-slate-200" />
 
-            <ul className="flex flex-col gap-1">
-                <Link href={`/app/admin/preferences`}>
-                    <li
-                        className={cn(
-                            BASE_LIST_ITEM_CLASSES,
-                            activeOption !== "preferences"
-                                ? BASE_LIST_ITEM_HOVER_CLASSES
-                                : BASE_LIST_ITEM_ACTIVE_CLASSES
-                        )}
-                    >
-                        <MdSettings size={15} />
-                        {dict.admin.sidebar.preferences}
-                    </li>
-                </Link>
-            </ul>
+                    <ul className="flex flex-col gap-1">
+                        <Link href={`/${currentLanguage || "en"}/app/admin/preferences/platform`}>
+                            <li
+                                className={cn(
+                                    BASE_LIST_ITEM_CLASSES,
+                                    activeOption !== "preferences"
+                                        ? BASE_LIST_ITEM_HOVER_CLASSES
+                                        : BASE_LIST_ITEM_ACTIVE_CLASSES
+                                )}
+                            >
+                                <MdSettings size={15} />
+                                {dict.admin.sidebar.preferences}
+                            </li>
+                        </Link>
+                    </ul>
+                </>
+            )}
         </nav>
     );
 };

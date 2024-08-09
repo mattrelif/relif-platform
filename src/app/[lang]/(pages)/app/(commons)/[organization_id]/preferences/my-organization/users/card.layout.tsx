@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ type Props = UserSchema & {
 
 const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [editUserSheetOpenState, setEditUserSheetOpenState] = useState(false);
     const [removeUserDialogOpenState, setRemoveUserDialogOpenState] = useState(false);
@@ -88,54 +90,62 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                 </span>
             </div>
 
-            <div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="icon" className="w-7 h-7 p-0">
-                            <SlOptions className="text-sm" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        {/* <DropdownMenuItem onClick={() => setUserActivitiesSheetOpenState(true)}>
+            {platformRole === "ORG_ADMIN" && (
+                <>
+                    <div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <Button variant="icon" className="w-7 h-7 p-0">
+                                    <SlOptions className="text-sm" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {/* <DropdownMenuItem onClick={() => setUserActivitiesSheetOpenState(true)}>
                             View activities
                         </DropdownMenuItem> */}
-                        {/* <DropdownMenuSeparator /> */}
-                        <DropdownMenuItem onClick={() => setEditUserSheetOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaEdit className="text-xs" />
-                                {dict.commons.preferences.myOrganization.users.card.edit}
-                            </span>
-                        </DropdownMenuItem>
-                        {currentUserId !== data.id && (
-                            <DropdownMenuItem onClick={() => setRemoveUserDialogOpenState(true)}>
-                                <span className="flex items-center gap-2">
-                                    <FaTrash className="text-xs" />
-                                    {dict.commons.preferences.myOrganization.users.card.remove}
-                                </span>
-                            </DropdownMenuItem>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+                                {/* <DropdownMenuSeparator /> */}
+                                <DropdownMenuItem onClick={() => setEditUserSheetOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <FaEdit className="text-xs" />
+                                        {dict.commons.preferences.myOrganization.users.card.edit}
+                                    </span>
+                                </DropdownMenuItem>
+                                {currentUserId !== data.id && (
+                                    <DropdownMenuItem
+                                        onClick={() => setRemoveUserDialogOpenState(true)}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <FaTrash className="text-xs" />
+                                            {
+                                                dict.commons.preferences.myOrganization.users.card
+                                                    .remove
+                                            }
+                                        </span>
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
 
+                    <UserEdit
+                        user={data}
+                        refreshList={refreshList}
+                        editUserSheetOpenState={editUserSheetOpenState}
+                        setEditUserSheetOpenState={setEditUserSheetOpenState}
+                    />
+
+                    <UserRemove
+                        user={data}
+                        refreshList={refreshList}
+                        removeUserDialogOpenState={removeUserDialogOpenState}
+                        setRemoveUserDialogOpenState={setRemoveUserDialogOpenState}
+                    />
+                </>
+            )}
             {/* <UserActivities
                 userActivitiesSheetOpenState={userActivitiesSheetOpenState}
                 setUserActivitiesSheetOpenState={setUserActivitiesSheetOpenState}
             /> */}
-
-            <UserEdit
-                user={data}
-                refreshList={refreshList}
-                editUserSheetOpenState={editUserSheetOpenState}
-                setEditUserSheetOpenState={setEditUserSheetOpenState}
-            />
-
-            <UserRemove
-                user={data}
-                refreshList={refreshList}
-                removeUserDialogOpenState={removeUserDialogOpenState}
-                setRemoveUserDialogOpenState={setRemoveUserDialogOpenState}
-            />
         </li>
     );
 };

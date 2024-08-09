@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ type Props = VoluntarySchema & {
 
 const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
@@ -63,21 +65,25 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                                 {dict.commons.volunteers.list.card.profile}
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${voluntary?.id}/edit`}>
-                                <span className="flex items-center gap-2">
-                                    <FaEdit className="text-xs" />
-                                    {dict.commons.volunteers.list.card.editVoluntary}
-                                </span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaTrash className="text-xs" />
-                                {dict.commons.volunteers.list.card.removeVoluntary}
-                            </span>
-                        </DropdownMenuItem>
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href={`${urlPath}/${voluntary?.id}/edit`}>
+                                        <span className="flex items-center gap-2">
+                                            <FaEdit className="text-xs" />
+                                            {dict.commons.volunteers.list.card.editVoluntary}
+                                        </span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <FaTrash className="text-xs" />
+                                        {dict.commons.volunteers.list.card.removeVoluntary}
+                                    </span>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
@@ -88,12 +94,14 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                 </div>
             </div>
 
-            <RemoveModal
-                volunteer={voluntary}
-                refreshList={refreshList}
-                removeDialogOpenState={removeDialogOpenState}
-                setRemoveDialogOpenState={setRemoveDialogOpenState}
-            />
+            {platformRole === "ORG_ADMIN" && (
+                <RemoveModal
+                    volunteer={voluntary}
+                    refreshList={refreshList}
+                    removeDialogOpenState={removeDialogOpenState}
+                    setRemoveDialogOpenState={setRemoveDialogOpenState}
+                />
+            )}
         </li>
     );
 };

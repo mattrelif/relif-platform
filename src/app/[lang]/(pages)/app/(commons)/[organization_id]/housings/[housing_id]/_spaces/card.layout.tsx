@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ type Props = SpaceSchema & {
 
 const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [viewSheetOpenState, setViewSheetOpenState] = useState(false);
     const [editSheetOpenState, setEditSheetOpenState] = useState(false);
@@ -78,18 +80,22 @@ const SpaceCard = ({ refreshList, ...data }: Props): ReactNode => {
                         <DropdownMenuItem onClick={() => setViewSheetOpenState(true)}>
                             {dict.housingOverview.dropdownViewSpace}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setEditSheetOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaEdit className="text-xs" />
-                                {dict.housingOverview.dropdownEditSpace}
-                            </span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaTrash className="text-xs" />
-                                {dict.housingOverview.dropdownRemoveSpace}
-                            </span>
-                        </DropdownMenuItem>
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <DropdownMenuItem onClick={() => setEditSheetOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <FaEdit className="text-xs" />
+                                        {dict.housingOverview.dropdownEditSpace}
+                                    </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <FaTrash className="text-xs" />
+                                        {dict.housingOverview.dropdownRemoveSpace}
+                                    </span>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

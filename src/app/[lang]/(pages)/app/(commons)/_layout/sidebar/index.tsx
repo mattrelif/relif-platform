@@ -2,13 +2,12 @@
 
 import { OrgSelector } from "@/app/[lang]/(pages)/app/(commons)/_layout/sidebar/orgSelector.layout";
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { cn } from "@/lib/utils";
-import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { FaHome, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser, FaUserNurse } from "react-icons/fa6";
 import { MdSettings } from "react-icons/md";
@@ -23,19 +22,11 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 const Sidebar = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
-    const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
+    const platformRole = usePlatformRole();
 
     const organizationID = pathname.split("/")[3];
     const activeOption = pathname.split("/")[4] ?? "home";
-
-    useEffect(() => {
-        try {
-            const user = getFromLocalStorage("r_ud");
-            setCurrentUser(user);
-        } catch (err) {
-            console.error(err);
-        }
-    }, []);
+    const currentLanguage = pathname.split("/")[1];
 
     return (
         <nav className="row-span-2 w-[250px] h-[calc(100vh-32px)] bg-slate-50 pr-4 flex flex-col gap-5">
@@ -48,7 +39,7 @@ const Sidebar = (): ReactNode => {
                 />
             </div>
 
-            {currentUser && currentUser.platform_role === "ORG_ADMIN" && (
+            {platformRole === "ORG_ADMIN" && (
                 <div className="w-full h-max py-4">
                     <div className="flex flex-col">
                         <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
@@ -61,7 +52,7 @@ const Sidebar = (): ReactNode => {
 
             <ul className="flex flex-col gap-1">
                 <span className="text-slate-500 font-bold text-sm pl-2 mb-2">Platform</span>
-                <Link href={`/app/${organizationID}`}>
+                <Link href={`/${currentLanguage || "en"}/app/${organizationID}`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
@@ -75,7 +66,7 @@ const Sidebar = (): ReactNode => {
                     </li>
                 </Link>
 
-                <Link href={`/app/${organizationID}/housings`}>
+                <Link href={`/${currentLanguage || "en"}/app/${organizationID}/housings`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
@@ -89,7 +80,7 @@ const Sidebar = (): ReactNode => {
                     </li>
                 </Link>
 
-                <Link href={`/app/${organizationID}/beneficiaries`}>
+                <Link href={`/${currentLanguage || "en"}/app/${organizationID}/beneficiaries`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
@@ -103,7 +94,7 @@ const Sidebar = (): ReactNode => {
                     </li>
                 </Link>
 
-                <Link href={`/app/${organizationID}/volunteers`}>
+                <Link href={`/${currentLanguage || "en"}/app/${organizationID}/volunteers`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
@@ -117,7 +108,7 @@ const Sidebar = (): ReactNode => {
                     </li>
                 </Link>
 
-                <Link href={`/app/${organizationID}/inventory`}>
+                <Link href={`/${currentLanguage || "en"}/app/${organizationID}/inventory`}>
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,
@@ -135,7 +126,9 @@ const Sidebar = (): ReactNode => {
             <span className="w-full border-b-[1px] border-slate-200" />
 
             <ul className="flex flex-col gap-1">
-                <Link href={`/app/${organizationID}/preferences/platform`}>
+                <Link
+                    href={`/${currentLanguage || "en"}/app/${organizationID}/preferences/platform`}
+                >
                     <li
                         className={cn(
                             BASE_LIST_ITEM_CLASSES,

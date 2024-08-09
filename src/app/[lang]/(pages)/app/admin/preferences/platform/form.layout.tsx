@@ -2,6 +2,7 @@
 
 import { TIMEZONES } from "@/app/constants/timezones";
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import {
     Select,
     SelectContent,
@@ -16,6 +17,7 @@ import { ReactNode, useEffect, useState } from "react";
 
 const Form = (): ReactNode => {
     const dict = useDictionary();
+    const platformRole = usePlatformRole();
 
     const [userData, setUserData] = useState<UserSchema | null>(null);
     const [language, setLanguage] = useState("english");
@@ -59,6 +61,10 @@ const Form = (): ReactNode => {
             });
         }
     };
+
+    if (platformRole !== "RELIF_MEMBER") {
+        return <div />;
+    }
 
     return (
         <>

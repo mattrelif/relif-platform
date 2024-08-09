@@ -1,6 +1,7 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,18 +44,19 @@ const calculateAge = (birthdate: string): number => {
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
+    const pathname = usePathname();
+    const dict = useDictionary();
+    const platformRole = usePlatformRole();
+
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
 
-    const pathname = usePathname();
     const beneficiaryPath = pathname.split("/").slice(0, 5).join("/");
     const housingPath = pathname.split("/").slice(0, 4).join("/");
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const age = calculateAge(data.birthdate);
     const isUnderage = age < 18;
-
-    const dict = useDictionary();
 
     const GENDER_MAPPING = {
         male: dict.commons.beneficiaries.card.gender.male,
@@ -126,27 +128,40 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                                 {dict.commons.beneficiaries.card.dropdownMenu.viewHousing}
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`${beneficiaryPath}/${data?.id}/edit`}>
-                                <span className="flex items-center gap-2">
-                                    <FaEdit className="text-xs" />
-                                    {dict.commons.beneficiaries.card.dropdownMenu.editBeneficiary}
-                                </span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <FaTrash className="text-xs" />
-                                {dict.commons.beneficiaries.card.dropdownMenu.removeBeneficiary}
-                            </span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setMoveDialogOpenState(true)}>
-                            <span className="flex items-center gap-2">
-                                <IoMdMove className="text-xs" />
-                                {dict.commons.beneficiaries.card.dropdownMenu.moveToOtherHousing}
-                            </span>
-                        </DropdownMenuItem>
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href={`${beneficiaryPath}/${data?.id}/edit`}>
+                                        <span className="flex items-center gap-2">
+                                            <FaEdit className="text-xs" />
+                                            {
+                                                dict.commons.beneficiaries.card.dropdownMenu
+                                                    .editBeneficiary
+                                            }
+                                        </span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <FaTrash className="text-xs" />
+                                        {
+                                            dict.commons.beneficiaries.card.dropdownMenu
+                                                .removeBeneficiary
+                                        }
+                                    </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setMoveDialogOpenState(true)}>
+                                    <span className="flex items-center gap-2">
+                                        <IoMdMove className="text-xs" />
+                                        {
+                                            dict.commons.beneficiaries.card.dropdownMenu
+                                                .moveToOtherHousing
+                                        }
+                                    </span>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">

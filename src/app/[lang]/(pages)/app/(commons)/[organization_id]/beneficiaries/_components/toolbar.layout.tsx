@@ -1,4 +1,5 @@
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { PDFDocument } from "@/components/reports/beneficiaries";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,11 @@ import { MdAdd } from "react-icons/md";
 
 const Toolbar = (): ReactNode => {
     const pathname = usePathname();
+    const platformRole = usePlatformRole();
+    const dict = useDictionary();
+
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const organizationId = pathname.split("/")[3];
-    const dict = useDictionary();
 
     const handleDownloadPDF = async () => {
         try {
@@ -74,12 +77,14 @@ const Toolbar = (): ReactNode => {
 
     return (
         <div className="flex items-center gap-4">
-            <Button asChild>
-                <Link href={`${urlPath}/create`} className="flex items-center gap-2">
-                    <MdAdd size={16} />
-                    {dict.commons.beneficiaries.toolbar.createBeneficiary}
-                </Link>
-            </Button>
+            {platformRole === "ORG_ADMIN" && (
+                <Button asChild>
+                    <Link href={`${urlPath}/create`} className="flex items-center gap-2">
+                        <MdAdd size={16} />
+                        {dict.commons.beneficiaries.toolbar.createBeneficiary}
+                    </Link>
+                </Button>
+            )}
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Button variant="icon" className="w-[40px] h-[40px] p-0">
