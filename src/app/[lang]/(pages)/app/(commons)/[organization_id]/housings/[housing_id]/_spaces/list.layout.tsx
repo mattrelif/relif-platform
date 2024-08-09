@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { SpaceSchema } from "@/types/space.types";
+import { flattenObject } from "@/utils/flattenObject";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
+import Papa from "papaparse";
 import { ReactNode, useEffect, useState } from "react";
 import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
 import { MdError, MdSpaceDashboard } from "react-icons/md";
@@ -57,6 +59,22 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
         }
     };
 
+    const handleDownloadCSV = async () => {
+        try {
+            const response = await await getSpacesByHousingId(housingId, 0, 99999);
+            const spaceList = response.data.data;
+
+            const flatData = spaceList.map((space: any) => flattenObject(space));
+
+            const csv = Papa.unparse(flatData);
+
+            const csvBlob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            saveAs(csvBlob, `spaces_${housingId}.csv`);
+        } catch {
+            console.error("Error generating CSV");
+        }
+    };
+
     useEffect(() => {
         setIsLoading(true);
         getSpaceList();
@@ -77,7 +95,7 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem className="flex gap-2">
+                            <DropdownMenuItem className="flex gap-2" onClick={handleDownloadCSV}>
                                 <FaFileCsv />
                                 {dict.housingOverview.downloadCsv}
                             </DropdownMenuItem>

@@ -1,5 +1,3 @@
-"use client";
-
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { PDFDocument } from "@/components/reports/beneficiaries";
 import { Button } from "@/components/ui/button";
@@ -10,10 +8,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
+import { flattenObject } from "@/utils/flattenObject";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Papa from "papaparse";
 import { ReactNode } from "react";
 import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
@@ -45,6 +45,33 @@ const Toolbar = (): ReactNode => {
         }
     };
 
+    const handleDownloadCSV = async () => {
+        try {
+            if (organizationId) {
+                const response = await getBeneficiariesByOrganizationID(
+                    organizationId,
+                    0,
+                    99999,
+                    ""
+                );
+                const beneficiaries = response.data.data;
+
+                const flatData = beneficiaries.map((beneficiary: any) =>
+                    flattenObject(beneficiary)
+                );
+
+                const csv = Papa.unparse(flatData);
+
+                const csvBlob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                saveAs(csvBlob, "beneficiaries.csv");
+            } else {
+                throw new Error();
+            }
+        } catch (error) {
+            console.error(dict.commons.beneficiaries.toolbar.errorGeneratingCSV, error);
+        }
+    };
+
     return (
         <div className="flex items-center gap-4">
             <Button asChild>
@@ -60,7 +87,7 @@ const Toolbar = (): ReactNode => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuItem className="flex gap-2">
+                    <DropdownMenuItem className="flex gap-2" onClick={handleDownloadCSV}>
                         <FaFileCsv />
                         {dict.commons.beneficiaries.toolbar.downloadCSV}
                     </DropdownMenuItem>

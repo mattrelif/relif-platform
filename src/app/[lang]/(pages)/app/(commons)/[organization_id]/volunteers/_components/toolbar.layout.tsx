@@ -10,10 +10,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getVoluntariesByOrganizationID } from "@/repository/organization.repository";
+import { flattenObject } from "@/utils/flattenObject";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Papa from "papaparse";
 import { ReactNode } from "react";
 import { FaDownload, FaFileCsv, FaFilePdf } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
@@ -41,6 +43,22 @@ const Toolbar = (): ReactNode => {
         }
     };
 
+    const handleDownloadCSV = async () => {
+        try {
+            const response = await getVoluntariesByOrganizationID(organizationId, 0, 99999, "");
+            const voluntaryList = response.data.data;
+
+            const flatData = voluntaryList.map((voluntary: any) => flattenObject(voluntary));
+
+            const csv = Papa.unparse(flatData);
+
+            const csvBlob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            saveAs(csvBlob, "voluntaries.csv");
+        } catch {
+            console.error("Error generating CSV");
+        }
+    };
+
     return (
         <div className="flex items-center gap-4">
             <Button asChild>
@@ -56,7 +74,7 @@ const Toolbar = (): ReactNode => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuItem className="flex gap-2">
+                    <DropdownMenuItem className="flex gap-2" onClick={handleDownloadCSV}>
                         <FaFileCsv />
                         {dict.commons.volunteers.list.toolbar.downloadCSV}
                     </DropdownMenuItem>

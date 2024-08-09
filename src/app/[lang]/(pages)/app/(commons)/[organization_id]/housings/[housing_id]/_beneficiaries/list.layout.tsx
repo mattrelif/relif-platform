@@ -12,10 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { flattenObject } from "@/utils/flattenObject";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Papa from "papaparse";
 import { ReactNode, useEffect, useState, useCallback, ChangeEvent } from "react";
 import { FaDownload, FaFileCsv, FaFilePdf, FaUsers } from "react-icons/fa";
 import { MdAdd, MdError, MdSearch } from "react-icons/md";
@@ -74,13 +76,29 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
 
     const handleDownloadPDF = async () => {
         try {
-            const response = await getBeneficiariesByHousingId(housingId, 0, 99999, "Lucas");
+            const response = await getBeneficiariesByHousingId(housingId, 0, 99999, "");
             const blob = await pdf(
                 <PDFDocument title="Housing beneficiaries" beneficiaries={response.data.data} />
             ).toBlob();
             saveAs(blob, `beneficiaries_${housingId}.pdf`);
         } catch {
             console.error("Error generating PDF");
+        }
+    };
+
+    const handleDownloadCSV = async () => {
+        try {
+            const response = await getBeneficiariesByHousingId(housingId, 0, 99999, "");
+            const beneficiaryList = response.data.data;
+
+            const flatData = beneficiaryList.map((beneficiary: any) => flattenObject(beneficiary));
+
+            const csv = Papa.unparse(flatData);
+
+            const csvBlob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            saveAs(csvBlob, `beneficiaries_${housingId}.csv`);
+        } catch {
+            console.error("Error generating CSV");
         }
     };
 
@@ -104,7 +122,7 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem className="flex gap-2">
+                            <DropdownMenuItem className="flex gap-2" onClick={handleDownloadCSV}>
                                 <FaFileCsv />
                                 {dict.housingOverview.downloadCsv}
                             </DropdownMenuItem>
