@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { VoluntarySchema } from "@/types/voluntary.types";
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const Toolbar = ({ volunteer }: Props): ReactNode => {
+    const dict = useDictionary();
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
@@ -24,7 +26,9 @@ const Toolbar = ({ volunteer }: Props): ReactNode => {
     return (
         <div className="w-full h-max flex justify-between items-center">
             <Button size="sm" variant="secondary" asChild>
-                <Link href={backToListPath}>Back to list</Link>
+                <Link href={backToListPath}>
+                    {dict.commons.volunteers.volunteerId.toolbar.backToList}
+                </Link>
             </Button>
 
             <div className="flex items-center gap-2">
@@ -42,7 +46,9 @@ const Toolbar = ({ volunteer }: Props): ReactNode => {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Edit volunteer</TooltipContent>
+                        <TooltipContent>
+                            {dict.commons.volunteers.volunteerId.toolbar.editVolunteer}
+                        </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
 
@@ -58,7 +64,9 @@ const Toolbar = ({ volunteer }: Props): ReactNode => {
                                 <FaTrash />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Remove volunteer</TooltipContent>
+                        <TooltipContent>
+                            {dict.commons.volunteers.volunteerId.toolbar.removeVolunteer}
+                        </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>

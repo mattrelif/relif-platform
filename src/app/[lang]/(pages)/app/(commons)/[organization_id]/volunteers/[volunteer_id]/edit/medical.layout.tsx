@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { MedicalInformationSchema } from "@/types/commons.types";
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { MdHealthAndSafety } from "react-icons/md";
 
 type Props = {
@@ -19,6 +20,8 @@ type Props = {
 };
 
 const Medical = ({ defaultValue }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [allergies, setAllergies] = useState<string[]>(defaultValue.allergies);
     const [currentMedications, setCurrentMedications] = useState<string[]>(
         defaultValue.current_medications
@@ -38,8 +41,7 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
     );
 
     const handleInputChange =
-        (setter: React.Dispatch<React.SetStateAction<string[]>>) =>
-        (event: ChangeEvent<HTMLInputElement>) => {
+        (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
             const values = event.target.value.split(",").map(value => value.trim());
             setter(values);
         };
@@ -48,17 +50,19 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
         <>
             <div className="w-full h-max flex flex-col gap-6 p-4 border border-slate-200 rounded-lg">
                 <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                    <MdHealthAndSafety /> Medical Information
+                    <MdHealthAndSafety /> {dict.commons.volunteers.volunteerId.edit.medical.title}
                 </h2>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="allergies">Allergies *</Label>
+                    <Label htmlFor="allergies">
+                        {dict.commons.volunteers.volunteerId.edit.medical.allergies}
+                    </Label>
                     <Input
                         id="allergies"
                         name="allergies"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setAllergies)}
                         defaultValue={defaultValue.allergies.join(",")}
                     />
@@ -72,13 +76,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="currentMedications">Current medications *</Label>
+                    <Label htmlFor="currentMedications">
+                        {dict.commons.volunteers.volunteerId.edit.medical.currentMedications}
+                    </Label>
                     <Input
                         id="currentMedications"
                         name="currentMedications"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setCurrentMedications)}
                         defaultValue={defaultValue.current_medications.join(",")}
                     />
@@ -92,13 +98,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="chronicMedicalConditions">Chronic medical conditions *</Label>
+                    <Label htmlFor="chronicMedicalConditions">
+                        {dict.commons.volunteers.volunteerId.edit.medical.chronicMedicalConditions}
+                    </Label>
                     <Input
                         id="chronicMedicalConditions"
                         name="chronicMedicalConditions"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setChronicMedicalConditions)}
                         defaultValue={defaultValue.recurrent_medical_conditions.join(",")}
                     />
@@ -112,13 +120,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="healthInsurance">Health Insurance *</Label>
+                    <Label htmlFor="healthInsurance">
+                        {dict.commons.volunteers.volunteerId.edit.medical.healthInsurance}
+                    </Label>
                     <Input
                         id="healthInsurance"
                         name="healthInsurance"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setHealthInsurance)}
                         defaultValue={defaultValue.health_insurance_plans.join(",")}
                     />
@@ -132,7 +142,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="bloodType">Blood type *</Label>
+                    <Label htmlFor="bloodType">
+                        {dict.commons.volunteers.volunteerId.edit.medical.bloodType}
+                    </Label>
                     <Select name="bloodType" required defaultValue={defaultValue.blood_type}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select blood type..." />
@@ -151,13 +163,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="vaccinations">Vaccinations *</Label>
+                    <Label htmlFor="vaccinations">
+                        {dict.commons.volunteers.volunteerId.edit.medical.vaccinations}
+                    </Label>
                     <Input
                         id="vaccinations"
                         name="vaccinations"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setVaccinations)}
                         defaultValue={defaultValue.taken_vaccines.join(",")}
                     />
@@ -171,13 +185,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="mentalHealth">Mental health *</Label>
+                    <Label htmlFor="mentalHealth">
+                        {dict.commons.volunteers.volunteerId.edit.medical.mentalHealth}
+                    </Label>
                     <Input
                         id="mentalHealth"
                         name="mentalHealth"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setMentalHealth)}
                         defaultValue={defaultValue.mental_health_history.join(",")}
                     />
@@ -191,7 +207,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="height">Height (cm) *</Label>
+                    <Label htmlFor="height">
+                        {dict.commons.volunteers.volunteerId.edit.medical.height}
+                    </Label>
                     <Input
                         id="height"
                         name="height"
@@ -203,7 +221,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="weight">Weight (kg) *</Label>
+                    <Label htmlFor="weight">
+                        {dict.commons.volunteers.volunteerId.edit.medical.weight}
+                    </Label>
                     <Input
                         id="weight"
                         name="weight"
@@ -215,13 +235,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="addictions">Addictions *</Label>
+                    <Label htmlFor="addictions">
+                        {dict.commons.volunteers.volunteerId.edit.medical.addictions}
+                    </Label>
                     <Input
                         id="addictions"
                         name="addictions"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setAddictions)}
                         defaultValue={defaultValue.addictions.join(",")}
                     />
@@ -235,13 +257,15 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="disabilities">Disabilities *</Label>
+                    <Label htmlFor="disabilities">
+                        {dict.commons.volunteers.volunteerId.edit.medical.disabilities}
+                    </Label>
                     <Input
                         id="disabilities"
                         name="disabilities"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setDisabilities)}
                         defaultValue={defaultValue.disabilities.join(",")}
                     />
@@ -256,14 +280,14 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
 
                 <div className="flex flex-col gap-3 w-full">
                     <Label htmlFor="prothesisOrMedicalDevices">
-                        Use of prosthesis or medical devices *
+                        {dict.commons.volunteers.volunteerId.edit.medical.prothesisOrMedicalDevices}
                     </Label>
                     <Input
                         id="prothesisOrMedicalDevices"
                         name="prothesisOrMedicalDevices"
                         type="text"
                         required
-                        placeholder="Write as much as you want, separated by commas"
+                        placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setProsthesisOrMedicalDevices)}
                         defaultValue={defaultValue.prothesis_or_medical_devices.join(",")}
                     />

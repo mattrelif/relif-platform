@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { getVolunteerById } from "@/repository/volunteer.repository";
@@ -56,6 +57,7 @@ const GENDER_MAPPING = {
 
 const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const [data, setData] = useState<VoluntarySchema | null>(null);
@@ -82,13 +84,17 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
     }, []);
 
     if (isLoading)
-        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                {dict.commons.volunteers.volunteerId.content.loading}
+            </h2>
+        );
 
     if (!isLoading && error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.volunteers.volunteerId.content.error}
             </span>
         );
 
@@ -102,7 +108,8 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                             {convertToTitleCase(data.full_name)}
                         </h2>
                         <span className="text-sm text-slate-500 flex items-center gap-4">
-                            Registered in {formatDate(data.created_at, locale || "en")}
+                            {dict.commons.volunteers.volunteerId.content.registeredIn}{" "}
+                            {formatDate(data.created_at, locale || "en")}
                         </span>
                     </div>
                 </div>
@@ -111,26 +118,38 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                     <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
                         <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                             <IoPerson />
-                            Personal data
+                            {dict.commons.volunteers.volunteerId.content.personalData}
                         </h3>
                         <ul>
                             <li className="w-full p-2 text-sm text-slate-900">
-                                <strong>Full name:</strong> {convertToTitleCase(data.full_name)}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.fullName}:
+                                </strong>{" "}
+                                {convertToTitleCase(data.full_name)}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                <strong>Birthdate:</strong>{" "}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.birthdate}:
+                                </strong>{" "}
                                 {formatDate(data.birthdate, locale || "en")} (
                                 {calculateAge(data.birthdate)} years old)
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>E-mail:</strong> {data.email}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.email}:
+                                </strong>{" "}
+                                {data.email}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Gender:</strong>{" "}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.gender}:
+                                </strong>{" "}
                                 {GENDER_MAPPING[data.gender as keyof typeof GENDER_MAPPING]}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap gap-2">
-                                <strong>Phones:</strong>
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.phones}:
+                                </strong>
                                 <HoverCard>
                                     <HoverCardTrigger>
                                         <span className="text-sm text-slate-900 flex items-center gap-2">
@@ -139,7 +158,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                     </HoverCardTrigger>
                                     <HoverCardContent>
                                         <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            Phones
+                                            {dict.commons.volunteers.volunteerId.content.phones}
                                         </h3>
                                         <ul>
                                             {data.phones.map(phone => (
@@ -152,7 +171,9 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                 </HoverCard>
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2 flex-wrap">
-                                <strong>Segments:</strong>{" "}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.segments}:
+                                </strong>{" "}
                                 {data.segments?.map(segment => (
                                     <Badge className="bg-relif-orange-500">
                                         {convertToTitleCase(segment)}
@@ -164,52 +185,68 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                     <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
                         <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                             <FaCity />
-                            Address
+                            {dict.commons.volunteers.volunteerId.content.address}
                         </h3>
                         <ul>
                             <li className="w-full p-2 text-sm text-slate-900">
-                                <strong>Address:</strong>{" "}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.address}:
+                                </strong>{" "}
                                 {convertToTitleCase(data.address.address_line_1)} -{" "}
                                 {convertToTitleCase(data.address.address_line_2)}
                             </li>
                             <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
                                 <li className="p-2 text-sm text-slate-900">
-                                    <strong>City:</strong> {convertToTitleCase(data.address.city)}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.city}:
+                                    </strong>{" "}
+                                    {convertToTitleCase(data.address.city)}
                                 </li>
                                 <li className="p-2 text-sm text-slate-900">
-                                    <strong>State / Province:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.state}:
+                                    </strong>{" "}
                                     {convertToTitleCase(data.address.district)}
                                 </li>
                             </div>
                             <div className="flex flex-wrap gap-2 justify-between items-center border-t-[1px] border-slate-100">
                                 <li className="p-2 text-sm text-slate-900">
-                                    <strong>Zip / Postal Code:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.postalCode}:
+                                    </strong>{" "}
                                     {convertToTitleCase(data.address.zip_code)}
                                 </li>
                                 <li className="p-2 text-sm text-slate-900">
-                                    <strong>Country:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.country}:
+                                    </strong>{" "}
                                     {convertToTitleCase(data.address.country)}
                                 </li>
                             </div>
                         </ul>
                         <h3 className="text-relif-orange-200 font-bold text-base py-4 border-t-[1px] border-slate-200 mt-4 flex items-center gap-2">
                             <MdContactEmergency />
-                            Emergency Contacts
+                            {dict.commons.volunteers.volunteerId.content.emergencyContacts}
                         </h3>
                         <ul>
                             <li className="w-full p-2 text-sm text-slate-900">
-                                <strong>Name:</strong>{" "}
+                                <strong>{dict.commons.volunteers.volunteerId.content.name}:</strong>{" "}
                                 {convertToTitleCase(data.emergency_contacts[0].full_name)}
                             </li>
                             <li className="w-full p-2 text-sm text-slate-900">
-                                <strong>Relationship Degree:</strong>{" "}
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.relationshipDegree}
+                                    :
+                                </strong>{" "}
                                 {RELATIONSHIPS_MAPPING[
                                     data.emergency_contacts[0]
                                         .relationship as keyof typeof RELATIONSHIPS_MAPPING
                                 ] || data.emergency_contacts[0].relationship}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                <strong>Email:</strong>
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.emails}:
+                                </strong>
                                 <HoverCard>
                                     <HoverCardTrigger>
                                         <span className="text-sm text-slate-900 flex items-center gap-2">
@@ -224,7 +261,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                     </HoverCardTrigger>
                                     <HoverCardContent>
                                         <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            E-mails
+                                            {dict.commons.volunteers.volunteerId.content.emails}
                                         </h3>
                                         <ul>
                                             {data.emergency_contacts[0].emails.map(email => (
@@ -237,7 +274,9 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                 </HoverCard>
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
-                                <strong>Phone:</strong>
+                                <strong>
+                                    {dict.commons.volunteers.volunteerId.content.phones}:
+                                </strong>
                                 <HoverCard>
                                     <HoverCardTrigger>
                                         <span className="text-sm text-slate-900 flex items-center gap-2">
@@ -252,7 +291,7 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                                     </HoverCardTrigger>
                                     <HoverCardContent>
                                         <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            Phones
+                                            {dict.commons.volunteers.volunteerId.content.phones}
                                         </h3>
                                         <ul>
                                             {data.emergency_contacts[0].phones.map(phone => (
@@ -270,59 +309,101 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                 <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
                     <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                         <FaBriefcaseMedical />
-                        Medical information
+                        {dict.commons.volunteers.volunteerId.content.medicalInformation}
                     </h3>
                     <div>
                         <ul className="w-full grid grid-cols-2">
                             <div>
                                 <li className="w-full p-2 text-sm text-slate-900">
-                                    <strong>Allergies:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.allergies}:
+                                    </strong>{" "}
                                     {data.medical_information.allergies.join(", ")}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Current medications:</strong>{" "}
+                                    <strong>
+                                        {
+                                            dict.commons.volunteers.volunteerId.content
+                                                .currentMedications
+                                        }
+                                        :
+                                    </strong>{" "}
                                     {data.medical_information.current_medications.join(", ")}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Chronic Medical Conditions:</strong>{" "}
+                                    <strong>
+                                        {
+                                            dict.commons.volunteers.volunteerId.content
+                                                .chronicMedicalConditions
+                                        }
+                                        :
+                                    </strong>{" "}
                                     {data.medical_information.recurrent_medical_conditions.join(
                                         ", "
                                     )}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Health Insurance:</strong>{" "}
+                                    <strong>
+                                        {
+                                            dict.commons.volunteers.volunteerId.content
+                                                .healthInsurance
+                                        }
+                                        :
+                                    </strong>{" "}
                                     {data.medical_information.health_insurance_plans.join(", ")}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Blood Type:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.bloodType}:
+                                    </strong>{" "}
                                     {data.medical_information.blood_type}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Vaccinations:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.vaccinations}:
+                                    </strong>{" "}
                                     {data.medical_information.taken_vaccines.join(", ")}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Mental Health:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.mentalHealth}:
+                                    </strong>{" "}
                                     {data.medical_information.mental_health_history.join(", ")}
                                 </li>
                             </div>
                             <div>
                                 <li className="w-full p-2 text-sm text-slate-900">
-                                    <strong>Height:</strong> {data.medical_information.height}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.height}:
+                                    </strong>{" "}
+                                    {data.medical_information.height}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Weight:</strong> {data.medical_information.weight}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.weight}:
+                                    </strong>{" "}
+                                    {data.medical_information.weight}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Smoking and Alcohol Consumption Habits:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.addictions}:
+                                    </strong>{" "}
                                     {data.medical_information.addictions}{" "}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Disabilities:</strong>{" "}
+                                    <strong>
+                                        {dict.commons.volunteers.volunteerId.content.disabilities}:
+                                    </strong>{" "}
                                     {data.medical_information.disabilities.join(", ")}
                                 </li>
                                 <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                    <strong>Use of prosthesics or medical devices:</strong>{" "}
+                                    <strong>
+                                        {
+                                            dict.commons.volunteers.volunteerId.content
+                                                .useOfProstheticsOrMedicalDevices
+                                        }
+                                        :
+                                    </strong>{" "}
                                     {data.medical_information.prothesis_or_medical_devices.join(
                                         ", "
                                     )}

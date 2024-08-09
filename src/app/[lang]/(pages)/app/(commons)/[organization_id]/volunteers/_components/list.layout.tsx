@@ -1,6 +1,7 @@
 "use client";
 
 import { Toolbar } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/volunteers/_components/toolbar.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Input } from "@/components/ui/input";
 import {
     Pagination,
@@ -20,6 +21,7 @@ import { MdError, MdSearch } from "react-icons/md";
 import { Card } from "./card.layout";
 
 const VolunteersList = (): ReactNode => {
+    const dict = useDictionary();
     const [volunteers, setVolunteers] = useState<{
         count: number;
         data: VoluntarySchema[];
@@ -86,7 +88,7 @@ const VolunteersList = (): ReactNode => {
                     <MdSearch className="text-slate-400 text-2xl" />
                     <Input
                         type="text"
-                        placeholder="Search"
+                        placeholder={dict.commons.volunteers.list.searchPlaceholder}
                         value={searchTerm}
                         onChange={handleSearchChange}
                         className="w-[300px]"
@@ -97,19 +99,21 @@ const VolunteersList = (): ReactNode => {
 
             <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
-                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                        {dict.commons.volunteers.list.loading}
+                    </h2>
                 )}
 
                 {!isLoading && error && (
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                         <MdError />
-                        Something went wrong. Please try again later.
+                        {dict.commons.volunteers.list.error}
                     </span>
                 )}
 
                 {!isLoading && !error && volunteers && volunteers.data.length <= 0 && (
                     <span className="text-sm text-slate-900 font-medium p-4">
-                        No beneficiaries found...
+                        {dict.commons.volunteers.list.noVolunteersFound}
                     </span>
                 )}
 

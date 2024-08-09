@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { PDFDocument } from "@/components/reports/voluntaries";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,8 @@ import { MdAdd } from "react-icons/md";
 
 const Toolbar = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
+
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const organizationId = pathname.split("/")[3];
 
@@ -43,7 +46,7 @@ const Toolbar = (): ReactNode => {
             <Button asChild>
                 <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                     <MdAdd size={16} />
-                    Create voluntary
+                    {dict.commons.volunteers.list.toolbar.createVoluntary}
                 </Link>
             </Button>
             <DropdownMenu>
@@ -55,11 +58,11 @@ const Toolbar = (): ReactNode => {
                 <DropdownMenuContent>
                     <DropdownMenuItem className="flex gap-2">
                         <FaFileCsv />
-                        Download CSV
+                        {dict.commons.volunteers.list.toolbar.downloadCSV}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
                         <FaFilePdf />
-                        Download PDF
+                        {dict.commons.volunteers.list.toolbar.downloadPDF}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

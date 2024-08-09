@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -32,6 +33,7 @@ const RemoveModal = ({
     const { toast } = useToast();
     const router = useRouter();
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const [isLoading, setIsLoading] = useState(false);
     const backToListPath = pathname.split("/").slice(0, 5).join("/");
@@ -48,28 +50,29 @@ const RemoveModal = ({
             }
 
             toast({
-                title: "Removed!",
-                description: "Volunteer removed successfully.",
+                title: dict.commons.volunteers.list.remove.title,
+                description: dict.commons.volunteers.list.remove.removedSuccess,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Volunteer Removal Failed",
-                description:
-                    "An error occurred while attempting to remove the volunteer. Please try again later or contact support if the issue persists.",
+                title: dict.commons.volunteers.list.remove.removalFailedTitle,
+                description: dict.commons.volunteers.list.remove.removalFailedDescription,
                 variant: "destructive",
             });
         }
     };
+
     return (
         <Dialog open={removeDialogOpenState} onOpenChange={setRemoveDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.commons.volunteers.list.remove.title}
+                    </DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This will permanently delete the volunteer
-                        below.
+                        {dict.commons.volunteers.list.remove.description}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
@@ -79,11 +82,13 @@ const RemoveModal = ({
                     </div>
                     <div className="flex gap-4 pt-5">
                         <Button variant="outline" onClick={() => setRemoveDialogOpenState(false)}>
-                            Cancel
+                            {dict.commons.volunteers.list.remove.cancel}
                         </Button>
                         <DialogClose asChild>
                             <Button onClick={handleDelete}>
-                                {!isLoading ? "Delete" : "Loading..."}
+                                {!isLoading
+                                    ? dict.commons.volunteers.list.remove.delete
+                                    : dict.commons.volunteers.list.remove.loading}
                             </Button>
                         </DialogClose>
                     </div>

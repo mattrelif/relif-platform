@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ type Props = VoluntarySchema & {
 };
 
 const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
+    const dict = useDictionary();
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
 
     const pathname = usePathname();
@@ -57,28 +59,31 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${voluntary?.id}`}>Profile</Link>
+                            <Link href={`${urlPath}/${voluntary?.id}`}>
+                                {dict.commons.volunteers.list.card.profile}
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`${urlPath}/${voluntary?.id}/edit`}>
                                 <span className="flex items-center gap-2">
                                     <FaEdit className="text-xs" />
-                                    Edit voluntary
+                                    {dict.commons.volunteers.list.card.editVoluntary}
                                 </span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaTrash className="text-xs" />
-                                Remove voluntary
+                                {dict.commons.volunteers.list.card.removeVoluntary}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at {formatDate(voluntary?.created_at, locale || "en")}
+                        {dict.commons.volunteers.list.card.createdAt}{" "}
+                        {formatDate(voluntary?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>
