@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { UserSchema } from "@/types/user.types";
@@ -9,6 +10,8 @@ import { FaCopy } from "react-icons/fa";
 
 const OrganizationToken = (): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
+
     const [token, setToken] = useState("");
     const [error, setError] = useState(false);
 
@@ -25,15 +28,20 @@ const OrganizationToken = (): ReactNode => {
         navigator.clipboard.writeText(token).then(
             () => {
                 toast({
-                    title: "Success!",
-                    description: "The organization token has been successfully copied.",
+                    title: dict.commons.preferences.myOrganization.others.coordination.token
+                        .success,
+                    description:
+                        dict.commons.preferences.myOrganization.others.coordination.token
+                            .successDescription,
                     variant: "success",
                 });
             },
             () => {
                 toast({
-                    title: "Error!",
-                    description: "Failed to copy the organization token.",
+                    title: dict.commons.preferences.myOrganization.others.coordination.token.error,
+                    description:
+                        dict.commons.preferences.myOrganization.others.coordination.token
+                            .errorDescription,
                     variant: "destructive",
                 });
             }
@@ -46,7 +54,7 @@ const OrganizationToken = (): ReactNode => {
         <div>
             <Button onClick={copyToClipboard} className="flex items-center gap-2" variant="outline">
                 <FaCopy />
-                Copy Organization Token to Clipboard
+                {dict.commons.preferences.myOrganization.others.coordination.token.copyToken}
             </Button>
         </div>
     );

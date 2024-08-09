@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,8 @@ const UserEdit = ({
     setEditUserSheetOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
+
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -78,17 +81,18 @@ const UserEdit = ({
             refreshList();
 
             toast({
-                title: "Saved!",
-                description: "The new data was saved successfully.",
+                title: dict.commons.preferences.myOrganization.users.edit.saved,
+                description: dict.commons.preferences.myOrganization.users.edit.savedDescription,
                 variant: "success",
             });
 
             setEditUserSheetOpenState(false);
         } catch {
             toast({
-                title: "Error updating user data",
+                title: dict.commons.preferences.myOrganization.users.edit.errorUpdatingUserData,
                 description:
-                    "There was an issue updating the user's information. Please check the data and try again. If the problem persists, contact support.",
+                    dict.commons.preferences.myOrganization.users.edit
+                        .errorUpdatingUserDataDescription,
                 variant: "destructive",
             });
         }
@@ -97,7 +101,9 @@ const UserEdit = ({
     if (isLoading)
         return (
             <div className="w-full h-full flex flex-col gap-2 p-2">
-                <span className="text-sm text-relif-orange-400 font-medium">Loading...</span>
+                <span className="text-sm text-relif-orange-400 font-medium">
+                    {dict.commons.preferences.myOrganization.users.edit.loading}
+                </span>
             </div>
         );
 
@@ -106,7 +112,7 @@ const UserEdit = ({
             <div className="p-4 w-full h-[calc(100vh-75px)] flex flex-col overflow-x-hidden overflow-y-scroll border-[1px] border-slate-200 rounded-lg">
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.commons.preferences.myOrganization.users.edit.error}
                 </span>
             </div>
         );
@@ -116,7 +122,9 @@ const UserEdit = ({
             <Sheet open={editUserSheetOpenState} onOpenChange={setEditUserSheetOpenState}>
                 <SheetContent className="p-2">
                     <SheetHeader className="p-4">
-                        <SheetTitle>Edit user information</SheetTitle>
+                        <SheetTitle>
+                            {dict.commons.preferences.myOrganization.users.edit.editUserInformation}
+                        </SheetTitle>
                     </SheetHeader>
                     <form
                         className="p-4 w-full h-[calc(100vh-75px)] flex flex-col overflow-x-hidden overflow-y-scroll border-[1px] border-slate-200 rounded-lg"
@@ -124,7 +132,9 @@ const UserEdit = ({
                     >
                         <div className="flex flex-col gap-5">
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="email">E-mail</Label>
+                                <Label htmlFor="email">
+                                    {dict.commons.preferences.myOrganization.users.edit.email}
+                                </Label>
                                 <Input
                                     id="email"
                                     name="email"
@@ -136,7 +146,9 @@ const UserEdit = ({
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="firstName">First name *</Label>
+                                <Label htmlFor="firstName">
+                                    {dict.commons.preferences.myOrganization.users.edit.firstName} *
+                                </Label>
                                 <Input
                                     id="firstName"
                                     name="firstName"
@@ -147,7 +159,9 @@ const UserEdit = ({
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="lastName">Last name *</Label>
+                                <Label htmlFor="lastName">
+                                    {dict.commons.preferences.myOrganization.users.edit.lastName} *
+                                </Label>
                                 <Input
                                     id="lastName"
                                     name="lastName"
@@ -158,7 +172,9 @@ const UserEdit = ({
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="role">Role *</Label>
+                                <Label htmlFor="role">
+                                    {dict.commons.preferences.myOrganization.users.edit.role} *
+                                </Label>
                                 <Input
                                     id="role"
                                     name="role"
@@ -171,27 +187,48 @@ const UserEdit = ({
 
                             {currentUser.id !== user.id && (
                                 <div className="flex flex-col gap-3">
-                                    <Label htmlFor="platformRole">Platform Role *</Label>
+                                    <Label htmlFor="platformRole">
+                                        {
+                                            dict.commons.preferences.myOrganization.users.edit
+                                                .platformRole
+                                        }{" "}
+                                        *
+                                    </Label>
                                     <Select defaultValue={user.platform_role} name="platformRole">
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="ORG_MEMBER">Member</SelectItem>
-                                            <SelectItem value="ORG_ADMIN">Admin</SelectItem>
+                                            <SelectItem value="ORG_MEMBER">
+                                                {
+                                                    dict.commons.preferences.myOrganization.users
+                                                        .edit.member
+                                                }
+                                            </SelectItem>
+                                            <SelectItem value="ORG_ADMIN">
+                                                {
+                                                    dict.commons.preferences.myOrganization.users
+                                                        .edit.admin
+                                                }
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             )}
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="phone">Phone *</Label>
+                                <Label htmlFor="phone">
+                                    {dict.commons.preferences.myOrganization.users.edit.phone} *
+                                </Label>
                                 <div className="w-full flex gap-2">
                                     <Input
                                         id="countryCode"
                                         name="countryCode"
                                         type="text"
-                                        placeholder="e.g. +55"
+                                        placeholder={
+                                            dict.commons.preferences.myOrganization.users.edit
+                                                .phonePlaceholder
+                                        }
                                         className="w-[30%]"
                                         defaultValue={user?.phones[0].split("_")[0]}
                                         required
@@ -214,7 +251,7 @@ const UserEdit = ({
                                 className="mt-[43px] w-full flex items-center gap-1"
                             >
                                 <FaSave />
-                                Save
+                                {dict.commons.preferences.myOrganization.users.edit.save}
                             </Button>
                         </div>
                     </form>

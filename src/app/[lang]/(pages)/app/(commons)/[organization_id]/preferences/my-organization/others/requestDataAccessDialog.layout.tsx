@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -24,6 +25,8 @@ const RequestDataAccessDialog = ({
     setRequestDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
+
     const [orgToken, setOrgToken] = useState("");
 
     const handleRequest = async () => {
@@ -31,16 +34,22 @@ const RequestDataAccessDialog = ({
             await createDataAccessRequest(orgToken);
 
             toast({
-                title: "Request successful!",
-                description: "Your data access request was completed successfully.",
+                title: dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                    .requestSuccessful,
+                description:
+                    dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                        .requestSuccessfulDescription,
                 variant: "success",
             });
 
             setRequestDialogOpenState(false);
         } catch {
             toast({
-                title: "Request failed",
-                description: "Unable to complete the request at this time. Please try again later.",
+                title: dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                    .requestFailed,
+                description:
+                    dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                        .requestFailedDescription,
                 variant: "destructive",
             });
         }
@@ -51,12 +60,16 @@ const RequestDataAccessDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="pb-3">
-                        Request Data from Another Organization
+                        {
+                            dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                                .requestData
+                        }
                     </DialogTitle>
                     <DialogDescription>
-                        Please provide the token of the organization from which you wish to request
-                        access. To obtain this token, contact a member of the organization and
-                        request it.
+                        {
+                            dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                                .requestDataDescription
+                        }
                     </DialogDescription>
                     <div className="pt-4 pb-5">
                         <Input
@@ -70,9 +83,19 @@ const RequestDataAccessDialog = ({
                     </div>
                     <div className="flex gap-4 pt-5">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">
+                                {
+                                    dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                                        .cancel
+                                }
+                            </Button>
                         </DialogClose>
-                        <Button onClick={handleRequest}>Request</Button>
+                        <Button onClick={handleRequest}>
+                            {
+                                dict.commons.preferences.myOrganization.others.dataAccess.dialog
+                                    .request
+                            }
+                        </Button>
                     </div>
                 </DialogHeader>
             </DialogContent>

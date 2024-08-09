@@ -1,4 +1,5 @@
 import { OrganizationInviteDialog } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/organizationInviteDialog.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -15,31 +16,38 @@ type InfoCardProps = OrganizationDataAccessRequestSchema & {
     children: Readonly<ReactNode>;
 };
 
-const OrganizationInfoCard = ({ children, ...data }: InfoCardProps): ReactNode => (
-    <HoverCard>
-        <HoverCardTrigger>{children}</HoverCardTrigger>
-        <HoverCardContent>
-            <h3 className="text-sm text-slate-900 font-bold">
-                {data?.requester_organization?.name}
-            </h3>
-            <span className="flex w-full pt-3 border-b-[1px] border-slate-200" />
-            <h4 className="text-relif-orange-200 text-xs font-bold pt-3 pb-1 flex items-center gap-1">
-                <MdPhone />
-                Requester Contact
-            </h4>
-            <div className="w-full flex items-center justify-between">
-                <span className="text-xs text-slate-500">{data?.requester?.email}</span>
-            </div>
-            <div className="w-full flex items-center justify-between">
-                <span className="text-xs text-slate-500">
-                    {data.requester?.phones[0]
-                        .split("_")[0]
-                        .concat(data?.requester?.phones[0].split("_")[1])}
-                </span>
-            </div>
-        </HoverCardContent>
-    </HoverCard>
-);
+const OrganizationInfoCard = ({ children, ...data }: InfoCardProps): ReactNode => {
+    const dict = useDictionary();
+
+    return (
+        <HoverCard>
+            <HoverCardTrigger>{children}</HoverCardTrigger>
+            <HoverCardContent>
+                <h3 className="text-sm text-slate-900 font-bold">
+                    {data?.requester_organization?.name}
+                </h3>
+                <span className="flex w-full pt-3 border-b-[1px] border-slate-200" />
+                <h4 className="text-relif-orange-200 text-xs font-bold pt-3 pb-1 flex items-center gap-1">
+                    <MdPhone />
+                    {
+                        dict.commons.preferences.myOrganization.invites.organization.card
+                            .requesterContact
+                    }
+                </h4>
+                <div className="w-full flex items-center justify-between">
+                    <span className="text-xs text-slate-500">{data?.requester?.email}</span>
+                </div>
+                <div className="w-full flex items-center justify-between">
+                    <span className="text-xs text-slate-500">
+                        {data.requester?.phones[0]
+                            .split("_")[0]
+                            .concat(data?.requester?.phones[0].split("_")[1])}
+                    </span>
+                </div>
+            </HoverCardContent>
+        </HoverCard>
+    );
+};
 
 type Props = OrganizationDataAccessRequestSchema & {
     refreshList: () => void;
@@ -48,6 +56,7 @@ type Props = OrganizationDataAccessRequestSchema & {
 const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
     const { toast } = useToast();
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
@@ -56,14 +65,20 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
             await rejectRequest(data.id, "");
             refreshList();
             toast({
-                title: "Request Rejected!",
-                description: "You have successfully rejected the request.",
+                title: dict.commons.preferences.myOrganization.invites.organization.card.toast
+                    .requestRejected,
+                description:
+                    dict.commons.preferences.myOrganization.invites.organization.card.toast
+                        .requestRejectedDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Request Failed!",
-                description: "There was an error processing your request. Please try again later.",
+                title: dict.commons.preferences.myOrganization.invites.organization.card.toast
+                    .requestFailed,
+                description:
+                    dict.commons.preferences.myOrganization.invites.organization.card.toast
+                        .requestFailedDescription,
                 variant: "destructive",
             });
         }
@@ -82,11 +97,19 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
                         {convertToTitleCase(data.requester_organization.name)}
                     </span>
                     <span className="text-xs text-slate-500">
-                        <strong>By: </strong>
+                        <strong>
+                            {dict.commons.preferences.myOrganization.invites.organization.card.by}:{" "}
+                        </strong>
                         {data.requester.first_name} {data.requester.last_name}
                     </span>
                     <span className="text-xs text-slate-500">
-                        <strong>E-mail: </strong>
+                        <strong>
+                            {
+                                dict.commons.preferences.myOrganization.invites.organization.card
+                                    .email
+                            }
+                            :{" "}
+                        </strong>
                         {data.requester.email}
                     </span>
                     <span className="text-xs text-slate-400 mt-2">
@@ -106,7 +129,12 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
                             </OrganizationInviteDialog>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Accept invitation</p>
+                            <p>
+                                {
+                                    dict.commons.preferences.myOrganization.invites.organization
+                                        .card.acceptedInvitation
+                                }
+                            </p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -123,7 +151,12 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Reject invitation</p>
+                            <p>
+                                {
+                                    dict.commons.preferences.myOrganization.invites.organization
+                                        .card.rejectInvitation
+                                }
+                            </p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

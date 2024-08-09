@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ import { MdError, MdSave } from "react-icons/md";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const [orgData, setOrgData] = useState<OrganizationSchema | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -70,8 +72,9 @@ const Form = (): ReactNode => {
                 });
 
                 toast({
-                    title: "Saved!",
-                    description: "The new data was saved successfully.",
+                    title: dict.commons.preferences.myOrganization.overview.toast.saved,
+                    description:
+                        dict.commons.preferences.myOrganization.overview.toast.savedDescription,
                     variant: "success",
                 });
             } else {
@@ -79,9 +82,10 @@ const Form = (): ReactNode => {
             }
         } catch {
             toast({
-                title: "Invalid entered data",
+                title: dict.commons.preferences.myOrganization.overview.toast.invalidEnteredData,
                 description:
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+                    dict.commons.preferences.myOrganization.overview.toast
+                        .invalidEnteredDataDescription,
                 variant: "destructive",
             });
         }
@@ -89,23 +93,28 @@ const Form = (): ReactNode => {
 
     return (
         <>
-            {isLoading && <h2 className="p-2 text-relif-orange-400 font-medium">Loading...</h2>}
+            {isLoading && (
+                <h2 className="p-2 text-relif-orange-400 font-medium">
+                    {dict.commons.preferences.myOrganization.overview.loading}
+                </h2>
+            )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.commons.preferences.myOrganization.overview.error}
                 </span>
             )}
-
             {!error && !isLoading && orgData && (
                 <form onSubmit={handleSubmit}>
                     <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-bold text-base text-relif-orange-200 mb-6">
-                        Your organization
+                        {dict.commons.preferences.myOrganization.overview.yourOrganization}
                     </h2>
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">
+                                {dict.commons.preferences.myOrganization.overview.name}
+                            </Label>
                             <Input
                                 id="name"
                                 name="name"
@@ -117,7 +126,9 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="description">Description</Label>
+                            <Label htmlFor="description">
+                                {dict.commons.preferences.myOrganization.overview.description}
+                            </Label>
                             <textarea
                                 className="flex min-h-32 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 id="description"
@@ -127,7 +138,9 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="addressLine1">Address Line 1 *</Label>
+                            <Label htmlFor="addressLine1">
+                                {dict.commons.preferences.myOrganization.overview.addressLine} 1 *
+                            </Label>
                             <Input
                                 id="addressLine1"
                                 name="addressLine1"
@@ -138,7 +151,9 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="addressLine2">Address Line 2</Label>
+                            <Label htmlFor="addressLine2">
+                                {dict.commons.preferences.myOrganization.overview.addressLine} 2
+                            </Label>
                             <Input
                                 id="addressLine2"
                                 name="addressLine2"
@@ -150,7 +165,9 @@ const Form = (): ReactNode => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="city">City *</Label>
+                                <Label htmlFor="city">
+                                    {dict.commons.preferences.myOrganization.overview.city} *
+                                </Label>
                                 <Input
                                     id="city"
                                     name="city"
@@ -161,7 +178,9 @@ const Form = (): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="state">State / Province</Label>
+                                <Label htmlFor="state">
+                                    {dict.commons.preferences.myOrganization.overview.state}
+                                </Label>
                                 <Input
                                     id="state"
                                     name="state"
@@ -172,7 +191,9 @@ const Form = (): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="zipcode">Zip / Postal Code</Label>
+                                <Label htmlFor="zipcode">
+                                    {dict.commons.preferences.myOrganization.overview.zipcode}
+                                </Label>
                                 <Input
                                     id="zipcode"
                                     name="zipcode"
@@ -183,7 +204,9 @@ const Form = (): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="country">Country</Label>
+                                <Label htmlFor="country">
+                                    {dict.commons.preferences.myOrganization.overview.country}
+                                </Label>
                                 <Input
                                     id="country"
                                     name="country"
@@ -201,7 +224,7 @@ const Form = (): ReactNode => {
                         className="mt-[43px] w-full flex items-center gap-1"
                     >
                         <MdSave size={14} />
-                        Save
+                        {dict.commons.preferences.myOrganization.overview.save}
                     </Button>
                 </form>
             )}

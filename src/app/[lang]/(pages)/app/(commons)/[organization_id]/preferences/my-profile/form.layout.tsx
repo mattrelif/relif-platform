@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import { MdError, MdSave } from "react-icons/md";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -66,17 +68,16 @@ const Form = (): ReactNode => {
                 });
 
                 toast({
-                    title: "Saved!",
-                    description: "The new data was saved successfully.",
+                    title: dict.commons.preferences.myProfile.toast.saved,
+                    description: dict.commons.preferences.myProfile.toast.savedDescription,
                 });
             } else {
                 throw new Error();
             }
         } catch {
             toast({
-                title: "Update Failed",
-                description:
-                    "An error occurred while attempting to update the data. Please try again later or contact support if the issue persists.",
+                title: dict.commons.preferences.myProfile.toast.updateFailed,
+                description: dict.commons.preferences.myProfile.toast.updateFailedDescription,
                 variant: "destructive",
             });
         }
@@ -85,25 +86,29 @@ const Form = (): ReactNode => {
     return (
         <>
             {isLoading && (
-                <h2 className="p-2 text-relif-orange-400 text-sm font-medium">Loading...</h2>
+                <h2 className="p-2 text-relif-orange-400 text-sm font-medium">
+                    {dict.commons.preferences.myProfile.loading}
+                </h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.commons.preferences.myProfile.error}
                 </span>
             )}
 
             {!isLoading && !error && (
                 <form onSubmit={handleSubmit}>
                     <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-bold text-base text-relif-orange-200 mb-6">
-                        Your profile
+                        {dict.commons.preferences.myProfile.yourProfile}
                     </h2>
 
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="email">E-mail</Label>
+                            <Label htmlFor="email">
+                                {dict.commons.preferences.myProfile.email}
+                            </Label>
                             <Input
                                 id="email"
                                 name="email"
@@ -115,7 +120,9 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="firstName">First name *</Label>
+                            <Label htmlFor="firstName">
+                                {dict.commons.preferences.myProfile.firstName} *
+                            </Label>
                             <Input
                                 id="firstName"
                                 name="firstName"
@@ -126,7 +133,9 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="lastName">Last name *</Label>
+                            <Label htmlFor="lastName">
+                                {dict.commons.preferences.myProfile.lastName} *
+                            </Label>
                             <Input
                                 id="lastName"
                                 name="lastName"
@@ -137,25 +146,31 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="role">Role *</Label>
+                            <Label htmlFor="role">
+                                {dict.commons.preferences.myProfile.role} *
+                            </Label>
                             <Input
                                 id="role"
                                 name="role"
                                 type="text"
                                 required
                                 defaultValue={currentUser?.role}
-                                placeholder="e.g. Director of Human Resources"
+                                placeholder={dict.commons.preferences.myProfile.rolePlaceholder}
                             />
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="phone">Phone *</Label>
+                            <Label htmlFor="phone">
+                                {dict.commons.preferences.myProfile.phone} *
+                            </Label>
                             <div className="w-full flex gap-2">
                                 <Input
                                     id="countryCode"
                                     name="countryCode"
                                     type="text"
-                                    placeholder="e.g. +55"
+                                    placeholder={
+                                        dict.commons.preferences.myProfile.countryCodePlaceholder
+                                    }
                                     className="w-[30%]"
                                     defaultValue={currentUser?.phones[0].split("_")[0]}
                                     required
@@ -178,7 +193,7 @@ const Form = (): ReactNode => {
                         disabled={isLoading}
                     >
                         <MdSave size={14} />
-                        Save
+                        {dict.commons.preferences.myProfile.save}
                     </Button>
                 </form>
             )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,8 @@ type Props = UserSchema & {
 };
 
 const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [editUserSheetOpenState, setEditUserSheetOpenState] = useState(false);
     const [removeUserDialogOpenState, setRemoveUserDialogOpenState] = useState(false);
 
@@ -58,7 +61,9 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                             </span>
                         </HoverCardTrigger>
                         <HoverCardContent>
-                            <h3 className="text-slate-900 font-bold text-sm mb-2">Phones</h3>
+                            <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                {dict.commons.preferences.myOrganization.users.card.phonesTitle}
+                            </h3>
                             <ul>
                                 {data.phones.map(phone => (
                                     <li className="text-slate-500 w-full text-xs flex items-center gap-2">
@@ -72,9 +77,14 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
             </div>
 
             <div className="flex flex-col">
-                <span className="text-xs text-slate-500">{data?.role || "Colaborator"}</span>
+                <span className="text-xs text-slate-500">
+                    {data?.role || dict.commons.preferences.myOrganization.users.card.roleFallback}
+                </span>
                 <span>
-                    <Badge>{data.platform_role || "MEMBER"}</Badge>
+                    <Badge>
+                        {data.platform_role ||
+                            dict.commons.preferences.myOrganization.users.card.platformRoleFallback}
+                    </Badge>
                 </span>
             </div>
 
@@ -93,14 +103,14 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                         <DropdownMenuItem onClick={() => setEditUserSheetOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaEdit className="text-xs" />
-                                Edit
+                                {dict.commons.preferences.myOrganization.users.card.edit}
                             </span>
                         </DropdownMenuItem>
                         {currentUserId !== data.id && (
                             <DropdownMenuItem onClick={() => setRemoveUserDialogOpenState(true)}>
                                 <span className="flex items-center gap-2">
                                     <FaTrash className="text-xs" />
-                                    Remove
+                                    {dict.commons.preferences.myOrganization.users.card.remove}
                                 </span>
                             </DropdownMenuItem>
                         )}

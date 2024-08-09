@@ -1,6 +1,7 @@
 "use client";
 
 import { UserInviteDialogLayout } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/userInviteDialog.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -18,6 +19,7 @@ type Props = JoinOrganizationRequestSchema & {
 
 const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const { toast } = useToast();
 
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
@@ -27,13 +29,17 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
             await rejectRequest(data.id, "");
             refreshList();
             toast({
-                title: "Request Rejected!",
-                description: "You have successfully rejected the request.",
+                title: dict.commons.preferences.myOrganization.invites.user.card.requestRejected,
+                description:
+                    dict.commons.preferences.myOrganization.invites.user.card
+                        .requestRejectedDescription,
             });
         } catch {
             toast({
-                title: "Request Failed!",
-                description: "There was an error processing your request. Please try again later.",
+                title: dict.commons.preferences.myOrganization.invites.user.card.requestFailed,
+                description:
+                    dict.commons.preferences.myOrganization.invites.user.card
+                        .requestFailedDescription,
                 variant: "destructive",
             });
         }
@@ -53,7 +59,8 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
                     </span>
                     <span className="text-xs text-slate-500">{data.user.email}</span>
                     <span className="text-xs text-slate-400 mt-2">
-                        Created at {formatDate(data.created_at, locale)}
+                        {dict.commons.preferences.myOrganization.invites.user.card.createdAt}{" "}
+                        {formatDate(data.created_at, locale)}
                     </span>
                 </div>
             </div>
@@ -69,7 +76,12 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
                             </UserInviteDialogLayout>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Accept invitation</p>
+                            <p>
+                                {
+                                    dict.commons.preferences.myOrganization.invites.user.card
+                                        .acceptedInvitation
+                                }
+                            </p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -86,7 +98,12 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Reject invitation</p>
+                            <p>
+                                {
+                                    dict.commons.preferences.myOrganization.invites.user.card
+                                        .rejectInvitation
+                                }
+                            </p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

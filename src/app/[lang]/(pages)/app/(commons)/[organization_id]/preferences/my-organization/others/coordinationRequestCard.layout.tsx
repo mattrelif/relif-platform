@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
 import { formatDate } from "@/utils/formatDate";
@@ -10,6 +11,7 @@ type Props = UpdateOrganizationTypeRequestSchema;
 
 const CoordinationRequestCard = (request: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "es" | "pt";
 
     const statusColor =
@@ -25,14 +27,28 @@ const CoordinationRequestCard = (request: Props): ReactNode => {
             <div className="flex gap-4">
                 <div className="flex flex-col">
                     <span className="text-sm text-slate-900 font-medium">
-                        Requested at {formatDate(request.created_at, locale || "en")}
+                        {
+                            dict.commons.preferences.myOrganization.others.coordination.card
+                                .requestedAt
+                        }{" "}
+                        {formatDate(request.created_at, locale || "en")}
                     </span>
                     <span className="text-xs text-slate-500 flex items-center gap-2 mt-2">
-                        Current status: <Badge className={statusColor}>{request.status}</Badge>
+                        {
+                            dict.commons.preferences.myOrganization.others.coordination.card
+                                .currentStatus
+                        }
+                        : <Badge className={statusColor}>{request.status}</Badge>
                     </span>
                     {request.status === "REJECTED" && (
                         <span className="text-xs text-slate-500 mt-1">
-                            <strong>Reject reason: </strong>
+                            <strong>
+                                {
+                                    dict.commons.preferences.myOrganization.others.coordination.card
+                                        .rejectReason
+                                }
+                                :{" "}
+                            </strong>
                             {request.reject_reason}
                         </span>
                     )}

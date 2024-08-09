@@ -1,3 +1,5 @@
+import { DictionaryProvider } from "@/app/context/dictionaryContext";
+import { getDictionary } from "@/app/dictionaries";
 import { Locale } from "@/app/i18n-config";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
@@ -5,8 +7,6 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import { ReactNode } from "react";
 import "../globals.css";
-import { getDictionary } from "@/app/dictionaries";
-import { DictionaryProvider } from "@/app/context/dictionaryContext";
 
 const fontSans = FontSans({
     subsets: ["latin"],

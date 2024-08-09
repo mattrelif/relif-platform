@@ -138,6 +138,255 @@
                 "requests": "Solicitações"
             }
         },
+        "preferences": {
+            "title": "Preferências",
+            "menu": {
+                "platform": "Plataforma",
+                "myOrganization": "Minha Organização",
+                "myProfile": "Meu Perfil",
+                "support": "Suporte"
+            },
+            "platform": {
+                "loading": "Carregando...",
+                "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                "language": "Idioma",
+                "select": "Selecione...",
+                "portuguese": "Português",
+                "english": "Inglês",
+                "spanish": "Espanhol",
+                "timezone": "Fuso horário"
+            },
+            "myProfile": {
+                "loading": "Carregando...",
+                "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                "yourProfile": "Seu perfil",
+                "email": "E-mail",
+                "firstName": "Nome",
+                "lastName": "Sobrenome",
+                "role": "Função",
+                "rolePlaceholder": "ex.: Diretor de Recursos Humanos",
+                "phone": "Telefone",
+                "countryCodePlaceholder": "ex.: +55",
+                "save": "Salvar",
+                "toast": {
+                    "saved": "Salvo!",
+                    "savedDescription": "Os novos dados foram salvos com sucesso.",
+                    "updateFailed": "Falha na atualização",
+                    "updateFailedDescription": "Ocorreu um erro ao tentar atualizar os dados. Por favor, tente novamente mais tarde ou entre em contato com o suporte se o problema persistir."
+                }
+            },
+            "support": {
+                "message": "Em construção..."
+            },
+            "myOrganization": {
+                "users": {
+                    "tab": "Usuários",
+                    "add": {
+                        "success": "Sucesso!",
+                        "successDescription": "O usuário foi convidado com sucesso.",
+                        "error": "Erro!",
+                        "errorDescription": "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.",
+                        "inviteNewUser": "Convidar um novo usuário",
+                        "enterEmail": "Digite o e-mail do usuário que você deseja adicionar à sua organização.",
+                        "email": "E-mail",
+                        "emailPlaceholder": "ex.: john.doe@example.com",
+                        "cancel": "Cancelar",
+                        "inviteUser": "Convidar usuário"
+                    },
+                    "card": {
+                        "roleFallback": "Colaborador",
+                        "platformRoleFallback": "MEMBRO",
+                        "edit": "Editar",
+                        "remove": "Remover",
+                        "phonesTitle": "Telefones"
+                    },
+                    "edit": {
+                        "loading": "Carregando...",
+                        "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                        "editUserInformation": "Editar informações do usuário",
+                        "email": "E-mail",
+                        "firstName": "Nome",
+                        "lastName": "Sobrenome",
+                        "role": "Função",
+                        "rolePlaceholder": "ex.: Diretor de Recursos Humanos",
+                        "platformRole": "Função na Plataforma",
+                        "member": "Membro",
+                        "admin": "Administrador",
+                        "phone": "Telefone",
+                        "phonePlaceholder": "ex.: +55",
+                        "save": "Salvar",
+                        "saved": "Salvo!",
+                        "savedDescription": "Os novos dados foram salvos com sucesso.",
+                        "errorUpdatingUserData": "Erro ao atualizar dados do usuário",
+                        "errorUpdatingUserDataDescription": "Houve um problema ao atualizar as informações do usuário. Verifique os dados e tente novamente. Se o problema persistir, entre em contato com o suporte."
+                    },
+                    "list": {
+                        "loading": "Carregando...",
+                        "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                        "noUsersFound": "Nenhum usuário encontrado..."
+                    },
+                    "page": {
+                        "addUser": "Adicionar usuário"
+                    },
+                    "remove": {
+                        "absolutelySure": "Você tem certeza?",
+                        "actionCannotBeUndone": "Esta ação não pode ser desfeita. Isso excluirá permanentemente o usuário abaixo.",
+                        "cancel": "Cancelar",
+                        "delete": "Excluir",
+                        "removed": "Removido!",
+                        "removedDescription": "Usuário removido com sucesso.",
+                        "userDeletionFailed": "Falha na exclusão do usuário",
+                        "userDeletionFailedDescription": "Ocorreu um erro ao tentar excluir o usuário. Por favor, tente novamente mais tarde ou entre em contato com o suporte se o problema persistir."
+                    }
+                },
+                "invites": {
+                    "tab": "Convites",
+                    "users": "Usuários",
+                    "dataAccess": "Acesso a Dados",
+                    "organization": {
+                        "list": {
+                            "loading": "Carregando...",
+                            "noRequests": "Você não tem solicitações...",
+                            "error": "Algo deu errado. Por favor, tente novamente mais tarde."
+                        },
+                        "card": {
+                            "requesterContact": "Contato do Solicitante",
+                            "by": "Por",
+                            "email": "E-mail",
+                            "acceptInvitation": "Aceitar convite",
+                            "rejectInvitation": "Rejeitar convite",
+                            "toast": {
+                                "requestRejected": "Solicitação Rejeitada!",
+                                "requestRejectedDescription": "Você rejeitou a solicitação com sucesso.",
+                                "requestFailed": "Falha na Solicitação!",
+                                "requestFailedDescription": "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde."
+                            }
+                        },
+                        "dialog": {
+                            "acceptDataAccessRequest": "Aceitar solicitação de acesso a dados",
+                            "confirmingRequest": "Confirmando a solicitação para conceder à organização abaixo acesso aos dados da sua organização.",
+                            "requester": "Solicitante",
+                            "by": "Por",
+                            "cancel": "Cancelar",
+                            "accept": "Aceitar",
+                            "toast": {
+                                "requestAccepted": "Solicitação Aceita!",
+                                "requestAcceptedDescription": "Você aceitou a solicitação com sucesso.",
+                                "requestFailed": "Falha na Solicitação!",
+                                "requestFailedDescription": "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde."
+                            }
+                        }
+                    },
+                    "user": {
+                        "list": {
+                            "loading": "Carregando...",
+                            "noInvitations": "Você não tem convites...",
+                            "error": "Algo deu errado. Por favor, tente novamente mais tarde."
+                        },
+                        "card": {
+                            "requestRejected": "Solicitação Rejeitada!",
+                            "requestRejectedDescription": "Você rejeitou a solicitação com sucesso.",
+                            "requestFailed": "Falha na Solicitação!",
+                            "requestFailedDescription": "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.",
+                            "acceptInvitation": "Aceitar convite",
+                            "rejectInvitation": "Rejeitar convite",
+                            "createdAt": "Criado em"
+                        },
+                        "dialog": {
+                            "requestAccepted": "Solicitação Aceita!",
+                            "requestAcceptedDescription": "Você aceitou a solicitação com sucesso.",
+                            "requestFailed": "Falha na Solicitação!",
+                            "requestFailedDescription": "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.",
+                            "acceptRequest": "Aceitar solicitação",
+                            "confirmingRequest": "Confirmando a solicitação para aceitar a entrada do usuário abaixo na sua organização.",
+                            "cancel": "Cancelar",
+                            "accept": "Aceitar"
+                        }
+                    }
+                },
+                "others": {
+                    "tab": "Outros",
+                    "coordination": {
+                        "card": {
+                            "requestedAt": "Solicitado em",
+                            "currentStatus": "Status atual",
+                            "rejectReason": "Motivo da rejeição"
+                        },
+                        "dialog": {
+                            "requestSuccessful": "Solicitação bem-sucedida!",
+                            "requestSuccessfulDescription": "Sua solicitação foi concluída com sucesso.",
+                            "requestFailed": "Falha na solicitação",
+                            "requestFailedDescription": "Não foi possível concluir a solicitação no momento. Por favor, tente novamente mais tarde.",
+                            "requestFeature": "Você tem certeza de que deseja solicitar este recurso?",
+                            "requestDescriptionPart1": "A solicitação será enviada para análise de nossa equipe.",
+                            "requestDescriptionPart2": "O processo de avaliação leva entre 7 e 10 dias úteis.",
+                            "requestDescriptionPart3": "Além disso, podemos precisar entrar em contato com você para validação dos dados.",
+                            "cancel": "Cancelar",
+                            "sendRequest": "Enviar solicitação"
+                        },
+                        "historic": {
+                            "requestHistory": "Histórico de solicitações",
+                            "noRequestsFound": "Nenhuma solicitação encontrada..."
+                        },
+                        "token": {
+                            "success": "Sucesso!",
+                            "successDescription": "O token da organização foi copiado com sucesso.",
+                            "error": "Erro!",
+                            "errorDescription": "Falha ao copiar o token da organização.",
+                            "loadingError": "Erro ao carregar o token.",
+                            "copyToken": "Copiar Token da Organização para a Área de Transferência"
+                        }
+                    },
+                    "page": {
+                        "loading": "Carregando...",
+                        "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                        "coordinatingOrganization": "Quero ser uma organização coordenadora",
+                        "coordinatingOrganizationDescription": "Uma organização coordenadora pode acessar dados de outras organizações, como listas de beneficiários, abrigos e informações semelhantes.",
+                        "requestToBeCoordinatingOrganization": "Solicitar ser uma organização coordenadora",
+                        "viewHistoric": "Ver histórico",
+                        "alreadyCoordinatingOrganization": "Você já é uma organização coordenadora",
+                        "appealAccepted": "Apelo aceito em",
+                        "requestedBy": "Solicitado por"
+                    },
+                    "dataAccess": {
+                        "card": {
+                            "requestDataAccess": "Solicitar acesso a dados de outra organização"
+                        },
+                        "dialog": {
+                            "requestSuccessful": "Solicitação bem-sucedida!",
+                            "requestSuccessfulDescription": "Sua solicitação de acesso a dados foi concluída com sucesso.",
+                            "requestFailed": "Falha na solicitação",
+                            "requestFailedDescription": "Não foi possível concluir a solicitação no momento. Por favor, tente novamente mais tarde.",
+                            "requestData": "Solicitar Dados de Outra Organização",
+                            "requestDataDescription": "Por favor, forneça o token da organização da qual você deseja solicitar acesso. Para obter este token, entre em contato com um membro da organização e solicite-o.",
+                            "insertToken": "Insira o token da organização aqui",
+                            "cancel": "Cancelar",
+                            "request": "Solicitar"
+                        }
+                    }
+                },
+                "overview": {
+                    "tab": "Visão Geral",
+                    "loading": "Carregando...",
+                    "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                    "yourOrganization": "Sua organização",
+                    "name": "Nome",
+                    "description": "Descrição",
+                    "addressLine": "Linha de Endereço",
+                    "city": "Cidade",
+                    "state": "Estado / Província",
+                    "zipcode": "CEP / Código Postal",
+                    "country": "País",
+                    "save": "Salvar",
+                    "toast": {
+                        "saved": "Salvo!",
+                        "savedDescription": "Os novos dados foram salvos com sucesso.",
+                        "invalidEnteredData": "Dados inseridos inválidos",
+                        "invalidEnteredDataDescription": "Ocorreu um erro ao tentar atualizar os dados. Por favor, tente novamente mais tarde ou entre em contato com o suporte se o problema persistir."
+                    }
+                }
+            }
+        },
         "beneficiaries": {
             "create": {
                 "createBeneficiary": "Criar beneficiário",

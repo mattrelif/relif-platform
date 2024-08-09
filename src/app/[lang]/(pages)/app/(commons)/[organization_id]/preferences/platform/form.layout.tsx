@@ -1,6 +1,7 @@
 "use client";
 
 import { TIMEZONES } from "@/app/constants/timezones";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     Select,
     SelectContent,
@@ -15,6 +16,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 
 const Form = (): ReactNode => {
+    const dict = useDictionary();
+
     const [userData, setUserData] = useState<UserSchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
@@ -62,42 +65,56 @@ const Form = (): ReactNode => {
     };
 
     if (isLoading)
-        return <h2 className="p-2 text-relif-orange-400 text-sm font-medium">Loading...</h2>;
+        return (
+            <h2 className="p-2 text-relif-orange-400 text-sm font-medium">
+                {dict.commons.preferences.platform.loading}
+            </h2>
+        );
 
     if (error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.preferences.platform.error}
             </span>
         );
 
     return (
         <>
             <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
-                <span className="text-sm text-slate-900 font-semibold">Language</span>
+                <span className="text-sm text-slate-900 font-semibold">
+                    {dict.commons.preferences.platform.language}
+                </span>
                 <Select
                     defaultValue={userData?.preferences.language}
                     onValueChange={handleLanguage}
                 >
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select..." />
+                        <SelectValue placeholder={dict.commons.preferences.platform.select} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="portuguese">Portuguese</SelectItem>
-                        <SelectItem value="english">English</SelectItem>
-                        <SelectItem value="spanish">Spanish</SelectItem>
+                        <SelectItem value="portuguese">
+                            {dict.commons.preferences.platform.portuguese}
+                        </SelectItem>
+                        <SelectItem value="english">
+                            {dict.commons.preferences.platform.english}
+                        </SelectItem>
+                        <SelectItem value="spanish">
+                            {dict.commons.preferences.platform.spanish}
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
             <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
-                <span className="text-sm text-slate-900 font-semibold">Timezone</span>
+                <span className="text-sm text-slate-900 font-semibold">
+                    {dict.commons.preferences.platform.timezone}
+                </span>
                 <Select
                     defaultValue={userData?.preferences.timezone}
                     onValueChange={handleTimezone}
                 >
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select..." />
+                        <SelectValue placeholder={dict.commons.preferences.platform.select} />
                     </SelectTrigger>
                     <SelectContent>
                         {TIMEZONES.map(tz => (

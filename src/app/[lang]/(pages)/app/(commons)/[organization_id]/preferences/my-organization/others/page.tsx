@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { findUpdateOrganizationTypeRequestsByOrganizationId } from "@/repository/organization.repository";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
@@ -17,6 +18,7 @@ import RequestDataAccess from "./requestDataAccess.layout";
 
 export default function Page(): ReactNode {
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const [data, setData] = useState<{
         count: number;
@@ -57,13 +59,18 @@ export default function Page(): ReactNode {
         })();
     }, []);
 
-    if (isLoading) return <h2 className="p-4 text-relif-orange-400 font-medium">Loading...</h2>;
+    if (isLoading)
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium">
+                {dict.commons.preferences.myOrganization.others.page.loading}
+            </h2>
+        );
 
     if (error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.preferences.myOrganization.others.page.error}
             </span>
         );
 
@@ -73,18 +80,28 @@ export default function Page(): ReactNode {
                 {!isCoordination ? (
                     <div className="border-[1px] border-relif-orange-200 rounded-md w-full h-max p-4">
                         <h2 className="text-base font-bold text-relif-orange-200 pb-1">
-                            I want to be a coordinating organization
+                            {
+                                dict.commons.preferences.myOrganization.others.page
+                                    .coordinatingOrganization
+                            }
                         </h2>
                         <p className="text-sm text-slate-900 mb-5">
-                            A coordinating organization can access data from other organizations,
-                            such as lists of beneficiaries, shelters, and similar information.
+                            {
+                                dict.commons.preferences.myOrganization.others.page
+                                    .coordinatingOrganizationDescription
+                            }
                         </p>
                         <div className="flex flex-wrap items-center gap-4">
                             <CoordinationRequestDialog>
-                                <Button>Request to be a coordinating organization</Button>
+                                <Button>
+                                    {
+                                        dict.commons.preferences.myOrganization.others.page
+                                            .requestToBeCoordinatingOrganization
+                                    }
+                                </Button>
                             </CoordinationRequestDialog>
                             <Button variant="outline" onClick={() => setSheetOpenState(true)}>
-                                View historic
+                                {dict.commons.preferences.myOrganization.others.page.viewHistoric}
                             </Button>
                         </div>
                     </div>
@@ -92,19 +109,24 @@ export default function Page(): ReactNode {
                     <>
                         <div className="border-[1px] border-relif-orange-200 rounded-md w-full h-max p-4">
                             <h2 className="text-base font-bold text-relif-orange-200 pb-1">
-                                You're already a coordinating organization
+                                {
+                                    dict.commons.preferences.myOrganization.others.page
+                                        .alreadyCoordinatingOrganization
+                                }
                             </h2>
                             <p className="text-sm text-slate-900 mb-5">
-                                A coordinating organization can access data from other
-                                organizations, such as lists of beneficiaries, shelters, and similar
-                                information.
+                                {
+                                    dict.commons.preferences.myOrganization.others.page
+                                        .coordinatingOrganizationDescription
+                                }
                             </p>
                             <span className="block text-sm text-slate-500">
-                                Appeal accepted in{" "}
+                                {dict.commons.preferences.myOrganization.others.page.appealAccepted}{" "}
                                 {formatDate(isCoordination?.accepted_at, locale || "en")}
                             </span>
                             <span className="text-xs text-slate-500 mb-5">
-                                Requested by {isCoordination?.creator?.first_name} (
+                                {dict.commons.preferences.myOrganization.others.page.requestedBy}{" "}
+                                {isCoordination?.creator?.first_name} (
                                 {isCoordination?.creator?.email}) on{" "}
                                 {formatDate(isCoordination?.created_at, locale || "en")}
                             </span>

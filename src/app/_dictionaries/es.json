@@ -138,6 +138,255 @@
                 "requests": "Solicitudes"
             }
         },
+        "preferences": {
+            "title": "Preferencias",
+            "menu": {
+                "platform": "Plataforma",
+                "myOrganization": "Mi Organización",
+                "myProfile": "Mi Perfil",
+                "support": "Soporte"
+            },
+            "platform": {
+                "loading": "Cargando...",
+                "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                "language": "Idioma",
+                "select": "Seleccionar...",
+                "portuguese": "Portugués",
+                "english": "Inglés",
+                "spanish": "Español",
+                "timezone": "Zona horaria"
+            },
+            "myProfile": {
+                "loading": "Cargando...",
+                "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                "yourProfile": "Tu perfil",
+                "email": "Correo electrónico",
+                "firstName": "Nombre",
+                "lastName": "Apellido",
+                "role": "Rol",
+                "rolePlaceholder": "ej. Director de Recursos Humanos",
+                "phone": "Teléfono",
+                "countryCodePlaceholder": "ej. +55",
+                "save": "Guardar",
+                "toast": {
+                    "saved": "¡Guardado!",
+                    "savedDescription": "Los nuevos datos se han guardado con éxito.",
+                    "updateFailed": "Fallo en la actualización",
+                    "updateFailedDescription": "Ocurrió un error al intentar actualizar los datos. Por favor, inténtelo de nuevo más tarde o comuníquese con el soporte si el problema persiste."
+                }
+            },
+            "support": {
+                "message": "En construcción..."
+            },
+            "myOrganization": {
+                "users": {
+                    "tab": "Usuarios",
+                    "add": {
+                        "success": "¡Éxito!",
+                        "successDescription": "El usuario ha sido invitado con éxito.",
+                        "error": "¡Error!",
+                        "errorDescription": "Ocurrió un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde.",
+                        "inviteNewUser": "Invitar a un nuevo usuario",
+                        "enterEmail": "Ingrese el correo electrónico del usuario que desea agregar a su organización.",
+                        "email": "Correo electrónico",
+                        "emailPlaceholder": "ej. john.doe@example.com",
+                        "cancel": "Cancelar",
+                        "inviteUser": "Invitar usuario"
+                    },
+                    "card": {
+                        "roleFallback": "Colaborador",
+                        "platformRoleFallback": "MIEMBRO",
+                        "edit": "Editar",
+                        "remove": "Eliminar",
+                        "phonesTitle": "Teléfonos"
+                    },
+                    "edit": {
+                        "loading": "Cargando...",
+                        "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                        "editUserInformation": "Editar información del usuario",
+                        "email": "Correo electrónico",
+                        "firstName": "Nombre",
+                        "lastName": "Apellido",
+                        "role": "Rol",
+                        "rolePlaceholder": "ej. Director de Recursos Humanos",
+                        "platformRole": "Rol en la Plataforma",
+                        "member": "Miembro",
+                        "admin": "Administrador",
+                        "phone": "Teléfono",
+                        "phonePlaceholder": "ej. +55",
+                        "save": "Guardar",
+                        "saved": "¡Guardado!",
+                        "savedDescription": "Los nuevos datos se han guardado con éxito.",
+                        "errorUpdatingUserData": "Error al actualizar los datos del usuario",
+                        "errorUpdatingUserDataDescription": "Hubo un problema al actualizar la información del usuario. Verifique los datos e inténtelo de nuevo. Si el problema persiste, comuníquese con el soporte."
+                    },
+                    "list": {
+                        "loading": "Cargando...",
+                        "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                        "noUsersFound": "No se encontraron usuarios..."
+                    },
+                    "page": {
+                        "addUser": "Agregar usuario"
+                    },
+                    "remove": {
+                        "absolutelySure": "¿Estás completamente seguro?",
+                        "actionCannotBeUndone": "Esta acción no se puede deshacer. Esto eliminará permanentemente al usuario a continuación.",
+                        "cancel": "Cancelar",
+                        "delete": "Eliminar",
+                        "removed": "¡Eliminado!",
+                        "removedDescription": "Usuario eliminado con éxito.",
+                        "userDeletionFailed": "Fallo en la eliminación del usuario",
+                        "userDeletionFailedDescription": "Ocurrió un error al intentar eliminar al usuario. Por favor, inténtelo de nuevo más tarde o comuníquese con el soporte si el problema persiste."
+                    }
+                },
+                "invites": {
+                    "tab": "Invitaciones",
+                    "users": "Usuarios",
+                    "dataAccess": "Acceso a Datos",
+                    "organization": {
+                        "list": {
+                            "loading": "Cargando...",
+                            "noRequests": "No tienes solicitudes...",
+                            "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde."
+                        },
+                        "card": {
+                            "requesterContact": "Contacto del Solicitante",
+                            "by": "Por",
+                            "email": "Correo electrónico",
+                            "acceptInvitation": "Aceptar invitación",
+                            "rejectInvitation": "Rechazar invitación",
+                            "toast": {
+                                "requestRejected": "¡Solicitud Rechazada!",
+                                "requestRejectedDescription": "Has rechazado la solicitud con éxito.",
+                                "requestFailed": "¡Fallo en la Solicitud!",
+                                "requestFailedDescription": "Hubo un error al procesar tu solicitud. Por favor, inténtelo de nuevo más tarde."
+                            }
+                        },
+                        "dialog": {
+                            "acceptDataAccessRequest": "Aceptar solicitud de acceso a datos",
+                            "confirmingRequest": "Confirmando la solicitud para otorgar a la organización a continuación acceso a los datos de tu organización.",
+                            "requester": "Solicitante",
+                            "by": "Por",
+                            "cancel": "Cancelar",
+                            "accept": "Aceptar",
+                            "toast": {
+                                "requestAccepted": "¡Solicitud Aceptada!",
+                                "requestAcceptedDescription": "Has aceptado la solicitud con éxito.",
+                                "requestFailed": "¡Fallo en la Solicitud!",
+                                "requestFailedDescription": "Hubo un error al procesar tu solicitud. Por favor, inténtelo de nuevo más tarde."
+                            }
+                        }
+                    },
+                    "user": {
+                        "list": {
+                            "loading": "Cargando...",
+                            "noInvitations": "No tienes invitaciones...",
+                            "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde."
+                        },
+                        "card": {
+                            "requestRejected": "¡Solicitud Rechazada!",
+                            "requestRejectedDescription": "Has rechazado la solicitud con éxito.",
+                            "requestFailed": "¡Fallo en la Solicitud!",
+                            "requestFailedDescription": "Hubo un error al procesar tu solicitud. Por favor, inténtelo de nuevo más tarde.",
+                            "acceptInvitation": "Aceptar invitación",
+                            "rejectInvitation": "Rechazar invitación",
+                            "createdAt": "Creado en"
+                        },
+                        "dialog": {
+                            "requestAccepted": "¡Solicitud Aceptada!",
+                            "requestAcceptedDescription": "Has aceptado la solicitud con éxito.",
+                            "requestFailed": "¡Fallo en la Solicitud!",
+                            "requestFailedDescription": "Hubo un error al procesar tu solicitud. Por favor, inténtelo de nuevo más tarde.",
+                            "acceptRequest": "Aceptar solicitud",
+                            "confirmingRequest": "Confirmando la solicitud para aceptar la entrada del usuario a continuación en tu organización.",
+                            "cancel": "Cancelar",
+                            "accept": "Aceptar"
+                        }
+                    }
+                },
+                "others": {
+                    "tab": "Otros",
+                    "coordination": {
+                        "card": {
+                            "requestedAt": "Solicitado en",
+                            "currentStatus": "Estado actual",
+                            "rejectReason": "Motivo del rechazo"
+                        },
+                        "dialog": {
+                            "requestSuccessful": "¡Solicitud exitosa!",
+                            "requestSuccessfulDescription": "Tu solicitud se ha completado con éxito.",
+                            "requestFailed": "Fallo en la solicitud",
+                            "requestFailedDescription": "No se pudo completar la solicitud en este momento. Por favor, inténtelo de nuevo más tarde.",
+                            "requestFeature": "¿Estás seguro de que quieres solicitar esta función?",
+                            "requestDescriptionPart1": "La solicitud será enviada para su análisis por parte de nuestro equipo.",
+                            "requestDescriptionPart2": "El proceso de evaluación tarda entre 7 y 10 días hábiles.",
+                            "requestDescriptionPart3": "Además, es posible que necesitemos ponernos en contacto contigo para validar los datos.",
+                            "cancel": "Cancelar",
+                            "sendRequest": "Enviar solicitud"
+                        },
+                        "historic": {
+                            "requestHistory": "Historial de solicitudes",
+                            "noRequestsFound": "No se encontraron solicitudes..."
+                        },
+                        "token": {
+                            "success": "¡Éxito!",
+                            "successDescription": "El token de la organización se ha copiado con éxito.",
+                            "error": "¡Error!",
+                            "errorDescription": "No se pudo copiar el token de la organización.",
+                            "loadingError": "Error al cargar el token.",
+                            "copyToken": "Copiar Token de la Organización al Portapapeles"
+                        }
+                    },
+                    "page": {
+                        "loading": "Cargando...",
+                        "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                        "coordinatingOrganization": "Quiero ser una organización coordinadora",
+                        "coordinatingOrganizationDescription": "Una organización coordinadora puede acceder a datos de otras organizaciones, como listas de beneficiarios, albergues e información similar.",
+                        "requestToBeCoordinatingOrganization": "Solicitar ser una organización coordinadora",
+                        "viewHistoric": "Ver histórico",
+                        "alreadyCoordinatingOrganization": "Ya eres una organización coordinadora",
+                        "appealAccepted": "Apelación aceptada en",
+                        "requestedBy": "Solicitado por"
+                    },
+                    "dataAccess": {
+                        "card": {
+                            "requestDataAccess": "Solicitar acceso a datos de otra organización"
+                        },
+                        "dialog": {
+                            "requestSuccessful": "¡Solicitud exitosa!",
+                            "requestSuccessfulDescription": "Tu solicitud de acceso a datos se ha completado con éxito.",
+                            "requestFailed": "Fallo en la solicitud",
+                            "requestFailedDescription": "No se pudo completar la solicitud en este momento. Por favor, inténtelo de nuevo más tarde.",
+                            "requestData": "Solicitar Datos de Otra Organización",
+                            "requestDataDescription": "Por favor, proporciona el token de la organización de la que deseas solicitar acceso. Para obtener este token, contacta a un miembro de la organización y solicítalo.",
+                            "insertToken": "Inserta el token de la organización aquí",
+                            "cancel": "Cancelar",
+                            "request": "Solicitar"
+                        }
+                    }
+                },
+                "overview": {
+                    "tab": "Resumen",
+                    "loading": "Cargando...",
+                    "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                    "yourOrganization": "Tu organización",
+                    "name": "Nombre",
+                    "description": "Descripción",
+                    "addressLine": "Línea de Dirección",
+                    "city": "Ciudad",
+                    "state": "Estado / Provincia",
+                    "zipcode": "Código Postal",
+                    "country": "País",
+                    "save": "Guardar",
+                    "toast": {
+                        "saved": "¡Guardado!",
+                        "savedDescription": "Los nuevos datos se han guardado con éxito.",
+                        "invalidEnteredData": "Datos ingresados inválidos",
+                        "invalidEnteredDataDescription": "Ocurrió un error al intentar actualizar los datos. Por favor, inténtelo de nuevo más tarde o comuníquese con el soporte si el problema persiste."
+                    }
+                }
+            }
+        },
         "beneficiaries": {
             "create": {
                 "createBeneficiary": "Crear beneficiario",

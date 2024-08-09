@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -18,6 +19,7 @@ import { ReactNode } from "react";
 
 const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -32,15 +34,14 @@ const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => 
 
             await createInvite(data.email);
             toast({
-                title: "Success!",
-                description: "The user has been successfully invited.",
+                title: dict.commons.preferences.myOrganization.users.add.success,
+                description: dict.commons.preferences.myOrganization.users.add.successDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Error!",
-                description:
-                    "An error occurred while processing your request. Please try again later.",
+                title: dict.commons.preferences.myOrganization.users.add.error,
+                description: dict.commons.preferences.myOrganization.users.add.errorDescription,
                 variant: "destructive",
             });
         }
@@ -51,27 +52,38 @@ const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => 
             <DialogTrigger>{children}</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Invite a new user</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.commons.preferences.myOrganization.users.add.inviteNewUser}
+                    </DialogTitle>
                     <DialogDescription>
-                        Enter the email of the user you want to add to your organization.
+                        {dict.commons.preferences.myOrganization.users.add.enterEmail}
                     </DialogDescription>
                     <form onSubmit={handleSubmit}>
                         <div className="flex flex-col pt-4 gap-2">
-                            <Label htmlFor="email">E-mail *</Label>
+                            <Label htmlFor="email">
+                                {dict.commons.preferences.myOrganization.users.add.email} *
+                            </Label>
                             <Input
                                 id="email"
                                 name="email"
                                 type="email"
                                 required
-                                placeholder="e.g. john.doe@example.com"
+                                placeholder={
+                                    dict.commons.preferences.myOrganization.users.add
+                                        .emailPlaceholder
+                                }
                             />
                         </div>
                         <div className="flex gap-4 pt-5">
                             <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
+                                <Button variant="outline">
+                                    {dict.commons.preferences.myOrganization.users.add.cancel}
+                                </Button>
                             </DialogClose>
                             <DialogClose asChild>
-                                <Button type="submit">Invite user</Button>
+                                <Button type="submit">
+                                    {dict.commons.preferences.myOrganization.users.add.inviteUser}
+                                </Button>
                             </DialogClose>
                         </div>
                     </form>

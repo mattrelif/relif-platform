@@ -138,6 +138,255 @@
                 "requests": "Requests"
             }
         },
+        "preferences": {
+            "title": "Preferences",
+            "menu": {
+                "platform": "Platform",
+                "myOrganization": "My Organization",
+                "myProfile": "My Profile",
+                "support": "Support"
+            },
+            "platform": {
+                "loading": "Loading...",
+                "error": "Something went wrong. Please try again later.",
+                "language": "Language",
+                "select": "Select...",
+                "portuguese": "Portuguese",
+                "english": "English",
+                "spanish": "Spanish",
+                "timezone": "Timezone"
+            },
+            "myProfile": {
+                "loading": "Loading...",
+                "error": "Something went wrong. Please try again later.",
+                "yourProfile": "Your profile",
+                "email": "E-mail",
+                "firstName": "First name",
+                "lastName": "Last name",
+                "role": "Role",
+                "rolePlaceholder": "e.g. Director of Human Resources",
+                "phone": "Phone",
+                "countryCodePlaceholder": "e.g. +55",
+                "save": "Save",
+                "toast": {
+                    "saved": "Saved!",
+                    "savedDescription": "The new data was saved successfully.",
+                    "updateFailed": "Update Failed",
+                    "updateFailedDescription": "An error occurred while attempting to update the data. Please try again later or contact support if the issue persists."
+                }
+            },
+            "support": {
+                "message": "Under construction..."
+            },
+            "myOrganization": {
+                "users": {
+                    "tab": "Users",
+                    "add": {
+                        "success": "Success!",
+                        "successDescription": "The user has been successfully invited.",
+                        "error": "Error!",
+                        "errorDescription": "An error occurred while processing your request. Please try again later.",
+                        "inviteNewUser": "Invite a new user",
+                        "enterEmail": "Enter the email of the user you want to add to your organization.",
+                        "email": "E-mail",
+                        "emailPlaceholder": "e.g. john.doe@example.com",
+                        "cancel": "Cancel",
+                        "inviteUser": "Invite user"
+                    },
+                    "card": {
+                        "roleFallback": "Colaborator",
+                        "platformRoleFallback": "MEMBER",
+                        "edit": "Edit",
+                        "remove": "Remove",
+                        "phonesTitle": "Phones"
+                    },
+                    "edit": {
+                        "loading": "Loading...",
+                        "error": "Something went wrong. Please try again later.",
+                        "editUserInformation": "Edit user information",
+                        "email": "E-mail",
+                        "firstName": "First name",
+                        "lastName": "Last name",
+                        "role": "Role",
+                        "rolePlaceholder": "e.g. Director of Human Resources",
+                        "platformRole": "Platform Role",
+                        "member": "Member",
+                        "admin": "Admin",
+                        "phone": "Phone",
+                        "phonePlaceholder": "e.g. +55",
+                        "save": "Save",
+                        "saved": "Saved!",
+                        "savedDescription": "The new data was saved successfully.",
+                        "errorUpdatingUserData": "Error updating user data",
+                        "errorUpdatingUserDataDescription": "There was an issue updating the user's information. Please check the data and try again. If the problem persists, contact support."
+                    },
+                    "list": {
+                        "loading": "Loading...",
+                        "error": "Something went wrong. Please try again later.",
+                        "noUsersFound": "No users found..."
+                    },
+                    "page": {
+                        "addUser": "Add user"
+                    },
+                    "remove": {
+                        "absolutelySure": "Are you absolutely sure?",
+                        "actionCannotBeUndone": "This action cannot be undone. This will permanently delete the user below.",
+                        "cancel": "Cancel",
+                        "delete": "Delete",
+                        "removed": "Removed!",
+                        "removedDescription": "User removed successfully.",
+                        "userDeletionFailed": "User Deletion Failed",
+                        "userDeletionFailedDescription": "An error occurred while attempting to delete the user. Please try again later or contact support if the issue persists."
+                    }
+                },
+                "invites": {
+                    "tab": "Invites",
+                    "users": "Users",
+                    "dataAccess": "Data Access",
+                    "organization": {
+                        "list": {
+                            "loading": "Loading...",
+                            "noRequests": "You have no requests...",
+                            "error": "Something went wrong. Please try again later."
+                        },
+                        "card": {
+                            "requesterContact": "Requester Contact",
+                            "by": "By",
+                            "email": "E-mail",
+                            "acceptInvitation": "Accept invitation",
+                            "rejectInvitation": "Reject invitation",
+                            "toast": {
+                                "requestRejected": "Request Rejected!",
+                                "requestRejectedDescription": "You have successfully rejected the request.",
+                                "requestFailed": "Request Failed!",
+                                "requestFailedDescription": "There was an error processing your request. Please try again later."
+                            }
+                        },
+                        "dialog": {
+                            "acceptDataAccessRequest": "Accept data access request",
+                            "confirmingRequest": "Confirming the request to grant the organization below access to your organization's data.",
+                            "requester": "Requester",
+                            "by": "By",
+                            "cancel": "Cancel",
+                            "accept": "Accept",
+                            "toast": {
+                                "requestAccepted": "Request Accepted!",
+                                "requestAcceptedDescription": "You have successfully accepted the request.",
+                                "requestFailed": "Request Failed!",
+                                "requestFailedDescription": "There was an error processing your request. Please try again later."
+                            }
+                        }
+                    },
+                    "user": {
+                        "list": {
+                            "loading": "Loading...",
+                            "noInvitations": "You have no invitations...",
+                            "error": "Something went wrong. Please try again later."
+                        },
+                        "card": {
+                            "requestRejected": "Request Rejected!",
+                            "requestRejectedDescription": "You have successfully rejected the request.",
+                            "requestFailed": "Request Failed!",
+                            "requestFailedDescription": "There was an error processing your request. Please try again later.",
+                            "acceptInvitation": "Accept invitation",
+                            "rejectInvitation": "Reject invitation",
+                            "createdAt": "Created at"
+                        },
+                        "dialog": {
+                            "requestAccepted": "Request Accepted!",
+                            "requestAcceptedDescription": "You have successfully accepted the request.",
+                            "requestFailed": "Request Failed!",
+                            "requestFailedDescription": "There was an error processing your request. Please try again later.",
+                            "acceptRequest": "Accept request",
+                            "confirmingRequest": "Confirming the request to accept the entry of the user below into your organization.",
+                            "cancel": "Cancel",
+                            "accept": "Accept"
+                        }
+                    }
+                },
+                "others": {
+                    "tab": "Others",
+                    "coordination": {
+                        "card": {
+                            "requestedAt": "Requested at",
+                            "currentStatus": "Current status",
+                            "rejectReason": "Reject reason"
+                        },
+                        "dialog": {
+                            "requestSuccessful": "Request successful!",
+                            "requestSuccessfulDescription": "Your request was completed successfully.",
+                            "requestFailed": "Request failed",
+                            "requestFailedDescription": "Unable to complete the request at this time. Please try again later.",
+                            "requestFeature": "Are you sure you want to request this feature?",
+                            "requestDescriptionPart1": "The request will be sent for analysis by our team.",
+                            "requestDescriptionPart2": "The evaluation process takes between 7 and 10 business days.",
+                            "requestDescriptionPart3": "Additionally, we may need to contact you for data validation.",
+                            "cancel": "Cancel",
+                            "sendRequest": "Send request"
+                        },
+                        "historic": {
+                            "requestHistory": "Request history",
+                            "noRequestsFound": "No requests found..."
+                        },
+                        "token": {
+                            "success": "Success!",
+                            "successDescription": "The organization token has been successfully copied.",
+                            "error": "Error!",
+                            "errorDescription": "Failed to copy the organization token.",
+                            "loadingError": "Error loading token.",
+                            "copyToken": "Copy Organization Token to Clipboard"
+                        }
+                    },
+                    "page": {
+                        "loading": "Loading...",
+                        "error": "Something went wrong. Please try again later.",
+                        "coordinatingOrganization": "I want to be a coordinating organization",
+                        "coordinatingOrganizationDescription": "A coordinating organization can access data from other organizations, such as lists of beneficiaries, shelters, and similar information.",
+                        "requestToBeCoordinatingOrganization": "Request to be a coordinating organization",
+                        "viewHistoric": "View historic",
+                        "alreadyCoordinatingOrganization": "You're already a coordinating organization",
+                        "appealAccepted": "Appeal accepted in",
+                        "requestedBy": "Requested by"
+                    },
+                    "dataAccess": {
+                        "card": {
+                            "requestDataAccess": "Request data access to other organization"
+                        },
+                        "dialog": {
+                            "requestSuccessful": "Request successful!",
+                            "requestSuccessfulDescription": "Your data access request was completed successfully.",
+                            "requestFailed": "Request failed",
+                            "requestFailedDescription": "Unable to complete the request at this time. Please try again later.",
+                            "requestData": "Request Data from Another Organization",
+                            "requestDataDescription": "Please provide the token of the organization from which you wish to request access. To obtain this token, contact a member of the organization and request it.",
+                            "insertToken": "Insert the organization token here",
+                            "cancel": "Cancel",
+                            "request": "Request"
+                        }
+                    }
+                },
+                "overview": {
+                    "tab": "Overview",
+                    "loading": "Loading...",
+                    "error": "Something went wrong. Please try again later.",
+                    "yourOrganization": "Your organization",
+                    "name": "Name",
+                    "description": "Description",
+                    "addressLine": "Address Line",
+                    "city": "City",
+                    "state": "State / Province",
+                    "zipcode": "Zip / Postal Code",
+                    "country": "Country",
+                    "save": "Save",
+                    "toast": {
+                        "saved": "Saved!",
+                        "savedDescription": "The new data was saved successfully.",
+                        "invalidEnteredData": "Invalid entered data",
+                        "invalidEnteredDataDescription": "An error occurred while attempting to update the data. Please try again later or contact support if the issue persists."
+                    }
+                }
+            }
+        },
         "beneficiaries": {
             "create": {
                 "title": "Create beneficiary",

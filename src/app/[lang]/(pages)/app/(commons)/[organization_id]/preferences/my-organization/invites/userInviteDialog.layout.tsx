@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -23,19 +24,24 @@ type Props = {
 
 const UserInviteDialogLayout = ({ request, refreshList, children }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const handleAccept = async () => {
         try {
             await acceptRequest(request.id);
             refreshList();
             toast({
-                title: "Request Accepted!",
-                description: "You have successfully accepted the request.",
+                title: dict.commons.preferences.myOrganization.invites.user.dialog.requestAccepted,
+                description:
+                    dict.commons.preferences.myOrganization.invites.user.dialog
+                        .requestAcceptedDescription,
             });
         } catch {
             toast({
-                title: "Request Failed!",
-                description: "There was an error processing your request. Please try again later.",
+                title: dict.commons.preferences.myOrganization.invites.user.dialog.requestFailed,
+                description:
+                    dict.commons.preferences.myOrganization.invites.user.dialog
+                        .requestFailedDescription,
                 variant: "destructive",
             });
         }
@@ -46,10 +52,14 @@ const UserInviteDialogLayout = ({ request, refreshList, children }: Props): Reac
             <DialogTrigger>{children}</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Accept request</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.commons.preferences.myOrganization.invites.user.dialog.acceptRequest}
+                    </DialogTitle>
                     <DialogDescription>
-                        Confirming the request to accept the entry of the user below into your
-                        organization.
+                        {
+                            dict.commons.preferences.myOrganization.invites.user.dialog
+                                .confirmingRequest
+                        }
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
@@ -59,10 +69,14 @@ const UserInviteDialogLayout = ({ request, refreshList, children }: Props): Reac
                     </div>
                     <div className="flex gap-4 pt-5">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">
+                                {dict.commons.preferences.myOrganization.invites.user.dialog.cancel}
+                            </Button>
                         </DialogClose>
                         <DialogClose asChild>
-                            <Button onClick={handleAccept}>Accept</Button>
+                            <Button onClick={handleAccept}>
+                                dict.commons.preferences.myOrganization.invites.user.dialog.accept
+                            </Button>
                         </DialogClose>
                     </div>
                 </DialogHeader>

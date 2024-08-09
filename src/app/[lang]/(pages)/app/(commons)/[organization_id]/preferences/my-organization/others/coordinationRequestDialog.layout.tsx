@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -16,19 +17,26 @@ import { ReactNode } from "react";
 
 const CoordinationRequestDialog = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const handleRequest = async () => {
         try {
             await createRequest();
             toast({
-                title: "Request successful!",
-                description: "Your request was completed successfully.",
+                title: dict.commons.preferences.myOrganization.others.coordination.dialog
+                    .requestSuccessful,
+                description:
+                    dict.commons.preferences.myOrganization.others.coordination.dialog
+                        .requestSuccessfulDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Request failed",
-                description: "Unable to complete the request at this time. Please try again later.",
+                title: dict.commons.preferences.myOrganization.others.coordination.dialog
+                    .requestFailed,
+                description:
+                    dict.commons.preferences.myOrganization.others.coordination.dialog
+                        .requestFailedDescription,
                 variant: "destructive",
             });
         }
@@ -40,20 +48,42 @@ const CoordinationRequestDialog = ({ children }: { children: Readonly<ReactNode>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="pb-3">
-                        Are you sure you want to request this feature?
+                        {
+                            dict.commons.preferences.myOrganization.others.coordination.dialog
+                                .requestFeature
+                        }
                     </DialogTitle>
                     <DialogDescription>
-                        The request will be sent for analysis by our team.{" "}
+                        {
+                            dict.commons.preferences.myOrganization.others.coordination.dialog
+                                .requestDescriptionPart1
+                        }{" "}
                         <strong>
-                            The evaluation process takes between 7 and 10 business days.
+                            {
+                                dict.commons.preferences.myOrganization.others.coordination.dialog
+                                    .requestDescriptionPart2
+                            }
                         </strong>{" "}
-                        Additionally, we may need to contact you for data validation.
+                        {
+                            dict.commons.preferences.myOrganization.others.coordination.dialog
+                                .requestDescriptionPart3
+                        }
                     </DialogDescription>
                     <div className="flex gap-4 pt-5">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">
+                                {
+                                    dict.commons.preferences.myOrganization.others.coordination
+                                        .dialog.cancel
+                                }
+                            </Button>
                         </DialogClose>
-                        <Button onClick={handleRequest}>Send request</Button>
+                        <Button onClick={handleRequest}>
+                            {
+                                dict.commons.preferences.myOrganization.others.coordination.dialog
+                                    .sendRequest
+                            }
+                        </Button>
                     </div>
                 </DialogHeader>
             </DialogContent>

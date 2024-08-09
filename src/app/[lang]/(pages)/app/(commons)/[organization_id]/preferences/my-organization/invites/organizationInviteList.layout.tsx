@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { findDataAccessRequestsByOrganizationId } from "@/repository/organization.repository";
 import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
 import { UserSchema } from "@/types/user.types";
@@ -10,6 +11,8 @@ import { MdError } from "react-icons/md";
 import { OrganizationInvite } from "./organizationInvite.layout";
 
 const OrganizationInviteList = (): ReactNode => {
+    const dict = useDictionary();
+
     const [requests, setRequests] = useState<{
         count: number;
         data: OrganizationDataAccessRequestSchema[];
@@ -56,14 +59,19 @@ const OrganizationInviteList = (): ReactNode => {
         <>
             {isLoading && (
                 <div className="w-full h-full flex flex-col gap-2 p-2">
-                    <span className="text-sm text-relif-orange-400 font-medium">Loading...</span>
+                    <span className="text-sm text-relif-orange-400 font-medium">
+                        {dict.commons.preferences.myOrganization.invites.organization.list.loading}
+                    </span>
                 </div>
             )}
 
             {!error && !isLoading && requests?.count === 0 && (
                 <div className="w-full h-full flex flex-col gap-2 p-2">
                     <span className="text-sm text-slate-900 font-medium">
-                        You have no requests...
+                        {
+                            dict.commons.preferences.myOrganization.invites.organization.list
+                                .noRequests
+                        }
                     </span>
                 </div>
             )}
@@ -72,7 +80,7 @@ const OrganizationInviteList = (): ReactNode => {
                 <div className="w-full h-full flex flex-col gap-2 p-2">
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                         <MdError />
-                        Something went wrong. Please try again later.
+                        {dict.commons.preferences.myOrganization.invites.organization.list.error}
                     </span>
                 </div>
             )}

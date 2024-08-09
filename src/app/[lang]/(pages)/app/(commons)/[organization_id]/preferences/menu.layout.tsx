@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,6 +15,7 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
     "text-relif-orange-200 bg-relif-orange-200/10 border-[1px] border-relif-orange-200/30";
 
 const Menu = (): ReactNode => {
+    const dict = useDictionary();
     const pathname = usePathname();
     const activeOption = pathname.split("/")[5] ?? "platform";
     const urlPath = pathname.split("/").slice(0, 5).join("/");
@@ -31,7 +33,7 @@ const Menu = (): ReactNode => {
                         )}
                     >
                         <FaSitemap size={15} />
-                        Platform
+                        {dict.commons.preferences.menu.platform}
                     </li>
                 </Link>
 
@@ -45,7 +47,7 @@ const Menu = (): ReactNode => {
                         )}
                     >
                         <FaBuildingUser size={15} />
-                        My Organization
+                        {dict.commons.preferences.menu.myOrganization}
                     </li>
                 </Link>
 
@@ -59,7 +61,7 @@ const Menu = (): ReactNode => {
                         )}
                     >
                         <FaClipboardUser size={15} />
-                        My Profile
+                        {dict.commons.preferences.menu.myProfile}
                     </li>
                 </Link>
 
@@ -73,7 +75,7 @@ const Menu = (): ReactNode => {
                         )}
                     >
                         <FaInfoCircle size={15} />
-                        Support
+                        {dict.commons.preferences.menu.support}
                     </li>
                 </Link>
             </ul>

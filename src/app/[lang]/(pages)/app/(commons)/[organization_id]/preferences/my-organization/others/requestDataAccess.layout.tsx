@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
 import { FaDatabase } from "react-icons/fa";
@@ -7,6 +8,8 @@ import { FaDatabase } from "react-icons/fa";
 import { RequestDataAccessDialog } from "./requestDataAccessDialog.layout";
 
 const RequestDataAccess = (): ReactNode => {
+    const dict = useDictionary();
+
     const [requestDialogOpenState, setRequestDialogOpenState] = useState(false);
 
     return (
@@ -17,7 +20,7 @@ const RequestDataAccess = (): ReactNode => {
                 onClick={() => setRequestDialogOpenState(true)}
             >
                 <FaDatabase />
-                Request data access to other organization
+                {dict.commons.preferences.myOrganization.others.dataAccess.card.requestDataAccess}
             </Button>
 
             <RequestDataAccessDialog
