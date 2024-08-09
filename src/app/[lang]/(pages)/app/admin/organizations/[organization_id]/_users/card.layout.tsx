@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { UserSchema } from "@/types/user.types";
@@ -12,6 +13,7 @@ type Props = UserSchema;
 
 const UserCard = (data: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
     const initials = data?.first_name?.charAt(0)?.concat(data?.last_name?.charAt(0));
 
@@ -33,14 +35,18 @@ const UserCard = (data: Props): ReactNode => {
                     </span>
                     <span className="text-xs text-slate-500 mt-1 flex items-center gap-2">
                         <MdAccessTime />
-                        Created at {formatDate(data?.created_at, locale || "en")}
+                        {dict.admin.organizations.organizationId.users.card.createdAt}{" "}
+                        {formatDate(data?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>
 
             <div className="flex flex-col">
                 <span>
-                    <Badge>{data?.platform_role || "MEMBER"}</Badge>
+                    <Badge>
+                        {data?.platform_role ||
+                            dict.admin.organizations.organizationId.users.card.member}
+                    </Badge>
                 </span>
             </div>
         </li>

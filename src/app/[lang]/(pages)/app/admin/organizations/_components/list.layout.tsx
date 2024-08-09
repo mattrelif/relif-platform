@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     Pagination,
     PaginationContent,
@@ -18,6 +19,8 @@ import { MdError } from "react-icons/md";
 import { Card } from "./card.layout";
 
 const OrganizationsList = (): ReactNode => {
+    const dict = useDictionary();
+
     const [organizations, setOrganizations] = useState<{
         count: number;
         data: OrganizationSchema[];
@@ -59,18 +62,22 @@ const OrganizationsList = (): ReactNode => {
     return (
         <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
             {isLoading && (
-                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                    {dict.admin.organizations.list.loading}
+                </h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.admin.organizations.list.error}
                 </span>
             )}
 
             {!isLoading && !error && organizations && organizations.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">No housings found...</span>
+                <span className="text-sm text-slate-900 font-medium p-4">
+                    {dict.admin.organizations.list.noHousingsFound}
+                </span>
             )}
 
             {!isLoading && !error && organizations && organizations.data.length > 0 && (

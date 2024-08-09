@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -31,6 +32,7 @@ const AcceptModal = ({
     setAcceptDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const router = useRouter();
 
     const handleAccept = async (): Promise<void> => {
@@ -44,15 +46,13 @@ const AcceptModal = ({
             }
 
             toast({
-                title: "Coordination Access Enabled",
-                description:
-                    "Organization's type has been successfully changed to coordination, with access to data from other organizations.",
+                title: dict.admin.requests.accept.coordinationAccessEnabledTitle,
+                description: dict.admin.requests.accept.coordinationAccessEnabledDescription,
             });
         } catch {
             toast({
-                title: "Coordination Access Change Failed",
-                description:
-                    "An error occurred while attempting to change the organization's type to coordination. Please try again later or contact support if the issue persists.",
+                title: dict.admin.requests.accept.coordinationAccessChangeFailedTitle,
+                description: dict.admin.requests.accept.coordinationAccessChangeFailedDescription,
                 variant: "destructive",
             });
         }
@@ -62,11 +62,11 @@ const AcceptModal = ({
         <Dialog open={acceptDialogOpenState} onOpenChange={setAcceptDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Accept request</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.admin.requests.accept.acceptRequestTitle}
+                    </DialogTitle>
                     <DialogDescription>
-                        Confirming the request to accept the change of the organization type below
-                        from Management to Coordination, allowing access to data from other
-                        organizations.
+                        {dict.admin.requests.accept.acceptRequestDescription}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
@@ -83,10 +83,12 @@ const AcceptModal = ({
                     </div>
                     <div className="flex gap-4 pt-5">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{dict.admin.requests.accept.cancel}</Button>
                         </DialogClose>
                         <DialogClose asChild>
-                            <Button onClick={handleAccept}>Accept</Button>
+                            <Button onClick={handleAccept}>
+                                {dict.admin.requests.accept.accept}
+                            </Button>
                         </DialogClose>
                     </div>
                 </DialogHeader>

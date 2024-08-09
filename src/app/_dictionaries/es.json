@@ -387,6 +387,21 @@
                 }
             }
         },
+        "home": {
+            "welcomeToRelif": "Bienvenido a Relif",
+            "briefOverview": "Una breve descripción de su funcionamiento",
+            "housings": "Alojamientos",
+            "volunteers": "Voluntarios",
+            "products": "Productos",
+            "occupancyRate": "Tasa de ocupación",
+            "beneficiaries": "Beneficiarios",
+            "occupied": "Ocupado",
+            "full": "LLENO",
+            "available": "DISPONIBLE",
+            "availableBeds": "Camas disponibles",
+            "overcrowded": "SOBREPOBLADO",
+            "viewHousing": "Ver alojamiento"
+        },
         "beneficiaries": {
             "create": {
                 "createBeneficiary": "Crear beneficiario",
@@ -968,6 +983,185 @@
                     "editVolunteer": "Editar voluntario",
                     "removeVolunteer": "Eliminar voluntario"
                 }
+            }
+        }
+    },
+    "admin": {
+        "header": {
+            "preferences": "Preferencias"
+        },
+        "sidebar": {
+            "admin": "Admin",
+            "organizations": "Organizaciones",
+            "requests": "Solicitudes",
+            "preferences": "Preferencias"
+        },
+        "preferences": {
+            "title": "Preferencias",
+            "menu": {
+                "platform": "Plataforma",
+                "users": "Usuarios"
+            },
+            "platform": {
+                "language": "Idioma",
+                "timezone": "Zona horaria",
+                "select": "Seleccionar...",
+                "portuguese": "Portugués",
+                "english": "Inglés",
+                "spanish": "Español"
+            },
+            "users": {
+                "add": {
+                    "successTitle": "¡Éxito!",
+                    "successDescription": "El usuario ha sido invitado exitosamente.",
+                    "errorTitle": "¡Error!",
+                    "errorDescription": "Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo más tarde.",
+                    "inviteNewUser": "Invitar a un nuevo usuario",
+                    "enterEmail": "Ingresa el correo electrónico del usuario que deseas agregar a tu organización.",
+                    "email": "Correo electrónico *",
+                    "placeholder": "ej: juan.perez@ejemplo.com",
+                    "cancel": "Cancelar",
+                    "inviteUser": "Invitar usuario"
+                },
+                "card": {
+                    "colaborator": "Colaborador",
+                    "member": "MIEMBRO",
+                    "remove": "Eliminar"
+                },
+                "list": {
+                    "loading": "Cargando...",
+                    "error": "Algo salió mal. Por favor, intenta de nuevo más tarde.",
+                    "noUsers": "No se encontraron usuarios..."
+                },
+                "remove": {
+                    "removedTitle": "¡Eliminado!",
+                    "removedDescription": "Usuario eliminado con éxito.",
+                    "deletionFailedTitle": "Error al Eliminar el Usuario",
+                    "deletionFailedDescription": "Ocurrió un error al intentar eliminar el usuario. Por favor, inténtelo de nuevo más tarde o comuníquese con el soporte si el problema persiste.",
+                    "confirmationTitle": "¿Estás absolutamente seguro?",
+                    "confirmationDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente al usuario a continuación.",
+                    "cancel": "Cancelar",
+                    "delete": "Eliminar"
+                },
+                "page": {
+                    "addUser": "Agregar Usuario"
+                }
+            }
+        },
+        "organizations": {
+            "list": {
+                "loading": "Cargando...",
+                "error": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+                "noHousingsFound": "No se encontraron alojamientos...",
+                "card": {
+                    "viewOrganization": "Ver organización",
+                    "disableAccess": "Desactivar acceso",
+                    "createdAt": "Creado en"
+                },
+                "disable": {
+                    "disableAccessQuestion": "¿Desactivar acceso?",
+                    "disableAccessDescription": "¿Estás seguro de que deseas desactivar el acceso a este alojamiento? Esta acción se puede revertir habilitando el acceso nuevamente más tarde si es necesario.",
+                    "cancel": "Cancelar",
+                    "disableAccess": "Desactivar acceso",
+                    "loading": "Cargando...",
+                    "accessDisabled": "Acceso desactivado",
+                    "accessDisabledDescription": "El acceso a la organización se desactivó con éxito.",
+                    "disableAccessFailed": "Error al desactivar el acceso",
+                    "disableAccessFailedDescription": "Ocurrió un error al intentar desactivar el acceso a la organización. Por favor, inténtalo de nuevo más tarde o contacta con el soporte si el problema persiste."
+                },
+                "enable": {
+                    "enableAccessQuestion": "¿Habilitar acceso?",
+                    "enableAccessDescription": "¿Estás seguro de que deseas habilitar el acceso a este alojamiento? Esta acción se puede revertir desactivando el acceso nuevamente más tarde si es necesario.",
+                    "cancel": "Cancelar",
+                    "disableAccess": "Desactivar acceso",
+                    "loading": "Cargando...",
+                    "accessEnabled": "Acceso habilitado",
+                    "accessEnabledDescription": "El acceso a la organización se habilitó con éxito.",
+                    "enableAccessFailed": "Error al habilitar el acceso",
+                    "enableAccessFailedDescription": "Ocurrió un error al intentar habilitar el acceso a la organización. Por favor, inténtalo de nuevo más tarde o contacta con el soporte si el problema persiste."
+                },
+                "toolbar": {
+                    "reports": "Informes",
+                    "downloadCSV": "Descargar CSV",
+                    "downloadPDF": "Descargar PDF"
+                }
+            },
+            "organizationId": {
+                "content": {
+                    "loading": "Cargando...",
+                    "error": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+                    "createdAt": "Creado en",
+                    "users": "Usuarios",
+                    "search": "Buscar",
+                    "housings": "Alojamientos"
+                },
+                "error": {
+                    "message": "Algo salió mal. Por favor, inténtalo de nuevo más tarde."
+                },
+                "toolbar": {
+                    "backToList": "Volver a la lista",
+                    "disableAccess": "Desactivar acceso"
+                },
+                "housing": {
+                    "card": {
+                        "beneficiaries": "beneficiarios",
+                        "createdAt": "Creado en"
+                    },
+                    "list": {
+                        "loading": "Cargando...",
+                        "error": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+                        "noHousingsFound": "No se encontraron alojamientos..."
+                    }
+                },
+                "users": {
+                    "card": {
+                        "createdAt": "Creado en",
+                        "member": "MIEMBRO"
+                    },
+                    "list": {
+                        "loading": "Cargando...",
+                        "error": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+                        "noUsersFound": "No se encontraron usuarios..."
+                    }
+                }
+            }
+        },
+        "requests": {
+            "accept": {
+                "coordinationAccessEnabledTitle": "Acceso de Coordinación Habilitado",
+                "coordinationAccessEnabledDescription": "El tipo de organización se ha cambiado exitosamente a coordinación, con acceso a datos de otras organizaciones.",
+                "coordinationAccessChangeFailedTitle": "Cambio de Acceso de Coordinación Fallido",
+                "coordinationAccessChangeFailedDescription": "Ocurrió un error al intentar cambiar el tipo de la organización a coordinación. Inténtelo de nuevo más tarde o comuníquese con el soporte si el problema persiste.",
+                "acceptRequestTitle": "Aceptar solicitud",
+                "acceptRequestDescription": "Confirmando la solicitud para aceptar el cambio del tipo de la organización a continuación de Gestión a Coordinación, permitiendo acceso a datos de otras organizaciones.",
+                "cancel": "Cancelar",
+                "accept": "Aceptar"
+            },
+            "card": {
+                "viewOrganization": "Ver organización",
+                "accept": "Aceptar solicitud",
+                "reject": "Rechazar solicitud",
+                "requestedAt": "Solicitado en",
+                "statusAccepted": "Aceptado",
+                "statusRejected": "Rechazado",
+                "statusPending": "Pendiente"
+            },
+            "list": {
+                "loading": "Cargando...",
+                "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                "noRequests": "No se encontraron solicitudes..."
+            },
+            "reject": {
+                "requestRejectedTitle": "Solicitud Rechazada",
+                "requestRejectedDescription": "La solicitud para cambiar el tipo de la organización ha sido rechazada con éxito.",
+                "rejectionFailedTitle": "Rechazo Fallido",
+                "rejectionFailedDescription": "Ocurrió un error al intentar rechazar la solicitud. Inténtelo de nuevo más tarde o comuníquese con el soporte si el problema persiste.",
+                "rejectRequestTitle": "Rechazar solicitud",
+                "rejectRequestDescription": "Confirmando la solicitud para rechazar el cambio del tipo de la organización a continuación de Gestión a Coordinación.",
+                "rejectReason": "Motivo del rechazo",
+                "rejectReasonPlaceholder": "Máx. 250 caracteres",
+                "cancel": "Cancelar",
+                "reject": "Rechazar"
             }
         }
     },

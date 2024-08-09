@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -24,6 +25,8 @@ type Props = OrganizationSchema & {
 };
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [enableDialogOpenState, setEnableDialogOpenState] = useState(false);
     const [disableDialogOpenState, setDisableDialogOpenState] = useState(false);
 
@@ -52,21 +55,22 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     <DropdownMenuContent>
                         <DropdownMenuItem asChild>
                             <Link href={`/app/admin/organizations/${data.id}`}>
-                                View organization
+                                {dict.admin.organizations.list.card.viewOrganization}
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setDisableDialogOpenState(true)}>
                             <span className="flex items-center gap-2">
                                 <FaEdit className="text-xs" />
-                                Disable access
+                                {dict.admin.organizations.list.card.disableAccess}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col items-end">
                     <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        Created at {formatDate(data?.created_at, locale || "en")}
+                        {dict.admin.organizations.list.card.createdAt}{" "}
+                        {formatDate(data?.created_at, locale || "en")}
                     </span>
                 </div>
             </div>

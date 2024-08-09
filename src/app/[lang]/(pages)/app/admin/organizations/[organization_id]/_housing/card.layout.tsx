@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { HousingSchema } from "@/types/housing.types";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname } from "next/navigation";
@@ -11,6 +12,7 @@ type Props = HousingSchema;
 
 const HousingCard = (data: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     return (
@@ -23,11 +25,13 @@ const HousingCard = (data: Props): ReactNode => {
                 </span>
 
                 <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                    <FaPeopleGroup /> {data.occupied_vacancies} beneficiaries
+                    <FaPeopleGroup /> {data.occupied_vacancies}{" "}
+                    {dict.admin.organizations.organizationId.housing.card.beneficiaries}
                 </span>
 
                 <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    Created at {formatDate(data.created_at, locale || "en")}
+                    {dict.admin.organizations.organizationId.housing.card.createdAt}{" "}
+                    {formatDate(data.created_at, locale || "en")}
                 </span>
             </div>
         </li>

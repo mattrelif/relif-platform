@@ -1,9 +1,19 @@
+import { getDictionary } from "@/app/dictionaries";
+import { Locale } from "@/app/i18n-config";
 import { ReactNode } from "react";
 import { MdSettings } from "react-icons/md";
 
 import { Menu } from "./menu.layout";
 
-export default function Layout({ children }: { children: ReactNode }): ReactNode {
+export default async function Layout({
+    children,
+    params,
+}: {
+    children: ReactNode;
+    params: { lang: Locale };
+}): Promise<ReactNode> {
+    const dict = await getDictionary(params.lang);
+
     return (
         <>
             <div className="border-b-[1px] border-slate-200 p-8">
@@ -11,7 +21,7 @@ export default function Layout({ children }: { children: ReactNode }): ReactNode
                     <span className="w-[40px] h-[40px] bg-relif-orange-200 flex items-center justify-center text-white rounded-lg">
                         <MdSettings />
                     </span>
-                    Preferences
+                    {dict.admin.preferences.title}
                 </h1>
             </div>
             <div className="grid grid-cols-[350px_auto]">

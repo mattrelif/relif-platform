@@ -1,6 +1,7 @@
 "use client";
 
 import { TIMEZONES } from "@/app/constants/timezones";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     Select,
     SelectContent,
@@ -14,6 +15,8 @@ import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 
 const Form = (): ReactNode => {
+    const dict = useDictionary();
+
     const [userData, setUserData] = useState<UserSchema | null>(null);
     const [language, setLanguage] = useState("english");
     const [timezone, setTimezone] = useState("UTC+00");
@@ -60,23 +63,33 @@ const Form = (): ReactNode => {
     return (
         <>
             <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
-                <span className="text-sm text-slate-900 font-semibold">Language</span>
+                <span className="text-sm text-slate-900 font-semibold">
+                    {dict.admin.preferences.platform.language}
+                </span>
                 <Select defaultValue={language} onValueChange={handleLanguage}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select..." />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="portuguese">Portuguese</SelectItem>
-                        <SelectItem value="english">English</SelectItem>
-                        <SelectItem value="spanish">Spanish</SelectItem>
+                        <SelectItem value="portuguese">
+                            {dict.admin.preferences.platform.portuguese}
+                        </SelectItem>
+                        <SelectItem value="english">
+                            {dict.admin.preferences.platform.english}
+                        </SelectItem>
+                        <SelectItem value="spanish">
+                            {dict.admin.preferences.platform.spanish}
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
             <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
-                <span className="text-sm text-slate-900 font-semibold">Timezone</span>
+                <span className="text-sm text-slate-900 font-semibold">
+                    {dict.admin.preferences.platform.timezone}
+                </span>
                 <Select defaultValue={timezone} onValueChange={handleTimezone}>
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select..." />
+                        <SelectValue placeholder={dict.admin.preferences.platform.select} />
                     </SelectTrigger>
                     <SelectContent>
                         {TIMEZONES.map(tz => (

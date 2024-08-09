@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -9,6 +10,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { desativateOrganization } from "@/repository/organization.repository";
 import { OrganizationSchema } from "@/types/organization.types";
 import { useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
@@ -27,6 +29,7 @@ const DisableModal = ({
     setDisableDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -34,7 +37,7 @@ const DisableModal = ({
         try {
             setIsLoading(true);
 
-            // await disableAccessToHousing(organization.id);
+            await desativateOrganization(organization.id);
             if (refreshList) {
                 refreshList();
             } else {
@@ -42,16 +45,15 @@ const DisableModal = ({
             }
 
             toast({
-                title: "Access Disabled",
-                description: "Access to the organization was successfully disabled.",
+                title: dict.admin.organizations.list.disable.accessDisabled,
+                description: dict.admin.organizations.list.disable.accessDisabledDescription,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Disable Access Failed",
-                description:
-                    "An error occurred while attempting to disable access to the organization. Please try again later or contact support if the issue persists.",
+                title: dict.admin.organizations.list.disable.disableAccessFailed,
+                description: dict.admin.organizations.list.disable.disableAccessFailedDescription,
                 variant: "destructive",
             });
         }
@@ -62,10 +64,11 @@ const DisableModal = ({
             <Dialog open={disableDialogOpenState} onOpenChange={setDisableDialogOpenState}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle className="pb-3">Disable Access?</DialogTitle>
+                        <DialogTitle className="pb-3">
+                            {dict.admin.organizations.list.disable.disableAccessQuestion}
+                        </DialogTitle>
                         <DialogDescription>
-                            Are you sure you want to disable access to this housing? This action can
-                            be reversed by re-enabling access later if necessary.
+                            {dict.admin.organizations.list.disable.disableAccessDescription}
                         </DialogDescription>
                         <div className="flex flex-col pt-4">
                             <span className="text-sm text-slate-900 font-bold">
@@ -81,10 +84,12 @@ const DisableModal = ({
                                 variant="outline"
                                 onClick={() => setDisableDialogOpenState(false)}
                             >
-                                Cancel
+                                {dict.admin.organizations.list.disable.cancel}
                             </Button>
                             <Button onClick={handleDisable}>
-                                {!isLoading ? "Disable Access" : "Loading..."}
+                                {!isLoading
+                                    ? dict.admin.organizations.list.disable.disableAccess
+                                    : dict.admin.organizations.list.disable.loading}
                             </Button>
                         </div>
                     </DialogHeader>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ type Props = UpdateOrganizationTypeRequestSchema & {
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const [acceptDialogOpenState, setAcceptDialogOpenState] = useState(false);
@@ -40,6 +42,12 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
             : data.status === "REJECTED"
               ? "bg-red-600 text-white hover:bg-red-700"
               : "bg-yellow-400 text-slate-900 hover:bg-yellow-600";
+
+    const STATUS = {
+        ACCEPTED: dict.admin.requests.card.statusAccepted,
+        REJECTED: dict.admin.requests.card.statusRejected,
+        PENDING: dict.admin.requests.card.statusPending,
+    };
 
     return (
         <>
@@ -61,7 +69,9 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         {`${countryCode} ${phone}`}
                     </span>
                     <span className="mt-3">
-                        <Badge className={statusColor}>{data.status}</Badge>
+                        <Badge className={statusColor}>
+                            {STATUS[data.status as keyof typeof STATUS]}
+                        </Badge>
                     </span>
                 </div>
                 <div className="flex flex-col items-end justify-between">
@@ -74,7 +84,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         <DropdownMenuContent>
                             <DropdownMenuItem asChild>
                                 <Link href={`/app/admin/organizations/${data?.organization_id}`}>
-                                    View organization
+                                    {dict.admin.requests.card.viewOrganization}
                                 </Link>
                             </DropdownMenuItem>
                             {data.status !== "ACCEPTED" && data.status !== "REJECTED" && (
@@ -85,7 +95,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                                     >
                                         <span className="flex items-center gap-2">
                                             <MdCheck className="text-xs" />
-                                            Accept request
+                                            {dict.admin.requests.card.accept}
                                         </span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
@@ -93,7 +103,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                                     >
                                         <span className="flex items-center gap-2">
                                             <MdClose className="text-xs" />
-                                            Reject request
+                                            {dict.admin.requests.card.reject}
                                         </span>
                                     </DropdownMenuItem>
                                 </>
@@ -102,7 +112,8 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </DropdownMenu>
                     <div className="flex flex-col items-end">
                         <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                            Requested at {formatDate(data?.created_at, locale || "en")}
+                            {dict.admin.requests.card.requestedAt}{" "}
+                            {formatDate(data?.created_at, locale || "en")}
                         </span>
                     </div>
                 </div>

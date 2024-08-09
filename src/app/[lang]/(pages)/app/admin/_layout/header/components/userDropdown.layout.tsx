@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,17 +11,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { signOut } from "@/repository/auth.repository";
-import { removeFromLocalStorage } from "@/utils/localStorage";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { ReactNode } from "react";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage, removeFromLocalStorage } from "@/utils/localStorage";
+import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
 
 const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
-    const pathname = usePathname();
+    const dict = useDictionary();
     const router = useRouter();
     const { toast } = useToast();
 
-    const urlPath = pathname.split("/").slice(0, 4).join("/");
+    const [user, setUser] = useState<UserSchema | null>(null);
 
     const onHandleSignOut = async (): Promise<void> => {
         try {
@@ -29,24 +30,37 @@ const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
             router.push("/", { scroll: false });
         } catch {
             toast({
-                title: "Error",
-                description: "An error occurred. Please try again.",
+                title: dict.commons.header.toastErrorTitle,
+                description: dict.commons.header.toastErrorDescription,
                 variant: "destructive",
             });
         }
     };
 
+    useEffect(() => {
+        try {
+            const currentUser = getFromLocalStorage("r_ud");
+            if (currentUser) {
+                setUser(currentUser);
+            } else {
+                throw new Error();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }, []);
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuLabel>Hi, Anthony</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                    {dict.commons.header.hi}, {user?.first_name}
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href={`${urlPath}/preferences/my-profile`}>Profile</Link>
+                <DropdownMenuItem onClick={onHandleSignOut}>
+                    {dict.commons.header.logout}
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onHandleSignOut}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

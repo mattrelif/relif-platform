@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -28,6 +29,7 @@ const UserRemove = ({
     setRemoveUserDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const handleDelete = async (): Promise<void> => {
         try {
@@ -36,15 +38,14 @@ const UserRemove = ({
 
             setRemoveUserDialogOpenState(false);
             toast({
-                title: "Removed!",
-                description: "User removed successfully.",
+                title: dict.admin.preferences.users.remove.removedTitle,
+                description: dict.admin.preferences.users.remove.removedDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "User Deletion Failed",
-                description:
-                    "An error occurred while attempting to delete the user. Please try again later or contact support if the issue persists.",
+                title: dict.admin.preferences.users.remove.deletionFailedTitle,
+                description: dict.admin.preferences.users.remove.deletionFailedDescription,
                 variant: "destructive",
             });
         }
@@ -54,9 +55,11 @@ const UserRemove = ({
         <Dialog open={removeUserDialogOpenState} onOpenChange={setRemoveUserDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Are you absolutely sure?</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.admin.preferences.users.remove.confirmationTitle}
+                    </DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. This will permanently delete the user below.
+                        {dict.admin.preferences.users.remove.confirmationDescription}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
@@ -69,10 +72,12 @@ const UserRemove = ({
                             variant="outline"
                             onClick={() => setRemoveUserDialogOpenState(false)}
                         >
-                            Cancel
+                            {dict.admin.preferences.users.remove.cancel}
                         </Button>
                         <DialogClose asChild>
-                            <Button onClick={handleDelete}>Delete</Button>
+                            <Button onClick={handleDelete}>
+                                {dict.admin.preferences.users.remove.delete}
+                            </Button>
                         </DialogClose>
                     </div>
                 </DialogHeader>

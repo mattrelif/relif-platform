@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,6 +15,7 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 
 const Menu = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const activeOption = pathname.split("/")[5] ?? "platform";
 
     return (
@@ -29,7 +31,7 @@ const Menu = (): ReactNode => {
                         )}
                     >
                         <FaSitemap size={15} />
-                        Platform
+                        {dict.admin.preferences.menu.platform}
                     </li>
                 </Link>
 
@@ -43,7 +45,7 @@ const Menu = (): ReactNode => {
                         )}
                     >
                         <FaUsers size={15} />
-                        Users
+                        {dict.admin.preferences.menu.users}
                     </li>
                 </Link>
             </ul>

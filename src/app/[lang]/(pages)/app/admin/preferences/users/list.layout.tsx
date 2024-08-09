@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { findUsersByOrganizationId } from "@/repository/organization.repository";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
@@ -9,6 +10,8 @@ import { MdError } from "react-icons/md";
 import { UserCard } from "./card.layout";
 
 const UserList = (): ReactNode => {
+    const dict = useDictionary();
+
     const [currentUserId, setCurrentUserId] = useState("");
     const [data, setData] = useState<{ data: UserSchema[]; count: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -44,20 +47,24 @@ const UserList = (): ReactNode => {
     }, []);
 
     return (
-        <ul className="w-full h-[calc(100vh-316px)] border-[1px] border-slate-200 rounded-md p-2 mt-4 overflow-x-hidden overflow-y-scroll flex flex-col gap-2">
+        <ul className="w-full h-[calc(100vh-268px)] border-[1px] border-slate-200 rounded-md p-2 mt-4 overflow-x-hidden overflow-y-scroll flex flex-col gap-2">
             {isLoading && (
-                <h2 className="p-2 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                <h2 className="p-2 text-relif-orange-400 font-medium text-sm">
+                    {dict.admin.preferences.users.list.loading}
+                </h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.admin.preferences.users.list.error}
                 </span>
             )}
 
             {!isLoading && !error && !data && (
-                <span className="text-sm text-slate-900 font-medium">No users found...</span>
+                <span className="text-sm text-slate-900 font-medium">
+                    {dict.admin.preferences.users.list.noUsers}
+                </span>
             )}
 
             {!isLoading &&

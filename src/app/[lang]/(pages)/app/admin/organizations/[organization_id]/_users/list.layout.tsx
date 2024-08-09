@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { findUsersByOrganizationId } from "@/repository/organization.repository";
 import { UserSchema } from "@/types/user.types";
 import { ReactNode, useEffect, useState } from "react";
@@ -12,6 +13,8 @@ type Props = {
 };
 
 const UserList = ({ organizationId }: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [data, setData] = useState<{ data: UserSchema[]; count: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -32,20 +35,24 @@ const UserList = ({ organizationId }: Props): ReactNode => {
     }, []);
 
     return (
-        <div className="w-full h-[calc(100vh-386px)] border border-slate-200 rounded-md overflow-hidden">
+        <div className="w-full h-[calc(100vh-347px)] border border-slate-200 rounded-md overflow-hidden">
             {isLoading && (
-                <h2 className="text-relif-orange-400 font-medium text-sm p-2">Loading...</h2>
+                <h2 className="text-relif-orange-400 font-medium text-sm p-2">
+                    {dict.admin.organizations.organizationId.users.list.loading}
+                </h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-2">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.admin.organizations.organizationId.users.list.error}
                 </span>
             )}
 
             {!isLoading && !error && data && data.count <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-2">No users found...</span>
+                <span className="text-sm text-slate-900 font-medium p-2">
+                    {dict.admin.organizations.organizationId.users.list.noUsersFound}
+                </span>
             )}
 
             {!isLoading && !error && data && data.count > 0 && (

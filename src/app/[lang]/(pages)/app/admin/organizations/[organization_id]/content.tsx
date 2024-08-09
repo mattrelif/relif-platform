@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { findOrganizationByID } from "@/repository/organization.repository";
 import { OrganizationSchema } from "@/types/organization.types";
 import { formatDate } from "@/utils/formatDate";
@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaHouseChimneyUser, FaUsers } from "react-icons/fa6";
-import { MdError, MdSearch } from "react-icons/md";
+import { MdError } from "react-icons/md";
 
 import { HousingList } from "./_housing/list.layout";
 import { UserList } from "./_users/list.layout";
@@ -20,6 +20,7 @@ type Props = {
 
 const Content = ({ organizationId }: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const [data, setData] = useState<OrganizationSchema | null>(null);
@@ -43,13 +44,17 @@ const Content = ({ organizationId }: Props): ReactNode => {
     }, []);
 
     if (isLoading)
-        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                {dict.admin.organizations.organizationId.content.loading}
+            </h2>
+        );
 
     if (!isLoading && error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.admin.organizations.organizationId.content.error}
             </span>
         );
 
@@ -68,7 +73,8 @@ const Content = ({ organizationId }: Props): ReactNode => {
                             {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                         </span>
                         <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                            Created at {formatDate(data?.created_at, locale || "en")}
+                            {dict.admin.organizations.organizationId.content.createdAt}{" "}
+                            {formatDate(data?.created_at, locale || "en")}
                         </span>
                     </div>
                 </div>
@@ -77,23 +83,23 @@ const Content = ({ organizationId }: Props): ReactNode => {
                     <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
                         <h3 className="text-relif-orange-200 font-bold flex items-center gap-2">
                             <FaUsers />
-                            Users
+                            {dict.admin.organizations.organizationId.content.users}
                         </h3>
-                        <div className="flex items-center gap-2">
-                            <MdSearch className="text-slate-400 text-2xl" />
-                            <Input type="text" placeholder="Search" className="w-full h-8" />
-                        </div>
+                        {/* <div className="flex items-center gap-2"> */}
+                        {/*    <MdSearch className="text-slate-400 text-2xl" /> */}
+                        {/*    <Input type="text" placeholder="Search" className="w-full h-8" /> */}
+                        {/* </div> */}
                         <UserList organizationId={organizationId} />
                     </div>
                     <div className="flex flex-col gap-2 w-full h-max grow border border-slate-200 rounded-lg p-2">
                         <h3 className="text-relif-orange-200 font-bold flex items-center gap-2">
                             <FaHouseChimneyUser />
-                            Housings
+                            {dict.admin.organizations.organizationId.content.housings}
                         </h3>
-                        <div className="flex items-center gap-2">
-                            <MdSearch className="text-slate-400 text-2xl" />
-                            <Input type="text" placeholder="Search" className="w-full h-8" />
-                        </div>
+                        {/* <div className="flex items-center gap-2"> */}
+                        {/*    <MdSearch className="text-slate-400 text-2xl" /> */}
+                        {/*    <Input type="text" placeholder="Search" className="w-full h-8" /> */}
+                        {/* </div> */}
                         <HousingList organizationId={organizationId} />
                     </div>
                 </div>

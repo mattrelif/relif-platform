@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { findRequests } from "@/repository/updateOrganizationTypeRequests";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
@@ -10,6 +11,8 @@ import { MdError } from "react-icons/md";
 import { Card } from "./card.layout";
 
 const RequestList = (): ReactNode => {
+    const dict = useDictionary();
+
     const [requests, setRequests] = useState<{
         count: number;
         data: UpdateOrganizationTypeRequestSchema[];
@@ -44,18 +47,22 @@ const RequestList = (): ReactNode => {
     return (
         <div className="h-[calc(100vh-115px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
             {isLoading && (
-                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                    {dict.admin.requests.list.loading}
+                </h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.admin.requests.list.error}
                 </span>
             )}
 
             {!isLoading && !error && requests && requests.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">No requests found...</span>
+                <span className="text-sm text-slate-900 font-medium p-4">
+                    {dict.admin.requests.list.noRequests}
+                </span>
             )}
 
             {!isLoading && !error && requests && requests.data.length > 0 && (

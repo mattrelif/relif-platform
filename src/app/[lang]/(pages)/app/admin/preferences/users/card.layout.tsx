@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ type Props = UserSchema & {
 };
 
 const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => {
+    const dict = useDictionary();
     const [removeUserDialogOpenState, setRemoveUserDialogOpenState] = useState(false);
     const initials = data.first_name.charAt(0).concat(data.last_name.charAt(0));
 
@@ -50,9 +52,11 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
             </div>
 
             <div className="flex flex-col">
-                <span className="text-xs text-slate-500">{data?.role || "Colaborator"}</span>
+                <span className="text-xs text-slate-500">
+                    {data?.role || dict.admin.preferences.users.card.colaborator}
+                </span>
                 <span>
-                    <Badge>{data.platform_role || "MEMBER"}</Badge>
+                    <Badge>{data.platform_role || dict.admin.preferences.users.card.member}</Badge>
                 </span>
             </div>
 
@@ -64,14 +68,15 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        {currentUserId !== data.id && (
-                            <DropdownMenuItem onClick={() => setRemoveUserDialogOpenState(true)}>
-                                <span className="flex items-center gap-2">
-                                    <FaTrash className="text-xs" />
-                                    Remove
-                                </span>
-                            </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem
+                            onClick={() => setRemoveUserDialogOpenState(true)}
+                            disabled={currentUserId === data.id}
+                        >
+                            <span className="flex items-center gap-2">
+                                <FaTrash className="text-xs" />
+                                {dict.admin.preferences.users.card.remove}
+                            </span>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

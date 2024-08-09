@@ -1,11 +1,12 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { FaBuilding, FaHome, FaUsers } from "react-icons/fa";
+import { FaBuilding, FaUsers } from "react-icons/fa";
 import { MdSettings } from "react-icons/md";
 
 const BASE_LIST_ITEM_CLASSES =
@@ -17,6 +18,7 @@ const BASE_LIST_ITEM_ACTIVE_CLASSES =
 
 const Sidebar = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const activeOption = pathname.split("/")[4] ?? "home";
 
     return (
@@ -31,20 +33,9 @@ const Sidebar = (): ReactNode => {
             </div>
 
             <ul className="flex flex-col gap-1">
-                <span className="text-slate-500 font-bold text-sm pl-2 mb-2">Admin</span>
-                <Link href={`/app/admin/home`}>
-                    <li
-                        className={cn(
-                            BASE_LIST_ITEM_CLASSES,
-                            activeOption !== "home"
-                                ? BASE_LIST_ITEM_HOVER_CLASSES
-                                : BASE_LIST_ITEM_ACTIVE_CLASSES
-                        )}
-                    >
-                        <FaHome size={15} />
-                        Home
-                    </li>
-                </Link>
+                <span className="text-slate-500 font-bold text-sm pl-2 mb-2">
+                    {dict.admin.sidebar.admin}
+                </span>
 
                 <Link href={`/app/admin/organizations`}>
                     <li
@@ -56,7 +47,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaBuilding size={15} />
-                        Organizations
+                        {dict.admin.sidebar.organizations}
                     </li>
                 </Link>
 
@@ -70,7 +61,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <FaUsers size={15} />
-                        Requests
+                        {dict.admin.sidebar.requests}
                     </li>
                 </Link>
             </ul>
@@ -88,7 +79,7 @@ const Sidebar = (): ReactNode => {
                         )}
                     >
                         <MdSettings size={15} />
-                        Preferences
+                        {dict.admin.sidebar.preferences}
                     </li>
                 </Link>
             </ul>

@@ -387,6 +387,21 @@
                 }
             }
         },
+        "home": {
+            "welcomeToRelif": "Welcome to Relif",
+            "briefOverview": "A brief overview of its operation",
+            "housings": "Housings",
+            "volunteers": "Volunteers",
+            "products": "Products",
+            "occupancyRate": "Occupancy rate",
+            "beneficiaries": "beneficiaries",
+            "occupied": "occupied",
+            "full": "FULL",
+            "available": "AVAILABLE",
+            "availableBeds": "available beds",
+            "overcrowded": "OVERCROWDED",
+            "viewHousing": "View housing"
+        },
         "beneficiaries": {
             "create": {
                 "title": "Create beneficiary",
@@ -968,6 +983,185 @@
                     "editVolunteer": "Edit volunteer",
                     "removeVolunteer": "Remove volunteer"
                 }
+            }
+        }
+    },
+    "admin": {
+        "header": {
+            "preferences": "Preferences"
+        },
+        "sidebar": {
+            "admin": "Admin",
+            "organizations": "Organizations",
+            "requests": "Requests",
+            "preferences": "Preferences"
+        },
+        "preferences": {
+            "title": "Preferences",
+            "menu": {
+                "platform": "Platform",
+                "users": "Users"
+            },
+            "platform": {
+                "language": "Language",
+                "timezone": "Timezone",
+                "select": "Select...",
+                "portuguese": "Portuguese",
+                "english": "English",
+                "spanish": "Spanish"
+            },
+            "users": {
+                "add": {
+                    "successTitle": "Success!",
+                    "successDescription": "The user has been successfully invited.",
+                    "errorTitle": "Error!",
+                    "errorDescription": "An error occurred while processing your request. Please try again later.",
+                    "inviteNewUser": "Invite a new user",
+                    "enterEmail": "Enter the email of the user you want to add to your organization.",
+                    "email": "E-mail *",
+                    "placeholder": "e.g. john.doe@example.com",
+                    "cancel": "Cancel",
+                    "inviteUser": "Invite user"
+                },
+                "card": {
+                    "colaborator": "Colaborator",
+                    "member": "MEMBER",
+                    "remove": "Remove"
+                },
+                "list": {
+                    "loading": "Loading...",
+                    "error": "Something went wrong. Please try again later.",
+                    "noUsers": "No users found..."
+                },
+                "remove": {
+                    "removedTitle": "Removed!",
+                    "removedDescription": "User removed successfully.",
+                    "deletionFailedTitle": "User Deletion Failed",
+                    "deletionFailedDescription": "An error occurred while attempting to delete the user. Please try again later or contact support if the issue persists.",
+                    "confirmationTitle": "Are you absolutely sure?",
+                    "confirmationDescription": "This action cannot be undone. This will permanently delete the user below.",
+                    "cancel": "Cancel",
+                    "delete": "Delete"
+                },
+                "page": {
+                    "addUser": "Add User"
+                }
+            }
+        },
+        "organizations": {
+            "list": {
+                "loading": "Loading...",
+                "error": "Something went wrong. Please try again later.",
+                "noHousingsFound": "No housings found...",
+                "card": {
+                    "viewOrganization": "View organization",
+                    "disableAccess": "Disable access",
+                    "createdAt": "Created at"
+                },
+                "disable": {
+                    "disableAccessQuestion": "Disable Access?",
+                    "disableAccessDescription": "Are you sure you want to disable access to this housing? This action can be reversed by re-enabling access later if necessary.",
+                    "cancel": "Cancel",
+                    "disableAccess": "Disable Access",
+                    "loading": "Loading...",
+                    "accessDisabled": "Access Disabled",
+                    "accessDisabledDescription": "Access to the organization was successfully disabled.",
+                    "disableAccessFailed": "Disable Access Failed",
+                    "disableAccessFailedDescription": "An error occurred while attempting to disable access to the organization. Please try again later or contact support if the issue persists."
+                },
+                "enable": {
+                    "enableAccessQuestion": "Enable Access?",
+                    "enableAccessDescription": "Are you sure you want to re-enable access to this housing? This action can be reversed by re-enabling access later if necessary.",
+                    "cancel": "Cancel",
+                    "disableAccess": "Disable Access",
+                    "loading": "Loading...",
+                    "accessEnabled": "Access Enabled",
+                    "accessEnabledDescription": "Access to the organization was successfully disabled.",
+                    "enableAccessFailed": "Enable Access Failed",
+                    "enableAccessFailedDescription": "An error occurred while attempting to disable access to the organization. Please try again later or contact support if the issue persists."
+                },
+                "toolbar": {
+                    "reports": "Reports",
+                    "downloadCSV": "Download CSV",
+                    "downloadPDF": "Download PDF"
+                }
+            },
+            "organizationId": {
+                "content": {
+                    "loading": "Loading...",
+                    "error": "Something went wrong. Please try again later.",
+                    "createdAt": "Created at",
+                    "users": "Users",
+                    "search": "Search",
+                    "housings": "Housings"
+                },
+                "error": {
+                    "message": "Something went wrong. Please try again later."
+                },
+                "toolbar": {
+                    "backToList": "Back to list",
+                    "disableAccess": "Disable access"
+                },
+                "housing": {
+                    "card": {
+                        "beneficiaries": "beneficiaries",
+                        "createdAt": "Created at"
+                    },
+                    "list": {
+                        "loading": "Loading...",
+                        "error": "Something went wrong. Please try again later.",
+                        "noHousingsFound": "No housings found..."
+                    }
+                },
+                "users": {
+                    "card": {
+                        "createdAt": "Created at",
+                        "member": "MEMBER"
+                    },
+                    "list": {
+                        "loading": "Loading...",
+                        "error": "Something went wrong. Please try again later.",
+                        "noUsersFound": "No users found..."
+                    }
+                }
+            }
+        },
+        "requests": {
+            "accept": {
+                "coordinationAccessEnabledTitle": "Coordination Access Enabled",
+                "coordinationAccessEnabledDescription": "Organization's type has been successfully changed to coordination, with access to data from other organizations.",
+                "coordinationAccessChangeFailedTitle": "Coordination Access Change Failed",
+                "coordinationAccessChangeFailedDescription": "An error occurred while attempting to change the organization's type to coordination. Please try again later or contact support if the issue persists.",
+                "acceptRequestTitle": "Accept request",
+                "acceptRequestDescription": "Confirming the request to accept the change of the organization type below from Management to Coordination, allowing access to data from other organizations.",
+                "cancel": "Cancel",
+                "accept": "Accept"
+            },
+            "card": {
+                "viewOrganization": "View organization",
+                "accept": "Accept request",
+                "reject": "Reject request",
+                "requestedAt": "Requested at",
+                "statusAccepted": "Accepted",
+                "statusRejected": "Rejected",
+                "statusPending": "Pending"
+            },
+            "list": {
+                "loading": "Loading...",
+                "error": "Something went wrong. Please try again later.",
+                "noRequests": "No requests found..."
+            },
+            "reject": {
+                "requestRejectedTitle": "Request Rejected",
+                "requestRejectedDescription": "The request to change the organization's type has been successfully rejected.",
+                "rejectionFailedTitle": "Rejection Failed",
+                "rejectionFailedDescription": "An error occurred while attempting to reject the request. Please try again later or contact support if the issue persists.",
+                "rejectRequestTitle": "Reject request",
+                "rejectRequestDescription": "Confirming the request to reject the change of the organization type below from Management to Coordination.",
+                "rejectReason": "Reject reason",
+                "rejectReasonPlaceholder": "Max 250 characters",
+                "cancel": "Cancel",
+                "reject": "Reject"
             }
         }
     },

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -32,6 +33,7 @@ const RejectModal = ({
     setRejectDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
     const router = useRouter();
     const [rejectReason, setRejectReason] = useState("");
 
@@ -46,16 +48,14 @@ const RejectModal = ({
             }
 
             toast({
-                title: "Request Rejected",
-                description:
-                    "The request to change the organization's type has been successfully rejected.",
+                title: dict.admin.requests.reject.requestRejectedTitle,
+                description: dict.admin.requests.reject.requestRejectedDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Rejection Failed",
-                description:
-                    "An error occurred while attempting to reject the request. Please try again later or contact support if the issue persists.",
+                title: dict.admin.requests.reject.rejectionFailedTitle,
+                description: dict.admin.requests.reject.rejectuibFailedDescription,
                 variant: "destructive",
             });
         }
@@ -65,10 +65,11 @@ const RejectModal = ({
         <Dialog open={rejectDialogOpenState} onOpenChange={setRejectDialogOpenState}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="pb-3">Reject request</DialogTitle>
+                    <DialogTitle className="pb-3">
+                        {dict.admin.requests.reject.rejectRequestTitle}
+                    </DialogTitle>
                     <DialogDescription>
-                        Confirming the request to reject the change of the organization type below
-                        from Management to Coordination.
+                        {dict.admin.requests.reject.rejectRequestDescription}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
                         <span className="text-sm text-slate-900 font-bold">
@@ -84,7 +85,9 @@ const RejectModal = ({
                         </span>
                     </div>
                     <div className="flex flex-col gap-3 w-full pt-5">
-                        <Label htmlFor="notes">Reject reason</Label>
+                        <Label htmlFor="react-reason">
+                            {dict.admin.requests.reject.rejectReason}
+                        </Label>
                         <textarea
                             className="flex min-h-20 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             id="reject-reason"
@@ -98,10 +101,12 @@ const RejectModal = ({
                     </div>
                     <div className="flex gap-4 pt-5">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{dict.admin.requests.reject.cancel}</Button>
                         </DialogClose>
                         <DialogClose asChild>
-                            <Button onClick={handleReject}>Reject</Button>
+                            <Button onClick={handleReject}>
+                                {dict.admin.requests.reject.reject}
+                            </Button>
                         </DialogClose>
                     </div>
                 </DialogHeader>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { OrganizationSchema } from "@/types/organization.types";
@@ -13,6 +14,8 @@ import { DisableModal } from "../_components/disable.modal";
 type Props = OrganizationSchema;
 
 const Toolbar = (organization: Props): ReactNode => {
+    const dict = useDictionary();
+
     const [disableDialogOpenState, setDisableDialogOpenState] = useState(false);
 
     const pathname = usePathname();
@@ -21,7 +24,9 @@ const Toolbar = (organization: Props): ReactNode => {
     return (
         <div className="w-full h-max flex justify-between items-center">
             <Button size="sm" variant="secondary" asChild>
-                <Link href={backToListPath}>Back to list</Link>
+                <Link href={backToListPath}>
+                    {dict.admin.organizations.organizationId.toolbar.backToList}
+                </Link>
             </Button>
 
             <div className="flex items-center gap-2">
@@ -37,7 +42,9 @@ const Toolbar = (organization: Props): ReactNode => {
                                 <MdBlock />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Disable access</TooltipContent>
+                        <TooltipContent>
+                            {dict.admin.organizations.organizationId.toolbar.disableAccess}
+                        </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>

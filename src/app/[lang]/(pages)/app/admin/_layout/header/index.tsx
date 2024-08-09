@@ -2,6 +2,7 @@
 
 import { Breadcrumb } from "@/app/[lang]/(pages)/app/admin/_layout/header/components/breadcrumb.layout";
 import { UserDropdown } from "@/app/[lang]/(pages)/app/admin/_layout/header/components/userDropdown.layout";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -12,6 +13,7 @@ import { MdSettings } from "react-icons/md";
 
 const Header = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 4).join("/");
 
     return (
@@ -29,7 +31,7 @@ const Header = (): ReactNode => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Preferences</p>
+                            <p>{dict.admin.header.preferences}</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

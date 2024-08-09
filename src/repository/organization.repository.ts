@@ -137,13 +137,6 @@ export async function findJoinPlatformInvitesByOrganizationId(
     });
 }
 
-export async function findProductTypesByOrganizationId(orgId: string): Promise<AxiosResponse> {
-    return client.request({
-        url: `${PREFIX}/${orgId}/product-types`,
-        method: "GET",
-    });
-}
-
 export async function getBeneficiariesByOrganizationID(
     organizationId: string,
     offset: number,
@@ -209,5 +202,19 @@ export async function getDataAccessGrants(
     return client.request({
         url: `${PREFIX}/${orgId}/data-access-grants?offset=${offset}&limit=${limit}`,
         method: "GET",
+    });
+}
+
+export async function desativateOrganization(orgId: string): Promise<void> {
+    return client.request({
+        url: `${PREFIX}/${orgId}`,
+        method: "DELETE",
+    });
+}
+
+export async function reactivateOrganization(orgId: string): Promise<void> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/reactivate`,
+        method: "PUT",
     });
 }
