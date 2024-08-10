@@ -6,7 +6,6 @@ const client: AxiosInstance = axios.create({
     headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-cache",
-        Origin: "http://app.relifaid.org",
     },
     withCredentials: true,
 });
