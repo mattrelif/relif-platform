@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
@@ -8,107 +9,110 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { findHousingsByOrganizationId } from "@/repository/organization.repository";
-import { HousingSchema } from "@/types/housing.types";
-import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
-import { MdError } from "react-icons/md";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { ReactNode } from "react";
+import { MdSearch } from "react-icons/md";
 
 import { Card } from "./card.layout";
 
-const HousingList = (): ReactNode => {
-    const pathname = usePathname();
-    const [housings, setHousings] = useState<{ count: number; data: HousingSchema[] } | null>(null);
-    const [offset, setOffset] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
-    const LIMIT = 20;
-
-    const getHousingList = async () => {
-        try {
-            const organizationId = pathname.split("/")[3];
-
-            if (organizationId) {
-                const response = await findHousingsByOrganizationId(organizationId, offset, LIMIT);
-                setHousings(response.data);
-            } else {
-                throw new Error();
-            }
-        } catch {
-            setError(true);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        setIsLoading(true);
-        getHousingList();
-    }, [offset]);
-
-    const totalPages = housings ? Math.ceil(housings.count / LIMIT) : 0;
-    const currentPage = offset / LIMIT + 1;
-
-    const handlePageChange = (newPage: number) => {
-        setOffset((newPage - 1) * LIMIT);
-    };
-
+const ProductList = (): ReactNode => {
     return (
         <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
-            {isLoading && (
-                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
-            )}
+            <div className="p-4 flex items-center justify-between gap-3 border-b-[1px] border-slate-200">
+                <div className="flex items-center gap-2">
+                    <MdSearch className="text-slate-400 text-2xl mr-2" />
+                    <Select defaultValue="name">
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Select..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="reference">Reference</SelectItem>
+                            <SelectItem value="name">Name</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Input type="text" placeholder="Search..." className="w-[300px] lg:w-full" />
+                </div>
 
-            {!isLoading && error && (
-                <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
-                    <MdError />
-                    Something went wrong. Please try again later.
-                </span>
-            )}
+                <div>
+                    <Select>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Category..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="foodAndBeverages">Food and Beverages</SelectItem>
+                            <SelectItem value="personalCareAndBeauty">
+                                Personal Care and Beauty
+                            </SelectItem>
+                            <SelectItem value="householdCleaning">Household Cleaning</SelectItem>
+                            <SelectItem value="babyCareProducts">Baby Care Products</SelectItem>
+                            <SelectItem value="petProducts">Pet Products</SelectItem>
+                            <SelectItem value="pharmacyAndMedications">
+                                Pharmacy and Medications
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+            {/* {isLoading && ( */}
+            {/*    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2> */}
+            {/* )} */}
 
-            {!isLoading && !error && housings && housings.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">No housings found...</span>
-            )}
+            {/* {!isLoading && error && ( */}
+            {/*    <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4"> */}
+            {/*        <MdError /> */}
+            {/*        Something went wrong. Please try again later. */}
+            {/*    </span> */}
+            {/* )} */}
 
-            {!isLoading && !error && housings && housings.data.length > 0 && (
-                <>
-                    <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                        {housings?.data.map(housing => (
-                            <Card key={housing.id} {...housing} refreshList={getHousingList} />
-                        ))}
-                    </ul>
-                    <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        // disabled={currentPage === 1}
-                                    />
-                                </PaginationItem>
-                                {Array.from({ length: totalPages }).map((_, index) => (
-                                    <PaginationItem key={index}>
-                                        <PaginationLink
-                                            onClick={() => handlePageChange(index + 1)}
-                                            isActive={index + 1 === currentPage}
-                                        >
-                                            {index + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        // disabled={currentPage === totalPages}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
-                </>
-            )}
+            {/* {!isLoading && !error && housings && housings.data.length <= 0 && ( */}
+            {/*    <span className="text-sm text-slate-900 font-medium p-4">No housings found...</span> */}
+            {/* )} */}
+
+            {/* {!isLoading && !error && housings && housings.data.length > 0 && ( */}
+            <>
+                <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
+                    {/* {housings?.data.map(housing => ( */}
+                    <Card />
+                    {/* ))} */}
+                </ul>
+                <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                // onClick={() => handlePageChange(currentPage - 1)}
+                                // disabled={currentPage === 1}
+                                />
+                            </PaginationItem>
+                            {/* {Array.from({ length: totalPages }).map((_, index) => ( */}
+                            <PaginationItem>
+                                <PaginationLink
+                                // onClick={() => handlePageChange(index + 1)}
+                                // isActive={index + 1 === currentPage}
+                                >
+                                    {/* {index + 1} */}1
+                                </PaginationLink>
+                            </PaginationItem>
+                            {/* ))} */}
+                            <PaginationItem>
+                                <PaginationNext
+                                // onClick={() => handlePageChange(currentPage + 1)}
+                                // disabled={currentPage === totalPages}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+            </>
+            {/* )} */}
         </div>
     );
 };
 
-export { HousingList };
+export { ProductList };
