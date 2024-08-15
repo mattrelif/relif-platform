@@ -1,3 +1,5 @@
+import { ProductSchema } from "@/types/product.types";
+
 import {
     AddressSchema,
     DocumentSchema,
@@ -46,6 +48,31 @@ export type BeneficiaryAllocationSchema = {
     exit_reason: string;
 };
 
+export type DonateProductToBeneficiaryRequest = {
+    from: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    product_type_id: string;
+    quantity: number;
+};
+
+export type Donation = {
+    id: string;
+    organization_id: string;
+    beneficiary_id: string;
+    beneficiary: BeneficiarySchema;
+    from: {
+        type: "ORGANIZATION" | "HOUSING";
+        name: string;
+        id: string;
+    };
+    product_type_id: string;
+    product_type: ProductSchema;
+    quantity: number;
+    created_at: string;
+};
+
 export type CreateBeneficiaryRequest = Omit<
     BeneficiarySchema,
     | "id"
@@ -69,14 +96,3 @@ export type UpdateBeneficiaryRequest = Omit<
     | "created_at"
     | "updated_at"
 >;
-
-export type AllocateBeneficiaryRequest = {
-    housing_id: string;
-    room_id: string;
-};
-
-export type ReallocateBeneficiaryRequest = {
-    housing_id: string;
-    room_id: string;
-    exit_reason: string;
-};

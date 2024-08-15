@@ -60,19 +60,18 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                         <Badge>{product.unit_type.toUpperCase()}</Badge>
                     </span>
                 </div>
-                {/* <div className="w-full flex items-center gap-2 justify-between flex-wrap"> */}
                 <span className="text-xs text-slate-400 font-regular mt-3 flex items-center gap-2">
                     <MdCategory />
                     {CATEGORIES[product.category as keyof typeof CATEGORIES]}
                 </span>
                 <span className="text-xs text-slate-400 font-regular mt-1 flex items-center gap-1">
+                    {/* TODO */}
                     <FaBoxesPacking className="mr-1" />
                     {/* {console.log(product.storage_records)} */}
                     {product.storage_records.length <= 0 && "Não há produto no estoque"}
                     {/* Presente em <strong className="underline">3</strong> estoques, somando{" "} */}
                     {/* <strong className="underline">138</strong> unidades */}
                 </span>
-                {/* </div> */}
             </div>
             <div className="flex flex-col items-end justify-between">
                 <DropdownMenu>
@@ -82,11 +81,6 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        {/* <DropdownMenuItem> */}
-                        {/*    <span className="w-full flex items-center gap-2"> */}
-                        {/*        <FaBoxes /> View product */}
-                        {/*    </span> */}
-                        {/* </DropdownMenuItem> */}
                         <DropdownMenuItem asChild>
                             <Link href={`${inventoryPath}/${product.id}/edit`}>
                                 <span className="w-full flex items-center gap-2">
@@ -105,12 +99,18 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                                 <FaArrowCircleRight /> Dar entrada no produto
                             </span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setModalOutputOpenState(true)}>
+                        <DropdownMenuItem
+                            disabled={product.storage_records.length <= 0}
+                            onClick={() => setModalOutputOpenState(true)}
+                        >
                             <span className="w-full flex items-center gap-2">
                                 <FaArrowCircleLeft /> Dar baixa no produto
                             </span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setModalMoveOpenState(true)}>
+                        <DropdownMenuItem
+                            disabled={product.storage_records.length <= 0}
+                            onClick={() => setModalMoveOpenState(true)}
+                        >
                             <span className="w-full flex items-center gap-2">
                                 <IoMdMove /> Mover para outro estoque
                             </span>
@@ -130,16 +130,22 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
             />
 
             <InputProductModal
+                product={product}
+                refreshList={refreshList}
                 modalOpenState={modalInputOpenState}
                 setModalOpenState={setModalInputOpenState}
             />
 
             <OutputProductModal
+                product={product}
+                refreshList={refreshList}
                 modalOpenState={modalOutputOpenState}
                 setModalOpenState={setModalOutputOpenState}
             />
 
             <MoveProductModal
+                product={product}
+                refreshList={refreshList}
                 modalOpenState={modalMoveOpenState}
                 setModalOpenState={setModalMoveOpenState}
             />

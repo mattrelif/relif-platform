@@ -11,12 +11,11 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { deleteProduct, getProductById } from "@/repository/inventory.repository";
 import { ProductSchema } from "@/types/product.types";
-import { usePathname, useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
 type Props = {
     product: ProductSchema;
-    refreshList?: () => void;
+    refreshList: () => void;
     removeDialogOpenState: boolean;
     setRemoveDialogOpenState: Dispatch<SetStateAction<boolean>>;
 };
@@ -28,14 +27,11 @@ const RemoveModal = ({
     setRemoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
-    const router = useRouter();
-    const pathname = usePathname();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [allowToRemove, setAllowToRemove] = useState<
         "LOADING" | "UNAVAILABLE" | "AVAILABLE" | "ERROR"
     >("LOADING");
-    const backToListPath = pathname.split("/").slice(0, 5).join("/");
 
     useEffect(() => {
         (async () => {
@@ -58,24 +54,22 @@ const RemoveModal = ({
             setIsLoading(true);
 
             await deleteProduct(product.id);
-            if (refreshList) {
-                refreshList();
-            } else {
-                router.push(backToListPath);
-            }
+
+            refreshList();
 
             setRemoveDialogOpenState(false);
 
             toast({
-                title: "Success delete",
-                description: "Success description",
+                title: "Product Deleted Successfully",
+                description: `${product.name} has been removed from the inventory.`,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Error deleting",
-                description: "Error description",
+                title: "Error Deleting Product",
+                description:
+                    "An error occurred while trying to delete the product. Please try again.",
                 variant: "destructive",
             });
         }

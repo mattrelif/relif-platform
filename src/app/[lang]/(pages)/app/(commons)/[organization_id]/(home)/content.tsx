@@ -5,6 +5,7 @@ import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     findHousingsByOrganizationId,
     getBeneficiariesByOrganizationID,
+    getProductsByOrganizationID,
     getVoluntariesByOrganizationID,
 } from "@/repository/organization.repository";
 import { HousingSchema } from "@/types/housing.types";
@@ -25,6 +26,7 @@ const Content = (): ReactNode => {
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
     const [beneficiaries, setBeneficiaries] = useState(0);
     const [volunteers, setVolunteers] = useState(0);
+    const [products, setProducts] = useState(0);
 
     useEffect(() => {
         (async () => {
@@ -39,18 +41,25 @@ const Content = (): ReactNode => {
                     await findHousingsByOrganizationId(organizationId, OFFSET, LIMIT, ""),
                     await getBeneficiariesByOrganizationID(organizationId, OFFSET, LIMIT, ""),
                     await getVoluntariesByOrganizationID(organizationId, OFFSET, LIMIT, ""),
+                    await getProductsByOrganizationID(organizationId, OFFSET, LIMIT),
                 ];
 
-                const [housingsResponse, beneficiariesResponse, volunteersResponse] =
-                    await Promise.all(promises);
+                const [
+                    housingsResponse,
+                    beneficiariesResponse,
+                    volunteersResponse,
+                    productsResponse,
+                ] = await Promise.all(promises);
 
                 if (!housingsResponse.data) throw new Error();
                 if (!beneficiariesResponse.data) throw new Error();
                 if (!volunteersResponse.data) throw new Error();
+                if (!productsResponse.data) throw new Error();
 
                 setHousings(housingsResponse.data.data as HousingSchema[]);
                 setBeneficiaries(beneficiariesResponse.data.count);
                 setVolunteers(volunteersResponse.data.count);
+                setProducts(productsResponse.data.count);
             } catch {
                 setError(true);
             } finally {
@@ -117,9 +126,10 @@ const Content = (): ReactNode => {
                                 {dict.commons.home.products}
                             </span>
                         </div>
-                        {/* TODO: BACKEND */}
                         <div className="flex items-center justify-center">
-                            <span className="text-3xl text-white font-bold lg:text-2xl">0</span>
+                            <span className="text-3xl text-white font-bold lg:text-2xl">
+                                {products || 0}
+                            </span>
                         </div>
                     </div>
                 </div>

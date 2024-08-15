@@ -1,9 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { getBeneficiaryById } from "@/repository/beneficiary.repository";
-import { BeneficiarySchema } from "@/types/beneficiary.types";
+import {
+    getBeneficiaryById,
+    getDonationsByBeneficiaryId,
+} from "@/repository/beneficiary.repository";
+import { BeneficiarySchema, Donation } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
+import { formatDate } from "@/utils/formatDate";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCartPlus, FaMapMarkerAlt } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa6";
@@ -15,32 +19,44 @@ type Props = {
 };
 
 const Content = ({ beneficiaryId }: Props): ReactNode => {
+    const pathname = usePathname();
+    const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+
     const [beneficiary, setBeneficiary] = useState<BeneficiarySchema | null>(null);
-    // const [assistances, setAssistances] = useState<{
-    //     data: BeneficiaryAllocationSchema[];
-    //     count: number;
-    // } | null>(null);
+    const [assistances, setAssistances] = useState<{
+        data: Donation[];
+        count: number;
+    } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const getBeneficiariesAllocations = async () => {
-        try {
-            if (beneficiaryId) {
-                const responseBeneficiary = await getBeneficiaryById(beneficiaryId);
-                setBeneficiary(responseBeneficiary.data);
-            } else {
-                throw new Error();
-            }
-        } catch {
-            setError(true);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        setIsLoading(true);
-        (async () => getBeneficiariesAllocations())();
+        (async () => {
+            try {
+                setIsLoading(true);
+
+                const OFFSET = 0;
+                const LIMIT = 9999;
+
+                if (beneficiaryId) {
+                    const responseBeneficiary = await getBeneficiaryById(beneficiaryId);
+                    setBeneficiary(responseBeneficiary.data);
+
+                    const { data: donations } = await getDonationsByBeneficiaryId(
+                        beneficiaryId,
+                        OFFSET,
+                        LIMIT
+                    );
+                    setAssistances(donations);
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        })();
     }, []);
 
     if (isLoading)
@@ -82,143 +98,29 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                         <LuHelpingHand size={28} />
                         Assistance received
                     </h1>
-                    <ul className="flex flex-col gap-2">
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
-                        <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                            <span className="text-sm text-slate-900 flex items-center gap-2">
-                                July 24, 2024<Badge>4 itens</Badge>
-                            </span>
-                            <span></span>
-                            <span className="text-sm text-slate-900">
-                                <strong>From:</strong> Abrigo Santo Agostino
-                            </span>
-                            <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                <FaCartPlus />
-                                Itens
-                            </span>
-                            <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                2x Pão de Forma 500g (Panco) | 1x Margarina 500g (Qualy) | 3x Leite
-                                UHT ( Parmalat) | 1x Dúzia de Ovos (Indiferente)
-                            </span>
-                        </li>
+                    <ul className="flex flex-col gap-2 h-[calc(100vh-325px)]">
+                        {assistances?.data.map(assistance => (
+                            <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
+                                <span className="text-sm text-slate-900 flex items-center gap-2">
+                                    {formatDate(assistance.created_at, locale || "en")}
+                                </span>
+                                <span></span>
+                                <span className="text-sm text-slate-900">
+                                    <strong>From:</strong>{" "}
+                                    {assistance.from.type === "HOUSING"
+                                        ? assistance.from.name
+                                        : "Organization"}
+                                </span>
+                                <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
+                                    <FaCartPlus />
+                                    Product
+                                </span>
+                                <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
+                                    {assistance.quantity}x | {assistance.product_type.name} -{" "}
+                                    {assistance.product_type.brand}
+                                </span>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

@@ -101,7 +101,7 @@ const ProductList = (): ReactNode => {
                 <>
                     <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
                         {products?.data.map(product => (
-                            <Card {...product} refreshList={getProductList} />
+                            <Card {...product} refreshList={getProductList} key={product.id} />
                         ))}
                     </ul>
                 </>

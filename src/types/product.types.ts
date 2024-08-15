@@ -23,3 +23,23 @@ export type UpdateProductRequest = Omit<
     ProductSchema,
     "id" | "organization_id" | "created_at" | "updated_at" | "organization" | "storage_records"
 >;
+
+export type MoveProductRequest = {
+    from: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    to: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    quantity: number;
+};
+
+export type AddProductRequest = {
+    to: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    quantity: number;
+};

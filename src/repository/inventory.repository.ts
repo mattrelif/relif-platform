@@ -1,5 +1,5 @@
 import { client } from "@/lib/axios-client";
-import { UpdateProductRequest } from "@/types/product.types";
+import { AddProductRequest, MoveProductRequest, UpdateProductRequest } from "@/types/product.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "product-types";
@@ -26,16 +26,24 @@ export async function deleteProduct(productId: string): Promise<void> {
     });
 }
 
-export async function allocateProduct(productId: string): Promise<AxiosResponse> {
+export async function allocateProduct(
+    productId: string,
+    data: AddProductRequest
+): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${productId}/allocate`,
         method: "POST",
+        data,
     });
 }
 
-export async function reallocateProduct(productId: string): Promise<AxiosResponse> {
+export async function reallocateProduct(
+    productId: string,
+    data: MoveProductRequest
+): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${productId}/reallocate`,
         method: "POST",
+        data,
     });
 }
