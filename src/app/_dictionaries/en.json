@@ -984,6 +984,167 @@
                     "removeVolunteer": "Remove volunteer"
                 }
             }
+        },
+        "inventory": {
+            "list": {
+                "loading": "Loading...",
+                "error": "Something went wrong. Please try again later.",
+                "noProducts": "No products found..."
+            },
+            "create": {
+                "createNewProduct": "Create a new product",
+                "name": "Name *",
+                "description": "Description",
+                "brand": "Brand *",
+                "select": "Select...",
+                "unitType": "Unit type *",
+                "unitTypeOptions": {
+                    "un": "UN",
+                    "kg": "KG",
+                    "g": "G",
+                    "dz": "DZ",
+                    "box": "Box",
+                    "liters": "Liters",
+                    "other": "Other"
+                },
+                "category": "Category *",
+                "categoryOptions": {
+                    "foodAndBeverages": "Food and Beverages",
+                    "personalCareAndBeauty": "Personal Care and Beauty",
+                    "householdCleaning": "Household Cleaning",
+                    "babyCareProducts": "Baby Care Products",
+                    "petProducts": "Pet Products",
+                    "pharmacyAndMedications": "Pharmacy and Medications"
+                },
+                "alertTitle": "Assign Quantities and Associate with Housings or Organization After Creation",
+                "alertDescription": "You will be able to assign quantities and link them to specific housings or organization once the creation process is complete.",
+                "create": "Create",
+                "loading": "Loading...",
+                "productCreatedSuccessTitle": "Product created successfully!",
+                "productCreatedSuccessDescription": "The product has been added to the inventory.",
+                "errorCreatingProductTitle": "Error creating product",
+                "errorCreatingProductDescription": "An error occurred while trying to create the product. Please try again."
+            },
+            "toolbar": {
+                "createProduct": "Create product",
+                "downloadCSV": "Download CSV",
+                "downloadPDF": "Download PDF"
+            },
+            "remove": {
+                "productDeletedSuccessTitle": "Product Deleted Successfully",
+                "productDeletedSuccessDescription": "The product has been removed from the inventory.",
+                "errorDeletingProductTitle": "Error Deleting Product",
+                "errorDeletingProductDescription": "An error occurred while trying to delete the product. Please try again.",
+                "title": "Remove Product",
+                "description": "Are you sure you want to remove this product from the inventory? This action cannot be undone.",
+                "loading": "Loading...",
+                "remove": "Remove",
+                "unavailableMessage": "It is not possible to delete this product as there are still items of the same product in stock.",
+                "errorMessage": "An error has occurred. Please try again later.",
+                "close": "Close",
+                "cancel": "Cancel"
+            },
+            "output": {
+                "donateProductTitle": "Donate a product to a beneficiary",
+                "donateProductDescription": "Select location where it is, the quantity and who you want to send it to.",
+                "loading": "Loading...",
+                "errorMessage": "An error has occurred. Please try again later.",
+                "whereProduct": "Where's the product?",
+                "quantity": "Quantity",
+                "organization": "Organization",
+                "selectBeneficiary": "Select the beneficiary",
+                "cancel": "Cancel",
+                "donate": "Donate",
+                "select": "Select...",
+                "donationSuccessfulTitle": "Donation Successful",
+                "donationSuccessfulDescription": "You have successfully donated to the selected beneficiary.",
+                "donationFailedTitle": "Donation Failed",
+                "donationFailedDescription": "An error occurred while processing your donation. Please try again."
+            },
+            "move": {
+                "moveProductTitle": "Move the product to other location",
+                "moveProductDescription": "Select the new location where it will be moved",
+                "loading": "Loading...",
+                "errorMessage": "An error has occurred. Please try again later.",
+                "from": "From",
+                "organization": "Organization",
+                "newLocation": "New Location",
+                "quantity": "Quantity",
+                "cancel": "Cancel",
+                "move": "Move",
+                "select": "Select...",
+                "productMovedSuccessTitle": "Product Moved Successfully",
+                "productMovedSuccessDescription": "You have successfully moved the product.",
+                "errorMovingProductTitle": "Error Moving Product",
+                "errorMovingProductDescription": "An error occurred while trying to move the product. Please try again."
+            },
+            "input": {
+                "addProductTitle": "Add new product to inventory",
+                "addProductDescription": "Select the location where the product is present, the product and enter the quantity",
+                "loading": "Loading...",
+                "errorMessage": "An error has occurred. Please try again later.",
+                "whereProduct": "Where's the product?",
+                "quantity": "Quantity",
+                "cancel": "Cancel",
+                "save": "Save",
+                "organization": "Organization",
+                "select": "Select...",
+                "productAddedSuccessTitle": "Product Added Successfully",
+                "productAddedSuccessDescription": "{quantity} units of {productName} have been successfully added to storage.",
+                "errorAddingProductTitle": "Error Adding Product",
+                "errorAddingProductDescription": "An error occurred while trying to add the product to storage. Please try again."
+            },
+            "card": {
+                "foodAndBeverages": "Food and Beverages",
+                "personalCareAndBeauty": "Personal Care and Beauty",
+                "householdCleaning": "Household Cleaning",
+                "babyCareProducts": "Baby Care Products",
+                "petProducts": "Pet Products",
+                "pharmacyAndMedications": "Pharmacy and Medications",
+                "noProductInStock": "No product in stock",
+                "presentIn": "Present in",
+                "stock": "stock(s), totaling",
+                "units": "units",
+                "editProduct": "Edit product",
+                "deleteProduct": "Delete product",
+                "inputProduct": "Input product",
+                "outputProduct": "Output product",
+                "moveProduct": "Move to another stock",
+                "createdAt": "Created at"
+            },
+            "edit": {
+                "loading": "Loading...",
+                "errorEditing": "Error editing",
+                "title": "Edit a product",
+                "name": "Name *",
+                "description": "Description",
+                "brand": "Brand *",
+                "unitType": "Unit type *",
+                "selectPlaceholder": "Select...",
+                "unitOptions": {
+                    "un": "UN",
+                    "kg": "KG",
+                    "g": "G",
+                    "dz": "DZ",
+                    "box": "Box",
+                    "liters": "Liters",
+                    "others": "Others"
+                },
+                "category": "Category *",
+                "categoryOptions": {
+                    "foodAndBeverages": "Food and Beverages",
+                    "personalCareAndBeauty": "Personal Care and Beauty",
+                    "householdCleaning": "Household Cleaning",
+                    "babyCareProducts": "Baby Care Products",
+                    "petProducts": "Pet Products",
+                    "pharmacyAndMedications": "Pharmacy and Medications"
+                },
+                "update": "Update",
+                "errorToastTitle": "Error Editing Product",
+                "errorToastDescription": "An error occurred while trying to edit the product. Please try again.",
+                "successToastTitle": "Product Updated!",
+                "successToastDescription": "The product was successfully updated."
+            }
         }
     },
     "admin": {

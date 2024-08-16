@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -27,6 +28,7 @@ const RemoveModal = ({
     setRemoveDialogOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [allowToRemove, setAllowToRemove] = useState<
@@ -60,16 +62,15 @@ const RemoveModal = ({
             setRemoveDialogOpenState(false);
 
             toast({
-                title: "Product Deleted Successfully",
-                description: `${product.name} has been removed from the inventory.`,
+                title: dict.commons.inventory.remove.productDeletedSuccessTitle,
+                description: dict.commons.inventory.remove.productDeletedSuccessDescription,
                 variant: "success",
             });
         } catch {
             setIsLoading(false);
             toast({
-                title: "Error Deleting Product",
-                description:
-                    "An error occurred while trying to delete the product. Please try again.",
+                title: dict.commons.inventory.remove.errorDeletingProductTitle,
+                description: dict.commons.inventory.remove.errorDeletingProductDescription,
                 variant: "destructive",
             });
         }
@@ -80,8 +81,12 @@ const RemoveModal = ({
             <Dialog open={removeDialogOpenState} onOpenChange={setRemoveDialogOpenState}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle className="pb-3 text-start">TITLE</DialogTitle>
-                        <DialogDescription className="text-start">DESCRIPTION</DialogDescription>
+                        <DialogTitle className="pb-3 text-start">
+                            {dict.commons.inventory.remove.title}
+                        </DialogTitle>
+                        <DialogDescription className="text-start">
+                            {dict.commons.inventory.remove.description}
+                        </DialogDescription>
                         <div className="flex flex-col pt-4">
                             <span className="text-sm text-slate-900 font-bold text-start">
                                 {product?.name}
@@ -93,8 +98,7 @@ const RemoveModal = ({
 
                         {allowToRemove === "LOADING" && (
                             <div className="flex flex-col gap-4 pt-10">
-                                <span className="text-xs text-blue-500">Loading...</span>
-                                <Button disabled>Loading...</Button>
+                                <Button disabled>{dict.commons.inventory.remove.loading}</Button>
                             </div>
                         )}
 
@@ -104,28 +108,34 @@ const RemoveModal = ({
                                     variant="outline"
                                     onClick={() => setRemoveDialogOpenState(false)}
                                 >
-                                    Cancel
+                                    {dict.commons.inventory.remove.cancel}
                                 </Button>
                                 <Button onClick={handleDelete}>
-                                    {!isLoading ? "Remove" : "Loading..."}
+                                    {!isLoading
+                                        ? dict.commons.inventory.remove.remove
+                                        : dict.commons.inventory.remove.loading}
                                 </Button>
                             </div>
                         )}
 
                         {allowToRemove === "UNAVAILABLE" && (
                             <div className="flex flex-col gap-4 pt-10">
-                                <span className="text-xs text-red-500">Unavailable message</span>
+                                <span className="text-xs text-red-500 text-start">
+                                    {dict.commons.inventory.remove.unavailableMessage}
+                                </span>
                                 <Button onClick={() => setRemoveDialogOpenState(false)}>
-                                    Close
+                                    {dict.commons.inventory.remove.close}
                                 </Button>
                             </div>
                         )}
 
                         {allowToRemove === "ERROR" && (
                             <div className="flex flex-col gap-4 pt-10">
-                                <span className="text-xs text-red-500">Error message</span>
+                                <span className="text-xs text-red-500 text-start">
+                                    {dict.commons.inventory.remove.errorMessage}
+                                </span>
                                 <Button onClick={() => setRemoveDialogOpenState(false)}>
-                                    Close
+                                    {dict.commons.inventory.remove.close}
                                 </Button>
                             </div>
                         )}

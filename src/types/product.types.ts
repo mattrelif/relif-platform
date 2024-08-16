@@ -9,7 +9,15 @@ export type ProductSchema = {
     organization_id: string;
     organization: OrganizationSchema;
     unit_type: string;
-    storage_records: any[];
+    storage_records: Array<{
+        id: string;
+        location: {
+            id: string;
+            name: string;
+            type: "HOUSING" | "ORGANIZATION";
+        };
+        quantity: number;
+    }>;
     created_at: string;
     updated_at: string;
 };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { PDFDocument } from "@/components/reports/product";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import { MdAdd } from "react-icons/md";
 
 const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
 
     const handleDownloadPDF = async () => {
@@ -60,7 +62,7 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
             <Button asChild>
                 <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                     <MdAdd size={16} />
-                    Create product
+                    {dict.commons.inventory.toolbar.createProduct}
                 </Link>
             </Button>
             <DropdownMenu>
@@ -72,11 +74,11 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
                 <DropdownMenuContent>
                     <DropdownMenuItem className="flex gap-2" onClick={handleDownloadCSV}>
                         <FaFileCsv />
-                        Download CSV
+                        {dict.commons.inventory.toolbar.downloadCSV}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex gap-2" onClick={handleDownloadPDF}>
                         <FaFilePdf />
-                        Download PDF
+                        {dict.commons.inventory.toolbar.downloadPDF}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

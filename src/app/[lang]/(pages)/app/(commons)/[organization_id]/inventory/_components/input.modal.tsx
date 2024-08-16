@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -41,6 +42,7 @@ const InputProductModal = ({
     setModalOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
@@ -94,16 +96,14 @@ const InputProductModal = ({
 
             setModalOpenState(false);
             toast({
-                title: "Product Added Successfully",
-                description: `${quantity} units of ${product.name} have been successfully added to storage.`,
+                title: dict.commons.inventory.input.productAddedSuccessTitle,
+                description: dict.commons.inventory.input.productAddedSuccessDescription,
                 variant: "success",
             });
-        } catch (err) {
-            console.log(err);
+        } catch {
             toast({
-                title: "Error Adding Product",
-                description:
-                    "An error occurred while trying to add the product to storage. Please try again.",
+                title: dict.commons.inventory.input.errorAddingProductTitle,
+                description: dict.commons.inventory.input.errorAddingProductDescription,
                 variant: "destructive",
             });
         }
@@ -114,23 +114,22 @@ const InputProductModal = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="pb-3 text-start">
-                        Add new product to inventory
+                        {dict.commons.inventory.input.addProductTitle}
                     </DialogTitle>
                     <DialogDescription className="text-start">
-                        Select the location where the product is present, the product and enter the
-                        quantity
+                        {dict.commons.inventory.input.addProductDescription}
                     </DialogDescription>
 
                     {isLoading && (
                         <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                            Loading...
+                            {dict.commons.inventory.input.loading}
                         </h2>
                     )}
 
                     {error && (
                         <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                             <MdError />
-                            Error message
+                            {dict.commons.inventory.input.errorMessage}
                         </span>
                     )}
 
@@ -139,17 +138,19 @@ const InputProductModal = ({
                             <div className="flex flex-col gap-6 pt-4">
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        Where's the product?
+                                        {dict.commons.inventory.input.whereProduct}
                                     </Label>
                                     <Select onValueChange={setSelectedStorage}>
                                         <SelectTrigger className="w-full" id="locale">
-                                            <SelectValue placeholder="Select..." />
+                                            <SelectValue
+                                                placeholder={dict.commons.inventory.input.select}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem
                                                 value={`ORGANIZATION_${currentUser.organization_id}`}
                                             >
-                                                Organization Storage
+                                                {dict.commons.inventory.input.organization}
                                             </SelectItem>
                                             {housings?.map((housing: HousingSchema) => (
                                                 <SelectItem
@@ -164,12 +165,11 @@ const InputProductModal = ({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        Quantity
+                                        {dict.commons.inventory.input.quantity}
                                     </Label>
                                     <Input
                                         id="quantity"
                                         type="number"
-                                        placeholder="Quantity"
                                         min={0}
                                         required
                                         defaultValue={0}
@@ -179,9 +179,11 @@ const InputProductModal = ({
                             </div>
                             <div className="flex gap-4 pt-5">
                                 <Button variant="outline" onClick={() => setModalOpenState(false)}>
-                                    Cancel
+                                    {dict.commons.inventory.input.cancel}
                                 </Button>
-                                <Button onClick={handleAdd}>Save</Button>
+                                <Button onClick={handleAdd}>
+                                    {dict.commons.inventory.input.save}
+                                </Button>
                             </div>
                         </>
                     )}

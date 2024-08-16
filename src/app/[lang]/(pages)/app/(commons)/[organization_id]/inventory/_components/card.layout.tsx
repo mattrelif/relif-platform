@@ -3,6 +3,7 @@
 import { InputProductModal } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/input.modal";
 import { OutputProductModal } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/output.modal";
 import { RemoveModal } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/remove.modal";
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ type Props = ProductSchema & {
 
 const Card = ({ refreshList, ...product }: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
     const inventoryPath = pathname.split("/").slice(0, 5).join("/");
 
@@ -40,16 +42,19 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
     const [modalMoveOpenState, setModalMoveOpenState] = useState<boolean>(false);
 
     const CATEGORIES = {
-        foodAndBeverages: "Food and Beverages",
-        personalCareAndBeauty: "Personal Care and Beauty",
-        householdCleaning: "Household Cleaning",
-        babyCareProducts: "Baby Care Products",
-        petProducts: "Pet Products",
-        pharmacyAndMedications: "Pharmacy and Medications",
+        foodAndBeverages: dict.commons.inventory.card.foodAndBeverages,
+        personalCareAndBeauty: dict.commons.inventory.card.personalCareAndBeauty,
+        householdCleaning: dict.commons.inventory.card.householdCleaning,
+        babyCareProducts: dict.commons.inventory.card.babyCareProducts,
+        petProducts: dict.commons.inventory.card.petProducts,
+        pharmacyAndMedications: dict.commons.inventory.card.pharmacyAndMedications,
     };
 
+    const quantity =
+        product?.storage_records.reduce((acc, record) => acc + record.quantity, 0) || 0;
+
     return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70">
+        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
             <div className="flex flex-col">
                 <span className="text-sm text-slate-900 font-bold">{product.name}</span>
                 <div className="flex items-center gap-2">
@@ -65,12 +70,22 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                     {CATEGORIES[product.category as keyof typeof CATEGORIES]}
                 </span>
                 <span className="text-xs text-slate-400 font-regular mt-1 flex items-center gap-1">
-                    {/* TODO */}
                     <FaBoxesPacking className="mr-1" />
-                    {/* {console.log(product.storage_records)} */}
-                    {product.storage_records.length <= 0 && "Não há produto no estoque"}
-                    {/* Presente em <strong className="underline">3</strong> estoques, somando{" "} */}
-                    {/* <strong className="underline">138</strong> unidades */}
+                    <span>
+                        {product.storage_records.length <= 0 ? (
+                            dict.commons.inventory.card.noProductInStock
+                        ) : (
+                            <>
+                                {dict.commons.inventory.card.presentIn}{" "}
+                                <strong className="text-relif-orange-200">
+                                    {product.storage_records.length}
+                                </strong>{" "}
+                                {dict.commons.inventory.card.stock}{" "}
+                                <strong className="text-relif-orange-200">{quantity}</strong>{" "}
+                                {dict.commons.inventory.card.units}{" "}
+                            </>
+                        )}
+                    </span>
                 </span>
             </div>
             <div className="flex flex-col items-end justify-between">
@@ -84,19 +99,19 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                         <DropdownMenuItem asChild>
                             <Link href={`${inventoryPath}/${product.id}/edit`}>
                                 <span className="w-full flex items-center gap-2">
-                                    <FaEdit /> Edit product
+                                    <FaEdit /> {dict.commons.inventory.card.editProduct}
                                 </span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setModalRemoveOpenState(true)}>
                             <span className="w-full flex items-center gap-2">
-                                <FaTrash /> Delete product
+                                <FaTrash /> {dict.commons.inventory.card.deleteProduct}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setModalInputOpenState(true)}>
                             <span className="w-full flex items-center gap-2">
-                                <FaArrowCircleRight /> Dar entrada no produto
+                                <FaArrowCircleRight /> {dict.commons.inventory.card.inputProduct}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -104,7 +119,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             onClick={() => setModalOutputOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">
-                                <FaArrowCircleLeft /> Dar baixa no produto
+                                <FaArrowCircleLeft /> {dict.commons.inventory.card.outputProduct}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -112,13 +127,14 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             onClick={() => setModalMoveOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">
-                                <IoMdMove /> Mover para outro estoque
+                                <IoMdMove /> {dict.commons.inventory.card.moveProduct}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <span className="text-xs text-slate-400 font-regular mt-1 flex items-center gap-2">
-                    Created at {formatDate(product.created_at, locale || "en")}
+                <span className="text-xs text-slate-400 font-regular mt-1 flex items-center gap-2 lg:hidden">
+                    {dict.commons.inventory.card.createdAt}{" "}
+                    {formatDate(product.created_at, locale || "en")}
                 </span>
             </div>
 

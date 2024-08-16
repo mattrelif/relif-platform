@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -41,6 +42,7 @@ const OutputProductModal = ({
     setModalOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[] | []>([]);
@@ -85,7 +87,7 @@ const OutputProductModal = ({
 
             const storageFrom = selectedStorage.split("_");
 
-            await donateProductToBeneficiary(product.id, {
+            await donateProductToBeneficiary(selectedBeneficiary, {
                 from: {
                     type: storageFrom[0] as "ORGANIZATION" | "HOUSING",
                     id: storageFrom[1],
@@ -98,14 +100,14 @@ const OutputProductModal = ({
 
             setModalOpenState(false);
             toast({
-                title: "Donation Successful",
-                description: `You have successfully donated ${quantity} units of ${product.name} to the selected beneficiary.`,
+                title: dict.commons.inventory.output.donationSuccessfulTitle,
+                description: dict.commons.inventory.output.donationSuccessfulDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Donation Failed",
-                description: "An error occurred while processing your donation. Please try again.",
+                title: dict.commons.inventory.output.donationFailedTitle,
+                description: dict.commons.inventory.output.donationFailedDescription,
                 variant: "destructive",
             });
         }
@@ -116,22 +118,22 @@ const OutputProductModal = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="pb-3 text-start">
-                        Donate a product to a beneficiary
+                        {dict.commons.inventory.output.donateProductTitle}
                     </DialogTitle>
                     <DialogDescription className="text-start">
-                        Select location where it is, the quantity and who you want to send it to.
+                        {dict.commons.inventory.output.donateProductDescription}
                     </DialogDescription>
 
                     {isLoading && (
                         <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                            Loading...
+                            {dict.commons.inventory.output.loading}
                         </h2>
                     )}
 
                     {error && (
                         <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                             <MdError />
-                            Error message
+                            {dict.commons.inventory.output.errorMessage}
                         </span>
                     )}
 
@@ -140,7 +142,7 @@ const OutputProductModal = ({
                             <div className="flex flex-col gap-6 pt-4">
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        Where's the product?
+                                        {dict.commons.inventory.output.whereProduct}
                                     </Label>
                                     <Select onValueChange={setSelectedStorage}>
                                         <SelectTrigger className="w-full" id="locale">
@@ -148,11 +150,20 @@ const OutputProductModal = ({
                                         </SelectTrigger>
                                         {product && (
                                             <SelectContent>
-                                                {product?.storage_records?.map((storage: any) => (
-                                                    <SelectItem value={storage.id} key={storage.id}>
-                                                        {storage.id === currentUser?.organization_id
-                                                            ? "Organization Storage"
-                                                            : storage.name}
+                                                {product?.storage_records?.map(storage => (
+                                                    <SelectItem
+                                                        value={
+                                                            storage.location.id ===
+                                                            currentUser.organization_id
+                                                                ? `ORGANIZATION_${storage.location.id}`
+                                                                : `HOUSING_${storage.location.id}`
+                                                        }
+                                                        key={storage.location.id}
+                                                    >
+                                                        {storage.location.id ===
+                                                        currentUser?.organization_id
+                                                            ? `${dict.commons.inventory.output.organization} (${storage.quantity} ${product.unit_type})`
+                                                            : `${storage.location.name} (${storage.quantity} ${product.unit_type})`}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -161,12 +172,11 @@ const OutputProductModal = ({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        Quantity
+                                        {dict.commons.inventory.output.quantity}
                                     </Label>
                                     <Input
                                         id="quantity"
                                         type="number"
-                                        placeholder="Quantity"
                                         min={0}
                                         defaultValue={0}
                                         required
@@ -175,11 +185,13 @@ const OutputProductModal = ({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        Select the beneficiary
+                                        {dict.commons.inventory.output.selectBeneficiary}
                                     </Label>
                                     <Select onValueChange={setSelectedBeneficiary}>
                                         <SelectTrigger className="w-full" id="locale">
-                                            <SelectValue placeholder="Select..." />
+                                            <SelectValue
+                                                placeholder={dict.commons.inventory.output.select}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {beneficiaries?.map(beneficiary => (
@@ -198,9 +210,11 @@ const OutputProductModal = ({
                             </div>
                             <div className="flex gap-4 pt-5">
                                 <Button variant="outline" onClick={() => setModalOpenState(false)}>
-                                    Cancel
+                                    {dict.commons.inventory.output.cancel}
                                 </Button>
-                                <Button onClick={handleDonate}>Donate</Button>
+                                <Button onClick={handleDonate}>
+                                    {dict.commons.inventory.output.donate}
+                                </Button>
                             </div>
                         </>
                     )}

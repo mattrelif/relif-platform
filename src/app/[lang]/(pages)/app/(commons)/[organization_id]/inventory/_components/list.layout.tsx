@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { getProductsByOrganizationID } from "@/repository/organization.repository";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { Card } from "./card.layout";
 
 const ProductList = (): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
 
     const [products, setProducts] = useState<{
         count: number;
@@ -83,18 +85,22 @@ const ProductList = (): ReactNode => {
             {/* </div> */}
 
             {isLoading && (
-                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>
+                <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                    {dict.commons.inventory.list.loading}
+                </h2>
             )}
 
             {!isLoading && error && (
                 <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                     <MdError />
-                    Something went wrong. Please try again later.
+                    {dict.commons.inventory.list.error}
                 </span>
             )}
 
             {!isLoading && !error && products && products.data.length <= 0 && (
-                <span className="text-sm text-slate-900 font-medium p-4">No products found...</span>
+                <span className="text-sm text-slate-900 font-medium p-4">
+                    {dict.commons.inventory.list.noProducts}
+                </span>
             )}
 
             {!isLoading && !error && products && products.data.length > 0 && (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -41,6 +42,7 @@ const MoveProductModal = ({
     setModalOpenState,
 }: Props): ReactNode => {
     const { toast } = useToast();
+    const dict = useDictionary();
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
@@ -100,15 +102,14 @@ const MoveProductModal = ({
 
             setModalOpenState(false);
             toast({
-                title: "Product Moved Successfully",
-                description: `You have successfully moved ${quantity} units of ${product.name}.`,
+                title: dict.commons.inventory.move.productMovedSuccessTitle,
+                description: dict.commons.inventory.move.productMovedSuccessDescription,
                 variant: "success",
             });
         } catch {
             toast({
-                title: "Error Moving Product",
-                description:
-                    "An error occurred while trying to move the product. Please try again.",
+                title: dict.commons.inventory.move.errorMovingProductTitle,
+                description: dict.commons.inventory.move.errorMovingProductDescription,
                 variant: "destructive",
             });
         }
@@ -119,22 +120,22 @@ const MoveProductModal = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="pb-3 text-start">
-                        Move the product to other location
+                        {dict.commons.inventory.move.moveProductTitle}
                     </DialogTitle>
                     <DialogDescription className="text-start">
-                        Select the new location where it will be moved
+                        {dict.commons.inventory.move.moveProductDescription}
                     </DialogDescription>
 
                     {isLoading && (
                         <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                            Loading...
+                            {dict.commons.inventory.move.loading}
                         </h2>
                     )}
 
                     {error && (
                         <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                             <MdError />
-                            Error message
+                            {dict.commons.inventory.move.errorMessage}
                         </span>
                     )}
 
@@ -143,28 +144,35 @@ const MoveProductModal = ({
                             <div className="flex flex-col gap-6 pt-4">
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        From
+                                        {dict.commons.inventory.move.from}
                                     </Label>
                                     <Select onValueChange={setFrom}>
                                         <SelectTrigger className="w-full" id="locale">
                                             <SelectValue placeholder="Select..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {product?.storage_records?.map(
-                                                (storage: HousingSchema) => (
-                                                    <SelectItem key={storage.id} value={storage.id}>
-                                                        {storage.id === currentUser.organization_id
-                                                            ? "Organization"
-                                                            : storage.name}
-                                                    </SelectItem>
-                                                )
-                                            )}
+                                            {product?.storage_records?.map(storage => (
+                                                <SelectItem
+                                                    key={storage.location.id}
+                                                    value={
+                                                        storage.location.id ===
+                                                        currentUser.organization_id
+                                                            ? `ORGANIZATION_${storage.location.id}`
+                                                            : `HOUSING_${storage.location.id}`
+                                                    }
+                                                >
+                                                    {storage.location.id ===
+                                                    currentUser.organization_id
+                                                        ? `Organization (${storage.quantity} ${product.unit_type})`
+                                                        : `${storage.location.name} (${storage.quantity} ${product.unit_type})`}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        New Location
+                                        {dict.commons.inventory.move.newLocation}
                                     </Label>
                                     <Select onValueChange={setTo}>
                                         <SelectTrigger className="w-full" id="locale">
@@ -174,7 +182,7 @@ const MoveProductModal = ({
                                             <SelectItem
                                                 value={`ORGANIZATION_${currentUser.organization_id}`}
                                             >
-                                                Organization Storage
+                                                {dict.commons.inventory.move.organization}
                                             </SelectItem>
                                             {housings?.map((housing: HousingSchema) => (
                                                 <SelectItem
@@ -189,7 +197,7 @@ const MoveProductModal = ({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor="locale" className="text-start">
-                                        Quantity
+                                        {dict.commons.inventory.move.quantity}
                                     </Label>
                                     <Input
                                         id="quantity"
@@ -204,9 +212,11 @@ const MoveProductModal = ({
                             </div>
                             <div className="flex gap-4 pt-5">
                                 <Button variant="outline" onClick={() => setModalOpenState(false)}>
-                                    Cancel
+                                    {dict.commons.inventory.move.cancel}
                                 </Button>
-                                <Button onClick={handleMove}>Move</Button>
+                                <Button onClick={handleMove}>
+                                    {dict.commons.inventory.move.move}
+                                </Button>
                             </div>
                         </>
                     )}

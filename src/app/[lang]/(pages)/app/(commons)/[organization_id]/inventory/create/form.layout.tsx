@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ import { MdAdd } from "react-icons/md";
 
 const Form = (): ReactNode => {
     const router = useRouter();
+    const dict = useDictionary();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -53,8 +55,8 @@ const Form = (): ReactNode => {
                 });
 
                 toast({
-                    title: "Product created successfully!",
-                    description: `The product "${data.name}" has been added to the inventory.`,
+                    title: dict.commons.inventory.create.productCreatedSuccessTitle,
+                    description: dict.commons.inventory.create.productCreatedSuccessDescription,
                     variant: "success",
                 });
 
@@ -66,9 +68,8 @@ const Form = (): ReactNode => {
             console.log(err);
             setIsLoading(false);
             toast({
-                title: "Error creating product",
-                description:
-                    "An error occurred while trying to create the product. Please try again.",
+                title: dict.commons.inventory.create.errorCreatingProductTitle,
+                description: dict.commons.inventory.create.errorCreatingProductDescription,
                 variant: "destructive",
             });
         }
@@ -82,16 +83,16 @@ const Form = (): ReactNode => {
             <div className="flex flex-col gap-6">
                 <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                     <FaBoxes />
-                    Create a new product
+                    {dict.commons.inventory.create.createNewProduct}
                 </h1>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="name">Name *</Label>
+                    <Label htmlFor="name">{dict.commons.inventory.create.name}</Label>
                     <Input id="name" name="name" type="text" required />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">{dict.commons.inventory.create.description}</Label>
                     <textarea
                         className="flex min-h-32 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         id="description"
@@ -100,44 +101,72 @@ const Form = (): ReactNode => {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="brand">Brand *</Label>
+                    <Label htmlFor="brand">{dict.commons.inventory.create.brand}</Label>
                     <Input id="brand" name="brand" type="text" required />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="unitType">Unit type *</Label>
+                    <Label htmlFor="unitType">{dict.commons.inventory.create.unitType}</Label>
                     <Select name="unitType" required>
                         <SelectTrigger className="w-full" id="unitType">
-                            <SelectValue placeholder="Select..." />
+                            <SelectValue placeholder={dict.commons.inventory.create.select} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="un">UN</SelectItem>
-                            <SelectItem value="kg">KG</SelectItem>
-                            <SelectItem value="g">G</SelectItem>
-                            <SelectItem value="dz">DZ</SelectItem>
-                            <SelectItem value="box">Box</SelectItem>
-                            <SelectItem value="liters">Liters</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="un">
+                                {dict.commons.inventory.create.unitTypeOptions.un}
+                            </SelectItem>
+                            <SelectItem value="kg">
+                                {dict.commons.inventory.create.unitTypeOptions.kg}
+                            </SelectItem>
+                            <SelectItem value="g">
+                                {dict.commons.inventory.create.unitTypeOptions.g}
+                            </SelectItem>
+                            <SelectItem value="dz">
+                                {dict.commons.inventory.create.unitTypeOptions.dz}
+                            </SelectItem>
+                            <SelectItem value="box">
+                                {dict.commons.inventory.create.unitTypeOptions.box}
+                            </SelectItem>
+                            <SelectItem value="liters">
+                                {dict.commons.inventory.create.unitTypeOptions.liters}
+                            </SelectItem>
+                            <SelectItem value="other">
+                                {dict.commons.inventory.create.unitTypeOptions.other}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <Label htmlFor="category">Category *</Label>
+                    <Label htmlFor="category">{dict.commons.inventory.create.category}</Label>
                     <Select name="category" required>
                         <SelectTrigger className="w-full" id="category">
-                            <SelectValue placeholder="Select..." />
+                            <SelectValue placeholder={dict.commons.inventory.create.select} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="foodAndBeverages">Food and Beverages</SelectItem>
-                            <SelectItem value="personalCareAndBeauty">
-                                Personal Care and Beauty
+                            <SelectItem value="foodAndBeverages">
+                                {dict.commons.inventory.create.categoryOptions.foodAndBeverages}
                             </SelectItem>
-                            <SelectItem value="householdCleaning">Household Cleaning</SelectItem>
-                            <SelectItem value="babyCareProducts">Baby Care Products</SelectItem>
-                            <SelectItem value="petProducts">Pet Products</SelectItem>
+                            <SelectItem value="personalCareAndBeauty">
+                                {
+                                    dict.commons.inventory.create.categoryOptions
+                                        .personalCareAndBeauty
+                                }
+                            </SelectItem>
+                            <SelectItem value="householdCleaning">
+                                {dict.commons.inventory.create.categoryOptions.householdCleaning}
+                            </SelectItem>
+                            <SelectItem value="babyCareProducts">
+                                {dict.commons.inventory.create.categoryOptions.babyCareProducts}
+                            </SelectItem>
+                            <SelectItem value="petProducts">
+                                {dict.commons.inventory.create.categoryOptions.petProducts}
+                            </SelectItem>
                             <SelectItem value="pharmacyAndMedications">
-                                Pharmacy and Medications
+                                {
+                                    dict.commons.inventory.create.categoryOptions
+                                        .pharmacyAndMedications
+                                }
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -145,18 +174,17 @@ const Form = (): ReactNode => {
 
                 <Alert>
                     <IoMdAlert className="h-4 w-4" />
-                    <AlertTitle>
-                        Assign Quantities and Associate with Housings or Organization After Creation
-                    </AlertTitle>
+                    <AlertTitle>{dict.commons.inventory.create.alertTitle}</AlertTitle>
                     <AlertDescription className="text-slate-500">
-                        You will be able to assign quantities and link them to specific housings or
-                        organization once the creation process is complete.
+                        {dict.commons.inventory.create.alertDescription}
                     </AlertDescription>
                 </Alert>
 
                 <Button className="flex items-center gap-2" type="submit">
                     <MdAdd size={16} />
-                    {!isLoading ? "Create" : "Loading..."}
+                    {!isLoading
+                        ? dict.commons.inventory.create.create
+                        : dict.commons.inventory.create.loading}
                 </Button>
             </div>
         </form>

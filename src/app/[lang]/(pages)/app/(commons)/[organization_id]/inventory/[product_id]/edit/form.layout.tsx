@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ type Props = {
 
 const Form = ({ productId }: Props): ReactNode => {
     const router = useRouter();
+    const dict = useDictionary();
 
     const { toast } = useToast();
     const [product, setProduct] = useState<any | null>(null);
@@ -77,8 +79,8 @@ const Form = ({ productId }: Props): ReactNode => {
                 });
 
                 toast({
-                    title: "Created!",
-                    description: "DEscription",
+                    title: dict.commons.inventory.edit.successToastTitle,
+                    description: dict.commons.inventory.edit.successToastDescription,
                     variant: "success",
                 });
 
@@ -90,21 +92,25 @@ const Form = ({ productId }: Props): ReactNode => {
             console.log(err);
             setIsLoading(false);
             toast({
-                title: "Error",
-                description: "DEscription",
+                title: dict.commons.inventory.edit.errorToastTitle,
+                description: dict.commons.inventory.edit.errorToastDescription,
                 variant: "destructive",
             });
         }
     };
 
     if (isLoading)
-        return <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading...</h2>;
+        return (
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+                {dict.commons.inventory.edit.loading}
+            </h2>
+        );
 
     if (!isLoading && error)
         return (
             <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                 <MdError />
-                Error editing
+                {dict.commons.inventory.edit.errorEditing}
             </span>
         );
 
@@ -117,11 +123,11 @@ const Form = ({ productId }: Props): ReactNode => {
                 <div className="flex flex-col gap-6">
                     <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
                         <FaBoxes />
-                        Edit a product
+                        {dict.commons.inventory.edit.title}
                     </h1>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="name">Name *</Label>
+                        <Label htmlFor="name">{dict.commons.inventory.edit.name}</Label>
                         <Input
                             id="name"
                             name="name"
@@ -132,7 +138,9 @@ const Form = ({ productId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3 w-full">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">
+                            {dict.commons.inventory.edit.description}
+                        </Label>
                         <textarea
                             className="flex min-h-32 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             id="description"
@@ -142,7 +150,7 @@ const Form = ({ productId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="brand">Brand *</Label>
+                        <Label htmlFor="brand">{dict.commons.inventory.edit.brand}</Label>
                         <Input
                             id="brand"
                             name="brand"
@@ -153,41 +161,71 @@ const Form = ({ productId }: Props): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="unitType">Unit type *</Label>
+                        <Label htmlFor="unitType">{dict.commons.inventory.edit.unitType}</Label>
                         <Select name="unitType" defaultValue={product?.unit_type}>
                             <SelectTrigger className="w-full" id="unitType">
-                                <SelectValue placeholder="Select..." />
+                                <SelectValue
+                                    placeholder={dict.commons.inventory.edit.selectPlaceholder}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="un">UN</SelectItem>
-                                <SelectItem value="kg">KG</SelectItem>
-                                <SelectItem value="g">G</SelectItem>
-                                <SelectItem value="dz">DZ</SelectItem>
-                                <SelectItem value="box">Box</SelectItem>
-                                <SelectItem value="liters">Liters</SelectItem>
-                                <SelectItem value="others">Others</SelectItem>
+                                <SelectItem value="un">
+                                    {dict.commons.inventory.edit.unitOptions.un}
+                                </SelectItem>
+                                <SelectItem value="kg">
+                                    {dict.commons.inventory.edit.unitOptions.kg}
+                                </SelectItem>
+                                <SelectItem value="g">
+                                    {dict.commons.inventory.edit.unitOptions.g}
+                                </SelectItem>
+                                <SelectItem value="dz">
+                                    {dict.commons.inventory.edit.unitOptions.dz}
+                                </SelectItem>
+                                <SelectItem value="box">
+                                    {dict.commons.inventory.edit.unitOptions.box}
+                                </SelectItem>
+                                <SelectItem value="liters">
+                                    {dict.commons.inventory.edit.unitOptions.liters}
+                                </SelectItem>
+                                <SelectItem value="others">
+                                    {dict.commons.inventory.edit.unitOptions.others}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="category">Category *</Label>
+                        <Label htmlFor="category">{dict.commons.inventory.edit.category}</Label>
                         <Select name="category" defaultValue={product?.category}>
                             <SelectTrigger className="w-full" id="category">
-                                <SelectValue placeholder="Select..." />
+                                <SelectValue
+                                    placeholder={dict.commons.inventory.edit.selectPlaceholder}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="foodAndBeverages">Food and Beverages</SelectItem>
+                                <SelectItem value="foodAndBeverages">
+                                    {dict.commons.inventory.edit.categoryOptions.foodAndBeverages}
+                                </SelectItem>
                                 <SelectItem value="personalCareAndBeauty">
-                                    Personal Care and Beauty
+                                    {
+                                        dict.commons.inventory.edit.categoryOptions
+                                            .personalCareAndBeauty
+                                    }
                                 </SelectItem>
                                 <SelectItem value="householdCleaning">
-                                    Household Cleaning
+                                    {dict.commons.inventory.edit.categoryOptions.householdCleaning}
                                 </SelectItem>
-                                <SelectItem value="babyCareProducts">Baby Care Products</SelectItem>
-                                <SelectItem value="petProducts">Pet Products</SelectItem>
+                                <SelectItem value="babyCareProducts">
+                                    {dict.commons.inventory.edit.categoryOptions.babyCareProducts}
+                                </SelectItem>
+                                <SelectItem value="petProducts">
+                                    {dict.commons.inventory.edit.categoryOptions.petProducts}
+                                </SelectItem>
                                 <SelectItem value="pharmacyAndMedications">
-                                    Pharmacy and Medications
+                                    {
+                                        dict.commons.inventory.edit.categoryOptions
+                                            .pharmacyAndMedications
+                                    }
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -195,7 +233,7 @@ const Form = ({ productId }: Props): ReactNode => {
 
                     <Button className="flex items-center gap-2" type="submit">
                         <MdAdd size={16} />
-                        Update
+                        {dict.commons.inventory.edit.update}
                     </Button>
                 </div>
             </form>
