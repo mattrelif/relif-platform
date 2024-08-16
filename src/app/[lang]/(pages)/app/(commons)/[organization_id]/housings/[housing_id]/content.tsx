@@ -2,23 +2,15 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
 import { getHousingById } from "@/repository/housing.repository";
 import { HousingSchema } from "@/types/housing.types";
 import { formatDate } from "@/utils/formatDate";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser } from "react-icons/fa6";
-import { MdError, MdSearch, MdSpaceDashboard } from "react-icons/md";
+import { MdError, MdSpaceDashboard } from "react-icons/md";
 
 import { BeneficiaryList } from "./_beneficiaries/list.layout";
 import { SpaceList } from "./_spaces/list.layout";
@@ -28,6 +20,7 @@ const Content = ({ housingId }: { housingId: string }): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+    const inventoryPath = pathname.split("/").slice(0, 4).join("/");
 
     const [data, setData] = useState<HousingSchema | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -122,38 +115,45 @@ const Content = ({ housingId }: { housingId: string }): ReactNode => {
                                 <FaBoxesPacking />
                                 {dict.housingOverview.inventoryTitle}
                             </h3>
-                            <Button variant="outline" size="sm" className="flex items-center gap-2">
-                                {dict.housingOverview.btnManage}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex items-center gap-2"
+                                asChild
+                            >
+                                <Link href={`${inventoryPath}/inventory`}>
+                                    {dict.housingOverview.btnManage}
+                                </Link>
                             </Button>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <MdSearch className="text-slate-400 text-2xl" />
-                            <Input
-                                type="text"
-                                placeholder={dict.housingOverview.searchInventoryPlaceholder}
-                                className="w-full h-8"
-                            />
-                        </div>
-                        <div className="w-full h-[calc(100vh-459px)] border border-slate-200 rounded-md overflow-hidden">
+                        {/* <div className="flex items-center gap-2"> */}
+                        {/*    <MdSearch className="text-slate-400 text-2xl" /> */}
+                        {/*    <Input */}
+                        {/*        type="text" */}
+                        {/*        placeholder={dict.housingOverview.searchInventoryPlaceholder} */}
+                        {/*        className="w-full h-8" */}
+                        {/*    /> */}
+                        {/* </div> */}
+                        <div className="w-full h-[calc(100vh-354px)] border border-slate-200 rounded-md overflow-hidden">
                             <div className="w-full h-full overflow-x-hidden overflow-y-scroll">
                                 {/* <InventoryCard /> */}
                             </div>
                         </div>
-                        <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <PaginationPrevious href="#" />
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink href="#">1</PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationNext href="#" />
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-                        </div>
+                        {/* <div className="w-full h-max border-t-[1px] border-slate-200 p-2"> */}
+                        {/*    <Pagination> */}
+                        {/*        <PaginationContent> */}
+                        {/*            <PaginationItem> */}
+                        {/*                <PaginationPrevious href="#" /> */}
+                        {/*            </PaginationItem> */}
+                        {/*            <PaginationItem> */}
+                        {/*                <PaginationLink href="#">1</PaginationLink> */}
+                        {/*            </PaginationItem> */}
+                        {/*            <PaginationItem> */}
+                        {/*                <PaginationNext href="#" /> */}
+                        {/*            </PaginationItem> */}
+                        {/*        </PaginationContent> */}
+                        {/*    </Pagination> */}
+                        {/* </div> */}
                     </div>
                 </div>
             </div>
