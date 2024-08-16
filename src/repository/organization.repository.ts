@@ -8,6 +8,7 @@ import {
     OrganizationSchema,
     UpdateOrganizationRequest,
 } from "@/types/organization.types";
+import { CreateProductRequest } from "@/types/product.types";
 import {
     JoinOrganizationInviteSchema,
     JoinOrganizationRequestSchema,
@@ -216,5 +217,24 @@ export async function reactivateOrganization(orgId: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/${orgId}/reactivate`,
         method: "PUT",
+    });
+}
+
+export async function getProductsByOrganizationID(
+    orgId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/product-types?limit=${limit}&offset=${offset}`,
+        method: "GET",
+    });
+}
+
+export async function createProduct(orgId: string, data: CreateProductRequest): Promise<void> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/product-types`,
+        method: "POST",
+        data,
     });
 }

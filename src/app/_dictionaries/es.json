@@ -984,6 +984,167 @@
                     "removeVolunteer": "Eliminar voluntario"
                 }
             }
+        },
+        "inventory": {
+            "list": {
+                "loading": "Cargando...",
+                "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
+                "noProducts": "No se encontraron productos..."
+            },
+            "create": {
+                "createNewProduct": "Crear un nuevo producto",
+                "name": "Nombre *",
+                "description": "Descripción",
+                "brand": "Marca *",
+                "select": "Seleccionar...",
+                "unitType": "Tipo de unidad *",
+                "unitTypeOptions": {
+                    "un": "UN",
+                    "kg": "KG",
+                    "g": "G",
+                    "dz": "DZ",
+                    "box": "Caja",
+                    "liters": "Litros",
+                    "other": "Otro"
+                },
+                "category": "Categoría *",
+                "categoryOptions": {
+                    "foodAndBeverages": "Alimentos y Bebidas",
+                    "personalCareAndBeauty": "Cuidado Personal y Belleza",
+                    "householdCleaning": "Limpieza del Hogar",
+                    "babyCareProducts": "Productos para Bebés",
+                    "petProducts": "Productos para Mascotas",
+                    "pharmacyAndMedications": "Farmacia y Medicamentos"
+                },
+                "alertTitle": "Asignar Cantidades y Asociar con Viviendas u Organización Después de la Creación",
+                "alertDescription": "Podrá asignar cantidades y vincularlas a viviendas específicas u organización una vez que se complete el proceso de creación.",
+                "create": "Crear",
+                "loading": "Cargando...",
+                "productCreatedSuccessTitle": "¡Producto creado con éxito!",
+                "productCreatedSuccessDescription": "El producto ha sido añadido al inventario.",
+                "errorCreatingProductTitle": "Error al crear el producto",
+                "errorCreatingProductDescription": "Ocurrió un error al intentar crear el producto. Por favor, inténtelo de nuevo."
+            },
+            "toolbar": {
+                "createProduct": "Crear producto",
+                "downloadCSV": "Descargar CSV",
+                "downloadPDF": "Descargar PDF"
+            },
+            "remove": {
+                "productDeletedSuccessTitle": "Producto Eliminado con Éxito",
+                "productDeletedSuccessDescription": "El producto ha sido eliminado del inventario.",
+                "errorDeletingProductTitle": "Error al Eliminar el Producto",
+                "errorDeletingProductDescription": "Ocurrió un error al intentar eliminar el producto. Por favor, inténtelo de nuevo.",
+                "title": "Eliminar Producto",
+                "description": "¿Está seguro de que desea eliminar este producto del inventario? Esta acción no se puede deshacer.",
+                "loading": "Cargando...",
+                "remove": "Eliminar",
+                "unavailableMessage": "No es posible eliminar este producto ya que aún hay artículos del mismo producto en stock.",
+                "errorMessage": "Ha ocurrido un error. Por favor, inténtelo de nuevo más tarde.",
+                "close": "Cerrar",
+                "cancel": "Cancelar"
+            },
+            "output": {
+                "donateProductTitle": "Donar un producto a un beneficiario",
+                "donateProductDescription": "Seleccione la ubicación donde está, la cantidad y a quién desea enviar.",
+                "loading": "Cargando...",
+                "errorMessage": "Ha ocurrido un error. Por favor, inténtelo de nuevo más tarde.",
+                "whereProduct": "¿Dónde está el producto?",
+                "quantity": "Cantidad",
+                "organization": "Organización",
+                "selectBeneficiary": "Seleccione el beneficiario",
+                "cancel": "Cancelar",
+                "donate": "Donar",
+                "select": "Seleccionar...",
+                "donationSuccessfulTitle": "Donación Exitosa",
+                "donationSuccessfulDescription": "Ha donado con éxito al beneficiario seleccionado.",
+                "donationFailedTitle": "Error en la Donación",
+                "donationFailedDescription": "Ocurrió un error al procesar su donación. Por favor, inténtelo de nuevo."
+            },
+            "move": {
+                "moveProductTitle": "Mover el producto a otra ubicación",
+                "moveProductDescription": "Seleccione la nueva ubicación a la que se moverá",
+                "loading": "Cargando...",
+                "errorMessage": "Ha ocurrido un error. Por favor, inténtelo de nuevo más tarde.",
+                "from": "De",
+                "organization": "Organización",
+                "newLocation": "Nueva Ubicación",
+                "quantity": "Cantidad",
+                "cancel": "Cancelar",
+                "move": "Mover",
+                "select": "Seleccionar...",
+                "productMovedSuccessTitle": "Producto Movido con Éxito",
+                "productMovedSuccessDescription": "Ha movido el producto con éxito.",
+                "errorMovingProductTitle": "Error al Mover el Producto",
+                "errorMovingProductDescription": "Ocurrió un error al intentar mover el producto. Por favor, inténtelo de nuevo."
+            },
+            "input": {
+                "addProductTitle": "Agregar nuevo producto al inventario",
+                "addProductDescription": "Seleccione la ubicación donde se encuentra el producto, el producto e ingrese la cantidad",
+                "loading": "Cargando...",
+                "errorMessage": "Ha ocurrido un error. Por favor, inténtelo de nuevo más tarde.",
+                "whereProduct": "¿Dónde está el producto?",
+                "quantity": "Cantidad",
+                "cancel": "Cancelar",
+                "save": "Guardar",
+                "organization": "Organización",
+                "select": "Seleccionar...",
+                "productAddedSuccessTitle": "Producto Agregado con Éxito",
+                "productAddedSuccessDescription": "{quantity} unidades de {productName} han sido agregadas con éxito al inventario.",
+                "errorAddingProductTitle": "Error al Agregar el Producto",
+                "errorAddingProductDescription": "Ocurrió un error al intentar agregar el producto al inventario. Por favor, inténtelo de nuevo."
+            },
+            "card": {
+                "foodAndBeverages": "Alimentos y Bebidas",
+                "personalCareAndBeauty": "Cuidado Personal y Belleza",
+                "householdCleaning": "Limpieza del Hogar",
+                "babyCareProducts": "Productos para Bebés",
+                "petProducts": "Productos para Mascotas",
+                "pharmacyAndMedications": "Farmacia y Medicamentos",
+                "noProductInStock": "No hay productos en stock",
+                "presentIn": "Presente en",
+                "stock": "inventario(s), sumando",
+                "units": "unidades",
+                "editProduct": "Editar producto",
+                "deleteProduct": "Eliminar producto",
+                "inputProduct": "Registrar producto",
+                "outputProduct": "Dar de baja al producto",
+                "moveProduct": "Mover a otro inventario",
+                "createdAt": "Creado en"
+            },
+            "edit": {
+                "loading": "Cargando...",
+                "errorEditing": "Error al editar",
+                "title": "Editar un producto",
+                "name": "Nombre *",
+                "description": "Descripción",
+                "brand": "Marca *",
+                "unitType": "Tipo de unidad *",
+                "selectPlaceholder": "Seleccionar...",
+                "unitOptions": {
+                    "un": "UN",
+                    "kg": "KG",
+                    "g": "G",
+                    "dz": "DZ",
+                    "box": "Caja",
+                    "liters": "Litros",
+                    "others": "Otros"
+                },
+                "category": "Categoría *",
+                "categoryOptions": {
+                    "foodAndBeverages": "Alimentos y Bebidas",
+                    "personalCareAndBeauty": "Cuidado Personal y Belleza",
+                    "householdCleaning": "Limpieza del Hogar",
+                    "babyCareProducts": "Productos para Bebés",
+                    "petProducts": "Productos para Mascotas",
+                    "pharmacyAndMedications": "Farmacia y Medicamentos"
+                },
+                "update": "Actualizar",
+                "errorToastTitle": "Error al Editar el Producto",
+                "errorToastDescription": "Ocurrió un error al intentar editar el producto. Por favor, inténtelo de nuevo.",
+                "successToastTitle": "Producto Actualizado!",
+                "successToastDescription": "El producto se actualizó con éxito."
+            }
         }
     },
     "admin": {

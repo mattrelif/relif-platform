@@ -31,7 +31,7 @@ const BeneficiaryCard = (data: Props): ReactNode => {
             <div className="flex gap-4">
                 <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-relif-orange-200 text-white">
-                        {data.full_name.split(" ")[0].charAt(0) || "US"}
+                        {data.full_name.split(" ")[0].charAt(0).toUpperCase() || "US"}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">

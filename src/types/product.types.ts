@@ -1,3 +1,5 @@
+import { OrganizationSchema } from "@/types/organization.types";
+
 export type ProductSchema = {
     id: string;
     name: string;
@@ -5,17 +7,47 @@ export type ProductSchema = {
     brand: string;
     category: string;
     organization_id: string;
-    total_in_stock: number;
+    organization: OrganizationSchema;
+    unit_type: string;
+    storage_records: Array<{
+        id: string;
+        location: {
+            id: string;
+            name: string;
+            type: "HOUSING" | "ORGANIZATION";
+        };
+        quantity: number;
+    }>;
     created_at: string;
     updated_at: string;
 };
 
 export type CreateProductRequest = Omit<
     ProductSchema,
-    "id" | "organization_id" | "total_in_stock" | "created_at" | "updated_at"
+    "id" | "organization_id" | "created_at" | "updated_at" | "organization" | "storage_records"
 >;
 
 export type UpdateProductRequest = Omit<
     ProductSchema,
-    "id" | "organization_id" | "total_in_stock" | "created_at" | "updated_at"
+    "id" | "organization_id" | "created_at" | "updated_at" | "organization" | "storage_records"
 >;
+
+export type MoveProductRequest = {
+    from: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    to: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    quantity: number;
+};
+
+export type AddProductRequest = {
+    to: {
+        type: "ORGANIZATION" | "HOUSING";
+        id: string;
+    };
+    quantity: number;
+};

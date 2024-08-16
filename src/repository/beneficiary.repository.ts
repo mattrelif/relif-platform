@@ -2,6 +2,8 @@ import { client } from "@/lib/axios-client";
 import {
     BeneficiaryAllocationSchema,
     BeneficiarySchema,
+    DonateProductToBeneficiaryRequest,
+    Donation,
     UpdateBeneficiaryRequest,
 } from "@/types/beneficiary.types";
 import { AxiosResponse } from "axios";
@@ -62,6 +64,28 @@ export async function reallocateBeneficiary(
             housing_id: housingId,
             room_id: roomId,
         },
+    });
+}
+
+export async function getDonationsByBeneficiaryId(
+    beneficiaryId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: Donation[] }>> {
+    return client.request({
+        url: `${PREFIX}/${beneficiaryId}/donations?offset=${offset}&limit=${limit}`,
+        method: "GET",
+    });
+}
+
+export async function donateProductToBeneficiary(
+    beneficiaryId: string,
+    data: DonateProductToBeneficiaryRequest
+): Promise<void> {
+    return client.request({
+        url: `${PREFIX}/${beneficiaryId}/donations`,
+        method: "POST",
+        data,
     });
 }
 
