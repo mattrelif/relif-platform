@@ -12,7 +12,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { createRequest } from "@/repository/updateOrganizationTypeRequests";
+import { createRequest } from "@/repository/updateOrganizationTypeRequests.repository";
 import { ReactNode } from "react";
 
 const CoordinationRequestDialog = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {

@@ -31,7 +31,9 @@ const SignInForm = (): ReactNode => {
                 password: string;
             } = Object.fromEntries(formData);
 
-            await signIn(data.email, data.password);
+            const token = await signIn(data.email, data.password);
+
+            localStorage.setItem("r_to", token);
 
             const { data: responseData } = await getMe();
             saveToLocalStorage("r_ud", responseData);

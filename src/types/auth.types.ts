@@ -25,8 +25,8 @@ export type PasswordChangeRequestSchema = {
 };
 
 export type SessionSchema = {
+    id: string;
     user_id: string;
-    session_id: string;
     expires_at: string;
 };
 

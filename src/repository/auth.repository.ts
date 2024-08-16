@@ -5,12 +5,14 @@ import { AxiosResponse } from "axios";
 
 const PREFIX = "auth";
 
-export async function signIn(email: string, password: string): Promise<void> {
-    return client.request({
+export async function signIn(email: string, password: string): Promise<string> {
+    const { headers } = await client.request({
         url: `${PREFIX}/sign-in`,
         method: "POST",
         data: { email, password },
     });
+
+    return headers.token;
 }
 
 export async function signOut(): Promise<void> {
@@ -20,20 +22,24 @@ export async function signOut(): Promise<void> {
     });
 }
 
-export async function signUp(data: SignUpRequest): Promise<void> {
-    return client.request({
+export async function signUp(data: SignUpRequest): Promise<string> {
+    const { headers } = await client.request({
         url: `${PREFIX}/sign-up`,
         method: "POST",
         data: { ...data },
     });
+
+    return headers.token;
 }
 
-export async function orgSignUp(data: SignUpByInviteRequest): Promise<void> {
-    return client.request({
+export async function orgSignUp(data: SignUpByInviteRequest): Promise<string> {
+    const { headers } = await client.request({
         url: `${PREFIX}/org-sign-up`,
         method: "POST",
         data,
     });
+
+    return headers.token;
 }
 
 export async function getMe(): Promise<AxiosResponse<UserSchema>> {

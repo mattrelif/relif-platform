@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { rejectRequest } from "@/repository/updateOrganizationTypeRequests";
+import { rejectRequest } from "@/repository/updateOrganizationTypeRequests.repository";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
 import { useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";

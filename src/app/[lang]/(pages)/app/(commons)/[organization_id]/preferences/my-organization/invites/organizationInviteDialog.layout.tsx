@@ -12,7 +12,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { acceptRequest } from "@/repository/organizationDataAccessRequests";
+import { acceptRequest } from "@/repository/organizationDataAccessRequests.repository";
 import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
 import { ReactNode } from "react";
 

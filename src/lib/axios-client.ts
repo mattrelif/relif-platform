@@ -7,7 +7,16 @@ const client: AxiosInstance = axios.create({
         "Content-Type": "application/json",
         "Cache-Control": "no-cache",
     },
-    withCredentials: true,
+});
+
+client.interceptors.request.use(config => {
+    const token = localStorage.getItem("r_to");
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
 });
 
 export { client };

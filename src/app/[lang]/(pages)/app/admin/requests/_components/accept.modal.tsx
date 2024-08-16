@@ -11,7 +11,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { acceptRequest } from "@/repository/updateOrganizationTypeRequests";
+import { acceptRequest } from "@/repository/updateOrganizationTypeRequests.repository";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
 import { useRouter } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction } from "react";

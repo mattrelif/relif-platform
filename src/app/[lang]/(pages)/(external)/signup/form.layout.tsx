@@ -48,7 +48,7 @@ const Form = (): ReactNode => {
 
             const timezone = getTimezone();
 
-            await signUp({
+            const token = await signUp({
                 first_name: data.firstName,
                 last_name: data.lastName,
                 email: data.email,
@@ -60,6 +60,8 @@ const Form = (): ReactNode => {
                     timezone,
                 },
             });
+
+            localStorage.setItem("r_to", token);
 
             toast({
                 title: dict.signup.toastSuccessTitle,

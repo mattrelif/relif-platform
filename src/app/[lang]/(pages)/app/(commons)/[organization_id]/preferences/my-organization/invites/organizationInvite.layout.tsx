@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
-import { rejectRequest } from "@/repository/organizationDataAccessRequests";
+import { rejectRequest } from "@/repository/organizationDataAccessRequests.repository";
 import { OrganizationDataAccessRequestSchema } from "@/types/organization.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";

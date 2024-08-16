@@ -2,7 +2,7 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { findRequests } from "@/repository/updateOrganizationTypeRequests";
+import { findRequests } from "@/repository/updateOrganizationTypeRequests.repository";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";

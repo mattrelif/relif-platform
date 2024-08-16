@@ -26,6 +26,7 @@ const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
     const onHandleSignOut = async (): Promise<void> => {
         try {
             await signOut();
+            removeFromLocalStorage("r_to");
             removeFromLocalStorage("r_ud");
             router.push("/", { scroll: false });
         } catch {

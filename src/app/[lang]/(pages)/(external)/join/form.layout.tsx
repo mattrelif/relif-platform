@@ -60,7 +60,7 @@ const Form = (): ReactNode => {
                 return;
             }
 
-            await orgSignUp({
+            const token = await orgSignUp({
                 first_name: data.firstName,
                 last_name: data.lastName,
                 email,
@@ -73,6 +73,8 @@ const Form = (): ReactNode => {
                     timezone,
                 },
             });
+
+            localStorage.setItem("r_to", token);
 
             toast({
                 title: dict.signup.toastSuccessTitle,
