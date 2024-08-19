@@ -65,7 +65,7 @@ const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => 
                         {dict.commons.preferences.myOrganization.users.add.enterEmail}
                     </DialogDescription>
                     <form onSubmit={handleSubmit}>
-                        <div className="flex flex-col pt-4 gap-2">
+                        <div className="flex flex-col pt-4 gap-2 text-start">
                             <Label htmlFor="email">
                                 {dict.commons.preferences.myOrganization.users.add.email} *
                             </Label>

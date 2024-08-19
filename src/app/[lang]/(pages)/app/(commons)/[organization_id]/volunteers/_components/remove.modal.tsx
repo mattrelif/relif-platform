@@ -75,10 +75,10 @@ const RemoveModal = ({
                         {dict.commons.volunteers.list.remove.description}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
-                        <span className="text-sm text-slate-900 font-bold">
+                        <span className="text-sm text-slate-900 font-bold text-start">
                             {convertToTitleCase(volunteer.full_name)}
                         </span>
-                        <span className="text-xs text-slate-500">{volunteer.email}</span>
+                        <span className="text-xs text-slate-500 text-start">{volunteer.email}</span>
                     </div>
                     <div className="flex gap-4 pt-5">
                         <Button variant="outline" onClick={() => setRemoveDialogOpenState(false)}>

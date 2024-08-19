@@ -79,6 +79,7 @@ const Form = (): ReactNode => {
             toast({
                 title: dict.signup.toastSuccessTitle,
                 description: dict.signup.toastSuccessDescription,
+                variant: "success",
             });
 
             router.push("/");

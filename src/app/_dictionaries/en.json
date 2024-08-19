@@ -135,7 +135,8 @@
                 "entry": "Entrypoint",
                 "admin": "Relif",
                 "organizations": "Organizations",
-                "requests": "Requests"
+                "requests": "Requests",
+                "allocate": "Allocate"
             }
         },
         "preferences": {
@@ -810,7 +811,6 @@
                 "emergencyPhone": "Phone",
                 "emergencyEmail": "E-mail",
                 "notes": "Notes",
-                "createBeneficiary": "Create beneficiary",
                 "registrationSuccessful": "Registration successful",
                 "volunteerRegisteredSuccessfully": "Volunteer registered successfully!",
                 "registrationError": "Registration Error",

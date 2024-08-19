@@ -34,42 +34,45 @@ const Header = (): ReactNode => {
                 <div />
             )}
 
-            <Breadcrumb />
+            {!isEntry && <Breadcrumb />}
 
             <div className="flex items-center gap-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button variant="icon" asChild className="w-7 h-7 p-0">
-                                <Link href="#">
-                                    <HiMiniBellAlert />
-                                </Link>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{dict.commons.notifications}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button variant="icon" asChild className="w-7 h-7 p-0">
-                                <Link href={`${urlPath}/preferences/platform`}>
-                                    <MdSettings />
-                                </Link>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{dict.commons.header.preferences}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                {!isEntry && (
+                    <>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button variant="icon" asChild className="w-7 h-7 p-0">
+                                        <Link href="#">
+                                            <HiMiniBellAlert />
+                                        </Link>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{dict.commons.notifications}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button variant="icon" asChild className="w-7 h-7 p-0">
+                                        <Link href={`${urlPath}/preferences/platform`}>
+                                            <MdSettings />
+                                        </Link>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{dict.commons.header.preferences}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </>
+                )}
 
                 <div className="flex items-center justify-center pl-2">
                     {currentUser ? (
-                        <UserDropdown>
+                        <UserDropdown isEntry={isEntry}>
                             <Avatar className="w-8 h-8">
                                 <AvatarFallback className="bg-relif-orange-200 text-white">
                                     {currentUser.first_name
@@ -80,7 +83,7 @@ const Header = (): ReactNode => {
                             </Avatar>
                         </UserDropdown>
                     ) : (
-                        <UserDropdown>
+                        <UserDropdown isEntry={isEntry}>
                             <Avatar className="w-8 h-8">
                                 <AvatarFallback className="bg-relif-orange-200 text-white">
                                     US

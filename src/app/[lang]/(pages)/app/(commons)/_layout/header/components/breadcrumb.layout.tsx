@@ -56,6 +56,7 @@ const Breadcrumb = (): ReactNode => {
         admin: dict.commons.header.breadcrumb.admin,
         organizations: dict.commons.header.breadcrumb.organizations,
         requests: dict.commons.header.breadcrumb.requests,
+        allocate: dict.commons.header.breadcrumb.allocate,
     };
 
     return (

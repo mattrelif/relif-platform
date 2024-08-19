@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { HousingSchema } from "@/types/housing.types";
 import { formatDate } from "@/utils/formatDate";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
@@ -29,6 +28,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const platformRole = usePlatformRole();
     const pathname = usePathname();
     const dict = useDictionary();
+    const router = useRouter();
 
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const urlPath = pathname.split("/").slice(0, 5).join("/");
@@ -48,89 +48,109 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
 
     const status = getStatus();
 
-    return (
-        <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
-            <div className="flex flex-col">
-                <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
-                <span className="text-xs text-slate-500 mt-3 flex items-center gap-1 lg:gap-2">
-                    <FaMapMarkerAlt />
-                    {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
-                </span>
-                <div className="flex flex-col gap-2 mt-4">
-                    <span className="text-xs text-slate-500 flex items-center gap-1">
-                        {data.occupied_vacancies} {dict.housingList.beneficiaries} (
-                        {((data.occupied_vacancies * 100) / data.total_vacancies)?.toFixed(0)}%{" "}
-                        {dict.housingList.occupied})
-                    </span>
-                    <span className="text-xs text-slate-500 flex items-center gap-2">
-                        {status === "FULL" && (
-                            <span>
-                                <Badge className="bg-slate-900 text-slate-50 hover:bg-slate-950">
-                                    {dict.housingList.statusFull}
-                                </Badge>
-                            </span>
-                        )}
-                        {status === "AVAILABLE" && (
-                            <span>
-                                <Badge className="bg-green-500 text-slate-50 hover:bg-green-600">
-                                    {dict.housingList.statusAvailable} (
-                                    {data.total_vacancies - data.occupied_vacancies}{" "}
-                                    {dict.housingList.availableBeds})
-                                </Badge>
-                            </span>
-                        )}
+    const handleDropdownItemClick = (e: any, url: string) => {
+        e.stopPropagation();
+        router.push(url);
+    };
 
-                        {status === "OVERCROWDED" && (
-                            <span>
-                                <Badge className="bg-red-600 text-slate-50 hover:bg-red-700">
-                                    {dict.housingList.statusOvercrowded}
-                                </Badge>
-                            </span>
-                        )}
+    return (
+        <>
+            <li
+                className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4"
+                onClick={() => router.push(`${urlPath}/${data?.id}`)}
+            >
+                <div className="flex flex-col">
+                    <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
+                    <span className="text-xs text-slate-500 mt-3 flex items-center gap-1 lg:gap-2">
+                        <FaMapMarkerAlt />
+                        {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
                     </span>
+                    <div className="flex flex-col gap-2 mt-4">
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                            {data.occupied_vacancies} {dict.housingList.beneficiaries} (
+                            {((data.occupied_vacancies * 100) / data.total_vacancies)?.toFixed(0)}%{" "}
+                            {dict.housingList.occupied})
+                        </span>
+                        <span className="text-xs text-slate-500 flex items-center gap-2">
+                            {status === "FULL" && (
+                                <span>
+                                    <Badge className="bg-slate-900 text-slate-50 hover:bg-slate-950">
+                                        {dict.housingList.statusFull}
+                                    </Badge>
+                                </span>
+                            )}
+                            {status === "AVAILABLE" && (
+                                <span>
+                                    <Badge className="bg-green-500 text-slate-50 hover:bg-green-600">
+                                        {dict.housingList.statusAvailable} (
+                                        {data.total_vacancies - data.occupied_vacancies}{" "}
+                                        {dict.housingList.availableBeds})
+                                    </Badge>
+                                </span>
+                            )}
+
+                            {status === "OVERCROWDED" && (
+                                <span>
+                                    <Badge className="bg-red-600 text-slate-50 hover:bg-red-700">
+                                        {dict.housingList.statusOvercrowded}
+                                    </Badge>
+                                </span>
+                            )}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div className="flex flex-col items-end justify-between">
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="icon" className="w-7 h-7 p-0">
-                            <SlOptions className="text-sm" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem asChild>
-                            <Link href={`${urlPath}/${data?.id}`}>
+                <div className="flex flex-col items-end justify-between">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button variant="icon" className="w-7 h-7 p-0">
+                                <SlOptions className="text-sm" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem
+                                onClick={e => handleDropdownItemClick(e, `${urlPath}/${data?.id}`)}
+                            >
                                 {dict.housingList.dropdownViewHousing}
-                            </Link>
-                        </DropdownMenuItem>
-                        {platformRole === "ORG_ADMIN" && (
-                            <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild>
-                                    <Link href={`${urlPath}/${data?.id}/edit`}>
+                            </DropdownMenuItem>
+                            {platformRole === "ORG_ADMIN" && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={e =>
+                                            handleDropdownItemClick(
+                                                e,
+                                                `${urlPath}/${data?.id}/edit`
+                                            )
+                                        }
+                                    >
                                         <span className="flex items-center gap-2">
                                             <FaEdit className="text-xs" />
                                             {dict.housingList.dropdownEditHousing}
                                         </span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setRemoveDialogOpenState(true)}>
-                                    <span className="flex items-center gap-2">
-                                        <FaTrash className="text-xs" />
-                                        {dict.housingList.dropdownRemoveHousing}
-                                    </span>
-                                </DropdownMenuItem>
-                            </>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="flex flex-col items-end lg:hidden">
-                    <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                        {dict.housingList.createdAt} {formatDate(data.created_at, locale || "en")}
-                    </span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setRemoveDialogOpenState(true);
+                                        }}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <FaTrash className="text-xs" />
+                                            {dict.housingList.dropdownRemoveHousing}
+                                        </span>
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="flex flex-col items-end lg:hidden">
+                        <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                            {dict.housingList.createdAt}{" "}
+                            {formatDate(data.created_at, locale || "en")}
+                        </span>
+                    </div>
                 </div>
-            </div>
-
+            </li>
             {platformRole === "ORG_ADMIN" && (
                 <RemoveModal
                     housing={data}
@@ -139,7 +159,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     setRemoveDialogOpenState={setRemoveDialogOpenState}
                 />
             )}
-        </li>
+        </>
     );
 };
 

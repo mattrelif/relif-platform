@@ -150,6 +150,7 @@ const Form = (): ReactNode => {
                 toast({
                     title: dict.commons.beneficiaries.create.toastSuccessTitle,
                     description: dict.commons.beneficiaries.create.toastSuccessDescription,
+                    variant: "success",
                 });
 
                 router.push(`${urlPath}/create/${newBeneficiary.id}/allocate`);

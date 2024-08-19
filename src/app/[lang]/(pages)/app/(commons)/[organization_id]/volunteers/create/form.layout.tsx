@@ -133,6 +133,7 @@ const Form = (): ReactNode => {
                 toast({
                     title: dict.commons.volunteers.create.registrationSuccessful,
                     description: dict.commons.volunteers.create.volunteerRegisteredSuccessfully,
+                    variant: "success",
                 });
 
                 router.push(urlPath);
@@ -340,7 +341,7 @@ const Form = (): ReactNode => {
 
                 <Button className="flex items-center gap-2">
                     <MdAdd size={16} />
-                    {dict.commons.volunteers.create.createBeneficiary}
+                    {dict.commons.volunteers.create.createVolunteer}
                 </Button>
             </div>
         </form>

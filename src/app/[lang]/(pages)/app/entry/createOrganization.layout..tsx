@@ -66,12 +66,12 @@ const CreateOrganization = (): ReactNode => {
     };
 
     return (
-        <div className="w-[700px] h-max border border-slate-200 rounded-lg overflow-hidden lg:w-full lg:border-none lg:h-full lg:overflow-y-scroll">
+        <div className="w-[700px] h-max border border-slate-200 rounded-lg overflow-hidden lg:w-full lg:border-none lg:h-full">
             <h1 className="text-white bg-relif-orange-200 font-bold text-xl flex items-center justify-center w-full border-b-[1px] border-slate-200 p-6 gap-2">
                 <FaRegBuilding /> {dict.createOrganization.title}
             </h1>
             <form
-                className="overflow-hidden flex flex-col gap-6 p-6 pl-8 overflow-x-hidden overflow-y-scroll lg:p-3"
+                className="flex flex-col gap-6 p-6 pl-8 overflow-x-hidden overflow-y-scroll lg:p-3 max-h-[calc(100vh-300px)]"
                 onSubmit={handleSubmit}
             >
                 <div className="flex flex-col pt-4 gap-2">

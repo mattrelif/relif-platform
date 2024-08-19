@@ -1,6 +1,5 @@
 "use client";
 
-import { TIMEZONES } from "@/app/constants/timezones";
 import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     Select,
@@ -66,19 +65,19 @@ const Form = (): ReactNode => {
         }
     };
 
-    const handleTimezone = async (newTimezone: string): Promise<void> => {
-        if (userData) {
-            await updateUser(userData.id, {
-                ...userData,
-                preferences: { language: userData.preferences.language, timezone: newTimezone },
-            });
-
-            updateLocalStorage("r_ud", {
-                ...userData,
-                preferences: { language: userData.preferences.language, timezone: newTimezone },
-            });
-        }
-    };
+    // const handleTimezone = async (newTimezone: string): Promise<void> => {
+    //     if (userData) {
+    //         await updateUser(userData.id, {
+    //             ...userData,
+    //             preferences: { language: userData.preferences.language, timezone: newTimezone },
+    //         });
+    //
+    //         updateLocalStorage("r_ud", {
+    //             ...userData,
+    //             preferences: { language: userData.preferences.language, timezone: newTimezone },
+    //         });
+    //     }
+    // };
 
     if (isLoading)
         return (
@@ -121,27 +120,27 @@ const Form = (): ReactNode => {
                     </SelectContent>
                 </Select>
             </div>
-            <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4">
-                <span className="text-sm text-slate-900 font-semibold">
-                    {dict.commons.preferences.platform.timezone}
-                </span>
-                <Select
-                    defaultValue={userData?.preferences.timezone}
-                    onValueChange={handleTimezone}
-                >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder={dict.commons.preferences.platform.select} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {TIMEZONES.map(tz => (
-                            <SelectItem
-                                key={tz.timezone}
-                                value={tz.timezone}
-                            >{`${tz.timezone} | ${tz.name}`}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+            {/* <div className="w-full h-max grid grid-cols-2 items-center border-b-[1px] border-slate-200 p-4"> */}
+            {/*    <span className="text-sm text-slate-900 font-semibold"> */}
+            {/*        {dict.commons.preferences.platform.timezone} */}
+            {/*    </span> */}
+            {/*    <Select */}
+            {/*        defaultValue={userData?.preferences.timezone} */}
+            {/*        onValueChange={handleTimezone} */}
+            {/*    > */}
+            {/*        <SelectTrigger className="w-full"> */}
+            {/*            <SelectValue placeholder={dict.commons.preferences.platform.select} /> */}
+            {/*        </SelectTrigger> */}
+            {/*        <SelectContent> */}
+            {/*            {TIMEZONES.map(tz => ( */}
+            {/*                <SelectItem */}
+            {/*                    key={tz.timezone} */}
+            {/*                    value={tz.timezone} */}
+            {/*                >{`${tz.timezone} | ${tz.name}`}</SelectItem> */}
+            {/*            ))} */}
+            {/*        </SelectContent> */}
+            {/*    </Select> */}
+            {/* </div> */}
         </>
     );
 };

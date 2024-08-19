@@ -118,14 +118,14 @@ const MoveModal = ({
 
     if (isLoading)
         return (
-            <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
+            <h2 className="p-4 text-relif-orange-400 font-medium text-sm text-start">
                 {dict.commons.beneficiaries.moveModal.loading}
             </h2>
         );
 
     if (error)
         return (
-            <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+            <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4 text-start">
                 <MdError />
                 {dict.commons.beneficiaries.moveModal.error}
             </span>
@@ -143,25 +143,26 @@ const MoveModal = ({
                     </DialogDescription>
 
                     <div className="flex flex-col pt-4">
-                        <span className="text-sm text-slate-900 font-bold">
+                        <span className="text-sm text-slate-900 font-bold text-start">
                             {beneficiary.full_name}
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-500 text-start">
                             <strong>Current:</strong>{" "}
                             {!beneficiary.current_housing_id
                                 ? dict.commons.beneficiaries.moveModal.unallocated
                                 : `${beneficiary.current_housing.name} (housed on ${beneficiary.current_room.name})`}
                         </span>
                     </div>
+
                     {housings.length === 0 && (
-                        <span className="text-sm text-red-500 font-medium pt-4">
+                        <span className="text-sm text-red-500 font-medium pt-4 text-start">
                             {dict.commons.beneficiaries.moveModal.noHousingsFound}
                         </span>
                     )}
 
                     {housings.length > 0 && (
-                        <div className="pt-4 flex flex-col gap-2">
-                            <span className="text-xs text-slate-500 font-bold">
+                        <div className="pt-4 flex flex-col gap-2 items-start">
+                            <span className="text-xs text-slate-500 font-bold text-start">
                                 {dict.commons.beneficiaries.moveModal.to}:
                             </span>
                             <Select onValueChange={getSpaces} required>

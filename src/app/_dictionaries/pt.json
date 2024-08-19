@@ -135,7 +135,8 @@
                 "entry": "Ponto de Entrada",
                 "admin": "Admin",
                 "organizations": "Organizações",
-                "requests": "Solicitações"
+                "requests": "Solicitações",
+                "allocate": "Alocar"
             }
         },
         "preferences": {
@@ -810,7 +811,6 @@
                 "emergencyPhone": "Telefone",
                 "emergencyEmail": "E-mail",
                 "notes": "Notas",
-                "createBeneficiary": "Criar beneficiário",
                 "registrationSuccessful": "Registro bem-sucedido",
                 "volunteerRegisteredSuccessfully": "Voluntário registrado com sucesso!",
                 "registrationError": "Erro de Registro",

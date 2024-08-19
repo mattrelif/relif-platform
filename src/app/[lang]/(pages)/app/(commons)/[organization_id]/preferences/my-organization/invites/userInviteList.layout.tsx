@@ -31,14 +31,17 @@ const UserInviteList = (): ReactNode => {
             const OFFSET = 0;
             const LIMIT = 9999;
             const response = await findJoinRequestsByOrganizationId(organizationId, OFFSET, LIMIT);
+            console.log(response);
 
             setInvites({
-                count: response.data.data.filter(
-                    invite => invite.status === "PENDING" && invite.user_id !== currentUser.id
-                ).length,
-                data: response.data.data.filter(
-                    invite => invite.status === "PENDING" && invite.user_id !== currentUser.id
-                ),
+                count:
+                    response.data.data?.filter(
+                        invite => invite.status === "PENDING" && invite.user_id !== currentUser.id
+                    ).length || 0,
+                data:
+                    response.data.data?.filter(
+                        invite => invite.status === "PENDING" && invite.user_id !== currentUser.id
+                    ) || [],
             });
         } else {
             throw new Error();

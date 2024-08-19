@@ -20,7 +20,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
-const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
+type Props = {
+    children: ReactNode;
+    isEntry: boolean;
+};
+
+const UserDropdown = ({ children, isEntry }: Props): ReactNode => {
     const dict = useDictionary();
     const pathname = usePathname();
     const router = useRouter();
@@ -64,39 +69,44 @@ const UserDropdown = ({ children }: { children: ReactNode }): ReactNode => {
                     {dict.commons.header.hi}, {user?.first_name}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href={`${urlPath}/preferences/my-profile`}>
-                        {dict.commons.header.profile}
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                        {dict.commons.header.preferences}
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                        <DropdownMenuItem>
-                            <Link href={`${urlPath}/preferences/my-organization/users`}>
-                                {dict.commons.header.team}
+                {!isEntry && (
+                    <>
+                        <DropdownMenuItem asChild>
+                            <Link href={`${urlPath}/preferences/my-profile`}>
+                                {dict.commons.header.profile}
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href={`${urlPath}/preferences/my-organization/overview`}>
-                                {dict.commons.header.organization}
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href={`${urlPath}/preferences/platform`}>
-                                {dict.commons.header.platform}
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href={`${urlPath}/preferences/support`}>
-                                {dict.commons.header.support}
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                </DropdownMenuSub>
-                <DropdownMenuSeparator />
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                {dict.commons.header.preferences}
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuItem>
+                                    <Link href={`${urlPath}/preferences/my-organization/users`}>
+                                        {dict.commons.header.team}
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href={`${urlPath}/preferences/my-organization/overview`}>
+                                        {dict.commons.header.organization}
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href={`${urlPath}/preferences/platform`}>
+                                        {dict.commons.header.platform}
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href={`${urlPath}/preferences/support`}>
+                                        {dict.commons.header.support}
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
+
                 <DropdownMenuItem onClick={onHandleSignOut}>
                     {dict.commons.header.logout}
                 </DropdownMenuItem>

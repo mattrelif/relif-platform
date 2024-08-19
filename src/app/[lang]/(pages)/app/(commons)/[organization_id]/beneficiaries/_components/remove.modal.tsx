@@ -76,10 +76,10 @@ const RemoveModal = ({
                         {dict.commons.beneficiaries.removeModal.confirmRemoveDescription}
                     </DialogDescription>
                     <div className="flex flex-col pt-4">
-                        <span className="text-sm text-slate-900 font-bold">
+                        <span className="text-sm text-slate-900 font-bold text-left">
                             {convertToTitleCase(beneficiary.full_name)}
                         </span>
-                        <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                        <span className="text-xs text-slate-500 flex items-center gap-1 mt-1 text-left">
                             <FaHouseChimneyUser />
                             {beneficiary?.current_housing.name ||
                                 dict.commons.beneficiaries.removeModal.unallocated}

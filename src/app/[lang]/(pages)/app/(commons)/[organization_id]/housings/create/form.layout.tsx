@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { signOut } from "@/repository/auth.repository";
 import { createHousing } from "@/repository/housing.repository";
-import { useRouter } from "next/navigation";
+import { UserSchema } from "@/types/user.types";
+import { getFromLocalStorage } from "@/utils/localStorage";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaHouseChimneyUser } from "react-icons/fa6";
@@ -16,6 +19,7 @@ import { MdAdd } from "react-icons/md";
 
 const Form = (): ReactNode => {
     const router = useRouter();
+    const pathname = usePathname();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const dict = useDictionary();
@@ -26,6 +30,7 @@ const Form = (): ReactNode => {
 
         try {
             const formData: FormData = new FormData(e.target);
+            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
 
             // @ts-ignore
             const data: {
@@ -50,15 +55,21 @@ const Form = (): ReactNode => {
                 },
             });
 
-            const organizationId = responseData.organization_id;
             const housingId = responseData.id;
 
             toast({
                 title: dict.createHousing.toastSuccessTitle,
                 description: dict.createHousing.toastSuccessDescription,
+                variant: "success",
             });
 
-            router.push(`/app/${organizationId}/housings/${housingId}`);
+            if (currentUser.organization_id) {
+                const organizationId = currentUser.organization_id;
+                router.push(`/app/${organizationId}/housings/${housingId}`);
+            } else {
+                router.push("/");
+                await signOut();
+            }
         } catch {
             setIsLoading(false);
             toast({
