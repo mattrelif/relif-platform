@@ -778,7 +778,8 @@
                     "cancel": "Cancelar",
                     "delete": "Excluir",
                     "loading": "Carregando...",
-                    "removedSuccess": "Voluntário removido com sucesso.",
+                    "removedSuccess": "Removido!",
+                    "removedSuccessDescription": "O voluntário foi removido com sucesso!",
                     "removalFailedTitle": "Falha na remoção do voluntário",
                     "removalFailedDescription": "Ocorreu um erro ao tentar remover o voluntário. Por favor, tente novamente mais tarde ou entre em contato com o suporte se o problema persistir."
                 },

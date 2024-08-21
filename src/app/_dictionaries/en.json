@@ -778,7 +778,8 @@
                     "cancel": "Cancel",
                     "delete": "Delete",
                     "loading": "Loading...",
-                    "removedSuccess": "Volunteer removed successfully.",
+                    "removedSuccess": "Removed!",
+                    "removedSuccessDescription": "The volunteer was successfully removed!",
                     "removalFailedTitle": "Volunteer Removal Failed",
                     "removalFailedDescription": "An error occurred while attempting to remove the volunteer. Please try again later or contact support if the issue persists."
                 },

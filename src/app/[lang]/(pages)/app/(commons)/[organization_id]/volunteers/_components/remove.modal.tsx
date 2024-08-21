@@ -50,8 +50,8 @@ const RemoveModal = ({
             }
 
             toast({
-                title: dict.commons.volunteers.list.remove.title,
-                description: dict.commons.volunteers.list.remove.removedSuccess,
+                title: dict.commons.volunteers.list.remove.removedSuccess,
+                description: dict.commons.volunteers.list.remove.removedSuccessDescription,
                 variant: "success",
             });
         } catch {
