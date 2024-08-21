@@ -26,6 +26,7 @@ export function middleware(request: NextRequest) {
             "/favicon.ico",
             "/images/logo-relif.svg",
             "/images/logo-relif-black.svg",
+            "/images/banner-signin.png",
         ].includes(pathname)
     )
         return;

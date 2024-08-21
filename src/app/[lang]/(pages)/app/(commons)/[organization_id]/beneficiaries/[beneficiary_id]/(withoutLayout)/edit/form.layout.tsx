@@ -181,6 +181,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
             toast({
                 title: dict.commons.beneficiaries.edit.toastSuccessTitle,
                 description: dict.commons.beneficiaries.edit.toastSuccessDescription,
+                variant: "success",
             });
 
             router.push(urlPath);

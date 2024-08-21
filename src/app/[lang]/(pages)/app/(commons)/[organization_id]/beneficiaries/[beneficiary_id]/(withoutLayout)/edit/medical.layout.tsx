@@ -61,10 +61,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="allergies"
                         name="allergies"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setAllergies)}
-                        defaultValue={defaultValue.allergies.join(",")}
+                        defaultValue={defaultValue.allergies?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {allergies?.map((allergy, index) => (
@@ -83,10 +82,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="currentMedications"
                         name="currentMedications"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setCurrentMedications)}
-                        defaultValue={defaultValue.current_medications.join(",")}
+                        defaultValue={defaultValue.current_medications?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {currentMedications?.map((medication, index) => (
@@ -105,10 +103,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="chronicMedicalConditions"
                         name="chronicMedicalConditions"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setChronicMedicalConditions)}
-                        defaultValue={defaultValue.recurrent_medical_conditions.join(",")}
+                        defaultValue={defaultValue.recurrent_medical_conditions?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {chronicMedicalConditions?.map((condition, index) => (
@@ -127,10 +124,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="healthInsurance"
                         name="healthInsurance"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setHealthInsurance)}
-                        defaultValue={defaultValue.health_insurance_plans.join(",")}
+                        defaultValue={defaultValue.health_insurance_plans?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {healthInsurance?.map((insurance, index) => (
@@ -145,7 +141,7 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                     <Label htmlFor="bloodType">
                         {dict.commons.beneficiaries.edit.medical.bloodType}
                     </Label>
-                    <Select name="bloodType" required defaultValue={defaultValue.blood_type}>
+                    <Select name="bloodType" required defaultValue={defaultValue?.blood_type}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select blood type..." />
                         </SelectTrigger>
@@ -170,10 +166,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="vaccinations"
                         name="vaccinations"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setVaccinations)}
-                        defaultValue={defaultValue.taken_vaccines.join(",")}
+                        defaultValue={defaultValue.taken_vaccines?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {vaccinations?.map((vaccination, index) => (
@@ -192,10 +187,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="mentalHealth"
                         name="mentalHealth"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setMentalHealth)}
-                        defaultValue={defaultValue.mental_health_history.join(",")}
+                        defaultValue={defaultValue.mental_health_history?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {mentalHealth?.map((mental, index) => (
@@ -213,8 +207,7 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         name="height"
                         type="number"
                         placeholder="e.g. 170cm"
-                        required
-                        defaultValue={defaultValue.height}
+                        defaultValue={defaultValue?.height}
                     />
                 </div>
 
@@ -225,8 +218,7 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         name="weight"
                         type="number"
                         placeholder="e.g. 80kg"
-                        required
-                        defaultValue={defaultValue.weight}
+                        defaultValue={defaultValue?.weight}
                     />
                 </div>
 
@@ -238,10 +230,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="addictions"
                         name="addictions"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setAddictions)}
-                        defaultValue={defaultValue.addictions.join(",")}
+                        defaultValue={defaultValue.addictions?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {addictions?.map((addiction, index) => (
@@ -260,10 +251,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="disabilities"
                         name="disabilities"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setDisabilities)}
-                        defaultValue={defaultValue.disabilities.join(",")}
+                        defaultValue={defaultValue.disabilities?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {disabilities?.map((disability, index) => (
@@ -282,10 +272,9 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="prothesisOrMedicalDevices"
                         name="prothesisOrMedicalDevices"
                         type="text"
-                        required
                         placeholder={dict.commons.beneficiaries.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setProsthesisOrMedicalDevices)}
-                        defaultValue={defaultValue.prothesis_or_medical_devices.join(",")}
+                        defaultValue={defaultValue.prothesis_or_medical_devices?.join(",")}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
                         {prosthesisOrMedicalDevices?.map((device, index) => (

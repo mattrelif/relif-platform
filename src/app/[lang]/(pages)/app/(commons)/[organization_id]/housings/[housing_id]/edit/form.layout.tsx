@@ -80,6 +80,7 @@ const Form = ({ housingId }: Props): ReactNode => {
             toast({
                 title: dict.housingOverview.editHousing.toastSuccessTitle,
                 description: dict.housingOverview.editHousing.toastSuccessDescription,
+                variant: "success",
             });
 
             const organizationId = pathname.split("/")[3];
