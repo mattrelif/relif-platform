@@ -572,6 +572,8 @@
                 "unallocated": "Não alocado",
                 "noHousingsFound": "Nenhuma acomodação encontrada...",
                 "to": "Para",
+                "exitReason": "Motivo da saída",
+                "available": "disponíveis",
                 "selectHousingPlaceholder": "Selecione a acomodação...",
                 "selectSpacePlaceholder": "Selecione o espaço...",
                 "cancel": "Cancelar",
@@ -1509,5 +1511,6 @@
         "toastSuccessDescription": "Acomodação removida com sucesso.",
         "toastErrorTitle": "Falha ao Remover Acomodação",
         "toastErrorDescription": "Ocorreu um erro ao tentar remover a acomodação. Por favor, tente novamente mais tarde ou entre em contato com o suporte se o problema persistir."
-    }
+    },
+    "notInformed": "Não informado"
 }

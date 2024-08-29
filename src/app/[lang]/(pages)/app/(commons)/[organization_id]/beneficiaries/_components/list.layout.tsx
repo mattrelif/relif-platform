@@ -7,7 +7,6 @@ import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
@@ -133,22 +132,25 @@ const BeneficiaryList = (): ReactNode => {
                                 <PaginationContent>
                                     <PaginationItem>
                                         <PaginationPrevious
-                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            onClick={() =>
+                                                handlePageChange(
+                                                    currentPage === 1 ? 1 : currentPage - 1
+                                                )
+                                            }
                                         />
                                     </PaginationItem>
-                                    {Array.from({ length: totalPages }).map((_, index) => (
-                                        <PaginationItem key={index}>
-                                            <PaginationLink
-                                                onClick={() => handlePageChange(index + 1)}
-                                                isActive={index + 1 === currentPage}
-                                            >
-                                                {index + 1}
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                    ))}
+                                    <PaginationItem className="rounded-md border border-relif-orange-200 px-2 py-1 text-sm text-relif-orange-200">
+                                        {currentPage} / {totalPages}
+                                    </PaginationItem>
                                     <PaginationItem>
                                         <PaginationNext
-                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            onClick={() =>
+                                                handlePageChange(
+                                                    currentPage === totalPages
+                                                        ? totalPages
+                                                        : currentPage + 1
+                                                )
+                                            }
                                         />
                                     </PaginationItem>
                                 </PaginationContent>

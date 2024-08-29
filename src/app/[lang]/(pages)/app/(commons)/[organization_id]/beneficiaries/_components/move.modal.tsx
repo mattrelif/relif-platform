@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -17,7 +18,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { reallocateBeneficiary } from "@/repository/beneficiary.repository";
+import { allocateBeneficiary, reallocateBeneficiary } from "@/repository/beneficiary.repository";
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
@@ -51,6 +52,7 @@ const MoveModal = ({
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
     const [selectedHousing, setSelectedHousing] = useState("");
     const [spaces, setSpaces] = useState<SpaceSchema[] | []>([]);
+    const [exitReason, setExitReason] = useState("");
     const [selectedSpace, setSelectedSpace] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -93,7 +95,16 @@ const MoveModal = ({
 
     const handleMove = async (): Promise<void> => {
         try {
-            await reallocateBeneficiary(beneficiary.id, selectedHousing, selectedSpace);
+            if (beneficiary.current_housing_id) {
+                await reallocateBeneficiary(
+                    beneficiary.id,
+                    selectedHousing,
+                    selectedSpace,
+                    exitReason
+                );
+            } else {
+                await allocateBeneficiary(beneficiary.id, selectedHousing, selectedSpace);
+            }
 
             if (refreshList) {
                 refreshList();
@@ -194,11 +205,28 @@ const MoveModal = ({
                                         <SelectItem value={space.id}>
                                             {space.name} [
                                             {space.total_vacancies - space.occupied_vacancies} of{" "}
-                                            {space.total_vacancies} occupied]
+                                            {space.total_vacancies}{" "}
+                                            {dict.commons.beneficiaries.moveModal.available}]
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {beneficiary.current_housing_id && (
+                                <div className="flex flex-col gap-3 w-full pt-5 text-start">
+                                    <Label htmlFor="react-reason">
+                                        {dict.commons.beneficiaries.moveModal.exitReason} *
+                                    </Label>
+                                    <textarea
+                                        className="flex min-h-20 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        id="exitReason"
+                                        name="exitReason"
+                                        value={exitReason}
+                                        onChange={e => setExitReason(e.target.value)}
+                                        maxLength={250}
+                                        required
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
 

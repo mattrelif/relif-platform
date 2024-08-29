@@ -574,6 +574,8 @@
                 "to": "To",
                 "selectHousingPlaceholder": "Select housing...",
                 "selectSpacePlaceholder": "Select space...",
+                "exitReason": "Exit reason",
+                "available": "available",
                 "cancel": "Cancel",
                 "move": "Move",
                 "toastSuccessTitle": "Beneficiary Relocated",
@@ -1509,5 +1511,6 @@
         "toastSuccessDescription": "Housing removed successfully.",
         "toastErrorTitle": "Housing Removal Failed",
         "toastErrorDescription": "An error occurred while attempting to remove the housing. Please try again later or contact support if the issue persists."
-    }
+    },
+    "notInformed": "Not informed"
 }

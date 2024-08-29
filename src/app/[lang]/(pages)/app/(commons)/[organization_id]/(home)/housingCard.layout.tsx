@@ -38,6 +38,11 @@ const HousingCard = ({ refreshList, ...data }: Props): ReactNode => {
 
     const status = getStatus();
 
+    const percentageOccupiedVacancies = (
+        (data.occupied_vacancies * 100) /
+        data.total_vacancies
+    )?.toFixed(0);
+
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 gap-4">
             <div className="flex flex-col">
@@ -45,7 +50,7 @@ const HousingCard = ({ refreshList, ...data }: Props): ReactNode => {
                 <div className="flex flex-wrap gap-2 mt-2">
                     <span className="text-xs text-slate-500 flex items-center gap-1">
                         {data.occupied_vacancies} beneficiaries (
-                        {((data.occupied_vacancies * 100) / data.total_vacancies)?.toFixed(0)}%
+                        {percentageOccupiedVacancies === "NaN" ? 0 : percentageOccupiedVacancies}%
                         occupied)
                     </span>
                     <span className="text-xs text-slate-500 flex items-center gap-2">

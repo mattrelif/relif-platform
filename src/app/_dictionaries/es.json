@@ -572,6 +572,8 @@
                 "unallocated": "No asignado",
                 "noHousingsFound": "No se encontraron alojamientos...",
                 "to": "A",
+                "exitReason": "Motivo de salida",
+                "available": "disponibles",
                 "selectHousingPlaceholder": "Seleccionar alojamiento...",
                 "selectSpacePlaceholder": "Seleccionar espacio...",
                 "cancel": "Cancelar",
@@ -1509,5 +1511,6 @@
         "toastSuccessDescription": "Alojamiento eliminado correctamente.",
         "toastErrorTitle": "Fallo al Eliminar Alojamiento",
         "toastErrorDescription": "Ocurrió un error al intentar eliminar el alojamiento. Por favor, inténtelo de nuevo más tarde o contacte con el soporte si el problema persiste."
-    }
+    },
+    "notInformed": "No informado"
 }

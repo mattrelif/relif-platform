@@ -61,7 +61,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="allergies"
                         name="allergies"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setAllergies)}
                         defaultValue={defaultValue.allergies.join(",")}
@@ -83,7 +82,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="currentMedications"
                         name="currentMedications"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setCurrentMedications)}
                         defaultValue={defaultValue.current_medications.join(",")}
@@ -105,7 +103,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="chronicMedicalConditions"
                         name="chronicMedicalConditions"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setChronicMedicalConditions)}
                         defaultValue={defaultValue.recurrent_medical_conditions.join(",")}
@@ -127,7 +124,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="healthInsurance"
                         name="healthInsurance"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setHealthInsurance)}
                         defaultValue={defaultValue.health_insurance_plans.join(",")}
@@ -145,7 +141,7 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                     <Label htmlFor="bloodType">
                         {dict.commons.volunteers.volunteerId.edit.medical.bloodType}
                     </Label>
-                    <Select name="bloodType" required defaultValue={defaultValue.blood_type}>
+                    <Select name="bloodType" defaultValue={defaultValue.blood_type}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select blood type..." />
                         </SelectTrigger>
@@ -170,7 +166,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="vaccinations"
                         name="vaccinations"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setVaccinations)}
                         defaultValue={defaultValue.taken_vaccines.join(",")}
@@ -192,7 +187,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="mentalHealth"
                         name="mentalHealth"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setMentalHealth)}
                         defaultValue={defaultValue.mental_health_history.join(",")}
@@ -215,7 +209,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         name="height"
                         type="number"
                         placeholder="e.g. 170cm"
-                        required
                         defaultValue={defaultValue.height}
                     />
                 </div>
@@ -229,7 +222,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         name="weight"
                         type="number"
                         placeholder="e.g. 80kg"
-                        required
                         defaultValue={defaultValue.weight}
                     />
                 </div>
@@ -242,7 +234,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="addictions"
                         name="addictions"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setAddictions)}
                         defaultValue={defaultValue.addictions.join(",")}
@@ -264,7 +255,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="disabilities"
                         name="disabilities"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setDisabilities)}
                         defaultValue={defaultValue.disabilities.join(",")}
@@ -286,7 +276,6 @@ const Medical = ({ defaultValue }: Props): ReactNode => {
                         id="prothesisOrMedicalDevices"
                         name="prothesisOrMedicalDevices"
                         type="text"
-                        required
                         placeholder={dict.commons.volunteers.volunteerId.edit.medical.writeAsMuch}
                         onChange={handleInputChange(setProsthesisOrMedicalDevices)}
                         defaultValue={defaultValue.prothesis_or_medical_devices.join(",")}

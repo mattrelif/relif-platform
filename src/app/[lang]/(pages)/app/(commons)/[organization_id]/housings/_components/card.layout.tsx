@@ -53,6 +53,11 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
         router.push(url);
     };
 
+    const percentageOccupiedVacancies = (
+        (data.occupied_vacancies * 100) /
+        data.total_vacancies
+    )?.toFixed(0);
+
     return (
         <>
             <li
@@ -63,13 +68,17 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     <span className="text-sm text-slate-900 font-bold">{data?.name}</span>
                     <span className="text-xs text-slate-500 mt-3 flex items-center gap-1 lg:gap-2">
                         <FaMapMarkerAlt />
-                        {`${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`}
+                        {data?.address.address_line_1
+                            ? `${data?.address.address_line_1}, ${data?.address.address_line_2} - ${data?.address.city}, ${data?.address.district} | ${data?.address.zip_code} - ${data?.address.country}`
+                            : "--"}
                     </span>
                     <div className="flex flex-col gap-2 mt-4">
                         <span className="text-xs text-slate-500 flex items-center gap-1">
                             {data.occupied_vacancies} {dict.housingList.beneficiaries} (
-                            {((data.occupied_vacancies * 100) / data.total_vacancies)?.toFixed(0)}%{" "}
-                            {dict.housingList.occupied})
+                            {percentageOccupiedVacancies !== "NaN"
+                                ? percentageOccupiedVacancies
+                                : 0}
+                            % {dict.housingList.occupied})
                         </span>
                         <span className="text-xs text-slate-500 flex items-center gap-2">
                             {status === "FULL" && (

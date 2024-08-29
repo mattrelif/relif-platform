@@ -24,6 +24,8 @@ const Form = (): ReactNode => {
     const [isLoading, setIsLoading] = useState(false);
     const dict = useDictionary();
 
+    const urlPath = pathname.split("/").slice(0, 5).join("/");
+
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
         setIsLoading(true);
@@ -64,8 +66,7 @@ const Form = (): ReactNode => {
             });
 
             if (currentUser.organization_id) {
-                const organizationId = currentUser.organization_id;
-                router.push(`/app/${organizationId}/housings/${housingId}`);
+                router.push(`${urlPath}/${housingId}`);
             } else {
                 router.push("/");
                 await signOut();

@@ -55,7 +55,8 @@ export async function allocateBeneficiary(
 export async function reallocateBeneficiary(
     beneficiaryId: string,
     housingId: string,
-    roomId: string
+    roomId: string,
+    exitReason: string
 ): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${beneficiaryId}/reallocate`,
@@ -63,6 +64,7 @@ export async function reallocateBeneficiary(
         data: {
             housing_id: housingId,
             room_id: roomId,
+            exit_reason: exitReason,
         },
     });
 }

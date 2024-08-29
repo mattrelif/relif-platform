@@ -172,6 +172,7 @@ const Form = ({ volunteerId }: Props): ReactNode => {
             toast({
                 title: dict.commons.volunteers.volunteerId.edit.updateSuccessful,
                 description: dict.commons.volunteers.volunteerId.edit.volunteerUpdatedSuccessfully,
+                variant: "success",
             });
 
             router.push(urlPath);

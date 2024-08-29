@@ -398,13 +398,14 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.allergies}:
                                 </strong>{" "}
-                                {data.medical_information.allergies.join(", ")}
+                                {data.medical_information.allergies.join(", ") || dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.currentMedications}:
                                 </strong>{" "}
-                                {data.medical_information.current_medications.join(", ")}
+                                {data.medical_information.current_medications.join(", ") ||
+                                    dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
@@ -414,51 +415,60 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                     }
                                     :
                                 </strong>{" "}
-                                {data.medical_information.recurrent_medical_conditions.join(", ")}
+                                {data.medical_information.recurrent_medical_conditions.join(", ") ||
+                                    dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.healthInsurance}:
                                 </strong>{" "}
-                                {data.medical_information.health_insurance_plans.join(", ")}
+                                {data.medical_information.health_insurance_plans.join(", ") ||
+                                    dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.bloodType}:
                                 </strong>{" "}
-                                {data.medical_information.blood_type}
+                                {data.medical_information.blood_type || "Não informado"}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.vaccinations}:
                                 </strong>{" "}
-                                {data.medical_information.taken_vaccines.join(", ")}
+                                {data.medical_information.taken_vaccines.join(", ") ||
+                                    dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.mentalHealth}:
                                 </strong>{" "}
-                                {data.medical_information.mental_health_history.join(", ")}
+                                {data.medical_information.mental_health_history.join(", ") ||
+                                    dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>{dict.commons.beneficiaries.create.medical.height}:</strong>{" "}
-                                {data.medical_information.height}cm
+                                {data.medical_information.height > 0
+                                    ? `${data.medical_information.height}cm`
+                                    : dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>{dict.commons.beneficiaries.create.medical.weight}:</strong>{" "}
-                                {data.medical_information.weight}kg
+                                {data.medical_information.weight > 0
+                                    ? `${data.medical_information.weight}kg`
+                                    : dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.addictions}:
                                 </strong>{" "}
-                                {data.medical_information.addictions}{" "}
+                                {data.medical_information.addictions.join(", ") || dict.notInformed}{" "}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.beneficiaries.create.medical.disabilities}:
                                 </strong>{" "}
-                                {data.medical_information.disabilities.join(", ")}
+                                {data.medical_information.disabilities.join(", ") ||
+                                    dict.notInformed}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
@@ -468,7 +478,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                     }
                                     :
                                 </strong>{" "}
-                                {data.medical_information.prothesis_or_medical_devices.join(", ")}
+                                {data.medical_information.prothesis_or_medical_devices.join(", ") ||
+                                    dict.notInformed}
                             </li>
                         </ul>
                     </div>
