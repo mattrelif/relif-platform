@@ -34,6 +34,7 @@ const Form = (): ReactNode => {
             toast({
                 title: dict.forgotPassword.toastSuccessTitle,
                 description: dict.forgotPassword.toastSuccessDescription,
+                variant: "success",
             });
         } catch (err) {
             setIsLoading(false);

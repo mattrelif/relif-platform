@@ -19,6 +19,11 @@ function getLocale(request: NextRequest): string | undefined {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    const { search } = request.nextUrl;
+    const urlSearchParams = new URLSearchParams(search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+
+    const urlParams = `?${new URLSearchParams(params)}`;
 
     if (
         [
@@ -40,7 +45,10 @@ export function middleware(request: NextRequest) {
 
         // eslint-disable-next-line consistent-return
         return NextResponse.redirect(
-            new URL(`/${locale}${pathname.startsWith("/") ? "" : "/"}${pathname}`, request.url)
+            new URL(
+                `/${locale}${pathname.startsWith("/") ? "" : "/"}${pathname}${urlParams}`,
+                request.url
+            )
         );
     }
 }

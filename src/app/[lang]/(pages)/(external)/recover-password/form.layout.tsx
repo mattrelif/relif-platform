@@ -22,6 +22,7 @@ const Form = (): ReactNode => {
 
         try {
             const code = params.get("code");
+            console.log(code);
             if (!code) {
                 throw new Error();
             }
@@ -48,6 +49,7 @@ const Form = (): ReactNode => {
             toast({
                 title: dict.recoverPassword.toastSuccessTitle,
                 description: dict.recoverPassword.toastSuccessDescription,
+                variant: "success",
             });
 
             setTimeout(() => router.push("/"), 1000);

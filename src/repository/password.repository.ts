@@ -14,6 +14,6 @@ export async function updatePassword(code: string, newPassword: string): Promise
     return client.request({
         url: `${PREFIX}/${code}`,
         method: "PUT",
-        data: { "new-password": newPassword },
+        data: { new_password: newPassword },
     });
 }

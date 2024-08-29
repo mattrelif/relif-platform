@@ -11,7 +11,7 @@ const nextConfig = {
                 source: "/:lang/app/:id/preferences/my-organization",
                 destination: "/:lang/app/:id/preferences/my-organization/overview",
                 permanent: true,
-            },
+            }
         ];
     },
 };
