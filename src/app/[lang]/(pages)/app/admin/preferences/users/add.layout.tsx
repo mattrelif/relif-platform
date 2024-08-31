@@ -60,7 +60,7 @@ const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => 
                         {dict.admin.preferences.users.add.enterEmail}
                     </DialogDescription>
                     <form onSubmit={handleSubmit}>
-                        <div className="flex flex-col pt-4 gap-2">
+                        <div className="flex flex-col pt-4 gap-2 text-start">
                             <Label htmlFor="email">{dict.admin.preferences.users.add.email}</Label>
                             <Input
                                 id="email"

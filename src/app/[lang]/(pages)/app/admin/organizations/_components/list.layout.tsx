@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/pagination";
 import { findAllOrganizations } from "@/repository/organization.repository";
 import { OrganizationSchema } from "@/types/organization.types";
-import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 
@@ -33,14 +31,8 @@ const OrganizationsList = (): ReactNode => {
 
     const getOrganizationList = async () => {
         try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
-
-            if (currentUser.organization_id) {
-                const response = await findAllOrganizations(offset, LIMIT);
-                setOrganizations(response.data);
-            } else {
-                throw new Error();
-            }
+            const response = await findAllOrganizations(offset, LIMIT);
+            setOrganizations(response.data);
         } catch {
             setError(true);
         } finally {

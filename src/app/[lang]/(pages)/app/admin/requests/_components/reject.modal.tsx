@@ -71,7 +71,7 @@ const RejectModal = ({
                     <DialogDescription>
                         {dict.admin.requests.reject.rejectRequestDescription}
                     </DialogDescription>
-                    <div className="flex flex-col pt-4">
+                    <div className="flex flex-col pt-4 text-start">
                         <span className="text-sm text-slate-900 font-bold">
                             {request.organization.name}
                         </span>
@@ -84,7 +84,7 @@ const RejectModal = ({
                             {request.creator.email}
                         </span>
                     </div>
-                    <div className="flex flex-col gap-3 w-full pt-5">
+                    <div className="flex flex-col gap-3 w-full pt-5 text-start">
                         <Label htmlFor="react-reason">
                             {dict.admin.requests.reject.rejectReason}
                         </Label>

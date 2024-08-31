@@ -61,7 +61,7 @@ const HousingList = ({ organizationId }: Props): ReactNode => {
             )}
 
             {!isLoading && !error && data && data.count > 0 && (
-                <ul className="w-full h-full overflow-x-hidden overflow-y-scroll p-2">
+                <ul className="w-full h-full overflow-x-hidden overflow-y-scroll p-2 flex flex-col gap-2">
                     {data.data?.map(housing => <HousingCard {...housing} />)}
                 </ul>
             )}

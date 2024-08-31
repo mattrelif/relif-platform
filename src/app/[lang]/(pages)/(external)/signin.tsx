@@ -44,16 +44,16 @@ const SignInForm = (): ReactNode => {
                 spanish: "es",
             };
 
-            if (!responseData.organization_id) {
+            if (responseData.platform_role === "RELIF_MEMBER") {
                 router.push(
-                    `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/entry`
+                    `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/admin/organizations`
                 );
                 return;
             }
 
-            if (responseData.platform_role === "RELIF_MEMBER") {
+            if (!responseData.organization_id) {
                 router.push(
-                    `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/admin/organizations`
+                    `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/entry`
                 );
                 return;
             }

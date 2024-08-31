@@ -70,7 +70,7 @@ const DisableModal = ({
                         <DialogDescription>
                             {dict.admin.organizations.list.disable.disableAccessDescription}
                         </DialogDescription>
-                        <div className="flex flex-col pt-4">
+                        <div className="flex flex-col pt-4 text-start">
                             <span className="text-sm text-slate-900 font-bold">
                                 {organization?.name}
                             </span>

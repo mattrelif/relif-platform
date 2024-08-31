@@ -4,8 +4,6 @@ import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { findRequests } from "@/repository/updateOrganizationTypeRequests.repository";
 import { UpdateOrganizationTypeRequestSchema } from "@/types/requests.types";
-import { UserSchema } from "@/types/user.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
 
@@ -26,14 +24,8 @@ const RequestList = (): ReactNode => {
 
     const getOrganizationList = async () => {
         try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
-
-            if (currentUser.organization_id) {
-                const response = await findRequests(OFFSET, LIMIT);
-                setRequests(response.data);
-            } else {
-                throw new Error();
-            }
+            const response = await findRequests(OFFSET, LIMIT);
+            setRequests(response.data);
         } catch {
             setError(true);
         } finally {

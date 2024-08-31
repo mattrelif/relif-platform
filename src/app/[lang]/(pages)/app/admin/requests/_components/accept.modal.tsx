@@ -48,6 +48,7 @@ const AcceptModal = ({
             toast({
                 title: dict.admin.requests.accept.coordinationAccessEnabledTitle,
                 description: dict.admin.requests.accept.coordinationAccessEnabledDescription,
+                variant: "success",
             });
         } catch {
             toast({
@@ -68,7 +69,7 @@ const AcceptModal = ({
                     <DialogDescription>
                         {dict.admin.requests.accept.acceptRequestDescription}
                     </DialogDescription>
-                    <div className="flex flex-col pt-4">
+                    <div className="flex flex-col pt-4 text-start">
                         <span className="text-sm text-slate-900 font-bold">
                             {request.organization.name}
                         </span>
