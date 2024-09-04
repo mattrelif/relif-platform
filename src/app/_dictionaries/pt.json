@@ -67,8 +67,8 @@
         "toastErrorGenericDescription": "Ocorreu um erro ao alterar sua senha. Por favor, tente novamente."
     },
     "entryChoose": {
-        "joinOrganizationToastSuccessTitle": "Sucesso ao Entrar na Organização",
-        "joinOrganizationToastSuccessDescription": "Você entrou na organização com sucesso.",
+        "joinOrganizationToastSuccessTitle": "Sucesso ao solicitar acesso para entrar na organização",
+        "joinOrganizationToastSuccessDescription": "Você solicitou o acesso a organização de token informado. Ao ser aceito, no seu login posterior a esse evento, estará com acesso a organização.",
         "joinOrganizationToastErrorTitle": "Erro ao Entrar na Organização",
         "joinOrganizationToastErrorDescription": "Ocorreu um erro ao tentar entrar na organização. Por favor, tente novamente.",
         "welcome": "Bem-vindo",
@@ -1347,6 +1347,7 @@
         "statusAvailable": "Disponível",
         "statusFull": "Lotado",
         "statusOvercrowded": "Superlotado",
+        "statusNoRooms": "Sem espaços",
         "beneficiaries": "beneficiários",
         "occupied": "ocupado",
         "availableBeds": "camas disponíveis",

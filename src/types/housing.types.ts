@@ -8,6 +8,7 @@ export type HousingSchema = {
     address: AddressSchema;
     occupied_vacancies: number;
     total_vacancies: number;
+    total_rooms: number;
     created_at: string;
     updated_at: string;
 };
@@ -21,6 +22,7 @@ export type CreateHousingRequest = Omit<
     | "updated_at"
     | "occupied_vacancies"
     | "total_vacancies"
+    | "total_rooms"
 >;
 
 export type UpdateHousingRequest = Omit<
@@ -32,4 +34,5 @@ export type UpdateHousingRequest = Omit<
     | "updated_at"
     | "occupied_vacancies"
     | "total_vacancies"
+    | "total_rooms"
 >;

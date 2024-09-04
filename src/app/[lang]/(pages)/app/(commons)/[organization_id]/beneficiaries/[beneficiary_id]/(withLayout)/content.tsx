@@ -14,7 +14,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { FaCity, FaMapMarkerAlt } from "react-icons/fa";
 import { FaBriefcaseMedical, FaHouseChimneyUser } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
-import { MdContactEmergency, MdError, MdMail, MdPhone } from "react-icons/md";
+import { MdContactEmergency, MdError, MdMail, MdPhone, MdNoteAlt } from "react-icons/md";
 
 import { Toolbar } from "./toolbar.layout";
 
@@ -483,52 +483,61 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                             </li>
                         </ul>
                     </div>
-                    {/* <div className="w-full grow border-[1px] border-relif-orange-200 rounded-lg overflow-hidden">
-                      <h3 className="pt-4 pl-4 pr-4 text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                          <MdOutlineFamilyRestroom />
-                          Family
-                      </h3>
-                      <ul className="h-[480px] overflow-y-scroll overflow-x-hidden pt-2 pb-4 pl-4 pr-4 flex flex-col gap-2">
-                          <Link href="#">
-                              <li className="w-full rounded-md bg-relif-orange-200/10 flex gap-4 p-4 hover:bg-relif-orange-200/20 cursor-pointer">
-                                  <div className="w-[80px] h-[80px] rounded-full overflow-hidden">
-                                      <Image
-                                          src="https://github.com/anthonyvii27.png"
-                                          alt="Family image"
-                                          width={80}
-                                          height={80}
-                                          className="p-[1px] border-2 rounded-full border-relif-orange-200"
-                                      />
-                                  </div>
-                                  <div className="h-max w-[calc(100%-80px)] flex flex-col">
-                                      <span className="w-full text-sm text-slate-900 font-bold">
-                                          Samanta Marks Oliver
-                                      </span>
-                                      <span className="w-full text-sm text-slate-500 mt-2 flex items-center gap-1">
-                                          <FaBirthdayCake /> March 24, 1987
-                                      </span>
-                                      <div className="mt-3 flex gap-2">
-                                          <span>
-                                              <Badge className="flex">Wife</Badge>
-                                          </span>
-                                          <span>
-                                              <Badge className="bg-relif-orange-400 flex items-center gap-1">
-                                                  <MdSpaceDashboard />
-                                                  In the same space
-                                              </Badge>
-                                          </span>
-                                          <span>
-                                              <Badge className="bg-relif-orange-400 flex items-center gap-1">
-                                                  <MdSpaceDashboard />
-                                                  In another space
-                                              </Badge>
-                                          </span>
-                                      </div>
-                                  </div>
-                              </li>
-                          </Link>
-                      </ul>
-                  </div> */}
+                    <div className="w-full grow border-[1px] border-relif-orange-200 rounded-lg overflow-hidden">
+                        <h3 className="pt-4 pl-4 pr-4 text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
+                            <MdNoteAlt />
+                            Notes
+                        </h3>
+                        <div className="w-full h-[calc(100%-53px)] p-4">
+                            <textarea
+                                className="flex h-full resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white focus:outline-none"
+                                readOnly
+                            >
+                                {data.notes}
+                            </textarea>
+                        </div>
+
+                        {/*  <ul className="h-[480px] overflow-y-scroll overflow-x-hidden pt-2 pb-4 pl-4 pr-4 flex flex-col gap-2"> */}
+                        {/*      <Link href="#"> */}
+                        {/*          <li className="w-full rounded-md bg-relif-orange-200/10 flex gap-4 p-4 hover:bg-relif-orange-200/20 cursor-pointer"> */}
+                        {/*              <div className="w-[80px] h-[80px] rounded-full overflow-hidden"> */}
+                        {/*                  <Image */}
+                        {/*                      src="https://github.com/anthonyvii27.png" */}
+                        {/*                      alt="Family image" */}
+                        {/*                      width={80} */}
+                        {/*                      height={80} */}
+                        {/*                      className="p-[1px] border-2 rounded-full border-relif-orange-200" */}
+                        {/*                  /> */}
+                        {/*              </div> */}
+                        {/*              <div className="h-max w-[calc(100%-80px)] flex flex-col"> */}
+                        {/*                  <span className="w-full text-sm text-slate-900 font-bold"> */}
+                        {/*                      Samanta Marks Oliver */}
+                        {/*                  </span> */}
+                        {/*                  <span className="w-full text-sm text-slate-500 mt-2 flex items-center gap-1"> */}
+                        {/*                      <FaBirthdayCake /> March 24, 1987 */}
+                        {/*                  </span> */}
+                        {/*                  <div className="mt-3 flex gap-2"> */}
+                        {/*                      <span> */}
+                        {/*                          <Badge className="flex">Wife</Badge> */}
+                        {/*                      </span> */}
+                        {/*                      <span> */}
+                        {/*                          <Badge className="bg-relif-orange-400 flex items-center gap-1"> */}
+                        {/*                              <MdSpaceDashboard /> */}
+                        {/*                              In the same space */}
+                        {/*                          </Badge> */}
+                        {/*                      </span> */}
+                        {/*                      <span> */}
+                        {/*                          <Badge className="bg-relif-orange-400 flex items-center gap-1"> */}
+                        {/*                              <MdSpaceDashboard /> */}
+                        {/*                              In another space */}
+                        {/*                          </Badge> */}
+                        {/*                      </span> */}
+                        {/*                  </div> */}
+                        {/*              </div> */}
+                        {/*          </li> */}
+                        {/*      </Link> */}
+                        {/*  </ul> */}
+                    </div>
                 </div>
             </div>
         );

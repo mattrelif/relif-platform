@@ -67,8 +67,8 @@
         "toastErrorGenericDescription": "Ocurrió un error al cambiar tu contraseña. Por favor, inténtalo de nuevo."
     },
     "entryChoose": {
-        "joinOrganizationToastSuccessTitle": "Unión a la Organización Exitosa",
-        "joinOrganizationToastSuccessDescription": "Te has unido a la organización con éxito.",
+        "joinOrganizationToastSuccessTitle": "¡Acceso a la organización solicitado con éxito!",
+        "joinOrganizationToastSuccessDescription": "Has solicitado acceso a la organización con el token proporcionado. Una vez aceptado, en tu próximo inicio de sesión después de este evento, tendrás acceso a la organización.",
         "joinOrganizationToastErrorTitle": "Error al Unirse a la Organización",
         "joinOrganizationToastErrorDescription": "Hubo un error al intentar unirse a la organización. Por favor, inténtalo de nuevo.",
         "welcome": "Bienvenido",
@@ -1347,6 +1347,7 @@
         "statusAvailable": "Disponible",
         "statusFull": "Lleno",
         "statusOvercrowded": "Superpoblado",
+        "statusNoRooms": "Sin habitaciones",
         "beneficiaries": "beneficiarios",
         "occupied": "ocupado",
         "availableBeds": "camas disponibles",

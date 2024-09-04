@@ -80,6 +80,12 @@ const Form = (): ReactNode => {
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
 
+            const today = new Date();
+            const birthdate = new Date(data.birthdate);
+            if (birthdate >= today) {
+                throw new Error();
+            }
+
             if (currentUser.organization_id) {
                 await createVolunteer(currentUser.organization_id, {
                     full_name: data.fullName,

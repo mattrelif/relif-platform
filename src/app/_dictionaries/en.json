@@ -67,10 +67,10 @@
         "toastErrorGenericDescription": "There was an error changing your password. Please try again."
     },
     "entryChoose": {
-        "joinOrganizationToastSuccessTitle": "",
-        "joinOrganizationToastSuccessDescription": "",
-        "joinOrganizationToastErrorTitle": "",
-        "joinOrganizationToastErrorDescription": "",
+        "joinOrganizationToastSuccessTitle": "Organization access requested successfully!",
+        "joinOrganizationToastSuccessDescription": "You have requested access to the organization with the provided token. Once accepted, in your subsequent login after this event, you will have access to the organization.",
+        "joinOrganizationToastErrorTitle": "An error occurred!",
+        "joinOrganizationToastErrorDescription": "An error occurred while requesting access to the organization. Please try again later.",
         "welcome": "Welcome",
         "createAnOrganization": "Create an organization",
         "btnCreate": "I want to create a new organization",
@@ -1347,6 +1347,7 @@
         "statusAvailable": "Available",
         "statusFull": "Full",
         "statusOvercrowded": "Over Crowded",
+        "statusNoRooms": "No Rooms",
         "beneficiaries": "beneficiaries",
         "occupied": "occupied",
         "availableBeds": "available beds",

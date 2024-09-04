@@ -18,7 +18,7 @@ const Form = (): ReactNode => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const email = searchParams.get("email");
-    const orgId = searchParams.get("orgId");
+    const orgId = searchParams.get("code");
 
     const [checkState, setCheckState] = useState<boolean>(false);
 

@@ -89,6 +89,12 @@ const Form = (): ReactNode => {
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
 
+            const today = new Date();
+            const birthdate = new Date(data.birthdate);
+            if (birthdate >= today) {
+                throw new Error();
+            }
+
             if (currentUser.organization_id) {
                 const { data: newBeneficiary } = await createBeneficiary(
                     currentUser.organization_id,

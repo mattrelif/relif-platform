@@ -81,27 +81,38 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             % {dict.housingList.occupied})
                         </span>
                         <span className="text-xs text-slate-500 flex items-center gap-2">
-                            {status === "FULL" && (
-                                <span>
-                                    <Badge className="bg-slate-900 text-slate-50 hover:bg-slate-950">
-                                        {dict.housingList.statusFull}
-                                    </Badge>
-                                </span>
-                            )}
-                            {status === "AVAILABLE" && (
-                                <span>
-                                    <Badge className="bg-green-500 text-slate-50 hover:bg-green-600">
-                                        {dict.housingList.statusAvailable} (
-                                        {data.total_vacancies - data.occupied_vacancies}{" "}
-                                        {dict.housingList.availableBeds})
-                                    </Badge>
-                                </span>
-                            )}
+                            {data.total_rooms > 0 ? (
+                                <>
+                                    {status === "FULL" && (
+                                        <span>
+                                            <Badge className="bg-slate-900 text-slate-50 hover:bg-slate-950">
+                                                {dict.housingList.statusFull}
+                                            </Badge>
+                                        </span>
+                                    )}
 
-                            {status === "OVERCROWDED" && (
+                                    {status === "AVAILABLE" && (
+                                        <span>
+                                            <Badge className="bg-green-500 text-slate-50 hover:bg-green-600">
+                                                {dict.housingList.statusAvailable} (
+                                                {data.total_vacancies - data.occupied_vacancies}{" "}
+                                                {dict.housingList.availableBeds})
+                                            </Badge>
+                                        </span>
+                                    )}
+
+                                    {status === "OVERCROWDED" && (
+                                        <span>
+                                            <Badge className="bg-red-600 text-slate-50 hover:bg-red-700">
+                                                {dict.housingList.statusOvercrowded}
+                                            </Badge>
+                                        </span>
+                                    )}
+                                </>
+                            ) : (
                                 <span>
-                                    <Badge className="bg-red-600 text-slate-50 hover:bg-red-700">
-                                        {dict.housingList.statusOvercrowded}
+                                    <Badge className="bg-gray-400 text-slate-50 hover:bg-red-700">
+                                        {dict.housingList.statusNoRooms}
                                     </Badge>
                                 </span>
                             )}

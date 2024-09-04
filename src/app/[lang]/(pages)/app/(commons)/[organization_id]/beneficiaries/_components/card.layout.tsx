@@ -90,13 +90,13 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                         <span className="text-sm text-slate-900 font-bold">
                             {convertToTitleCase(data?.full_name)}
                         </span>
-                        <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                        <span className="text-xs text-slate-900 font-medium mt-1 flex items-center gap-1">
                             <FaMapMarkerAlt />
                             {data?.current_housing_id
-                                ? convertToTitleCase(data?.current_housing.name)
+                                ? `${convertToTitleCase(data?.current_housing.name)} | ${data?.current_room.name}`
                                 : dict.commons.beneficiaries.card.unallocated}
                         </span>
-                        <span className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                        <span className="text-xs text-slate-500 mt-3 flex items-center gap-1">
                             <FaBirthdayCake /> {formatDate(data?.birthdate, locale || "en")} ({age}{" "}
                             {dict.commons.beneficiaries.card.yearsOld})
                         </span>

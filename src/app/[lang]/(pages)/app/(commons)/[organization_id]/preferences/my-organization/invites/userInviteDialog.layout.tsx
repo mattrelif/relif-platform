@@ -75,7 +75,7 @@ const UserInviteDialogLayout = ({ request, refreshList, children }: Props): Reac
                         </DialogClose>
                         <DialogClose asChild>
                             <Button onClick={handleAccept}>
-                                dict.commons.preferences.myOrganization.invites.user.dialog.accept
+                                {dict.commons.preferences.myOrganization.invites.user.dialog.accept}
                             </Button>
                         </DialogClose>
                     </div>
