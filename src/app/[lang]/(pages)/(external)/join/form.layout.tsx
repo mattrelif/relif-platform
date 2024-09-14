@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { orgSignUp } from "@/repository/auth.repository";
+import { deletePlatformInviteByCode } from "@/repository/organization.repository";
 import { getTimezone } from "@/utils/getTimezone";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,8 +18,7 @@ const Form = (): ReactNode => {
     const dict = useDictionary();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const email = searchParams.get("email");
-    const orgId = searchParams.get("code");
+    const code = searchParams.get("code");
 
     const [checkState, setCheckState] = useState<boolean>(false);
 
@@ -51,7 +51,7 @@ const Form = (): ReactNode => {
 
             const timezone = getTimezone();
 
-            if (!orgId || !email) {
+            if (!code) {
                 toast({
                     title: dict.signup.toastErrorTitle,
                     description: dict.signup.toastErrorGenericDescription,
@@ -60,21 +60,21 @@ const Form = (): ReactNode => {
                 return;
             }
 
-            const token = await orgSignUp({
+            const { data: invite } = await deletePlatformInviteByCode(code);
+
+            await orgSignUp({
                 first_name: data.firstName,
                 last_name: data.lastName,
-                email,
+                email: invite.invited_email,
                 password: data.password,
                 phones: [`${data.countryCode}_${data.phone}`],
                 role: data.role,
-                organization_id: orgId,
+                organization_id: invite.organization_id,
                 preferences: {
                     language: "english",
                     timezone,
                 },
             });
-
-            localStorage.setItem("r_to", token);
 
             toast({
                 title: dict.signup.toastSuccessTitle,
@@ -139,18 +139,6 @@ const Form = (): ReactNode => {
                 {dict.signup.yourCredentials}
             </h2>
             <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="email">{dict.signup.email} *</Label>
-                    <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        disabled
-                        defaultValue={email as string}
-                    />
-                </div>
-
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="password">{dict.signup.password} *</Label>
                     <Input id="password" name="password" type="password" required minLength={8} />

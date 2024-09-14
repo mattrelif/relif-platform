@@ -755,13 +755,25 @@
                 "error": {
                     "message": "Something went wrong. Please try again later."
                 },
+                "assistance": {
+                    "loading": "Loading...",
+                    "error": "Something went wrong. Please try again later.",
+                    "assistanceReceived": "Assistence received",
+                    "currentlyInSpace": "Currently in space",
+                    "from": "From",
+                    "product": "Product",
+                    "noAssistancesFound": "No assistances found..."
+                },
                 "movements": {
                     "loading": "Loading...",
                     "error": "Something went wrong. Please try again later.",
                     "currentlyInSpace": "Currently in space",
                     "movements": "Movements",
                     "unallocated": "Unallocated",
-                    "noAllocationsFound": "No allocations found..."
+                    "noAllocationsFound": "No allocations found...",
+                    "from": "From",
+                    "to": "To",
+                    "reason": "Reason"
                 }
             }
         },
@@ -1114,7 +1126,7 @@
                 "editProduct": "Edit product",
                 "deleteProduct": "Delete product",
                 "inputProduct": "Input product",
-                "outputProduct": "Output product",
+                "outputProduct": "Donate product",
                 "moveProduct": "Move to another stock",
                 "createdAt": "Created at"
             },

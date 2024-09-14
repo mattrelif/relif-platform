@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { createInvite } from "@/repository/joinPlatformInvites.repository";
+import { createInvite } from "@/repository/joinPlatformAdminInvites.repository";
 import { ReactNode } from "react";
 
 const AddUser = ({ children }: { children: Readonly<ReactNode> }): ReactNode => {

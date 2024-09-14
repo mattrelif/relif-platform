@@ -35,7 +35,7 @@ const UserRemove = ({
 
     const handleDelete = async (): Promise<void> => {
         try {
-            if (platformRole === "ORG_ADMIN") {
+            if (platformRole !== "ORG_ADMIN") {
                 throw new Error();
             }
 
@@ -70,7 +70,7 @@ const UserRemove = ({
                     <DialogDescription>
                         {dict.commons.preferences.myOrganization.users.remove.actionCannotBeUndone}
                     </DialogDescription>
-                    <div className="flex flex-col pt-4">
+                    <div className="flex flex-col pt-4 text-start">
                         <span className="text-sm text-slate-900 font-bold">
                             {user?.first_name} {user?.last_name}
                         </span>

@@ -111,7 +111,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setModalInputOpenState(true)}>
                             <span className="w-full flex items-center gap-2">
-                                <FaArrowCircleRight /> {dict.commons.inventory.card.inputProduct}
+                                <FaArrowCircleLeft /> {dict.commons.inventory.card.inputProduct}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -119,7 +119,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             onClick={() => setModalOutputOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">
-                                <FaArrowCircleLeft /> {dict.commons.inventory.card.outputProduct}
+                                <FaArrowCircleRight /> {dict.commons.inventory.card.outputProduct}
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem

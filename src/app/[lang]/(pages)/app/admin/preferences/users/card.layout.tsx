@@ -2,7 +2,6 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -40,24 +39,20 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                     <span className="text-sm text-slate-900 font-bold">
                         {data.first_name} {data.last_name}
                     </span>
-                    <span className="text-xs text-slate-500 mt-3 flex items-center gap-2">
-                        <MdMail />
-                        {data.email}
-                    </span>
-                    <span className="text-xs text-slate-500 flex items-center gap-2">
-                        <MdPhone />
-                        {data.phones[0]}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs text-slate-500 mt-3 flex items-center gap-2">
+                            <MdMail />
+                            {data.email}
+                        </span>
+                        <span className="text-xs text-slate-500 flex items-center gap-2">
+                            <MdPhone />
+                            {data.phones[0]}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                            {data?.role || dict.admin.preferences.users.card.colaborator}
+                        </span>
+                    </div>
                 </div>
-            </div>
-
-            <div className="flex flex-col lg:mt-5">
-                <span className="text-xs text-slate-500">
-                    {data?.role || dict.admin.preferences.users.card.colaborator}
-                </span>
-                <span>
-                    <Badge>{data.platform_role || dict.admin.preferences.users.card.member}</Badge>
-                </span>
             </div>
 
             <div className="lg:absolute lg:top-4 lg:right-4">

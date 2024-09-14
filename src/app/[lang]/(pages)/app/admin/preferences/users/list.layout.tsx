@@ -4,7 +4,7 @@ import { AddUser } from "@/app/[lang]/(pages)/app/admin/preferences/users/add.la
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Button } from "@/components/ui/button";
-import { findUsersByOrganizationId } from "@/repository/organization.repository";
+import { getRelifUsers } from "@/repository/user.repository";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { ReactNode, useEffect, useState } from "react";
@@ -16,28 +16,20 @@ const UserList = (): ReactNode => {
     const dict = useDictionary();
     const platformRole = usePlatformRole();
 
-    const [currentUserId, setCurrentUserId] = useState("");
+    const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [data, setData] = useState<{ data: UserSchema[]; count: number } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
 
     const getUserList = async () => {
         try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
+            const OFFSET = 0;
+            const LIMIT = 9999;
+            const response = await getRelifUsers(OFFSET, LIMIT);
+            setData(response.data);
 
-            if (currentUser.organization_id) {
-                const OFFSET = 0;
-                const LIMIT = 9999;
-                const response = await findUsersByOrganizationId(
-                    currentUser.organization_id,
-                    OFFSET,
-                    LIMIT
-                );
-                setData(response.data);
-                setCurrentUserId(currentUser.id);
-            } else {
-                throw new Error();
-            }
+            const currUser: UserSchema = await getFromLocalStorage("r_ud");
+            setCurrentUser(currUser);
         } catch {
             setError(true);
         } finally {
@@ -88,7 +80,7 @@ const UserList = (): ReactNode => {
                     data.data?.map(user => (
                         <UserCard
                             {...user}
-                            currentUserId={currentUserId}
+                            currentUserId={currentUser?.id as string}
                             refreshList={getUserList}
                         />
                     ))}

@@ -1,10 +1,11 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { Input } from "@/components/ui/input";
 import { getProductsByOrganizationID } from "@/repository/organization.repository";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
-import { MdError } from "react-icons/md";
+import { ChangeEvent, ReactNode, useCallback, useEffect, useState } from "react";
+import { MdError, MdSearch } from "react-icons/md";
 
 import { Card } from "./card.layout";
 
@@ -17,34 +18,55 @@ const ProductList = (): ReactNode => {
         data: any[];
     } | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [error, setError] = useState<boolean>(false);
     const LIMIT = 9999;
     const OFFSET = 0;
 
-    const getProductList = async () => {
-        try {
-            setIsLoading(true);
-            setError(false);
-
-            const organizationId = pathname.split("/")[3];
-
-            if (organizationId) {
-                const response = await getProductsByOrganizationID(organizationId, OFFSET, LIMIT);
-                setProducts(response.data);
-            } else {
-                throw new Error();
-            }
-        } catch {
-            setError(true);
-        } finally {
-            setIsLoading(false);
-        }
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
     };
+
+    const getProductList = useCallback(
+        async (filter: string = "") => {
+            try {
+                setIsLoading(true);
+                setError(false);
+
+                const organizationId = pathname.split("/")[3];
+
+                if (organizationId) {
+                    const response = await getProductsByOrganizationID(
+                        organizationId,
+                        OFFSET,
+                        LIMIT,
+                        filter
+                    );
+                    setProducts(response.data);
+                } else {
+                    throw new Error();
+                }
+            } catch {
+                setError(true);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [pathname]
+    );
 
     useEffect(() => {
         setIsLoading(true);
         getProductList();
     }, []);
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            getProductList(searchTerm);
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, getProductList]);
 
     return (
         <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
@@ -83,6 +105,19 @@ const ProductList = (): ReactNode => {
             {/*        </Select> */}
             {/*    </div> */}
             {/* </div> */}
+
+            <div className="flex items-end gap-4 justify-between border-b-[1px] py-2 px-4 lg:flex-row-reverse">
+                <div className="flex items-center gap-3 lg:grow">
+                    <MdSearch className="text-slate-400 text-2xl" />
+                    <Input
+                        type="text"
+                        placeholder={dict.commons.beneficiaries.list.searchPlaceholder}
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="w-[300px] lg:w-full"
+                    />
+                </div>
+            </div>
 
             {isLoading && (
                 <h2 className="p-4 text-relif-orange-400 font-medium text-sm">

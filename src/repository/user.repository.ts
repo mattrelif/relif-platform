@@ -11,6 +11,16 @@ export async function findUser(userId: string): Promise<AxiosResponse<UserSchema
     });
 }
 
+export async function getRelifUsers(
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ data: UserSchema[]; count: number }>> {
+    return client.request({
+        url: `${PREFIX}/relif-members?offset=${offset}&limit=${limit}`,
+        method: "GET",
+    });
+}
+
 export async function updateUser(userId: string, data: UpdateUserRequest): Promise<void> {
     return client.request({
         url: `${PREFIX}/${userId}`,

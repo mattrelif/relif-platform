@@ -183,6 +183,14 @@ const Form = (): ReactNode => {
                     {dict.commons.beneficiaries.create.title}
                 </h1>
 
+                <div className="flex flex-col gap-3 border border-slate-200 p-4 rounded-lg">
+                    <div className="w-full h-max flex items-center justify-center">
+                        <div className="w-[120px] h-[120px] rounded-full bg-red-200"></div>
+                    </div>
+                    <Label htmlFor="picture">Picture</Label>
+                    <Input id="picture" type="file" placeholder="teestee" />
+                </div>
+
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="fullName">{dict.commons.beneficiaries.create.fullName} *</Label>
                     <Input id="fullName" name="fullName" type="text" required />

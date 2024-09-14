@@ -1,5 +1,6 @@
 "use client";
 
+import { useDictionary } from "@/app/context/dictionaryContext";
 import {
     getBeneficiaryById,
     getDonationsByBeneficiaryId,
@@ -20,6 +21,7 @@ type Props = {
 
 const Content = ({ beneficiaryId }: Props): ReactNode => {
     const pathname = usePathname();
+    const dict = useDictionary();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
     const [beneficiary, setBeneficiary] = useState<BeneficiarySchema | null>(null);
@@ -60,13 +62,17 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
     }, []);
 
     if (isLoading)
-        return <h2 className="text-relif-orange-400 font-medium text-sm p-4">Loading...</h2>;
+        return (
+            <h2 className="text-relif-orange-400 font-medium text-sm p-4">
+                {dict.commons.beneficiaries.beneficiaryId.assistance.loading}
+            </h2>
+        );
 
     if (error)
         return (
             <span className="p-4 text-sm text-red-600 font-medium flex items-center gap-1">
                 <MdError />
-                Something went wrong. Please try again later.
+                {dict.commons.beneficiaries.beneficiaryId.assistance.error}
             </span>
         );
 
@@ -84,7 +90,10 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                             {beneficiary?.current_housing_id ? (
                                 <>
                                     {convertToTitleCase(beneficiary?.current_housing.name)} |
-                                    Currently in space{" "}
+                                    {
+                                        dict.commons.beneficiaries.beneficiaryId.assistance
+                                            .currentlyInSpace
+                                    }{" "}
                                     <strong>{beneficiary?.current_room.name}</strong>
                                 </>
                             ) : (
@@ -96,32 +105,52 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                 <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4 mt-2">
                     <h1 className="text-relif-orange-200 text-xl font-bold flex items-center gap-2 mb-4">
                         <LuHelpingHand size={28} />
-                        Assistance received
+                        {dict.commons.beneficiaries.beneficiaryId.assistance.assistanceReceived}
                     </h1>
-                    <ul className="flex flex-col gap-2 h-[calc(100vh-325px)]">
-                        {assistances?.data.map(assistance => (
-                            <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1">
-                                <span className="text-sm text-slate-900 flex items-center gap-2">
-                                    {formatDate(assistance.created_at, locale || "en")}
-                                </span>
-                                <span></span>
-                                <span className="text-sm text-slate-900">
-                                    <strong>From:</strong>{" "}
-                                    {assistance.from.type === "HOUSING"
-                                        ? assistance.from.name
-                                        : "Organization"}
-                                </span>
-                                <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
-                                    <FaCartPlus />
-                                    Product
-                                </span>
-                                <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
-                                    {assistance.quantity}x | {assistance.product_type.name} -{" "}
-                                    {assistance.product_type.brand}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
+                    {assistances?.count !== 0 ? (
+                        <ul className="h-[calc(100vh-325px)] overflow-x-hidden overflow-y-scroll">
+                            {assistances?.data.map(assistance => (
+                                <li className="w-full flex border border-slate-200 rounded-md p-4 flex-col gap-1 mt-2">
+                                    <span className="text-sm text-slate-900 flex items-center gap-2">
+                                        {formatDate(assistance.created_at, locale || "en")}
+                                    </span>
+                                    <span></span>
+                                    <span className="text-sm text-slate-900">
+                                        <strong>
+                                            {
+                                                dict.commons.beneficiaries.beneficiaryId.assistance
+                                                    .from
+                                            }
+                                            :
+                                        </strong>{" "}
+                                        {assistance.from.type === "HOUSING"
+                                            ? assistance.from.name
+                                            : "Organization"}
+                                    </span>
+                                    <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
+                                        <FaCartPlus />
+                                        {
+                                            dict.commons.beneficiaries.beneficiaryId.assistance
+                                                .product
+                                        }
+                                    </span>
+                                    <span className="flex flex-col mt-2 gap-1 text-xs text-slate-500">
+                                        {assistance.quantity}x | {assistance.product_type.name} -{" "}
+                                        {assistance.product_type.brand}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div className="h-[calc(100vh-325px)]">
+                            <span className="text-sm text-slate-900 font-medium">
+                                {
+                                    dict.commons.beneficiaries.beneficiaryId.assistance
+                                        .noAssistancesFound
+                                }
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
         );

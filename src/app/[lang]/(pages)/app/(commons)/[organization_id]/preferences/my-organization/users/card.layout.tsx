@@ -48,37 +48,39 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                     <span className="text-sm text-slate-900 font-bold">
                         {data.first_name} {data.last_name}
                     </span>
-                    <span className="text-xs text-slate-500 mt-3 flex items-center gap-2">
-                        <MdMail />
-                        {data.email}
-                    </span>
-                    <HoverCard>
-                        <HoverCardTrigger>
-                            <span className="text-xs text-slate-500 flex items-center gap-2">
-                                <MdPhone />
-                                {data.phones[0] && data.phones[0].split("_").join(" ")}
-                                {phonesLength >= 2 && (
-                                    <Badge variant="outline">+{phonesLength - 1}</Badge>
-                                )}
-                            </span>
-                        </HoverCardTrigger>
-                        <HoverCardContent>
-                            <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                {dict.commons.preferences.myOrganization.users.card.phonesTitle}
-                            </h3>
-                            <ul>
-                                {data.phones.map(phone => (
-                                    <li className="text-slate-500 w-full text-xs flex items-center gap-2">
-                                        <MdPhone /> {phone.split("_").join(" ")}
-                                    </li>
-                                ))}
-                            </ul>
-                        </HoverCardContent>
-                    </HoverCard>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-xs text-slate-500 mt-3 flex items-center gap-2">
+                            <MdMail />
+                            {data.email}
+                        </span>
+                        <HoverCard>
+                            <HoverCardTrigger>
+                                <span className="text-xs text-slate-500 flex items-center gap-2">
+                                    <MdPhone />
+                                    {data.phones[0] && data.phones[0].split("_").join(" ")}
+                                    {phonesLength >= 2 && (
+                                        <Badge variant="outline">+{phonesLength - 1}</Badge>
+                                    )}
+                                </span>
+                            </HoverCardTrigger>
+                            <HoverCardContent>
+                                <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                    {dict.commons.preferences.myOrganization.users.card.phonesTitle}
+                                </h3>
+                                <ul>
+                                    {data.phones.map(phone => (
+                                        <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                            <MdPhone /> {phone.split("_").join(" ")}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </HoverCardContent>
+                        </HoverCard>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col lg:mt-3 lg:flex-row lg:items-center lg:justify-between lg:flex-wrap">
+            <div className="flex flex-col justify-end lg:mt-3 lg:flex-row lg:items-center lg:justify-between lg:flex-wrap">
                 <span className="text-xs text-slate-500">
                     {data?.role || dict.commons.preferences.myOrganization.users.card.roleFallback}
                 </span>
@@ -104,12 +106,19 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                             View activities
                         </DropdownMenuItem> */}
                                 {/* <DropdownMenuSeparator /> */}
-                                <DropdownMenuItem onClick={() => setEditUserSheetOpenState(true)}>
-                                    <span className="flex items-center gap-2">
-                                        <FaEdit className="text-xs" />
-                                        {dict.commons.preferences.myOrganization.users.card.edit}
-                                    </span>
-                                </DropdownMenuItem>
+                                {currentUserId === data.id && (
+                                    <DropdownMenuItem
+                                        onClick={() => setEditUserSheetOpenState(true)}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <FaEdit className="text-xs" />
+                                            {
+                                                dict.commons.preferences.myOrganization.users.card
+                                                    .edit
+                                            }
+                                        </span>
+                                    </DropdownMenuItem>
+                                )}
                                 {currentUserId !== data.id && (
                                     <DropdownMenuItem
                                         onClick={() => setRemoveUserDialogOpenState(true)}

@@ -755,13 +755,25 @@
                 "error": {
                     "message": "Algo deu errado. Por favor, tente novamente mais tarde."
                 },
+                "assistance": {
+                    "loading": "Carregando...",
+                    "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
+                    "assistanceReceived": "Assistência recebida",
+                    "currentlyInSpace": "Atualmente no espaço",
+                    "from": "De",
+                    "product": "Produto",
+                    "noAssistancesFound": "Nenhuma assistência encontrada..."
+                },
                 "movements": {
                     "loading": "Carregando...",
                     "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
                     "currentlyInSpace": "Atualmente no espaço",
                     "movements": "Movimentos",
                     "unallocated": "Não alocado",
-                    "noAllocationsFound": "Nenhuma alocação encontrada..."
+                    "noAllocationsFound": "Nenhuma alocação encontrada...",
+                    "from": "De",
+                    "to": "Para",
+                    "reason": "Motivo"
                 }
             }
         },
@@ -1114,7 +1126,7 @@
                 "editProduct": "Editar produto",
                 "deleteProduct": "Excluir produto",
                 "inputProduct": "Dar entrada no produto",
-                "outputProduct": "Dar baixa no produto",
+                "outputProduct": "Doar o produto",
                 "moveProduct": "Mover para outro estoque",
                 "createdAt": "Criado em"
             },

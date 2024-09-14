@@ -755,13 +755,25 @@
                 "error": {
                     "message": "Algo salió mal. Por favor, inténtelo de nuevo más tarde."
                 },
+                "assistance": {
+                    "loading": "Cargando...",
+                    "error": "Algo salió mal. Por favor, inténtalo de nuevo más tarde.",
+                    "assistanceReceived": "Asistencia recibida",
+                    "currentlyInSpace": "Actualmente en el espacio",
+                    "from": "Desde",
+                    "product": "Producto",
+                    "noAssistancesFound": "No se encontraron asistencias..."
+                },
                 "movements": {
                     "loading": "Cargando...",
                     "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
                     "currentlyInSpace": "Actualmente en el espacio",
                     "movements": "Movimientos",
                     "unallocated": "No asignado",
-                    "noAllocationsFound": "No se encontraron asignaciones..."
+                    "noAllocationsFound": "No se encontraron asignaciones...",
+                    "from": "Desde",
+                    "to": "Hasta",
+                    "reason": "Razón"
                 }
             }
         },

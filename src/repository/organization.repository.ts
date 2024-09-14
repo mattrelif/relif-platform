@@ -138,6 +138,13 @@ export async function findJoinPlatformInvitesByOrganizationId(
     });
 }
 
+export async function deletePlatformInviteByCode(code: string): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `${PREFIX}/join-platform-invite/${code}/consume`,
+        method: "DELETE",
+    });
+}
+
 export async function getBeneficiariesByOrganizationID(
     organizationId: string,
     offset: number,
@@ -223,10 +230,11 @@ export async function reactivateOrganization(orgId: string): Promise<void> {
 export async function getProductsByOrganizationID(
     orgId: string,
     offset: number,
-    limit: number
+    limit: number,
+    search: string
 ): Promise<AxiosResponse<any>> {
     return client.request({
-        url: `${PREFIX}/${orgId}/product-types?limit=${limit}&offset=${offset}`,
+        url: `${PREFIX}/${orgId}/product-types?limit=${limit}&offset=${offset}&search=${search}`,
         method: "GET",
     });
 }
