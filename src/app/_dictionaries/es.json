@@ -1108,7 +1108,7 @@
                 "organization": "Organización",
                 "select": "Seleccionar...",
                 "productAddedSuccessTitle": "Producto Agregado con Éxito",
-                "productAddedSuccessDescription": "{quantity} unidades de {productName} han sido agregadas con éxito al inventario.",
+                "productAddedSuccessDescription": "Producto han sido agregadas con éxito al inventario.",
                 "errorAddingProductTitle": "Error al Agregar el Producto",
                 "errorAddingProductDescription": "Ocurrió un error al intentar agregar el producto al inventario. Por favor, inténtelo de nuevo."
             },

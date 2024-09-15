@@ -70,6 +70,7 @@ const Form = (): ReactNode => {
                 toast({
                     title: dict.commons.preferences.myProfile.toast.saved,
                     description: dict.commons.preferences.myProfile.toast.savedDescription,
+                    variant: "success",
                 });
             } else {
                 throw new Error();

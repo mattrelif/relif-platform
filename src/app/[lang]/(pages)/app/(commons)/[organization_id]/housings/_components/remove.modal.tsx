@@ -44,7 +44,7 @@ const RemoveModal = ({
     useEffect(() => {
         (async () => {
             try {
-                const { data } = await getBeneficiariesByHousingId(housing.id, OFFSET, LIMIT);
+                const { data } = await getBeneficiariesByHousingId(housing.id, OFFSET, LIMIT, "");
                 const beneficiaries = data.data;
 
                 if (beneficiaries.length > 0) {
@@ -93,7 +93,7 @@ const RemoveModal = ({
                     <DialogHeader>
                         <DialogTitle className="pb-3">{dict.removeHousing.title}</DialogTitle>
                         <DialogDescription>{dict.removeHousing.description}</DialogDescription>
-                        <div className="flex flex-col pt-4">
+                        <div className="flex flex-col pt-4 text-start">
                             <span className="text-sm text-slate-900 font-bold">
                                 {housing?.name}
                             </span>

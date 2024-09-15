@@ -149,7 +149,6 @@ const Form = ({ housingId }: Props): ReactNode => {
                             id="addressLine2"
                             name="addressLine2"
                             type="text"
-                            required
                             defaultValue={data.address.address_line_2}
                         />
                     </div>

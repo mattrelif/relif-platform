@@ -27,7 +27,7 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
 
     const handleDownloadPDF = async () => {
         try {
-            const response = await getProductsByOrganizationID(organizationId, 0, 99999);
+            const response = await getProductsByOrganizationID(organizationId, 0, 99999, "");
             const blob = await pdf(
                 <PDFDocument title="Products" products={response.data.data} />
             ).toBlob();
@@ -40,7 +40,7 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
     const handleDownloadCSV = async () => {
         try {
             if (organizationId) {
-                const response = await getProductsByOrganizationID(organizationId, 0, 99999);
+                const response = await getProductsByOrganizationID(organizationId, 0, 99999, "");
                 const housings = response.data.data;
 
                 const flatData = housings.map((housing: any) => flattenObject(housing));

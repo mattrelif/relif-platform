@@ -161,7 +161,6 @@ const Form = (): ReactNode => {
                                 id="addressLine2"
                                 name="addressLine2"
                                 type="text"
-                                required
                                 defaultValue={orgData?.address.address_line_2}
                                 readOnly={platformRole !== "ORG_ADMIN"}
                             />

@@ -11,7 +11,7 @@ export async function createInvite(invitedEmail: string): Promise<AxiosResponse<
     });
 }
 
-export async function consumeInvite(code: string): Promise<AxiosResponse<void>> {
+export async function consumeInvite(code: string): Promise<AxiosResponse<any>> {
     return client.request({
         url: `${PREFIX}/${code}/consume`,
         method: "DELETE",

@@ -1108,7 +1108,7 @@
                 "organization": "Organization",
                 "select": "Select...",
                 "productAddedSuccessTitle": "Product Added Successfully",
-                "productAddedSuccessDescription": "{quantity} units of {productName} have been successfully added to storage.",
+                "productAddedSuccessDescription": "The product have been successfully added to storage.",
                 "errorAddingProductTitle": "Error Adding Product",
                 "errorAddingProductDescription": "An error occurred while trying to add the product to storage. Please try again."
             },

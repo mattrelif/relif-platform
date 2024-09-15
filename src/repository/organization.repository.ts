@@ -138,13 +138,6 @@ export async function findJoinPlatformInvitesByOrganizationId(
     });
 }
 
-export async function deletePlatformInviteByCode(code: string): Promise<AxiosResponse<any>> {
-    return client.request({
-        url: `${PREFIX}/join-platform-invite/${code}/consume`,
-        method: "DELETE",
-    });
-}
-
 export async function getBeneficiariesByOrganizationID(
     organizationId: string,
     offset: number,

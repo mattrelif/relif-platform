@@ -69,7 +69,7 @@ const ProductList = (): ReactNode => {
     }, [searchTerm, getProductList]);
 
     return (
-        <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+        <div className="h-[calc(100vh-172px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col overflow-hidden">
             {/* <div className="p-4 flex items-center justify-between gap-3 border-b-[1px] border-slate-200"> */}
             {/*    <div className="flex items-center gap-2"> */}
             {/*        <MdSearch className="text-slate-400 text-2xl mr-2" /> */}
