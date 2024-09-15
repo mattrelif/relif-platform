@@ -37,9 +37,13 @@ export type BeneficiarySchema = {
 export type BeneficiaryAllocationSchema = {
     id: string;
     beneficiary_id: string;
+    old_housing: HousingSchema;
     old_housing_id: string;
+    old_room: SpaceSchema;
     old_room_id: string;
+    housing: HousingSchema;
     housing_id: string;
+    room: SpaceSchema;
     room_id: string;
     type: string;
     auditor_id: string;

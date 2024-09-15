@@ -4,6 +4,7 @@ import { OrgSelector } from "@/app/[lang]/(pages)/app/(commons)/_layout/sidebar/
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { cn } from "@/lib/utils";
+import { getFromLocalStorage } from "@/utils/localStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,6 +24,7 @@ const Sidebar = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
     const platformRole = usePlatformRole();
+    const currentUser = getFromLocalStorage("r_ud");
 
     const organizationID = pathname.split("/")[3];
     const activeOption = pathname.split("/")[4] ?? "home";
@@ -39,7 +41,9 @@ const Sidebar = (): ReactNode => {
                 />
             </div>
 
-            {platformRole === "ORG_ADMIN" && <OrgSelector />}
+            {currentUser.organization.type === "COORDINATOR" && platformRole === "ORG_ADMIN" && (
+                <OrgSelector />
+            )}
 
             <ul className="flex flex-col gap-1">
                 <span className="text-slate-500 font-bold text-sm pl-2 mb-2">Platform</span>

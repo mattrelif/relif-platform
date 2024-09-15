@@ -40,7 +40,7 @@ const RemoveModal = ({
             try {
                 const { data } = await getProductById(product.id);
 
-                if (data.storage_records.length > 0) {
+                if (data.storage_records[0].id) {
                     setAllowToRemove("UNAVAILABLE");
                 } else {
                     setAllowToRemove("AVAILABLE");

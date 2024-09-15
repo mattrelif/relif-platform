@@ -19,11 +19,11 @@ const Card = (data: BeneficiaryAllocationSchema): ReactNode => {
             </span>
             <span className="text-sm text-slate-900">
                 <strong>{dict.commons.beneficiaries.beneficiaryId.movements.from}:</strong>{" "}
-                {data.old_housing_id} ({data.old_room_id})
+                {data.old_housing_id ? `${data.old_housing.name} (${data.old_room.name})` : "-"}
             </span>
             <span className="text-sm text-slate-900">
                 <strong>{dict.commons.beneficiaries.beneficiaryId.movements.to}:</strong>{" "}
-                {data.housing_id} ({data.room_id})
+                {data.housing.name} ({data.room.name})
             </span>
             {data.type === "REALLOCATION" && (
                 <>

@@ -18,6 +18,16 @@ export type SignUpByInviteRequest = {
     preferences: UserPreferencesSchema;
 };
 
+export type SignUpAdminByInviteRequest = {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    phones: Array<string>;
+    role: string;
+    preferences: UserPreferencesSchema;
+};
+
 export type PasswordChangeRequestSchema = {
     user_id: string;
     code: string;

@@ -48,10 +48,10 @@ export default function Page(): ReactNode {
                     );
                 setData(orgTypeRequests);
 
-                console.log("Aqui", data);
-                if (data && data.count > 0) {
-                    console.log(data.data.find(item => item.status === "ACCEPTED"));
-                    setIsCoordination(data.data.find(item => item.status === "ACCEPTED") || null);
+                if (orgTypeRequests && orgTypeRequests.count > 0) {
+                    setIsCoordination(
+                        orgTypeRequests.data.find(item => item.status === "ACCEPTED") || null
+                    );
                 }
             } catch {
                 setError(true);

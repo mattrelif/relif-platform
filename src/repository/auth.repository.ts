@@ -1,5 +1,9 @@
 import { client } from "@/lib/axios-client";
-import { SignUpByInviteRequest, SignUpRequest } from "@/types/auth.types";
+import {
+    SignUpAdminByInviteRequest,
+    SignUpByInviteRequest,
+    SignUpRequest,
+} from "@/types/auth.types";
 import { UserSchema } from "@/types/user.types";
 import { AxiosResponse } from "axios";
 
@@ -35,6 +39,16 @@ export async function signUp(data: SignUpRequest): Promise<string> {
 export async function orgSignUp(data: SignUpByInviteRequest): Promise<string> {
     const { headers } = await client.request({
         url: `${PREFIX}/org-sign-up`,
+        method: "POST",
+        data,
+    });
+
+    return headers.token;
+}
+
+export async function adminSignUp(data: SignUpAdminByInviteRequest): Promise<string> {
+    const { headers } = await client.request({
+        url: `${PREFIX}/admin-sign-up`,
         method: "POST",
         data,
     });
