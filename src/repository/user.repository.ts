@@ -29,6 +29,13 @@ export async function updateUser(userId: string, data: UpdateUserRequest): Promi
     });
 }
 
+export async function reactiveUser(userId: string): Promise<void> {
+    return client.request({
+        url: `${PREFIX}/${userId}/reactivate`,
+        method: "PUT",
+    });
+}
+
 export async function deleteUser(userId: string): Promise<void> {
     return client.request({
         url: `${PREFIX}/${userId}`,

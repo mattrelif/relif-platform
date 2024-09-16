@@ -202,7 +202,8 @@
                         "platformRoleFallback": "MEMBER",
                         "edit": "Edit",
                         "remove": "Remove",
-                        "phonesTitle": "Phones"
+                        "phonesTitle": "Phones",
+                        "reactive": "Reactivate user"
                     },
                     "edit": {
                         "loading": "Loading...",
@@ -241,6 +242,16 @@
                         "removedDescription": "User removed successfully.",
                         "userDeletionFailed": "User Deletion Failed",
                         "userDeletionFailedDescription": "An error occurred while attempting to delete the user. Please try again later or contact support if the issue persists."
+                    },
+                    "reactivate": {
+                        "absolutelySure": "Are you absolutely sure?",
+                        "actionCannotBeUndone": "This action cannot be undone.",
+                        "cancel": "Cancel",
+                        "reactivate": "Reactivate",
+                        "reactivated": "User reactivated",
+                        "reactivatedDescription": "The user has been successfully reactivated.",
+                        "userReactivationFailed": "User reactivation failed",
+                        "userReactivationFailedDescription": "An error occurred while trying to reactivate the user."
                     }
                 },
                 "invites": {

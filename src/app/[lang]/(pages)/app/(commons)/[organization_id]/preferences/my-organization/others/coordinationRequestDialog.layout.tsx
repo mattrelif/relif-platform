@@ -78,12 +78,14 @@ const CoordinationRequestDialog = ({ children }: { children: Readonly<ReactNode>
                                 }
                             </Button>
                         </DialogClose>
-                        <Button onClick={handleRequest}>
-                            {
-                                dict.commons.preferences.myOrganization.others.coordination.dialog
-                                    .sendRequest
-                            }
-                        </Button>
+                        <DialogClose asChild>
+                            <Button onClick={handleRequest}>
+                                {
+                                    dict.commons.preferences.myOrganization.others.coordination
+                                        .dialog.sendRequest
+                                }
+                            </Button>
+                        </DialogClose>
                     </div>
                 </DialogHeader>
             </DialogContent>

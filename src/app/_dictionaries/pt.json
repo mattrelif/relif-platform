@@ -202,7 +202,8 @@
                         "platformRoleFallback": "MEMBRO",
                         "edit": "Editar",
                         "remove": "Remover",
-                        "phonesTitle": "Telefones"
+                        "phonesTitle": "Telefones",
+                        "reactive": "Reativar usuário"
                     },
                     "edit": {
                         "loading": "Carregando...",
@@ -241,6 +242,16 @@
                         "removedDescription": "Usuário removido com sucesso.",
                         "userDeletionFailed": "Falha na exclusão do usuário",
                         "userDeletionFailedDescription": "Ocorreu um erro ao tentar excluir o usuário. Por favor, tente novamente mais tarde ou entre em contato com o suporte se o problema persistir."
+                    },
+                    "reactivate": {
+                        "absolutelySure": "Você tem certeza absoluta?",
+                        "actionCannotBeUndone": "Essa ação não pode ser desfeita.",
+                        "cancel": "Cancelar",
+                        "reactivate": "Reativar",
+                        "reactivated": "Usuário reativado",
+                        "reactivatedDescription": "O usuário foi reativado com sucesso.",
+                        "userReactivationFailed": "Falha na reativação do usuário",
+                        "userReactivationFailedDescription": "Ocorreu um erro ao tentar reativar o usuário."
                     }
                 },
                 "invites": {

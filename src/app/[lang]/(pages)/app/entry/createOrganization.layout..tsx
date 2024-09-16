@@ -52,7 +52,11 @@ const CreateOrganization = (): ReactNode => {
             const organizationID = responseData.id;
 
             const currentUser = await getFromLocalStorage("r_ud");
-            updateLocalStorage("r_ud", { ...currentUser, platform_role: "ORG_ADMIN" });
+            updateLocalStorage("r_ud", {
+                ...currentUser,
+                platform_role: "ORG_ADMIN",
+                organization_id: organizationID,
+            });
 
             router.push(`/app/${organizationID}`);
         } catch {

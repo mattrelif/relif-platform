@@ -59,7 +59,7 @@ export default function Page(): ReactNode {
                 setIsLoading(false);
             }
         })();
-    }, []);
+    }, [sheetOpenState]);
 
     if (isLoading)
         return (
@@ -79,7 +79,6 @@ export default function Page(): ReactNode {
     if (data) {
         return (
             <div className="flex flex-col gap-4 w-full h-[calc(100vh-260px)] mt-4">
-                {/* {console.log(data, isCoordination)} */}
                 {!isCoordination ? (
                     <div className="border-[1px] border-relif-orange-200 rounded-md w-full h-max p-4">
                         <h2 className="text-base font-bold text-relif-orange-200 pb-1">

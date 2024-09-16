@@ -31,7 +31,6 @@ const UserInviteList = (): ReactNode => {
             const OFFSET = 0;
             const LIMIT = 9999;
             const response = await findJoinRequestsByOrganizationId(organizationId, OFFSET, LIMIT);
-            console.log(response);
 
             setInvites({
                 count:

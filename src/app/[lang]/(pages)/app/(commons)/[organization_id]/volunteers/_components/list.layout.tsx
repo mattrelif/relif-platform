@@ -26,7 +26,7 @@ const VolunteersList = (): ReactNode => {
         data: VoluntarySchema[];
     } | null>(null);
     const [offset, setOffset] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const LIMIT = 20;

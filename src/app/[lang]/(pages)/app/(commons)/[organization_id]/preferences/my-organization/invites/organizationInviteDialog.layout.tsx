@@ -66,7 +66,7 @@ const OrganizationInviteDialog = ({ request, refreshList, children }: Props): Re
                                 .confirmingRequest
                         }
                     </DialogDescription>
-                    <div className="flex flex-col pt-4">
+                    <div className="flex flex-col pt-4 text-start">
                         <span className="text-sm text-slate-900 font-bold">
                             {request.requester_organization.name}
                         </span>

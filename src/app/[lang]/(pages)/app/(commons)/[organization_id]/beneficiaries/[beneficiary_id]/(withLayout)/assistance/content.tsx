@@ -89,7 +89,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                             <FaMapMarkerAlt />
                             {beneficiary?.current_housing_id ? (
                                 <>
-                                    {convertToTitleCase(beneficiary?.current_housing.name)} |
+                                    {convertToTitleCase(beneficiary?.current_housing.name)} |{" "}
                                     {
                                         dict.commons.beneficiaries.beneficiaryId.assistance
                                             .currentlyInSpace

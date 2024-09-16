@@ -64,8 +64,7 @@ const Form = (): ReactNode => {
             } else {
                 throw new Error();
             }
-        } catch (err) {
-            console.log(err);
+        } catch {
             setIsLoading(false);
             toast({
                 title: dict.commons.inventory.create.errorCreatingProductTitle,

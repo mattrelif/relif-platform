@@ -88,8 +88,7 @@ const Form = ({ productId }: Props): ReactNode => {
             } else {
                 throw new Error();
             }
-        } catch (err) {
-            console.log(err);
+        } catch {
             setIsLoading(false);
             toast({
                 title: dict.commons.inventory.edit.errorToastTitle,

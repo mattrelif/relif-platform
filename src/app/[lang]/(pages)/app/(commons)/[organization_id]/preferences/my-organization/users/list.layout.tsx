@@ -54,15 +54,14 @@ const UserList = (): ReactNode => {
         <>
             <div className="w-full h-max pt-2 px-3 gap-4 flex items-center justify-between lg:justify-end lg:gap-0 lg:p-0 lg:pt-3">
                 <div className="h-10 lg:hidden" />
-                <AddUser>
-                    <Button
-                        className="flex items-center gap-2"
-                        disabled={platformRole !== "ORG_ADMIN"}
-                    >
-                        <MdAdd size={16} />
-                        {dict.commons.preferences.myOrganization.users.page.addUser}
-                    </Button>
-                </AddUser>
+                {platformRole === "ORG_ADMIN" && (
+                    <AddUser>
+                        <Button className="flex items-center gap-2">
+                            <MdAdd size={16} />
+                            {dict.commons.preferences.myOrganization.users.page.addUser}
+                        </Button>
+                    </AddUser>
+                )}
             </div>
             <ul className="w-full h-[calc(100vh-316px)] border-[1px] border-slate-200 rounded-md p-2 mt-4 overflow-x-hidden overflow-y-scroll flex flex-col gap-2">
                 {isLoading && (

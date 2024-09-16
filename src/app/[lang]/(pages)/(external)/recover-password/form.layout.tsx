@@ -22,7 +22,6 @@ const Form = (): ReactNode => {
 
         try {
             const code = params.get("code");
-            console.log(code);
             if (!code) {
                 throw new Error();
             }

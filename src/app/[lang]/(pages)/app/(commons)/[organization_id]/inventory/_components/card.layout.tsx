@@ -50,8 +50,8 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
         pharmacyAndMedications: dict.commons.inventory.card.pharmacyAndMedications,
     };
 
-    const quantity =
-        product?.storage_records.reduce((acc, record) => acc + record.quantity, 0) || 0;
+    // const quantity =
+    //     product?.storage_records.reduce((acc, record) => acc + record.quantity, 0) || 0;
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
@@ -72,19 +72,18 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                 <span className="text-xs text-slate-400 font-regular mt-1 flex items-center gap-1">
                     <FaBoxesPacking className="mr-1" />
                     <span>
-                        {product.storage_records.length <= 0 ? (
-                            dict.commons.inventory.card.noProductInStock
-                        ) : (
-                            <>
-                                {dict.commons.inventory.card.presentIn}{" "}
-                                <strong className="text-relif-orange-200">
-                                    {product.storage_records.length}
-                                </strong>{" "}
-                                {dict.commons.inventory.card.stock}{" "}
-                                <strong className="text-relif-orange-200">{quantity}</strong>{" "}
-                                {dict.commons.inventory.card.units}{" "}
-                            </>
-                        )}
+                        {/* {product.storage_records.length <= 0 ? ( */}
+                        {/*    dict.commons.inventory.card.noProductInStock */}
+                        {/* ) : ( */}
+                        {/*    <> */}
+                        {dict.commons.inventory.card.presentIn}{" "}
+                        <strong className="text-relif-orange-200">
+                            {/* {product.storage_records.length} */} 999
+                        </strong>{" "}
+                        {dict.commons.inventory.card.stock}{" "}
+                        <strong className="text-relif-orange-200">999</strong>{" "}
+                        {dict.commons.inventory.card.units} {/* </> */}
+                        {/* )} */}
                     </span>
                 </span>
             </div>
@@ -115,7 +114,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            disabled={product.storage_records.length <= 0}
+                            // disabled={product.storage_records.length <= 0}
                             onClick={() => setModalOutputOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">
@@ -123,7 +122,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            disabled={product.storage_records.length <= 0}
+                            // disabled={product.storage_records.length <= 0}
                             onClick={() => setModalMoveOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">

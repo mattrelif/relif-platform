@@ -61,7 +61,7 @@ const UserInviteDialogLayout = ({ request, refreshList, children }: Props): Reac
                                 .confirmingRequest
                         }
                     </DialogDescription>
-                    <div className="flex flex-col pt-4">
+                    <div className="flex flex-col pt-4 text-start">
                         <span className="text-sm text-slate-900 font-bold">
                             {request.user.first_name} {request.user.last_name}
                         </span>

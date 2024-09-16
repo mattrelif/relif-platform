@@ -15,10 +15,12 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { UserSchema } from "@/types/user.types";
 import { ReactNode, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { GrRevert } from "react-icons/gr";
 import { MdMail, MdPhone } from "react-icons/md";
 import { SlOptions } from "react-icons/sl";
 
 import { UserEdit } from "./edit.layout";
+import { UserReactivate } from "./reactive.layout";
 import { UserRemove } from "./remove.layout";
 
 type Props = UserSchema & {
@@ -32,9 +34,15 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
 
     const [editUserSheetOpenState, setEditUserSheetOpenState] = useState(false);
     const [removeUserDialogOpenState, setRemoveUserDialogOpenState] = useState(false);
+    const [reactivateUserDialogOpenState, setReactivateUserDialogOpenState] = useState(false);
 
-    const initials = data.first_name.charAt(0).concat(data.last_name.charAt(0));
+    const initials = data.first_name.charAt(0).concat(data.last_name.charAt(0)).toUpperCase();
     const phonesLength = data.phones.length;
+
+    const STATUS_COLOR = {
+        ACTIVE: "bg-relif-orange-200",
+        INACTIVE: "bg-gray-300",
+    };
 
     return (
         <li className="w-full h-max flex justify-between p-4 border-[1px] border-slate-200 rounded-md lg:flex-col lg:relative">
@@ -45,8 +53,12 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="text-sm text-slate-900 font-bold">
+                    <span className="text-sm text-slate-900 font-bold flex gap-3 flex-wrap">
                         {data.first_name} {data.last_name}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                        {data?.role ||
+                            dict.commons.preferences.myOrganization.users.card.roleFallback}
                     </span>
                     <div className="flex flex-col gap-1">
                         <span className="text-xs text-slate-500 mt-3 flex items-center gap-2">
@@ -77,20 +89,26 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                             </HoverCardContent>
                         </HoverCard>
                     </div>
+                    <div className="flex gap-2 mt-3">
+                        <span>
+                            <Badge>
+                                {data.platform_role ||
+                                    dict.commons.preferences.myOrganization.users.card
+                                        .platformRoleFallback}
+                            </Badge>
+                        </span>
+                        <span>
+                            <Badge
+                                className={`${STATUS_COLOR[data.status as keyof typeof STATUS_COLOR]}`}
+                            >
+                                {data.status}
+                            </Badge>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col justify-end lg:mt-3 lg:flex-row lg:items-center lg:justify-between lg:flex-wrap">
-                <span className="text-xs text-slate-500">
-                    {data?.role || dict.commons.preferences.myOrganization.users.card.roleFallback}
-                </span>
-                <span>
-                    <Badge>
-                        {data.platform_role ||
-                            dict.commons.preferences.myOrganization.users.card.platformRoleFallback}
-                    </Badge>
-                </span>
-            </div>
+            <div className="flex flex-col justify-end lg:mt-3 lg:flex-row lg:items-center lg:justify-between lg:flex-wrap"></div>
 
             {platformRole === "ORG_ADMIN" && (
                 <>
@@ -119,7 +137,7 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                                         </span>
                                     </DropdownMenuItem>
                                 )}
-                                {currentUserId !== data.id && (
+                                {data.status !== "INACTIVE" && currentUserId !== data.id && (
                                     <DropdownMenuItem
                                         onClick={() => setRemoveUserDialogOpenState(true)}
                                     >
@@ -128,6 +146,19 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                                             {
                                                 dict.commons.preferences.myOrganization.users.card
                                                     .remove
+                                            }
+                                        </span>
+                                    </DropdownMenuItem>
+                                )}
+                                {data.status === "INACTIVE" && (
+                                    <DropdownMenuItem
+                                        onClick={() => setReactivateUserDialogOpenState(true)}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <GrRevert className="text-xs" />
+                                            {
+                                                dict.commons.preferences.myOrganization.users.card
+                                                    .reactive
                                             }
                                         </span>
                                     </DropdownMenuItem>
@@ -149,12 +180,15 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                         removeUserDialogOpenState={removeUserDialogOpenState}
                         setRemoveUserDialogOpenState={setRemoveUserDialogOpenState}
                     />
+
+                    <UserReactivate
+                        user={data}
+                        refreshList={refreshList}
+                        reactivateUserDialogOpenState={reactivateUserDialogOpenState}
+                        setReactivateUserDialogOpenState={setReactivateUserDialogOpenState}
+                    />
                 </>
             )}
-            {/* <UserActivities
-                userActivitiesSheetOpenState={userActivitiesSheetOpenState}
-                setUserActivitiesSheetOpenState={setUserActivitiesSheetOpenState}
-            /> */}
         </li>
     );
 };
