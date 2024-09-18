@@ -4,7 +4,7 @@ import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { getAllocations } from "@/repository/inventory.repository";
-import { ProductEntry, ProductSchema } from "@/types/product.types";
+import { ProductSchema } from "@/types/product.types";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
@@ -20,7 +20,7 @@ const InputHistory = ({ productType, openState, setOpenState }: Props): ReactNod
     const dict = useDictionary();
     const pathname = usePathname();
 
-    const [data, setData] = useState<ProductEntry[] | []>([]);
+    const [data, setData] = useState<any[] | []>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -92,13 +92,17 @@ const InputHistory = ({ productType, openState, setOpenState }: Props): ReactNod
                                                 <strong>
                                                     {dict.commons.inventory.inputHistory.to}
                                                 </strong>{" "}
-                                                {entry?.to.id}
+                                                {entry.to.type === "ORGANIZATION"
+                                                    ? "Organization"
+                                                    : entry?.to.name}
                                             </span>
                                             <span className="text-slate-500 text-xs font-medium">
                                                 <strong>
                                                     {dict.commons.inventory.inputHistory.from}
                                                 </strong>{" "}
-                                                {entry?.from.id}
+                                                {entry.from.type === "ORGANIZATION"
+                                                    ? "Organization"
+                                                    : entry.from.name}
                                             </span>
                                         </div>
                                     ) : (
@@ -106,7 +110,9 @@ const InputHistory = ({ productType, openState, setOpenState }: Props): ReactNod
                                             <strong>
                                                 {dict.commons.inventory.inputHistory.locale}
                                             </strong>{" "}
-                                            {entry?.to.id}
+                                            {entry.to.type === "ORGANIZATION"
+                                                ? "Organization"
+                                                : entry?.to.name}
                                         </span>
                                     )}
                                 </div>
