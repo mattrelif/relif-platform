@@ -1,7 +1,6 @@
 "use client";
 
 import { useDictionary } from "@/app/context/dictionaryContext";
-import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { getDonations } from "@/repository/inventory.repository";
 import { ProductSchema } from "@/types/product.types";
@@ -72,10 +71,6 @@ const OutputHistory = ({ productType, openState, setOpenState }: Props): ReactNo
                             {data?.map(entry => (
                                 <div className="w-full h-max p-4 border-b-[1px]">
                                     <div className="flex gap-2 items-center">
-                                        <span>
-                                            <Badge className="text-sm">{`-${entry?.quantity}`}</Badge>
-                                        </span>
-
                                         <span className="text-slate-900 text-sm font-bold">
                                             {formatDate(entry?.created_at, locale || "en")}
                                         </span>
@@ -84,13 +79,19 @@ const OutputHistory = ({ productType, openState, setOpenState }: Props): ReactNo
                                     <div className="flex flex-col gap-1 mt-2">
                                         <span className="text-slate-500 text-xs font-medium">
                                             <strong>
-                                                {dict.commons.inventory.outputHistory.from}:
+                                                {dict.commons.inventory.outputHistory.quantity}
                                             </strong>{" "}
-                                            {entry?.from.id}
+                                            {entry?.quantity}
                                         </span>
                                         <span className="text-slate-500 text-xs font-medium">
                                             <strong>
-                                                {dict.commons.inventory.outputHistory.to}:
+                                                {dict.commons.inventory.outputHistory.from}
+                                            </strong>{" "}
+                                            {entry?.from.name}
+                                        </span>
+                                        <span className="text-slate-500 text-xs font-medium">
+                                            <strong>
+                                                {dict.commons.inventory.outputHistory.to}
                                             </strong>{" "}
                                             {entry?.beneficiary.full_name}
                                         </span>

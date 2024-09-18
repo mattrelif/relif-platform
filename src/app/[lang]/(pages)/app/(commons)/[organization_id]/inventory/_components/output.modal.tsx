@@ -174,7 +174,7 @@ const OutputProductModal = ({
                                                         {storage.location.id ===
                                                         currentUser?.organization_id
                                                             ? `${dict.commons.inventory.output.organization} (${storage.quantity} ${product.unit_type})`
-                                                            : `${storage.location.id} (${storage.quantity} ${product.unit_type})`}
+                                                            : `${storage.location.name} (${storage.quantity} ${product.unit_type})`}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

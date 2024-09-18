@@ -123,9 +123,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                                             }
                                             :
                                         </strong>{" "}
-                                        {assistance.from.type === "HOUSING"
-                                            ? assistance.from.name
-                                            : "Organization"}
+                                        {assistance.from?.name}
                                     </span>
                                     <span className="w-full flex items-center gap-2 text-sm text-relif-orange-200 font-bold border-t-[1px] border-dashed border-slate-200 mt-2 pt-2">
                                         <FaCartPlus />

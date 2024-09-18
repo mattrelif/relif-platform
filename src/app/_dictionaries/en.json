@@ -1152,7 +1152,8 @@
             "outputHistory": {
                 "productDonationHistory": "Product donation history",
                 "from": "From:",
-                "to": "To:"
+                "to": "To:",
+                "quantity": "Quantity:"
             },
             "edit": {
                 "loading": "Loading...",

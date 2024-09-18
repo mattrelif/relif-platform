@@ -1152,7 +1152,8 @@
             "outputHistory": {
                 "productDonationHistory": "Histórico de doação de produtos",
                 "from": "De:",
-                "to": "Para:"
+                "to": "Para:",
+                "quantity": "Quantidade:"
             },
             "edit": {
                 "loading": "Carregando...",
