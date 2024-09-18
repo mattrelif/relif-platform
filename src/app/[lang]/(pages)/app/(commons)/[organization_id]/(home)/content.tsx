@@ -41,7 +41,7 @@ const Content = (): ReactNode => {
                     await findHousingsByOrganizationId(organizationId, OFFSET, LIMIT, ""),
                     await getBeneficiariesByOrganizationID(organizationId, OFFSET, LIMIT, ""),
                     await getVoluntariesByOrganizationID(organizationId, OFFSET, LIMIT, ""),
-                    await getProductsByOrganizationID(organizationId, OFFSET, LIMIT),
+                    await getProductsByOrganizationID(organizationId, OFFSET, LIMIT, ""),
                 ];
 
                 const [
@@ -80,9 +80,9 @@ const Content = (): ReactNode => {
                     </h2>
                 </div>
                 <div className="w-full grid grid-cols-4 gap-4 lg:flex lg:flex-wrap">
-                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
-                            <span className="h-full text-white font-bold flex items-center gap-3">
+                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden flex flex-col">
+                        <div className="w-full py-1 px-5 bg-relif-orange-300 lg:p-3">
+                            <span className="h-full text-white font-bold flex items-center justify-center gap-3">
                                 <FaHouseChimneyUser />
                                 {dict.commons.home.housings}
                             </span>
@@ -93,9 +93,9 @@ const Content = (): ReactNode => {
                             </span>
                         </div>
                     </div>
-                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
-                            <span className="h-full text-white font-bold flex items-center gap-3">
+                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden flex flex-col">
+                        <div className="w-full py-1 px-5 bg-relif-orange-300 lg:p-3">
+                            <span className="h-full text-white font-bold flex items-center justify-center gap-3">
                                 <FaUsers />
                                 {convertToTitleCase(dict.commons.home.beneficiaries)}
                             </span>
@@ -106,9 +106,9 @@ const Content = (): ReactNode => {
                             </span>
                         </div>
                     </div>
-                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
-                            <span className="h-full text-white font-bold flex items-center gap-3">
+                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden flex flex-col">
+                        <div className="w-full py-1 px-5 bg-relif-orange-300 lg:p-3">
+                            <span className="h-full text-white font-bold flex items-center justify-center gap-3">
                                 <FaUserNurse />
                                 {dict.commons.home.volunteers}
                             </span>
@@ -119,9 +119,9 @@ const Content = (): ReactNode => {
                             </span>
                         </div>
                     </div>
-                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden grid grid-cols-[220px_auto]">
-                        <div className="w-full py-6 px-5 bg-relif-orange-300 lg:p-3">
-                            <span className="h-full text-white font-bold flex items-center gap-3">
+                    <div className="w-full h-max rounded-lg bg-relif-orange-200 overflow-hidden flex flex-col">
+                        <div className="w-full py-1 px-5 bg-relif-orange-300 lg:p-3">
+                            <span className="h-full text-white font-bold flex items-center justify-center gap-3">
                                 <FaBoxes />
                                 {dict.commons.home.products}
                             </span>

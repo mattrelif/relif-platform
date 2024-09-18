@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { donateProductToBeneficiary } from "@/repository/beneficiary.repository";
+import { getStorageRecords } from "@/repository/inventory.repository";
 import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
-import { ProductSchema } from "@/types/product.types";
+import { AllocationSchema, ProductSchema } from "@/types/product.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
@@ -46,6 +47,7 @@ const OutputProductModal = ({
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[] | []>([]);
+    const [storageRecords, setStorageRecords] = useState<AllocationSchema[] | []>([]);
     const [selectedStorage, setSelectedStorage] = useState<string>("");
     const [selectedBeneficiary, setSelectedBeneficiary] = useState<string>("");
     const [quantity, setQuantity] = useState<number>(0);
@@ -56,20 +58,29 @@ const OutputProductModal = ({
         setIsLoading(true);
         (async () => {
             try {
-                const currUser: UserSchema = await getFromLocalStorage("r_ud");
-                setCurrentUser(currUser);
+                if (modalOpenState) {
+                    const currUser: UserSchema = await getFromLocalStorage("r_ud");
+                    setCurrentUser(currUser);
 
-                if (currUser && currUser.organization_id) {
-                    const { data: beneficiariesResponse } = await getBeneficiariesByOrganizationID(
-                        currUser.organization_id,
-                        0,
-                        99999,
-                        ""
-                    );
+                    if (currUser && currUser.organization_id) {
+                        const promises = [
+                            await getBeneficiariesByOrganizationID(
+                                currUser.organization_id,
+                                0,
+                                99999,
+                                ""
+                            ),
+                            await getStorageRecords(product.id),
+                        ];
 
-                    setBeneficiaries(beneficiariesResponse.data);
-                } else {
-                    throw new Error();
+                        const [beneficiariesResponse, allocationsResponse] =
+                            await Promise.all(promises);
+
+                        setBeneficiaries(beneficiariesResponse.data.data);
+                        setStorageRecords(allocationsResponse.data);
+                    } else {
+                        throw new Error();
+                    }
                 }
             } catch (err) {
                 setError(true);
@@ -77,7 +88,7 @@ const OutputProductModal = ({
                 setIsLoading(false);
             }
         })();
-    }, []);
+    }, [modalOpenState]);
 
     const handleDonate = async (): Promise<void> => {
         try {
@@ -148,9 +159,9 @@ const OutputProductModal = ({
                                         <SelectTrigger className="w-full" id="locale">
                                             <SelectValue placeholder="Select..." />
                                         </SelectTrigger>
-                                        {product && (
+                                        {storageRecords && (
                                             <SelectContent>
-                                                {product?.storage_records?.map(storage => (
+                                                {storageRecords?.map(storage => (
                                                     <SelectItem
                                                         value={
                                                             storage.location.id ===
@@ -163,7 +174,7 @@ const OutputProductModal = ({
                                                         {storage.location.id ===
                                                         currentUser?.organization_id
                                                             ? `${dict.commons.inventory.output.organization} (${storage.quantity} ${product.unit_type})`
-                                                            : `${storage.location.name} (${storage.quantity} ${product.unit_type})`}
+                                                            : `${storage.location.id} (${storage.quantity} ${product.unit_type})`}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

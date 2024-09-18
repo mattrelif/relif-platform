@@ -11,9 +11,8 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { getVoluntariesByOrganizationID } from "@/repository/organization.repository";
-import { UserSchema } from "@/types/user.types";
 import { VoluntarySchema } from "@/types/voluntary.types";
-import { getFromLocalStorage } from "@/utils/localStorage";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState, useCallback, ChangeEvent } from "react";
 import { MdError, MdSearch } from "react-icons/md";
 
@@ -21,6 +20,9 @@ import { Card } from "./card.layout";
 
 const VolunteersList = (): ReactNode => {
     const dict = useDictionary();
+    const pathname = usePathname();
+    const organizationId = pathname.split("/")[3];
+
     const [volunteers, setVolunteers] = useState<{
         count: number;
         data: VoluntarySchema[];
@@ -34,11 +36,9 @@ const VolunteersList = (): ReactNode => {
     const getVoluntaryList = useCallback(
         async (filter: string = "") => {
             try {
-                const currentUser: UserSchema = await getFromLocalStorage("r_ud");
-
-                if (currentUser.organization_id) {
+                if (organizationId) {
                     const response = await getVoluntariesByOrganizationID(
-                        currentUser.organization_id,
+                        organizationId,
                         offset,
                         LIMIT,
                         filter

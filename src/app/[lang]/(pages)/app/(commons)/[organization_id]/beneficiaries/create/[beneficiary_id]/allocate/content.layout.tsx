@@ -87,6 +87,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
             toast({
                 title: dict.commons.beneficiaries.create.allocate.toastSuccessTitle,
                 description: dict.commons.beneficiaries.create.allocate.toastSuccessDescription,
+                variant: "success",
             });
 
             router.push(backToListPath);

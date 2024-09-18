@@ -1139,7 +1139,20 @@
                 "inputProduct": "Dar entrada no produto",
                 "outputProduct": "Doar o produto",
                 "moveProduct": "Mover para outro estoque",
-                "createdAt": "Criado em"
+                "createdAt": "Criado em",
+                "movementHistory": "Histórico de movimentação",
+                "donateHistory": "Histórico de doações"
+            },
+            "inputHistory": {
+                "productEntryHistory": "Histórico de entrada de produtos",
+                "from": "De:",
+                "to": "Para:",
+                "location": "Local:"
+            },
+            "outputHistory": {
+                "productDonationHistory": "Histórico de doação de produtos",
+                "from": "De:",
+                "to": "Para:"
             },
             "edit": {
                 "loading": "Carregando...",

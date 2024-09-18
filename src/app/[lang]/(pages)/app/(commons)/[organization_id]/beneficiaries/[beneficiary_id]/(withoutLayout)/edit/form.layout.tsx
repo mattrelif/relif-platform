@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { getBeneficiaryById, updateBeneficiary } from "@/repository/beneficiary.repository";
+import {
+    generateProfileImageUploadLink,
+    getBeneficiaryById,
+    updateBeneficiary,
+} from "@/repository/beneficiary.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
@@ -34,6 +38,8 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [languages, setLanguages] = useState<string[] | []>([]);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     useEffect(() => {
         setIsLoading(true);
@@ -74,6 +80,39 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
             const values = event.target.value.split(",").map(value => value.trim());
             setter(values);
         };
+
+    const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+        try {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const { data } = await generateProfileImageUploadLink(file.type);
+
+            await fetch(data.link, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": file.type,
+                },
+                body: file,
+            });
+
+            const s3Link = data.link.split("?")[0];
+            setImageUrl(s3Link);
+
+            toast({
+                title: "Upload Successful",
+                description: "The image has been uploaded successfully.",
+                variant: "success",
+            });
+        } catch (err) {
+            setIsUploading(false);
+            toast({
+                title: "Upload Failed",
+                description: "There was an error uploading the image.",
+                variant: "destructive",
+            });
+        }
+    };
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -127,6 +166,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
 
             await updateBeneficiary(beneficiaryId, {
                 full_name: fData.fullName,
+                image_url: imageUrl || "",
                 birthdate: fData.birthdate,
                 email: fData.email,
                 gender: fData.gender === "other" ? fData.otherGender : fData.gender,
@@ -205,6 +245,12 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                         <FaUsers />
                         {dict.commons.beneficiaries.edit.title}
                     </h1>
+
+                    <div className="flex flex-col gap-3 border border-slate-200 p-4 rounded-lg">
+                        <Label htmlFor="picture">Picture</Label>
+                        <Input id="picture" type="file" onChange={handleImageUpload} />
+                        {isUploading && <p>Uploading image...</p>}
+                    </div>
 
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="fullName">

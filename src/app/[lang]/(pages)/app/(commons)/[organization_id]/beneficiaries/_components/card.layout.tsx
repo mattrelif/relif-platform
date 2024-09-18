@@ -2,7 +2,7 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,6 +82,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
             >
                 <div className="flex gap-4">
                     <Avatar className="w-14 h-14">
+                        <AvatarImage src={data.image_url} />
                         <AvatarFallback className="bg-relif-orange-200 text-white">
                             {data?.full_name.charAt(0).toUpperCase()}
                         </AvatarFallback>

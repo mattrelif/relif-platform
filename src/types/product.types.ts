@@ -9,15 +9,7 @@ export type ProductSchema = {
     organization_id: string;
     organization: OrganizationSchema;
     unit_type: string;
-    storage_records: Array<{
-        id: string;
-        location: {
-            id: string;
-            name: string;
-            type: "HOUSING" | "ORGANIZATION";
-        };
-        quantity: number;
-    }>;
+    total_in_storage: number;
     created_at: string;
     updated_at: string;
 };
@@ -50,4 +42,37 @@ export type AddProductRequest = {
         id: string;
     };
     quantity: number;
+};
+
+export type AllocationSchema = {
+    id: string;
+    location: {
+        id: string;
+        name: string;
+        type: "HOUSING" | "ORGANIZATION";
+    };
+    quantity: number;
+};
+
+export type ProductEntry = {
+    id: string;
+    product_type_id: string;
+    product_type: ProductSchema;
+    brand: string;
+    category: string;
+    description: string;
+    created_at: string; // ISO Date
+    updated_at: string; // ISO Date
+    quantity: number;
+    from: {
+        id: string;
+        type: string; // "ORGANIZATION"
+    };
+    to: {
+        id: string;
+        type: string; // "ORGANIZATION"
+    };
+    type: string; // "ENTRANCE"
+    organization_id: string;
+    organization: OrganizationSchema;
 };

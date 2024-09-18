@@ -1,5 +1,6 @@
 import { OrganizationInviteDialog } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/preferences/my-organization/invites/organizationInviteDialog.layout";
 import { useDictionary } from "@/app/context/dictionaryContext";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -112,55 +113,82 @@ const OrganizationInvite = ({ refreshList, ...data }: Props): ReactNode => {
                         </strong>
                         {data.requester.email}
                     </span>
-                    <span className="text-xs text-slate-400 mt-2">
-                        {formatDate(data.created_at, locale)}
-                    </span>
+
+                    {data.status === "PENDING" && (
+                        <span className="text-xs text-slate-400 mt-2">
+                            {formatDate(data.created_at, locale || "en")}
+                        </span>
+                    )}
+
+                    <div className="mt-1">
+                        {data.status === "REJECTED" && (
+                            <span>
+                                <Badge className="bg-red-600">
+                                    REJECTED | {formatDate(data.rejected_at, locale || "en")}
+                                </Badge>
+                            </span>
+                        )}
+                        {data.status === "ACCEPTED" && (
+                            <span>
+                                <Badge className="bg-green-600">
+                                    ACCEPTED | {formatDate(data.accepted_at, locale || "en")}
+                                </Badge>
+                            </span>
+                        )}
+                        {data.status === "PENDING" && (
+                            <span>
+                                <Badge className="bg-green-600">PENDING APPROVAL</Badge>
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            <div className="flex items-start gap-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <OrganizationInviteDialog refreshList={refreshList} request={data}>
-                                <Button className="w-7 h-7 p-0 flex items-center justify-center">
-                                    <MdCheck />
-                                </Button>
-                            </OrganizationInviteDialog>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>
-                                {
-                                    dict.commons.preferences.myOrganization.invites.organization
-                                        .card.acceptedInvitation
-                                }
-                            </p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+            {data.status === "PENDING" && (
+                <div className="flex items-start gap-2">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <OrganizationInviteDialog refreshList={refreshList} request={data}>
+                                    <Button className="w-7 h-7 p-0 flex items-center justify-center">
+                                        <MdCheck />
+                                    </Button>
+                                </OrganizationInviteDialog>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>
+                                    {
+                                        dict.commons.preferences.myOrganization.invites.organization
+                                            .card.acceptedInvitation
+                                    }
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
 
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Button
-                                variant="outline"
-                                className="w-7 h-7 p-0 flex items-center justify-center"
-                                onClick={handleReject}
-                            >
-                                <MdClose />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>
-                                {
-                                    dict.commons.preferences.myOrganization.invites.organization
-                                        .card.rejectInvitation
-                                }
-                            </p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="outline"
+                                    className="w-7 h-7 p-0 flex items-center justify-center"
+                                    onClick={handleReject}
+                                >
+                                    <MdClose />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>
+                                    {
+                                        dict.commons.preferences.myOrganization.invites.organization
+                                            .card.rejectInvitation
+                                    }
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+            )}
         </li>
     );
 };

@@ -35,6 +35,7 @@ const UserInviteDialogLayout = ({ request, refreshList, children }: Props): Reac
                 description:
                     dict.commons.preferences.myOrganization.invites.user.dialog
                         .requestAcceptedDescription,
+                variant: "success",
             });
         } catch {
             toast({

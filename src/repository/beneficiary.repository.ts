@@ -30,6 +30,21 @@ export async function updateBeneficiary(
     });
 }
 
+export async function generateProfileImageUploadLink(
+    fileType: string
+): Promise<AxiosResponse<{ link: string }>> {
+    return client.request({
+        url: `${PREFIX}/generate-profile-image-upload-link`,
+        method: "POST",
+        data: {
+            file_type: fileType,
+        },
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}
+
 export async function deleteBeneficiary(beneficiaryId: string): Promise<AxiosResponse> {
     return client.request({
         url: `${PREFIX}/${beneficiaryId}`,

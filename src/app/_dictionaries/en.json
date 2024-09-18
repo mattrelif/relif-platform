@@ -1139,7 +1139,20 @@
                 "inputProduct": "Input product",
                 "outputProduct": "Donate product",
                 "moveProduct": "Move to another stock",
-                "createdAt": "Created at"
+                "createdAt": "Created at",
+                "movementHistory": "Movement history",
+                "donateHistory": "Donation history"
+            },
+            "inputHistory": {
+                "productEntryHistory": "Product entry history",
+                "from": "From:",
+                "to": "To:",
+                "location": "Location:"
+            },
+            "outputHistory": {
+                "productDonationHistory": "Product donation history",
+                "from": "From:",
+                "to": "To:"
             },
             "edit": {
                 "loading": "Loading...",

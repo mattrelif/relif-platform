@@ -9,7 +9,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { getDataAccessGrants } from "@/repository/organization.repository";
-import { OrganizationSchema } from "@/types/organization.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,7 +20,7 @@ const OrgSelector = (): ReactNode => {
     const router = useRouter();
     const dict = useDictionary();
 
-    const [orgs, setOrgs] = useState<{ count: number; data: OrganizationSchema[] } | null>(null);
+    const [orgs, setOrgs] = useState<{ count: number; data: any[] } | null>(null);
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const organizationId = pathname.split("/")[3];
 
@@ -54,10 +53,10 @@ const OrgSelector = (): ReactNode => {
 
     if (currentUser && currentUser.organization_id && orgs && orgs.count > 0) {
         return (
-            <>
-                <div className="w-full h-max py-4">
+            <div className="flex flex-col gap-2">
+                <div className="w-full h-max pt-4">
                     <div className="flex flex-col">
-                        <span className="text-slate-500 font-bold text-sm pl-2 pb-3">
+                        <span className="text-slate-500 font-bold text-sm pl-2">
                             {dict.sidebar.currentOrganization}
                         </span>
                     </div>
@@ -67,10 +66,15 @@ const OrgSelector = (): ReactNode => {
                         <SelectValue placeholder={dict.sidebar.orgPlaceholder} />
                     </SelectTrigger>
                     <SelectContent>
-                        {orgs.data.map(org => (
-                            <SelectItem value={org.id}>
+                        <SelectItem value={currentUser?.organization_id as string}>
+                            <span className="flex items-center gap-2">
+                                {currentUser?.organization.name}
+                            </span>
+                        </SelectItem>
+                        {orgs?.data.map(org => (
+                            <SelectItem value={org.target_organization_id}>
                                 <span className="flex items-center gap-2">
-                                    {org.name}
+                                    {org.target_organization.name}
                                     {currentUser?.organization_id === org.id ? (
                                         <FaCircle size={5} className="text-relif-orange-200" />
                                     ) : undefined}
@@ -79,7 +83,7 @@ const OrgSelector = (): ReactNode => {
                         ))}
                     </SelectContent>
                 </Select>
-            </>
+            </div>
         );
     }
 

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { adminSignUp } from "@/repository/auth.repository";
-import { deletePlatformInviteByCode } from "@/repository/organization.repository";
+import { consumeInvite } from "@/repository/joinPlatformInvites.repository";
 import { getTimezone } from "@/utils/getTimezone";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -60,7 +60,7 @@ const Form = (): ReactNode => {
                 return;
             }
 
-            const { data: invite } = await deletePlatformInviteByCode(code);
+            const { data: invite } = await consumeInvite(code);
 
             await adminSignUp({
                 first_name: data.firstName,

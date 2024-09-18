@@ -1,7 +1,9 @@
 "use client";
 
 import { InputProductModal } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/input.modal";
+import { InputHistory } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/inputHistory.drawer";
 import { OutputProductModal } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/output.modal";
+import { OutputHistory } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/outputHistory.drawer";
 import { RemoveModal } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/inventory/_components/remove.modal";
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +20,14 @@ import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaArrowCircleLeft, FaArrowCircleRight, FaEdit, FaTrash } from "react-icons/fa";
-import { FaBoxesPacking } from "react-icons/fa6";
+import {
+    FaArrowCircleLeft,
+    FaArrowCircleRight,
+    FaEdit,
+    FaHandHoldingHeart,
+    FaTrash,
+} from "react-icons/fa";
+import { FaArrowRightArrowLeft, FaBoxesPacking } from "react-icons/fa6";
 import { IoMdMove } from "react-icons/io";
 import { MdCategory } from "react-icons/md";
 import { SlOptions } from "react-icons/sl";
@@ -36,6 +44,8 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
     const inventoryPath = pathname.split("/").slice(0, 5).join("/");
 
+    const [inputHistoryOpenState, setInputHistoryOpenState] = useState<boolean>(false);
+    const [outputHistoryOpenState, setOutputHistoryOpenState] = useState<boolean>(false);
     const [modalRemoveOpenState, setModalRemoveOpenState] = useState<boolean>(false);
     const [modalInputOpenState, setModalInputOpenState] = useState<boolean>(false);
     const [modalOutputOpenState, setModalOutputOpenState] = useState<boolean>(false);
@@ -49,9 +59,6 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
         petProducts: dict.commons.inventory.card.petProducts,
         pharmacyAndMedications: dict.commons.inventory.card.pharmacyAndMedications,
     };
-
-    // const quantity =
-    //     product?.storage_records.reduce((acc, record) => acc + record.quantity, 0) || 0;
 
     return (
         <li className="w-full h-max p-4 border-b-[1px] border-slate-200 flex justify-between cursor-pointer hover:bg-slate-50/70 lg:gap-4">
@@ -72,18 +79,10 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                 <span className="text-xs text-slate-400 font-regular mt-1 flex items-center gap-1">
                     <FaBoxesPacking className="mr-1" />
                     <span>
-                        {/* {product.storage_records.length <= 0 ? ( */}
-                        {/*    dict.commons.inventory.card.noProductInStock */}
-                        {/* ) : ( */}
-                        {/*    <> */}
-                        {dict.commons.inventory.card.presentIn}{" "}
                         <strong className="text-relif-orange-200">
-                            {/* {product.storage_records.length} */} 999
+                            {product.total_in_storage}
                         </strong>{" "}
-                        {dict.commons.inventory.card.stock}{" "}
-                        <strong className="text-relif-orange-200">999</strong>{" "}
-                        {dict.commons.inventory.card.units} {/* </> */}
-                        {/* )} */}
+                        {dict.commons.inventory.card.units}
                     </span>
                 </span>
             </div>
@@ -95,6 +94,18 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => setInputHistoryOpenState(true)}>
+                            <span className="w-full flex items-center gap-2">
+                                <FaArrowRightArrowLeft />{" "}
+                                {dict.commons.inventory.card.movementHistory}
+                            </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOutputHistoryOpenState(true)}>
+                            <span className="w-full flex items-center gap-2">
+                                <FaHandHoldingHeart /> {dict.commons.inventory.card.donateHistory}
+                            </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`${inventoryPath}/${product.id}/edit`}>
                                 <span className="w-full flex items-center gap-2">
@@ -114,7 +125,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            // disabled={product.storage_records.length <= 0}
+                            disabled={product.total_in_storage <= 0}
                             onClick={() => setModalOutputOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">
@@ -122,7 +133,7 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                            // disabled={product.storage_records.length <= 0}
+                            disabled={product.total_in_storage <= 0}
                             onClick={() => setModalMoveOpenState(true)}
                         >
                             <span className="w-full flex items-center gap-2">
@@ -136,6 +147,18 @@ const Card = ({ refreshList, ...product }: Props): ReactNode => {
                     {formatDate(product.created_at, locale || "en")}
                 </span>
             </div>
+
+            <InputHistory
+                productType={product}
+                openState={inputHistoryOpenState}
+                setOpenState={setInputHistoryOpenState}
+            />
+
+            <OutputHistory
+                productType={product}
+                openState={outputHistoryOpenState}
+                setOpenState={setOutputHistoryOpenState}
+            />
 
             <RemoveModal
                 product={product}

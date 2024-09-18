@@ -132,7 +132,14 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                 <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
                     <Toolbar beneficiary={data as BeneficiarySchema} />
                     <div className="flex flex-col items-center">
-                        <h2 className="text-xl font-semibold text-slate-900">
+                        {data.image_url && (
+                            <img
+                                src={data.image_url}
+                                alt={data.full_name}
+                                className="w-32 h-32 rounded-full object-cover"
+                            />
+                        )}
+                        <h2 className="text-xl font-semibold text-slate-900 mt-4">
                             {convertToTitleCase(data.full_name)}
                         </h2>
                         <span className="text-sm text-slate-500 flex flex-wrap items-center gap-4">

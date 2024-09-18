@@ -1,5 +1,10 @@
 import { client } from "@/lib/axios-client";
-import { AddProductRequest, MoveProductRequest, UpdateProductRequest } from "@/types/product.types";
+import {
+    AddProductRequest,
+    MoveProductRequest,
+    ProductEntry,
+    UpdateProductRequest,
+} from "@/types/product.types";
 import { AxiosResponse } from "axios";
 
 const PREFIX = "product-types";
@@ -45,5 +50,34 @@ export async function reallocateProduct(
         url: `${PREFIX}/${productId}/reallocate`,
         method: "POST",
         data,
+    });
+}
+
+export async function getAllocations(
+    productId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: ProductEntry[] }>> {
+    return client.request({
+        url: `${PREFIX}/${productId}/allocations?offset=${offset}&limit=${limit}`,
+        method: "GET",
+    });
+}
+
+export async function getDonations(
+    productId: string,
+    offset: number,
+    limit: number
+): Promise<AxiosResponse<{ count: number; data: any[] }>> {
+    return client.request({
+        url: `${PREFIX}/${productId}/donations?offset=${offset}&limit=${limit}`,
+        method: "GET",
+    });
+}
+
+export async function getStorageRecords(productId: string): Promise<AxiosResponse> {
+    return client.request({
+        url: `${PREFIX}/${productId}/storage-records`,
+        method: "GET",
     });
 }

@@ -11,6 +11,7 @@ import { SpaceSchema } from "./space.types";
 
 export type BeneficiarySchema = {
     id: string;
+    image_url: string;
     full_name: string;
     email: string;
     documents: DocumentSchema[];

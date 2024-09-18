@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
 import { flattenObject } from "@/utils/flattenObject";
+import { getFromLocalStorage } from "@/utils/localStorage";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Link from "next/link";
@@ -26,6 +27,7 @@ const Toolbar = (): ReactNode => {
 
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const organizationId = pathname.split("/")[3];
+    const currentUser = getFromLocalStorage("r_ud");
 
     const handleDownloadPDF = async () => {
         try {
@@ -75,9 +77,11 @@ const Toolbar = (): ReactNode => {
         }
     };
 
+    const isMyOrganization = currentUser.organization_id === organizationId;
+
     return (
         <div className="flex flex-wrap items-center gap-4">
-            {platformRole === "ORG_ADMIN" && (
+            {platformRole === "ORG_ADMIN" && isMyOrganization && (
                 <Button asChild>
                     <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                         <MdAdd size={16} />

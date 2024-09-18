@@ -19,10 +19,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { reallocateProduct } from "@/repository/inventory.repository";
+import { getStorageRecords, reallocateProduct } from "@/repository/inventory.repository";
 import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { HousingSchema } from "@/types/housing.types";
-import { ProductSchema } from "@/types/product.types";
+import { AllocationSchema, ProductSchema } from "@/types/product.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
@@ -46,6 +46,7 @@ const MoveProductModal = ({
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [housings, setHousings] = useState<HousingSchema[] | []>([]);
+    const [storageRecords, setStorageRecords] = useState<AllocationSchema[] | []>([]);
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [quantity, setQuantity] = useState<number>(0);
@@ -56,18 +57,26 @@ const MoveProductModal = ({
         setIsLoading(true);
         (async () => {
             try {
-                const currUser: UserSchema = await getFromLocalStorage("r_ud");
-                setCurrentUser(currUser);
-                if (currUser && currUser.organization_id) {
-                    const { data: housingResponse } = await findHousingsByOrganizationId(
-                        currUser.organization_id,
-                        0,
-                        9999,
-                        ""
-                    );
-                    setHousings(housingResponse.data);
-                } else {
-                    throw new Error();
+                if (modalOpenState) {
+                    const currUser: UserSchema = await getFromLocalStorage("r_ud");
+                    setCurrentUser(currUser);
+                    if (currUser && currUser.organization_id) {
+                        const promises = [
+                            await findHousingsByOrganizationId(
+                                currUser.organization_id,
+                                0,
+                                9999,
+                                ""
+                            ),
+                            await getStorageRecords(product.id),
+                        ];
+
+                        const [housingsResponse, allocationsResponse] = await Promise.all(promises);
+                        setHousings(housingsResponse.data.data);
+                        setStorageRecords(allocationsResponse.data);
+                    } else {
+                        throw new Error();
+                    }
                 }
             } catch (err) {
                 setError(true);
@@ -75,7 +84,7 @@ const MoveProductModal = ({
                 setIsLoading(false);
             }
         })();
-    }, []);
+    }, [modalOpenState]);
 
     const handleMove = async (): Promise<void> => {
         try {
@@ -151,7 +160,7 @@ const MoveProductModal = ({
                                             <SelectValue placeholder="Select..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {product?.storage_records?.map(storage => (
+                                            {storageRecords?.map(storage => (
                                                 <SelectItem
                                                     key={storage.location.id}
                                                     value={
@@ -164,7 +173,7 @@ const MoveProductModal = ({
                                                     {storage.location.id ===
                                                     currentUser.organization_id
                                                         ? `Organization (${storage.quantity} ${product.unit_type})`
-                                                        : `${storage.location.name} (${storage.quantity} ${product.unit_type})`}
+                                                        : `${storage.location.id} (${storage.quantity} ${product.unit_type})`}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

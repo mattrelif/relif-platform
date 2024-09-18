@@ -41,7 +41,7 @@ const Sidebar = (): ReactNode => {
                 />
             </div>
 
-            {currentUser.organization.type === "COORDINATOR" && platformRole === "ORG_ADMIN" && (
+            {currentUser?.organization.type === "COORDINATOR" && platformRole === "ORG_ADMIN" && (
                 <OrgSelector />
             )}
 

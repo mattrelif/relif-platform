@@ -55,18 +55,20 @@ const InputProductModal = ({
         setIsLoading(true);
         (async () => {
             try {
-                const currUser: UserSchema = await getFromLocalStorage("r_ud");
-                setCurrentUser(currUser);
-                if (currUser && currUser.organization_id) {
-                    const { data: housingResponse } = await findHousingsByOrganizationId(
-                        currUser.organization_id,
-                        0,
-                        9999,
-                        ""
-                    );
-                    setHousings(housingResponse.data);
-                } else {
-                    throw new Error();
+                if (modalOpenState) {
+                    const currUser: UserSchema = await getFromLocalStorage("r_ud");
+                    setCurrentUser(currUser);
+                    if (currUser && currUser.organization_id) {
+                        const { data: housingResponse } = await findHousingsByOrganizationId(
+                            currUser.organization_id,
+                            0,
+                            9999,
+                            ""
+                        );
+                        setHousings(housingResponse.data);
+                    } else {
+                        throw new Error();
+                    }
                 }
             } catch (err) {
                 setError(true);
@@ -74,7 +76,7 @@ const InputProductModal = ({
                 setIsLoading(false);
             }
         })();
-    }, []);
+    }, [modalOpenState]);
 
     const handleAdd = async (): Promise<void> => {
         try {

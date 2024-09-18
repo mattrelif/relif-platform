@@ -62,6 +62,7 @@ const SignInForm = (): ReactNode => {
                 `/${LANGUAGES[responseData.preferences.language as keyof typeof LANGUAGES] || "en"}/app/${responseData.organization_id}`
             );
         } catch (err) {
+            console.log(err);
             setIsLoading(false);
             toast({
                 title: dict.root.toastErrorTitle,

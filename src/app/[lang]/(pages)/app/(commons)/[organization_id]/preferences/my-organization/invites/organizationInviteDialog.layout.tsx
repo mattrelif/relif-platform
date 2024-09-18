@@ -36,6 +36,7 @@ const OrganizationInviteDialog = ({ request, refreshList, children }: Props): Re
                 description:
                     dict.commons.preferences.myOrganization.invites.organization.dialog.toast
                         .requestAcceptedDescription,
+                variant: "success",
             });
         } catch {
             toast({

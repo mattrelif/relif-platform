@@ -33,6 +33,7 @@ const UserInvite = ({ refreshList, ...data }: Props): ReactNode => {
                 description:
                     dict.commons.preferences.myOrganization.invites.user.card
                         .requestRejectedDescription,
+                variant: "success",
             });
         } catch {
             toast({

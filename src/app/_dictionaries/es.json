@@ -1139,7 +1139,20 @@
                 "inputProduct": "Registrar producto",
                 "outputProduct": "Dar de baja al producto",
                 "moveProduct": "Mover a otro inventario",
-                "createdAt": "Creado en"
+                "createdAt": "Creado en",
+                "movementHistory": "Historial de movimientos",
+                "donateHistory": "Historial de donaciones"
+            },
+            "inputHistory": {
+                "productEntryHistory": "Historial de entrada de productos",
+                "from": "De:",
+                "to": "Para:",
+                "location": "Local:"
+            },
+            "outputHistory": {
+                "productDonationHistory": "Historial de donación de productos",
+                "from": "De:",
+                "to": "Para:"
             },
             "edit": {
                 "loading": "Cargando...",

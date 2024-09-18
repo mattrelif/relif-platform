@@ -10,7 +10,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { deleteProduct, getProductById } from "@/repository/inventory.repository";
+import { deleteProduct, getStorageRecords } from "@/repository/inventory.repository";
 import { ProductSchema } from "@/types/product.types";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
@@ -38,18 +38,20 @@ const RemoveModal = ({
     useEffect(() => {
         (async () => {
             try {
-                const { data } = await getProductById(product.id);
+                if (removeDialogOpenState) {
+                    const { data } = await getStorageRecords(product.id);
 
-                if (data.storage_records[0].id) {
-                    setAllowToRemove("UNAVAILABLE");
-                } else {
-                    setAllowToRemove("AVAILABLE");
+                    if (data[0].quantity) {
+                        setAllowToRemove("UNAVAILABLE");
+                    } else {
+                        setAllowToRemove("AVAILABLE");
+                    }
                 }
             } catch {
                 setAllowToRemove("ERROR");
             }
         })();
-    }, []);
+    }, [removeDialogOpenState]);
 
     const handleDelete = async (): Promise<void> => {
         try {

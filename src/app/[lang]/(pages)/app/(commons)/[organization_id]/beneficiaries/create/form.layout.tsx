@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { generateProfileImageUploadLink } from "@/repository/beneficiary.repository";
 import { createBeneficiary } from "@/repository/organization.repository";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import { MdAdd, MdContacts } from "react-icons/md";
 
@@ -26,13 +27,47 @@ const Form = (): ReactNode => {
     const dict = useDictionary();
 
     const [languages, setLanguages] = useState<string[] | []>([]);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     const handleInputChange =
-        (setter: React.Dispatch<React.SetStateAction<string[]>>) =>
-        (event: ChangeEvent<HTMLInputElement>) => {
+        (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
             const values = event.target.value.split(",").map(value => value.trim());
             setter(values);
         };
+
+    const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+        try {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const { data } = await generateProfileImageUploadLink(file.type);
+
+            await fetch(data.link, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": file.type,
+                },
+                body: file,
+            });
+
+            const s3Link = data.link.split("?")[0];
+            setImageUrl(s3Link);
+
+            toast({
+                title: "Upload Successful",
+                description: "The image has been uploaded successfully.",
+                variant: "success",
+            });
+        } catch (err) {
+            setIsUploading(false);
+            toast({
+                title: "Upload Failed",
+                description: "There was an error uploading the image.",
+                variant: "destructive",
+            });
+        }
+    };
 
     const pathname = usePathname();
     const urlPath = pathname.split("/").slice(0, 5).join("/");
@@ -100,6 +135,7 @@ const Form = (): ReactNode => {
                     currentUser.organization_id,
                     {
                         full_name: data.fullName,
+                        image_url: imageUrl || "",
                         birthdate: data.birthdate,
                         email: data.email,
                         gender: data.gender === "other" ? data.otherGender : data.gender,
@@ -184,11 +220,9 @@ const Form = (): ReactNode => {
                 </h1>
 
                 <div className="flex flex-col gap-3 border border-slate-200 p-4 rounded-lg">
-                    <div className="w-full h-max flex items-center justify-center">
-                        <div className="w-[120px] h-[120px] rounded-full bg-red-200"></div>
-                    </div>
                     <Label htmlFor="picture">Picture</Label>
-                    <Input id="picture" type="file" placeholder="teestee" />
+                    <Input id="picture" type="file" onChange={handleImageUpload} />
+                    {isUploading && <p>Uploading image...</p>}
                 </div>
 
                 <div className="flex flex-col gap-3">
