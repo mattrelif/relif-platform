@@ -796,8 +796,8 @@
                 "noVolunteersFound": "No volunteers found...",
                 "card": {
                     "profile": "Profile",
-                    "editVoluntary": "Edit voluntary",
-                    "removeVoluntary": "Remove voluntary",
+                    "editVoluntary": "Edit volunteer",
+                    "removeVoluntary": "Remove volunteer",
                     "createdAt": "Created at"
                 },
                 "remove": {
@@ -812,7 +812,7 @@
                     "removalFailedDescription": "An error occurred while attempting to remove the volunteer. Please try again later or contact support if the issue persists."
                 },
                 "toolbar": {
-                    "createVoluntary": "Create voluntary",
+                    "createVoluntary": "Create volunteer",
                     "downloadCSV": "Download CSV",
                     "downloadPDF": "Download PDF"
                 }
