@@ -95,7 +95,7 @@
         "currentOrganization": "Current Organization",
         "platform": "Platform",
         "home": "Home",
-        "housings": "Housings",
+        "housings": "Housing",
         "beneficiaries": "Beneficiaries",
         "volunteers": "Volunteers",
         "inventory": "Inventory",
@@ -130,7 +130,7 @@
                 "overview": "Overview",
                 "invites": "Invites",
                 "others": "Others",
-                "housings": "Housings",
+                "housings": "Housing",
                 "assistance": "Assistance",
                 "movements": "Movements",
                 "create": "Create",
@@ -404,8 +404,8 @@
         },
         "home": {
             "welcomeToRelif": "Welcome to Relif",
-            "briefOverview": "A brief overview of its operation",
-            "housings": "Housings",
+            "briefOverview": "A brief overview of your operations",
+            "housings": "Housing",
             "volunteers": "Volunteers",
             "products": "Products",
             "occupancyRate": "Occupancy rate",
@@ -581,7 +581,7 @@
                 "confirmMoveDescription": "You are about to move the beneficiary to a different location. Please ensure that this is the intended action before proceeding, as it may affect their current housing arrangements.",
                 "current": "Current",
                 "unallocated": "Unallocated",
-                "noHousingsFound": "No housings found...",
+                "noHousingsFound": "No housing found...",
                 "to": "To",
                 "selectHousingPlaceholder": "Select housing...",
                 "selectSpacePlaceholder": "Select space...",
@@ -1045,8 +1045,8 @@
                     "petProducts": "Pet Products",
                     "pharmacyAndMedications": "Pharmacy and Medications"
                 },
-                "alertTitle": "Assign Quantities and Associate with Housings or Organization After Creation",
-                "alertDescription": "You will be able to assign quantities and link them to specific housings or organization once the creation process is complete.",
+                "alertTitle": "Assign Quantities and Associate with Housing or Organization After Creation",
+                "alertDescription": "You will be able to assign quantities and link them to specific housing or organization once the creation process is complete.",
                 "create": "Create",
                 "loading": "Loading...",
                 "productCreatedSuccessTitle": "Product created successfully!",
@@ -1256,7 +1256,7 @@
             "list": {
                 "loading": "Loading...",
                 "error": "Something went wrong. Please try again later.",
-                "noHousingsFound": "No housings found...",
+                "noHousingsFound": "No housing found...",
                 "card": {
                     "viewOrganization": "View organization",
                     "disableAccess": "Disable access",
@@ -1297,7 +1297,7 @@
                     "createdAt": "Created at",
                     "users": "Users",
                     "search": "Search",
-                    "housings": "Housings"
+                    "housings": "Housing"
                 },
                 "error": {
                     "message": "Something went wrong. Please try again later."
@@ -1314,7 +1314,7 @@
                     "list": {
                         "loading": "Loading...",
                         "error": "Something went wrong. Please try again later.",
-                        "noHousingsFound": "No housings found..."
+                        "noHousingsFound": "No housing found..."
                     }
                 },
                 "users": {
@@ -1370,7 +1370,7 @@
         }
     },
     "housingList": {
-        "breadcrumb": "Housings",
+        "breadcrumb": "Housing",
         "searchPlaceholder": "Search",
         "btnCreate": "Create housing",
         "downloadCsv": "Download CSV",
@@ -1390,7 +1390,7 @@
         "availableBeds": "available beds",
         "loading": "Loading...",
         "error": "Something went wrong. Please try again later.",
-        "notFound": "No housings found..."
+        "notFound": "No housing found..."
     },
     "housingOverview": {
         "btnBack": "Back to list",
