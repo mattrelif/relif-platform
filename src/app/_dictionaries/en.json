@@ -1074,8 +1074,6 @@
                     "logisticsAndStorageSupplies": "Logistics and Storage Supplies",
                     "disinfectionAndDiseaseControlSupplies": "Disinfection and Disease Control Supplies",
                     "culturalAndReligiousItems": "Cultural and Religious Items"
-
-                    
                 },
                 "alertTitle": "Assign Quantities and Associate with Housing or Organization After Creation",
                 "alertDescription": "You will be able to assign quantities and link them to specific housing or organization once the creation process is complete.",
@@ -1272,8 +1270,7 @@
                     "legalAndDocumentationSupport": "Legal and Documentation Support",
                     "logisticsAndStorageSupplies": "Logistics and Storage Supplies",
                     "disinfectionAndDiseaseControlSupplies": "Disinfection and Disease Control Supplies",
-                    "culturalAndReligiousItems": "Cultural and Religious Items"
-                    
+                    "culturalAndReligiousItems": "Cultural and Religious Items"  
                 },
                 "update": "Update",
                 "errorToastTitle": "Error Editing Product",
