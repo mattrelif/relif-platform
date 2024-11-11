@@ -11,6 +11,10 @@ import { getTimezone } from "@/utils/getTimezone";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import Creatable from 'react-select/creatable'; // Importing react-select
+import { roles } from "@/utils/roles"; // Importing roles
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
@@ -18,10 +22,16 @@ const Form = (): ReactNode => {
     const router = useRouter();
 
     const [checkState, setCheckState] = useState<boolean>(false);
+    const [selectedRole, setSelectedRole] = useState<string | null>(null);
+    const [signupSuccess, setSignupSuccess] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [phone, setPhone] = useState<string>("");
+
+    const roleOptions = roles.map((role) => ({ value: role, label: role }));
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
-
+        setLoading(true);
         try {
             const formData: FormData = new FormData(e.target);
 
@@ -36,6 +46,8 @@ const Form = (): ReactNode => {
                 password: string;
                 confirmPassword: string;
             } = Object.fromEntries(formData);
+
+            data.role = selectedRole || data.role;
 
             if (data.password !== data.confirmPassword) {
                 toast({
@@ -53,7 +65,7 @@ const Form = (): ReactNode => {
                 last_name: data.lastName,
                 email: data.email,
                 password: data.password,
-                phones: [`${data.countryCode}_${data.phone}`],
+                phones: [phone],
                 role: data.role,
                 preferences: {
                     language: "english",
@@ -68,17 +80,48 @@ const Form = (): ReactNode => {
                 description: dict.signup.toastSuccessDescription,
                 variant: "success",
             });
+            setSignupSuccess(true);
+            //router.push("/");
+        } catch (err: any) {
+            const errorMessage = err.message === "signup.emailAlreadyExists"
+                ? dict.signup.emailAlreadyExists
+                : dict.signup.toastErrorGenericDescription;
 
-            router.push("/");
-        } catch (err) {
             toast({
                 title: dict.signup.toastErrorTitle,
-                description: dict.signup.toastErrorGenericDescription,
+                description: errorMessage,
                 variant: "destructive",
             });
+        } finally {
+            setLoading(false);
         }
     };
 
+    if (signupSuccess) {
+        // Display the success message after signup
+        return (
+            <div className="w-full max-w-[500px] py-[90px] lg:max-w-full lg:py-10 lg:h-full">
+            <div className="flex flex-col pb-10">
+                <h1 className="font-bold text-3xl text-slate-900">
+                    {dict.signup.emailVerificationTitle}
+                </h1>
+                <p className="text-base text-slate-600">
+                    {dict.signup.emailVerificationMessage}
+                </p>
+            </div>
+
+            {/* Sign In Button */}
+            <div className="w-full flex flex-col items-center mt-6">
+                <Button
+                    variant="link"
+                    onClick={() => router.push("/")}
+                >
+                    {dict.root.btnSignIn} {/* Button text from dictionary */}
+                </Button>
+            </div>
+        </div>
+        );
+    }
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-medium text-sm text-relif-orange-200 mb-6">
@@ -97,28 +140,29 @@ const Form = (): ReactNode => {
 
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="role">{dict.signup.role} *</Label>
-                    <Input
+                    <Creatable
                         id="role"
                         name="role"
-                        type="text"
-                        placeholder="e.g. Director of Human Resources"
+                        options={roleOptions} // Roles data passed to react-select
+                        onChange={(selectedOption) => setSelectedRole(selectedOption?.value || null)}
+                        placeholder="Select or type your role"
+                        isClearable
                         required
                     />
                 </div>
 
                 <div className="flex flex-col gap-3">
                     <Label htmlFor="phone">{dict.signup.phone} *</Label>
-                    <div className="w-full flex gap-2">
-                        <Input
-                            id="countryCode"
-                            name="countryCode"
-                            type="text"
-                            placeholder="e.g. +55"
-                            className="w-[30%]"
-                            required
-                        />
-                        <Input id="phone" name="phone" type="text" required />
-                    </div>
+                    <PhoneInput
+                        country={"us"}
+                        value={phone}
+                        onChange={(value: string) => setPhone(value)}
+                        inputProps={{
+                            name: "phone",
+                            required: true,
+                            autoFocus: true,
+                        }}
+                    />
                 </div>
             </div>
 
@@ -186,9 +230,9 @@ const Form = (): ReactNode => {
                     type="submit"
                     variant="default"
                     className="mt-[43px] w-full"
-                    disabled={!checkState}
+                    disabled={!checkState || loading}
                 >
-                    {dict.signup.btnSignUp}
+                    {loading ? "Signing Up..." : dict.signup.btnSignUp}
                 </Button>
                 <span className="text-sm text-gray-900">
                     {dict.signup.alreadyHaveAnAccount}
