@@ -39,7 +39,10 @@
         "toastSuccessDescription": "¡Usuario registrado con éxito!",
         "toastErrorTitle": "Error en el registro",
         "toastErrorPasswordsDescription": "Las contraseñas no coinciden.",
-        "toastErrorGenericDescription": "Ocurrió un error al registrar al usuario. Por favor, inténtalo de nuevo."
+        "toastErrorGenericDescription": "Ocurrió un error al registrar al usuario. Por favor, inténtalo de nuevo.",
+        "emailAlreadyExists": "El correo electrónico ya existe. Inicia sesión o usa una dirección de correo electrónico diferente.",
+        "emailVerificationTitle": "Verificación de Correo Electrónico Requerida",
+        "emailVerificationMessage": "Se ha enviado un enlace de verificación a su dirección de correo electrónico. Por favor, revise su bandeja de entrada (y la carpeta de spam, si es necesario) y siga las instrucciones para verificar su cuenta."
     },
     "forgotPassword": {
         "title": "¿Olvidaste tu contraseña?",
@@ -1416,7 +1419,7 @@
         "searchInventoryPlaceholder": "Buscar",
         "btnManage": "Gestionar",
         "inventoryUnits": "unidades",
-        "dropdownInventoryReceive":  "Recibir producto",
+        "dropdownInventoryReceive": "Recibir producto",
         "dropdownInventoryWriteOff": "Dar de baja producto",
         "dropdownInventoryMove": "Transferir a otro inventario",
         "previousPage": "Anterior",

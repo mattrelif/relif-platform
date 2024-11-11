@@ -39,7 +39,10 @@
         "toastSuccessDescription": "Usuário cadastrado com sucesso!",
         "toastErrorTitle": "Erro no cadastro",
         "toastErrorPasswordsDescription": "As senhas não correspondem.",
-        "toastErrorGenericDescription": "Ocorreu um erro ao cadastrar o usuário. Por favor, tente novamente."
+        "toastErrorGenericDescription": "Ocorreu um erro ao cadastrar o usuário. Por favor, tente novamente.",
+        "emailAlreadyExists": "O email já existe. Faça login ou use um endereço de email diferente.",
+        "emailVerificationTitle": "Verificação de E-mail Necessária",
+        "emailVerificationMessage": "Um link de verificação foi enviado para o seu endereço de e-mail. Verifique sua caixa de entrada (e a pasta de spam, se necessário) e siga as instruções para verificar sua conta."
     },
     "forgotPassword": {
         "title": "Esqueceu a senha?",
@@ -1416,7 +1419,7 @@
         "searchInventoryPlaceholder": "Buscar",
         "btnManage": "Gerenciar",
         "inventoryUnits": "unidades",
-        "dropdownInventoryReceive":  "Receber produto",
+        "dropdownInventoryReceive": "Receber produto",
         "dropdownInventoryWriteOff": "Dar baixa em produto",
         "dropdownInventoryMove": "Transferir para outro inventário",
         "previousPage": "Anterior",

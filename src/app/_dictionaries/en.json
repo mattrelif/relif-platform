@@ -39,7 +39,10 @@
         "toastSuccessDescription": "User registered successfully!",
         "toastErrorTitle": "Registration Error",
         "toastErrorPasswordsDescription": "Passwords do not match.",
-        "toastErrorGenericDescription": "An error occurred while registering the user. Please try again."
+        "toastErrorGenericDescription": "An error occurred while registering the user. Please try again.",
+        "emailAlreadyExists": "Email already exists. Please sign in or use a different email address.",
+        "emailVerificationTitle": "Email Verification Required",
+        "emailVerificationMessage": "A verification link has been sent to your email address. Please check your inbox (and spam folder, if necessary) and follow the instructions to verify your account."
     },
     "forgotPassword": {
         "title": "Forgot password?",
