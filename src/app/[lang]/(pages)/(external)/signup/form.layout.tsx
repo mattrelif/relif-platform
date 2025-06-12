@@ -9,17 +9,25 @@ import { useToast } from "@/components/ui/use-toast";
 import { signUp } from "@/repository/auth.repository";
 import { getTimezone } from "@/utils/getTimezone";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import Creatable from 'react-select/creatable'; // Importing react-select
-import { roles } from "@/utils/roles"; // Importing roles
+import Creatable from 'react-select/creatable';
+import { ActionMeta, OnChangeValue } from "react-select";
+import { roles } from "@/utils/roles";
+import { cn } from "@/lib/utils";
+
+interface RoleOption {
+    value: string;
+    label: string;
+}
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
     const dict = useDictionary();
     const router = useRouter();
+    const params = useParams();
 
     const [checkState, setCheckState] = useState<boolean>(false);
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -27,7 +35,14 @@ const Form = (): ReactNode => {
     const [loading, setLoading] = useState<boolean>(false);
     const [phone, setPhone] = useState<string>("");
 
-    const roleOptions = roles.map((role) => ({ value: role, label: role }));
+    const lang = params.lang as keyof typeof roles;
+    const englishRoles = roles.en;
+    const translatedRoles = roles[lang] || roles.en;
+
+    const roleOptions: RoleOption[] = englishRoles.map((role: string, index: number) => ({
+        value: role,
+        label: translatedRoles[index]
+    }));
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -143,11 +158,49 @@ const Form = (): ReactNode => {
                     <Creatable
                         id="role"
                         name="role"
-                        options={roleOptions} // Roles data passed to react-select
-                        onChange={(selectedOption) => setSelectedRole(selectedOption?.value || null)}
-                        placeholder="Select or type your role"
+                        options={roleOptions}
+                        onChange={(selectedOption: OnChangeValue<RoleOption, false>) => setSelectedRole(selectedOption?.value || null)}
+                        placeholder={dict.signup.rolePlaceholder}
                         isClearable
                         required
+                        styles={{
+                            control: (base, state) => ({
+                                ...base,
+                                height: "40px",
+                                minHeight: "40px",
+                                width: "100%",
+                                borderRadius: "0.375rem",
+                                borderWidth: "1px",
+                                borderColor: state.isFocused ? "#E5855B" : "#e2e8f0",
+                                boxShadow: state.isFocused ? "0 0 0 1px #E5855B" : "none",
+                                fontSize: "0.8rem",
+                                "&:hover": {
+                                    borderColor: state.isFocused ? "#E5855B" : "#e2e8f0",
+                                },
+                            }),
+                            input: (base) => ({
+                                ...base,
+                                margin: "0",
+                                padding: "0",
+                                color: "#0f172a",
+                                fontSize: "0.8rem",
+                            }),
+                            valueContainer: (base) => ({
+                                ...base,
+                                padding: "0 0.75rem",
+                                gap: "0.25rem",
+                            }),
+                            placeholder: (base) => ({
+                                ...base,
+                                color: "#94a3b8",
+                                fontSize: "0.8rem",
+                            }),
+                            singleValue: (base) => ({
+                                ...base,
+                                color: "#0f172a",
+                                fontSize: "0.8rem",
+                            }),
+                        }}
                     />
                 </div>
 
@@ -157,10 +210,21 @@ const Form = (): ReactNode => {
                         country={"us"}
                         value={phone}
                         onChange={(value: string) => setPhone(value)}
+                        containerClass="w-full"
+                        inputStyle={{
+                            height: "40px",
+                            width: "100%",
+                            borderColor: "#e2e8f0",
+                            borderRadius: "0.375rem",
+                            fontSize: "0.8rem",
+                        }}
+                        buttonStyle={{
+                            borderColor: "#e2e8f0",
+                            borderRadius: "0.375rem 0 0 0.375rem",
+                        }}
                         inputProps={{
                             name: "phone",
                             required: true,
-                            autoFocus: true,
                         }}
                     />
                 </div>

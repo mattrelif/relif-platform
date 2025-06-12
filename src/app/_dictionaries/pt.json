@@ -22,6 +22,7 @@
         "firstName": "Nome",
         "lastName": "Sobrenome",
         "role": "Função",
+        "rolePlaceholder": "Selecione ou digite sua função",
         "phone": "Telefone",
         "yourCredentials": "Suas credenciais",
         "email": "E-mail",
