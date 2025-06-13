@@ -12,9 +12,14 @@ export default function Layout({ children }: { children: ReactNode }): ReactNode
     const router = useRouter();
     const dict = useDictionary();
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        if (process.env.NODE_ENV === "development") {
+            setIsLoading(false);
+            return;
+        }
+
         (async () => {
             try {
                 setIsLoading(true);

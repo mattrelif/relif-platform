@@ -18,7 +18,10 @@ import { FaHouseChimneyUser, FaUserNurse, FaUsers } from "react-icons/fa6";
 const Content = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
-    const organizationId = pathname.split("/")[3];
+    const organizationId =
+        process.env.NODE_ENV === "development"
+            ? "00000000-0000-0000-0000-000000000000"
+            : pathname.split("/")[3];
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -29,6 +32,31 @@ const Content = (): ReactNode => {
     const [products, setProducts] = useState(0);
 
     useEffect(() => {
+        if (process.env.NODE_ENV === "development") {
+            const mockHousings: HousingSchema[] = Array.from({ length: 10 }, (_, i) => ({
+                id: `mock-id-${i}`,
+                organization_id: "00000000-0000-0000-0000-000000000000",
+                name: `Mock Housing ${i + 1}`,
+                status: "active",
+                address: {
+                    address_line_1: `${i + 1} Mock Street`,
+                    address_line_2: `Apt ${i}`,
+                    city: "Mockville",
+                    district: "Mockton",
+                    zip_code: "12345",
+                    country: "Mockland",
+                },
+                occupied_vacancies: Math.floor(Math.random() * 10),
+                total_vacancies: 10,
+                total_rooms: 5,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            }));
+            setHousings(mockHousings);
+            setIsLoading(false);
+            return;
+        }
+
         (async () => {
             try {
                 const OFFSET = 0;
@@ -134,12 +162,12 @@ const Content = (): ReactNode => {
                     </div>
                 </div>
             </div>
-            <div className="w-full h-[calc(100vh-390px)] border border-slate-200 rounded-lg mt-4 overflow-hidden">
+            <div className="w-full h-[calc(100vh-390px)] border border-slate-200 rounded-lg mt-4 flex flex-col">
                 <h3 className="text-slate-900 font-bold text-base p-4 bg-slate-50/50 flex items-center gap-2 border-b border-slate-200">
                     <FaHouseChimneyUser />
                     {dict.commons.home.occupancyRate}
                 </h3>
-                <ul className="w-full h-full overflow-x-hidden overflow-y-scroll">
+                <ul className="w-full h-full overflow-y-auto">
                     {housings?.map(housing => <HousingCard key={housing.id} {...housing} />)}
                 </ul>
             </div>
