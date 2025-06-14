@@ -115,7 +115,7 @@ const CreateOrganization = (): ReactNode => {
 
   return (
     <section className="flex items-center justify-center min-h-[calc(100vh-100px)] w-full bg-gradient-to-br from-slate-100 via-white to-slate-200 py-10">
-      <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+      <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-xl shadow-lg">
         <header className="bg-relif-orange-200 text-white py-6 px-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <FaRegBuilding size={32} />
@@ -123,7 +123,7 @@ const CreateOrganization = (): ReactNode => {
           </div>
         </header>
         <form
-          className="flex flex-col gap-8 p-8"
+          className="flex flex-col gap-8 p-8 overflow-y-auto max-h-[60vh]"
           onSubmit={handleSubmit}
         >
           {/* Logo upload section */}
