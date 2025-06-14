@@ -61,7 +61,7 @@ const CreateOrganization = (): ReactNode => {
       const { data: responseData } = await createOrganization({
         name: data.name,
         description: data.description,
-        areas_of_operation: selectedAreas,
+        areas_of_work: selectedAreas,
         logo: logoPreview,
         address: {
           address_line_1: data.addressLine1,
