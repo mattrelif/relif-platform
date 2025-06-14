@@ -12,26 +12,6 @@ import { useState, FormEvent, ChangeEvent, ReactNode } from "react";
 import { FaMapMarkerAlt, FaRegBuilding, FaUpload } from "react-icons/fa";
 import Image from "next/image";
 
-const AREAS_OF_OPERATION = [
-  "Disaster Response",
-  "Health & Medical",
-  "Food Security & Nutrition",
-  "Shelter & Housing",
-  "Water, Sanitation & Hygiene (WASH)",
-  "Education",
-  "Protection & Human Rights",
-  "Livelihoods & Economic Recovery",
-  "Logistics & Supply Chain",
-  "Camp Coordination & Management",
-  "Environment & Climate Action",
-  "Child Protection",
-  "Gender-Based Violence (GBV)",
-  "Migration & Refugee Assistance",
-  "Community Development",
-  "Peacebuilding & Conflict Resolution",
-  "Advocacy & Policy"
-];
-
 const CreateOrganization = (): ReactNode => {
   const router = useRouter();
   const { toast } = useToast();
@@ -162,7 +142,7 @@ const CreateOrganization = (): ReactNode => {
                 <Input id="name" name="name" type="text" required />
               </div>
               <div className="flex flex-col gap-2 mt-4">
-                <Label htmlFor="description">Description *</Label>
+                <Label htmlFor="description">{dict.createOrganization.description} *</Label>
                 <textarea
                   id="description"
                   name="description"
@@ -176,9 +156,9 @@ const CreateOrganization = (): ReactNode => {
           </div>
           {/* Areas of operation */}
           <div className="flex flex-col gap-3">
-            <Label className="mb-1">Areas of Operation *</Label>
+            <Label className="mb-1">{dict.createOrganization.areasOfOperation} *</Label>
             <div className="flex flex-wrap gap-2">
-              {AREAS_OF_OPERATION.map((area) => (
+              {dict.createOrganization.areasOfOperationList.map((area) => (
                 <button
                   key={area}
                   type="button"
@@ -195,7 +175,7 @@ const CreateOrganization = (): ReactNode => {
               ))}
             </div>
             {selectedAreas.length === 0 && (
-              <span className="text-xs text-red-500 mt-1">Please select at least one area.</span>
+              <span className="text-xs text-red-500 mt-1">{dict.createOrganization.selectAtLeastOneArea}</span>
             )}
           </div>
           {/* Address section */}
