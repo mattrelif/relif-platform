@@ -92,11 +92,10 @@ const Form = (): ReactNode => {
 
             toast({
                 title: dict.signup.toastSuccessTitle,
-                description: dict.signup.toastSuccessDescription,
+                description: "You can now log in with your new account.",
                 variant: "success",
             });
-            setSignupSuccess(true);
-            //router.push("/");
+            router.push(`/${params.lang}/login`);
         } catch (err: any) {
             const errorMessage = err.message === "signup.emailAlreadyExists"
                 ? dict.signup.emailAlreadyExists
@@ -112,31 +111,6 @@ const Form = (): ReactNode => {
         }
     };
 
-    if (signupSuccess) {
-        // Display the success message after signup
-        return (
-            <div className="w-full max-w-[500px] py-[90px] lg:max-w-full lg:py-10 lg:h-full">
-            <div className="flex flex-col pb-10">
-                <h1 className="font-bold text-3xl text-slate-900">
-                    {dict.signup.emailVerificationTitle}
-                </h1>
-                <p className="text-base text-slate-600">
-                    {dict.signup.emailVerificationMessage}
-                </p>
-            </div>
-
-            {/* Sign In Button */}
-            <div className="w-full flex flex-col items-center mt-6">
-                <Button
-                    variant="link"
-                    onClick={() => router.push("/")}
-                >
-                    {dict.root.btnSignIn} {/* Button text from dictionary */}
-                </Button>
-            </div>
-        </div>
-        );
-    }
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="border-b-[1px] border-dashed border-slate-200 pb-2 font-medium text-sm text-relif-orange-200 mb-6">
