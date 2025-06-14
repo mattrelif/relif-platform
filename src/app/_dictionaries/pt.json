@@ -93,7 +93,29 @@
         "zipCode": "CEP / Código Postal",
         "country": "País",
         "btnCreate": "Criar Organização",
-        "loading": "Carregando..."
+        "loading": "Carregando...",
+        "areasOfOperation": "Áreas de Operação",
+        "selectAtLeastOneArea": "Por favor, selecione pelo menos uma área.",
+        "description": "Descrição",
+        "areasOfOperationList": [
+            "Resposta a Desastres",
+            "Saúde e Medicina",
+            "Segurança Alimentar e Nutrição",
+            "Abrigo e Habitação",
+            "Água, Saneamento e Higiene (WASH)",
+            "Educação",
+            "Proteção e Direitos Humanos",
+            "Meios de Subsistência e Recuperação Econômica",
+            "Logística e Cadeia de Suprimentos",
+            "Coordenação e Gestão de Campos",
+            "Meio Ambiente e Ação Climática",
+            "Proteção Infantil",
+            "Violência Baseada em Gênero (VBG)",
+            "Migração e Assistência a Refugiados",
+            "Desenvolvimento Comunitário",
+            "Construção da Paz e Resolução de Conflitos",
+            "Advocacia e Políticas"
+        ]
     },
     "sidebar": {
         "currentOrganization": "Organização Atual",
