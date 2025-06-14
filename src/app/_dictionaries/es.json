@@ -92,7 +92,7 @@
         "state": "Estado / Provincia",
         "zipCode": "Código Postal",
         "country": "País",
-        "btnCreate": "Crear",
+        "btnCreate": "Crear Organización",
         "loading": "Cargando..."
     },
     "sidebar": {
