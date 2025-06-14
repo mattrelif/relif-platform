@@ -94,16 +94,18 @@ const CreateOrganization = (): ReactNode => {
   };
 
   return (
-    <section className="flex items-center justify-center min-h-[calc(100vh-100px)] w-full bg-gradient-to-br from-slate-100 via-white to-slate-200 py-10">
-      <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-xl shadow-lg">
-        <header className="bg-relif-orange-200 text-white py-6 px-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200">
+    <section className="flex items-center justify-center min-h-screen w-full bg-slate-50 py-8">
+      <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-xl shadow-lg">
+        {/* Simple header */}
+        <div className="border-b border-slate-200 px-8 py-6">
           <div className="flex items-center gap-3">
-            <FaRegBuilding size={32} />
-            <span className="font-bold text-2xl">{dict.createOrganization.title}</span>
+            <FaRegBuilding size={24} className="text-relif-orange-200" />
+            <h1 className="text-2xl font-bold text-slate-800">{dict.createOrganization.title}</h1>
           </div>
-        </header>
+        </div>
+        
         <form
-          className="flex flex-col gap-8 p-8 overflow-y-auto max-h-[60vh]"
+          className="flex flex-col gap-8 p-8 overflow-y-auto max-h-[75vh]"
           onSubmit={handleSubmit}
         >
           {/* Logo upload section */}
