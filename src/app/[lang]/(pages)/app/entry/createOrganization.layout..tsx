@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { createOrganization } from "@/repository/organization.repository";
 import { getFromLocalStorage, updateLocalStorage } from "@/utils/localStorage";
 import { useRouter } from "next/navigation";
-import { ReactNode, useState } from "react";
+import { useState, FormEvent, ChangeEvent, ReactNode } from "react";
 import { FaMapMarkerAlt, FaRegBuilding, FaUpload } from "react-icons/fa";
 import Image from "next/image";
 
@@ -41,7 +41,7 @@ const CreateOrganization = (): ReactNode => {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -53,41 +53,36 @@ const CreateOrganization = (): ReactNode => {
   };
 
   const handleAreaToggle = (area: string) => {
-    setSelectedAreas((prev) =>
+    setSelectedAreas((prev: string[]) =>
       prev.includes(area)
-        ? prev.filter((a) => a !== area)
+        ? prev.filter((a: string) => a !== area)
         : [...prev, area]
     );
   };
 
-  const handleSubmit = async (e: any): Promise<void> => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const formData: FormData = new FormData(e.target);
+      const formData: FormData = new FormData(e.currentTarget);
 
-      // @ts-ignore
-      const data: {
-        name: string;
-        description: string;
-        addressLine1: string;
-        addressLine2: string;
-        city: string;
-        postalCode: string;
-        state: string;
-        country: string;
-      } = Object.fromEntries(formData);
-
-      // For now, just simulating logo and areas of operation
-      // In production, you should upload logo to storage and save the URL
-      // and also handle areas as needed by your backend
+      const data = {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        addressLine1: formData.get("addressLine1") as string,
+        addressLine2: formData.get("addressLine2") as string,
+        city: formData.get("city") as string,
+        postalCode: formData.get("postalCode") as string,
+        state: formData.get("state") as string,
+        country: formData.get("country") as string,
+      };
 
       const { data: responseData } = await createOrganization({
         name: data.name,
         description: data.description,
         areas_of_operation: selectedAreas,
-        logo: logoPreview, // Or upload and set the returned URL
+        logo: logoPreview,
         address: {
           address_line_1: data.addressLine1,
           address_line_2: data.addressLine2,
@@ -101,7 +96,7 @@ const CreateOrganization = (): ReactNode => {
       const organizationID = responseData.id;
 
       const currentUser = await getFromLocalStorage("r_ud");
-      updateLocalStorage("r_ud", {
+      await updateLocalStorage("r_ud", {
         ...currentUser,
         platform_role: "ORG_ADMIN",
         organization_id: organizationID,
