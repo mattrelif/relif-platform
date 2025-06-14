@@ -93,7 +93,29 @@
         "zipCode": "Zip / Postal Code",
         "country": "Country",
         "btnCreate": "Create Organization",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "areasOfOperation": "Areas of Operation",
+        "selectAtLeastOneArea": "Please select at least one area.",
+        "description": "Description",
+        "areasOfOperationList": [
+            "Disaster Response",
+            "Health & Medical",
+            "Food Security & Nutrition",
+            "Shelter & Housing",
+            "Water, Sanitation & Hygiene (WASH)",
+            "Education",
+            "Protection & Human Rights",
+            "Livelihoods & Economic Recovery",
+            "Logistics & Supply Chain",
+            "Camp Coordination & Management",
+            "Environment & Climate Action",
+            "Child Protection",
+            "Gender-Based Violence (GBV)",
+            "Migration & Refugee Assistance",
+            "Community Development",
+            "Peacebuilding & Conflict Resolution",
+            "Advocacy & Policy"
+        ]
     },
     "sidebar": {
         "currentOrganization": "Current Organization",
