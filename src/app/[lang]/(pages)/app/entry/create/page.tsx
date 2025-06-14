@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { CreateOrganization } from "../createOrganization.layout.";
+import CreateOrganization from "../createOrganization.layout";
 
 export default function Page(): ReactNode {
     return (
