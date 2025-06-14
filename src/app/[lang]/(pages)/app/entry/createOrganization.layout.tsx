@@ -168,7 +168,7 @@ const CreateOrganization = (): ReactNode => {
                   name="description"
                   required
                   rows={3}
-                  className="border border-slate-200 rounded-md p-2 focus:outline-relif-orange-200 resize-none"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                   placeholder="Describe your organization..."
                 />
               </div>
@@ -217,7 +217,7 @@ const CreateOrganization = (): ReactNode => {
                 <Input id="city" name="city" type="text" required />
               </div>
               <div className="flex flex-col gap-1">
-                <Label htmlFor="postalCode">{dict.createOrganization.postalCode} *</Label>
+                <Label htmlFor="postalCode">{dict.createOrganization.zipCode} *</Label>
                 <Input id="postalCode" name="postalCode" type="text" required />
               </div>
               <div className="flex flex-col gap-1">
@@ -237,7 +237,7 @@ const CreateOrganization = (): ReactNode => {
               disabled={isLoading || selectedAreas.length === 0}
               className="px-8 py-2 text-lg font-semibold"
             >
-              {isLoading ? dict.loading : dict.createOrganization.submit}
+              {isLoading ? dict.loading : dict.createOrganization.btnCreate}
             </Button>
           </div>
         </form>
