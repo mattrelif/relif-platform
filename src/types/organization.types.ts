@@ -5,6 +5,8 @@ export type OrganizationSchema = {
     id: string;
     name: string;
     description: string;
+    logo?: string;
+    areas_of_work?: string[];
     address: AddressSchema;
     type: string;
     creator_id: string;
@@ -39,12 +41,16 @@ export type OrganizationDataAccessRequestSchema = {
 export type CreateOrganizationRequest = {
     name: string;
     description: string;
+    logo?: string;
+    areas_of_work?: string[];
     address: AddressSchema;
 };
 
 export type UpdateOrganizationRequest = {
     name: string;
     description: string;
+    logo?: string;
+    areas_of_work?: string[];
     address: AddressSchema;
 };
 

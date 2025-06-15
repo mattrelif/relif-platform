@@ -10,8 +10,10 @@ import { findOrganizationByID, updateOrganization } from "@/repository/organizat
 import { OrganizationSchema } from "@/types/organization.types";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, ChangeEvent } from "react";
 import { MdError, MdSave } from "react-icons/md";
+import { FaUpload, FaRegBuilding } from "react-icons/fa";
+import Image from "next/image";
 
 const Form = (): ReactNode => {
     const { toast } = useToast();
@@ -21,6 +23,8 @@ const Form = (): ReactNode => {
     const [orgData, setOrgData] = useState<OrganizationSchema | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+    const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -30,6 +34,14 @@ const Form = (): ReactNode => {
                 if (currentUser.organization_id) {
                     const response = await findOrganizationByID(currentUser.organization_id);
                     setOrgData(response.data);
+                    
+                    // Set initial logo and areas
+                    if (response.data.logo) {
+                        setLogoPreview(response.data.logo);
+                    }
+                    if (response.data.areas_of_work) {
+                        setSelectedAreas(response.data.areas_of_work);
+                    }
                 } else {
                     throw new Error();
                 }
@@ -40,6 +52,25 @@ const Form = (): ReactNode => {
             }
         })();
     }, []);
+
+    const handleLogoChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => setLogoPreview(reader.result as string);
+            reader.readAsDataURL(file);
+        } else {
+            setLogoPreview(orgData?.logo || null);
+        }
+    };
+
+    const handleAreaToggle = (area: string) => {
+        setSelectedAreas((prev: string[]) =>
+            prev.includes(area)
+                ? prev.filter((a: string) => a !== area)
+                : [...prev, area]
+        );
+    };
 
     const handleSubmit = async (e: any): Promise<void> => {
         e.preventDefault();
@@ -62,6 +93,8 @@ const Form = (): ReactNode => {
                 await updateOrganization(orgData.id, {
                     description: data.description,
                     name: orgData.name,
+                    logo: logoPreview || undefined,
+                    areas_of_work: selectedAreas.length > 0 ? selectedAreas : undefined,
                     address: {
                         address_line_1: data.addressLine1,
                         address_line_2: data.addressLine2,
@@ -137,6 +170,75 @@ const Form = (): ReactNode => {
                                 defaultValue={orgData?.description}
                                 readOnly={platformRole !== "ORG_ADMIN"}
                             />
+                        </div>
+
+                        {/* Logo Upload Section */}
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="logo">
+                                {dict.commons.preferences.myOrganization.overview.logo}
+                            </Label>
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-relif-orange-200 bg-slate-50 flex items-center justify-center">
+                                    {logoPreview ? (
+                                        <Image
+                                            src={logoPreview}
+                                            alt="Organization Logo"
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <FaRegBuilding size={24} className="text-slate-300" />
+                                    )}
+                                </div>
+                                {platformRole === "ORG_ADMIN" && (
+                                    <div className="flex flex-col gap-2">
+                                        <Label
+                                            htmlFor="logo"
+                                            className="cursor-pointer flex items-center gap-2 text-sm text-relif-orange-200 hover:underline"
+                                        >
+                                            <FaUpload size={12} />
+                                            {dict.commons.preferences.myOrganization.overview.uploadLogo}
+                                        </Label>
+                                        <Input
+                                            id="logo"
+                                            name="logo"
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleLogoChange}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Areas of Work Section */}
+                        <div className="flex flex-col gap-3">
+                            <Label>
+                                {dict.commons.preferences.myOrganization.overview.areasOfWork}
+                            </Label>
+                            <div className="flex flex-wrap gap-2">
+                                {dict.createOrganization.areasOfOperationList.map((area: string) => (
+                                    <button
+                                        key={area}
+                                        type="button"
+                                        disabled={platformRole !== "ORG_ADMIN"}
+                                        className={`px-3 py-1 mb-1 rounded-full border text-sm transition font-medium ${
+                                            selectedAreas.includes(area)
+                                                ? "bg-relif-orange-200 text-white border-relif-orange-200 shadow"
+                                                : "bg-white text-relif-orange-200 border-relif-orange-200 hover:bg-relif-orange-100"
+                                        } ${
+                                            platformRole !== "ORG_ADMIN" 
+                                                ? "opacity-50 cursor-not-allowed" 
+                                                : "cursor-pointer"
+                                        }`}
+                                        onClick={() => platformRole === "ORG_ADMIN" && handleAreaToggle(area)}
+                                        aria-pressed={selectedAreas.includes(area)}
+                                    >
+                                        {area}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
