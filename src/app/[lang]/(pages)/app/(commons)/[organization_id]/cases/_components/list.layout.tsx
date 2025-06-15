@@ -16,22 +16,14 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { CaseSchema } from "@/types/case.types";
-import { getCasesByOrganizationID } from "@/repository/organization.repository";
+import { CaseSchema, CaseStatsSchema } from "@/types/case.types";
+import { getCasesByOrganizationID, getCaseStats } from "@/repository/organization.repository";
 import { usePathname } from "next/navigation";
 import { FaFileAlt, FaClock, FaCheckCircle, FaExclamationTriangle, FaCalendarAlt } from 'react-icons/fa';
 import { format } from "date-fns";
 
 import { Card as CaseCard } from "./card.layout";
 import { CaseToolbar as Toolbar } from "./toolbar.layout";
-
-// Mock stats data
-const mockStats = {
-    total_cases: 145,
-    open_cases: 23, 
-    overdue_cases: 5,
-    closed_this_month: 12
-};
 
 // Filter types
 interface CaseFilters {
@@ -84,198 +76,11 @@ const filterOptions = {
     ]
 };
 
-// Mock data for testing - matches CaseSchema structure
-const mockCases: CaseSchema[] = [
-    {
-        id: "case-001",
-        case_number: "CASE-2024-001",
-        title: "Emergency Housing Request",
-        description: "Family of 4 needs immediate temporary housing after apartment fire",
-        case_type: "HOUSING",
-        status: "IN_PROGRESS",
-        priority: "HIGH",
-        urgency_level: "IMMEDIATE",
-        beneficiary_id: "ben-001",
-        beneficiary: {
-            id: "ben-001",
-            first_name: "Maria",
-            last_name: "Santos",
-            full_name: "Maria Santos",
-            email: "maria.santos@email.com",
-            phone: "+1234567890",
-            current_address: "123 Fire Damaged St, City",
-            image_url: ""
-        },
-        assigned_to_id: "user-001",
-        assigned_to: {
-            id: "user-001",
-            first_name: "John",
-            last_name: "Smith",
-            email: "john.smith@org.com"
-        },
-        due_date: "2024-02-15",
-        estimated_duration: "2_WEEKS",
-        budget_allocated: "$1,200",
-        tags: ["emergency", "housing", "family"],
-        notes_count: 5,
-        documents_count: 3,
-        last_activity: "2024-01-10T14:30:00Z",
-        created_at: "2024-01-01T09:00:00Z",
-        updated_at: "2024-01-10T14:30:00Z"
-    },
-    {
-        id: "case-002",
-        case_number: "CASE-2024-002",
-        title: "Legal Documentation Support",
-        description: "Assistance needed with immigration paperwork",
-        case_type: "LEGAL",
-        status: "OPEN",
-        priority: "MEDIUM",
-        urgency_level: "WITHIN_MONTH",
-        beneficiary_id: "ben-002",
-        beneficiary: {
-            id: "ben-002",
-            first_name: "Carlos",
-            last_name: "Rodriguez",
-            full_name: "Carlos Rodriguez",
-            email: "carlos.rodriguez@email.com",
-            phone: "+1234567891",
-            current_address: "456 Legal Ave, City",
-            image_url: ""
-        },
-        assigned_to_id: "user-002",
-        assigned_to: {
-            id: "user-002",
-            first_name: "Sarah",
-            last_name: "Johnson",
-            email: "sarah.johnson@org.com"
-        },
-        due_date: "2024-02-20",
-        estimated_duration: "1_MONTH",
-        budget_allocated: "$500",
-        tags: ["legal", "immigration", "documentation"],
-        notes_count: 2,
-        documents_count: 8,
-        last_activity: "2024-01-15T16:45:00Z",
-        created_at: "2024-01-05T14:00:00Z",
-        updated_at: "2024-01-15T16:45:00Z"
-    },
-    {
-        id: "case-003",
-        case_number: "CASE-2024-003",
-        title: "Medical Appointment Coordination",
-        description: "Schedule and coordinate multiple medical appointments",
-        case_type: "MEDICAL",
-        status: "CLOSED",
-        priority: "LOW",
-        urgency_level: "FLEXIBLE",
-        beneficiary_id: "ben-003",
-        beneficiary: {
-            id: "ben-003",
-            first_name: "Ana",
-            last_name: "Lopez",
-            full_name: "Ana Lopez",
-            email: "ana.lopez@email.com",
-            phone: "+1234567892",
-            current_address: "789 Medical St, City",
-            image_url: ""
-        },
-        assigned_to_id: "user-001",
-        assigned_to: {
-            id: "user-001",
-            first_name: "John",
-            last_name: "Smith",
-            email: "john.smith@org.com"
-        },
-        due_date: "2024-01-25",
-        estimated_duration: "3_MONTHS",
-        budget_allocated: "$300",
-        tags: ["medical", "appointments", "coordination"],
-        notes_count: 8,
-        documents_count: 2,
-        last_activity: "2024-01-25T17:00:00Z",
-        created_at: "2024-01-02T08:30:00Z",
-        updated_at: "2024-01-25T17:00:00Z"
-    },
-    {
-        id: "case-004",
-        case_number: "CASE-2024-004",
-        title: "Family Support Services",
-        description: "Comprehensive support services for family in crisis",
-        case_type: "SUPPORT",
-        status: "IN_PROGRESS",
-        priority: "URGENT",
-        urgency_level: "WITHIN_WEEK",
-        beneficiary_id: "ben-004",
-        beneficiary: {
-            id: "ben-004",
-            first_name: "Ahmed",
-            last_name: "Hassan",
-            full_name: "Ahmed Hassan",
-            email: "ahmed.hassan@email.com",
-            phone: "+1234567893",
-            current_address: "321 Support Ave, City",
-            image_url: ""
-        },
-        assigned_to_id: "user-003",
-        assigned_to: {
-            id: "user-003",
-            first_name: "Lisa",
-            last_name: "Chen",
-            email: "lisa.chen@org.com"
-        },
-        due_date: "2024-02-10",
-        estimated_duration: "6_MONTHS",
-        budget_allocated: "$2,000",
-        tags: ["family", "crisis", "support", "urgent"],
-        notes_count: 12,
-        documents_count: 6,
-        last_activity: "2024-01-20T09:30:00Z",
-        created_at: "2024-01-10T12:00:00Z",
-        updated_at: "2024-01-20T09:30:00Z"
-    },
-    {
-        id: "case-005",
-        case_number: "CASE-2024-005",
-        title: "General Assistance Case",
-        description: "General assistance and coordination services",
-        case_type: "OTHER",
-        status: "PENDING",
-        priority: "MEDIUM",
-        urgency_level: "WITHIN_MONTH",
-        beneficiary_id: "ben-005",
-        beneficiary: {
-            id: "ben-005",
-            first_name: "Fatima",
-            last_name: "Al-Zahra",
-            full_name: "Fatima Al-Zahra",
-            email: "fatima.alzahra@email.com",
-            phone: "+1234567894",
-            current_address: "654 General St, City",
-            image_url: ""
-        },
-        assigned_to_id: "user-002",
-        assigned_to: {
-            id: "user-002",
-            first_name: "Sarah",
-            last_name: "Johnson",
-            email: "sarah.johnson@org.com"
-        },
-        due_date: "2024-02-28",
-        estimated_duration: "1_MONTH",
-        budget_allocated: "$750",
-        tags: ["general", "assistance"],
-        notes_count: 4,
-        documents_count: 5,
-        last_activity: "2024-01-18T11:20:00Z",
-        created_at: "2024-01-12T10:15:00Z",
-        updated_at: "2024-01-18T11:20:00Z"
-    }
-];
-
-// Get unique assigned users from mock data
-const getUniqueUsers = () => {
-    const users = mockCases.map(case_ => case_.assigned_to).filter(Boolean);
+// Get unique assigned users from cases data
+const getUniqueUsers = (casesData: CaseSchema[] | null) => {
+    if (!casesData) return [];
+    
+    const users = casesData.map(case_ => case_.assigned_to).filter(Boolean);
     const uniqueUsers = users.filter((user, index, self) => 
         user && index === self.findIndex(u => u && u.id === user.id)
     );
@@ -291,8 +96,10 @@ const CaseList = (): ReactNode => {
         count: number;
         data: CaseSchema[];
     } | null>(null);
+    const [stats, setStats] = useState<CaseStatsSchema | null>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filters, setFilters] = useState<CaseFilters>(initialFilters);
@@ -300,41 +107,7 @@ const CaseList = (): ReactNode => {
 
     const LIMIT = 20;
 
-    // Filter cases based on search and filters
-    const getFilteredCases = useCallback(() => {
-        return mockCases.filter(case_ => {
-            // Search term filter
-            const matchesSearch = !searchTerm || (
-                case_.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                case_.case_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                case_.beneficiary?.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
 
-            // Status filter
-            const matchesStatus = filters.status.length === 0 || filters.status.includes(case_.status);
-
-            // Priority filter
-            const matchesPriority = filters.priority.length === 0 || filters.priority.includes(case_.priority);
-
-            // Case type filter
-            const matchesCaseType = filters.case_type.length === 0 || filters.case_type.includes(case_.case_type);
-
-            // Assigned user filter
-            const matchesAssignedTo = filters.assigned_to.length === 0 || 
-                (case_.assigned_to && case_.assigned_to.id && filters.assigned_to.includes(case_.assigned_to.id));
-
-            // Urgency level filter
-            const matchesUrgency = filters.urgency_level.length === 0 || filters.urgency_level.includes(case_.urgency_level);
-
-            // Date filters
-            const caseDate = new Date(case_.created_at);
-            const matchesDateFrom = !filters.date_from || caseDate >= filters.date_from;
-            const matchesDateTo = !filters.date_to || caseDate <= filters.date_to;
-
-            return matchesSearch && matchesStatus && matchesPriority && matchesCaseType && 
-                   matchesAssignedTo && matchesUrgency && matchesDateFrom && matchesDateTo;
-        });
-    }, [searchTerm, filters]);
 
     const getCasesList = useCallback(async () => {
         try {
@@ -363,9 +136,38 @@ const CaseList = (): ReactNode => {
         }
     }, [pathname, offset, searchTerm]);
 
+    const getCasesStats = useCallback(async () => {
+        try {
+            setIsLoadingStats(true);
+            
+            const pathParts = pathname.split("/");
+            const organizationId = pathParts[3];
+            if (!organizationId) {
+                throw new Error("Organization ID not found");
+            }
+            
+            const response = await getCaseStats(organizationId);
+            setStats(response.data);
+        } catch (err) {
+            console.error("Error fetching case stats:", err);
+            // Set default stats on error
+            setStats({
+                total_cases: 0,
+                open_cases: 0,
+                in_progress_cases: 0,
+                overdue_cases: 0,
+                closed_this_month: 0,
+                avg_resolution_days: 0
+            });
+        } finally {
+            setIsLoadingStats(false);
+        }
+    }, [pathname]);
+
     useEffect(() => {
         getCasesList();
-    }, [getCasesList]);
+        getCasesStats();
+    }, [getCasesList, getCasesStats]);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -440,7 +242,7 @@ const CaseList = (): ReactNode => {
                     </div>
                     <div className="flex items-center justify-center">
                         <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {mockStats.total_cases}
+                            {isLoadingStats ? "..." : (stats?.total_cases || 0)}
                         </span>
                     </div>
                 </div>
@@ -453,7 +255,7 @@ const CaseList = (): ReactNode => {
                     </div>
                     <div className="flex items-center justify-center">
                         <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {mockStats.open_cases}
+                            {isLoadingStats ? "..." : (stats?.open_cases || 0)}
                         </span>
                     </div>
                 </div>
@@ -466,7 +268,7 @@ const CaseList = (): ReactNode => {
                     </div>
                     <div className="flex items-center justify-center">
                         <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {mockStats.overdue_cases}
+                            {isLoadingStats ? "..." : (stats?.overdue_cases || 0)}
                         </span>
                     </div>
                 </div>
@@ -479,7 +281,7 @@ const CaseList = (): ReactNode => {
                     </div>
                     <div className="flex items-center justify-center">
                         <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {mockStats.closed_this_month}
+                            {isLoadingStats ? "..." : (stats?.closed_this_month || 0)}
                         </span>
                     </div>
                 </div>
@@ -608,7 +410,7 @@ const CaseList = (): ReactNode => {
                                                 <SelectValue placeholder="Select user..." />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {getUniqueUsers().map(option => (
+                                                {getUniqueUsers(cases?.data || null).map(option => (
                                                     <SelectItem key={option.value} value={option.value} className="text-xs">
                                                         {option.label}
                                                     </SelectItem>
@@ -741,7 +543,7 @@ const CaseList = (): ReactNode => {
                     {/* Assigned to badges */}
                     {filters.assigned_to.map(userId => (
                         <Badge key={`assigned-${userId}`} variant="secondary" className="text-xs h-6">
-                            Assigned: {getUniqueUsers().find(u => u.value === userId)?.label}
+                            Assigned: {getUniqueUsers(cases?.data || null).find(u => u.value === userId)?.label}
                             <button
                                 onClick={() => removeFilterValue('assigned_to', userId)}
                                 className="ml-1 hover:text-red-600"
