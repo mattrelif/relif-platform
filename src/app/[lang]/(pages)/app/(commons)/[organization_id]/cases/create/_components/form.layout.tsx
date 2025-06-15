@@ -21,9 +21,11 @@ import { CalendarDays, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags } from "react-icons/fa";
-import { getBeneficiariesByOrganizationID, findUsersByOrganizationId } from "@/repository/organization.repository";
+import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, createCase } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
+import { CreateCasePayload } from "@/types/case.types";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DocumentData {
     file: File;
@@ -62,6 +64,7 @@ interface CaseFormData {
 export const CreateCaseForm = (): ReactNode => {
     const router = useRouter();
     const pathname = usePathname();
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
     const [noteTags, setNoteTags] = useState<string[]>([]);
@@ -241,18 +244,67 @@ export const CreateCaseForm = (): ReactNode => {
         setIsLoading(true);
 
         try {
-            // TODO: Implement actual API call with document upload
-            console.log("Creating case with data:", formData);
-            console.log("Documents to upload:", formData.documents);
+            const organizationId = pathname.split("/")[3];
             
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!organizationId) {
+                toast({
+                    title: "Error",
+                    description: "Organization ID not found",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Prepare the case payload according to CreateCasePayload interface
+            const casePayload: CreateCasePayload = {
+                beneficiary_id: formData.beneficiary_id,
+                assigned_to_id: formData.assigned_to_id,
+                title: formData.title,
+                description: formData.description,
+                case_type: formData.case_type as CreateCasePayload['case_type'],
+                priority: formData.priority as CreateCasePayload['priority'],
+                urgency_level: formData.urgency_level ? formData.urgency_level as CreateCasePayload['urgency_level'] : undefined,
+                due_date: formData.due_date ? formData.due_date.toISOString() : undefined,
+                estimated_duration: formData.estimated_duration || undefined,
+                budget_allocated: formData.budget_allocated || undefined,
+                tags: formData.tags.length > 0 ? formData.tags : undefined,
+            };
+
+            // Add initial note if provided
+            if (formData.initial_note.title || formData.initial_note.content) {
+                casePayload.initial_note = {
+                    title: formData.initial_note.title,
+                    content: formData.initial_note.content,
+                    note_type: formData.initial_note.note_type as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER",
+                    is_important: formData.initial_note.is_important,
+                    tags: formData.initial_note.tags,
+                };
+            }
+
+            // Create the case
+            const response = await createCase(casePayload);
+            
+            toast({
+                title: "Success",
+                description: "Case created successfully",
+            });
+
+            // TODO: Handle document uploads if any documents were added
+            if (formData.documents.length > 0) {
+                console.log("Documents to upload:", formData.documents);
+                // Document upload will be implemented separately
+            }
             
             // Redirect back to cases list
             const casesPath = pathname.replace('/create', '');
             router.push(casesPath);
         } catch (error) {
             console.error("Error creating case:", error);
+            toast({
+                title: "Error",
+                description: "Failed to create case. Please try again.",
+                variant: "destructive",
+            });
         } finally {
             setIsLoading(false);
         }

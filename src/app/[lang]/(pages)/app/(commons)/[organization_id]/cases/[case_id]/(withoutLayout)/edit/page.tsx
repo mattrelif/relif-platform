@@ -16,9 +16,11 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags, FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
-import { getBeneficiariesByOrganizationID, findUsersByOrganizationId } from "@/repository/organization.repository";
+import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, updateCase } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
+import { UpdateCasePayload } from "@/types/case.types";
+import { useToast } from "@/components/ui/use-toast";
 
 // Mock function to get case data - replace with actual API call
 const getCaseById = async (caseId: string) => {
@@ -44,6 +46,7 @@ const getCaseById = async (caseId: string) => {
 const EditCasePage = (): ReactNode => {
     const router = useRouter();
     const pathname = usePathname();
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
@@ -170,16 +173,47 @@ const EditCasePage = (): ReactNode => {
         setIsSaving(true);
         
         try {
-            // Here you would make an API call to update the case
-            console.log("Updating case:", formData);
+            if (!caseId) {
+                toast({
+                    title: "Error",
+                    description: "Case ID not found",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Prepare the update payload according to UpdateCasePayload interface
+            const updatePayload: UpdateCasePayload = {
+                title: formData.title,
+                description: formData.description,
+                case_type: formData.case_type as UpdateCasePayload['case_type'],
+                status: formData.status as UpdateCasePayload['status'],
+                priority: formData.priority as UpdateCasePayload['priority'],
+                urgency_level: formData.urgency_level ? formData.urgency_level as UpdateCasePayload['urgency_level'] : undefined,
+                assigned_to_id: formData.assigned_to_id,
+                due_date: formData.due_date ? formData.due_date.toISOString() : undefined,
+                estimated_duration: formData.estimated_duration || undefined,
+                budget_allocated: formData.budget_allocated || undefined,
+                tags: formData.tags.length > 0 ? formData.tags : undefined,
+            };
+
+            // Update the case
+            await updateCase(caseId, updatePayload);
             
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            toast({
+                title: "Success",
+                description: "Case updated successfully",
+            });
             
             // Redirect back to case overview
             router.push(backPath);
         } catch (error) {
             console.error("Error updating case:", error);
+            toast({
+                title: "Error",
+                description: "Failed to update case. Please try again.",
+                variant: "destructive",
+            });
         } finally {
             setIsSaving(false);
         }
