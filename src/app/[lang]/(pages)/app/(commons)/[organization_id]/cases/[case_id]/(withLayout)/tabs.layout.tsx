@@ -18,22 +18,12 @@ const TabsLayout = (): ReactNode => {
             <TabsList>
                 <TabsTrigger value="overview" asChild>
                     <Link href={`${urlPath}`}>
-                        {dict.commons.beneficiaries.beneficiaryId.tabsLayout.overview}
+                        Overview
                     </Link>
                 </TabsTrigger>
-                <TabsTrigger value="assistance" asChild>
-                    <Link href={`${urlPath}/assistance`}>
-                        {dict.commons.beneficiaries.beneficiaryId.tabsLayout.assistance}
-                    </Link>
-                </TabsTrigger>
-                <TabsTrigger value="movements" asChild>
-                    <Link href={`${urlPath}/movements`}>
-                        {dict.commons.beneficiaries.beneficiaryId.tabsLayout.movements}
-                    </Link>
-                </TabsTrigger>
-                <TabsTrigger value="cases" asChild>
-                    <Link href={`${urlPath}/cases`}>
-                        Cases
+                <TabsTrigger value="notes" asChild>
+                    <Link href={`${urlPath}/notes`}>
+                        Updates
                     </Link>
                 </TabsTrigger>
             </TabsList>
@@ -41,4 +31,4 @@ const TabsLayout = (): ReactNode => {
     );
 };
 
-export { TabsLayout };
+export { TabsLayout }; 

@@ -65,7 +65,7 @@ const Form = (): ReactNode => {
                 variant: "success",
             });
 
-            if (currentUser.organization_id) {
+            if (currentUser?.organization_id) {
                 router.push(`${urlPath}/${housingId}`);
             } else {
                 router.push("/");

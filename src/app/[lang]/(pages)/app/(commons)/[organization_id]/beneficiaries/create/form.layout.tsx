@@ -130,7 +130,7 @@ const Form = (): ReactNode => {
                 throw new Error();
             }
 
-            if (currentUser.organization_id) {
+            if (currentUser?.organization_id) {
                 const { data: newBeneficiary } = await createBeneficiary(
                     currentUser.organization_id,
                     {

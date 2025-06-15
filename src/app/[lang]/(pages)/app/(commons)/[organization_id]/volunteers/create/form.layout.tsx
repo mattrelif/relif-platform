@@ -86,7 +86,7 @@ const Form = (): ReactNode => {
                 throw new Error();
             }
 
-            if (currentUser.organization_id) {
+            if (currentUser?.organization_id) {
                 await createVolunteer(currentUser.organization_id, {
                     full_name: data.fullName,
                     birthdate: data.birthdate,
