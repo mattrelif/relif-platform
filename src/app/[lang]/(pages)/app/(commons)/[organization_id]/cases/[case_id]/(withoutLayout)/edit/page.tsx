@@ -14,24 +14,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { FaFileAlt, FaUserTie, FaTags, FaFlag, FaArrowLeft } from "react-icons/fa";
+import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags, FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
-
-// Mock data for dropdowns
-const mockBeneficiaries = [
-    { id: "ben-001", name: "Maria Santos" },
-    { id: "ben-002", name: "João Silva" },
-    { id: "ben-003", name: "Ana Costa" },
-    { id: "ben-004", name: "Pedro Oliveira" },
-    { id: "ben-005", name: "Lucia Ferreira" },
-];
-
-const mockUsers = [
-    { id: "user-001", name: "John Smith" },
-    { id: "user-002", name: "Sarah Johnson" },
-    { id: "user-003", name: "Michael Brown" },
-    { id: "user-004", name: "Emily Davis" },
-];
+import { getBeneficiariesByOrganizationID, findUsersByOrganizationId } from "@/repository/organization.repository";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { UserSchema } from "@/types/user.types";
 
 // Mock function to get case data - replace with actual API call
 const getCaseById = async (caseId: string) => {
@@ -60,6 +47,9 @@ const EditCasePage = (): ReactNode => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
+    const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[]>([]);
+    const [users, setUsers] = useState<UserSchema[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
     
     const [formData, setFormData] = useState({
         title: "",
@@ -113,6 +103,36 @@ const EditCasePage = (): ReactNode => {
 
         fetchCaseData();
     }, [caseId]);
+
+    // Load beneficiaries and users
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setIsLoadingData(true);
+                const organizationId = pathname.split("/")[3];
+                
+                if (!organizationId) {
+                    console.error("Organization ID not found");
+                    return;
+                }
+
+                // Load beneficiaries and users in parallel
+                const [beneficiariesResponse, usersResponse] = await Promise.all([
+                    getBeneficiariesByOrganizationID(organizationId, 0, 1000, ""),
+                    findUsersByOrganizationId(organizationId, 0, 1000)
+                ]);
+
+                setBeneficiaries(beneficiariesResponse.data.data || []);
+                setUsers(usersResponse.data.data || []);
+            } catch (error) {
+                console.error("Error loading data:", error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadData();
+    }, [pathname]);
 
     const handleInputChange = (field: string, value: string | boolean | Date | undefined) => {
         setFormData(prev => ({
@@ -367,13 +387,13 @@ const EditCasePage = (): ReactNode => {
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select beneficiary..." />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    {mockBeneficiaries.map((beneficiary) => (
-                                        <SelectItem key={beneficiary.id} value={beneficiary.id}>
-                                            {beneficiary.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
+                                                            <SelectContent>
+                                {beneficiaries.map((beneficiary) => (
+                                    <SelectItem key={beneficiary.id} value={beneficiary.id}>
+                                        {beneficiary.full_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
                             </Select>
                         </div>
 
@@ -383,13 +403,13 @@ const EditCasePage = (): ReactNode => {
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select user..." />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    {mockUsers.map((user) => (
-                                        <SelectItem key={user.id} value={user.id}>
-                                            {user.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
+                                                            <SelectContent>
+                                {users.map((user) => (
+                                    <SelectItem key={user.id} value={user.id}>
+                                        {user.first_name} {user.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
                             </Select>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode, ChangeEvent, Dispatch, SetStateAction } from "react";
+import { useState, ReactNode, ChangeEvent, Dispatch, SetStateAction, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,22 +21,9 @@ import { CalendarDays, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags } from "react-icons/fa";
-
-// Mock data for dropdowns
-const mockBeneficiaries = [
-    { id: "ben-001", name: "Maria Santos" },
-    { id: "ben-002", name: "João Silva" },
-    { id: "ben-003", name: "Ana Costa" },
-    { id: "ben-004", name: "Pedro Oliveira" },
-    { id: "ben-005", name: "Lucia Ferreira" },
-];
-
-const mockUsers = [
-    { id: "user-001", name: "John Smith" },
-    { id: "user-002", name: "Sarah Johnson" },
-    { id: "user-003", name: "Michael Brown" },
-    { id: "user-004", name: "Emily Davis" },
-];
+import { getBeneficiariesByOrganizationID, findUsersByOrganizationId } from "@/repository/organization.repository";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
+import { UserSchema } from "@/types/user.types";
 
 interface DocumentData {
     file: File;
@@ -78,6 +65,9 @@ export const CreateCaseForm = (): ReactNode => {
     const [isLoading, setIsLoading] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
     const [noteTags, setNoteTags] = useState<string[]>([]);
+    const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[]>([]);
+    const [users, setUsers] = useState<UserSchema[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
     
     const [formData, setFormData] = useState<CaseFormData>({
         title: "",
@@ -102,6 +92,36 @@ export const CreateCaseForm = (): ReactNode => {
             tags: [],
         },
     });
+
+    // Load beneficiaries and users on component mount
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                setIsLoadingData(true);
+                const organizationId = pathname.split("/")[3];
+                
+                if (!organizationId) {
+                    console.error("Organization ID not found");
+                    return;
+                }
+
+                // Load beneficiaries and users in parallel
+                const [beneficiariesResponse, usersResponse] = await Promise.all([
+                    getBeneficiariesByOrganizationID(organizationId, 0, 1000, ""),
+                    findUsersByOrganizationId(organizationId, 0, 1000)
+                ]);
+
+                setBeneficiaries(beneficiariesResponse.data.data || []);
+                setUsers(usersResponse.data.data || []);
+            } catch (error) {
+                console.error("Error loading data:", error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        loadData();
+    }, [pathname]);
 
     const handleInputChange = (field: keyof CaseFormData, value: string | boolean | Date | undefined) => {
         setFormData(prev => ({
@@ -422,9 +442,9 @@ export const CreateCaseForm = (): ReactNode => {
                                 <SelectValue placeholder="Select beneficiary..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {mockBeneficiaries.map((beneficiary) => (
+                                {beneficiaries.map((beneficiary) => (
                                     <SelectItem key={beneficiary.id} value={beneficiary.id}>
-                                        {beneficiary.name}
+                                        {beneficiary.full_name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -438,9 +458,9 @@ export const CreateCaseForm = (): ReactNode => {
                                 <SelectValue placeholder="Select user..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {mockUsers.map((user) => (
+                                {users.map((user) => (
                                     <SelectItem key={user.id} value={user.id}>
-                                        {user.name}
+                                        {user.first_name} {user.last_name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
