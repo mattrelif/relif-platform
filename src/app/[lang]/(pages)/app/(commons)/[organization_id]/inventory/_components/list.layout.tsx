@@ -107,14 +107,14 @@ const ProductList = (): ReactNode => {
             {/* </div> */}
 
             <div className="flex items-end gap-4 justify-between border-b-[1px] py-2 px-4 lg:flex-row-reverse">
-                <div className="flex items-center gap-3 lg:grow">
-                    <MdSearch className="text-slate-400 text-2xl" />
+                <div className="relative lg:grow">
+                    <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
                     <Input
                         type="text"
                         placeholder={dict.commons.beneficiaries.list.searchPlaceholder}
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="w-[300px] lg:w-full"
+                        className="w-[300px] lg:w-full pl-10"
                     />
                 </div>
             </div>

@@ -83,14 +83,14 @@ const VolunteersList = (): ReactNode => {
     return (
         <>
             <div className="flex items-end gap-4 justify-between lg:flex-col lg:items-start">
-                <div className="flex items-center gap-3">
-                    <MdSearch className="text-slate-400 text-2xl" />
+                <div className="relative">
+                    <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
                     <Input
                         type="text"
                         placeholder={dict.commons.volunteers.list.searchPlaceholder}
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="w-[300px]"
+                        className="w-[300px] pl-10"
                     />
                 </div>
                 <Toolbar />

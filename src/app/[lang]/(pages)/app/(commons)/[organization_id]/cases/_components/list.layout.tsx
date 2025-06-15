@@ -17,6 +17,8 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { CaseSchema } from "@/types/case.types";
+import { getCasesByOrganizationID } from "@/repository/organization.repository";
+import { usePathname } from "next/navigation";
 import { FaFileAlt, FaClock, FaCheckCircle, FaExclamationTriangle, FaCalendarAlt } from 'react-icons/fa';
 import { format } from "date-fns";
 
@@ -284,6 +286,7 @@ const getUniqueUsers = () => {
 };
 
 const CaseList = (): ReactNode => {
+    const pathname = usePathname();
     const [cases, setCases] = useState<{
         count: number;
         data: CaseSchema[];
@@ -338,25 +341,27 @@ const CaseList = (): ReactNode => {
             setIsLoading(true);
             setError(false);
             
-            // Get filtered cases
-            const filteredCases = getFilteredCases();
-
-            // Simulate pagination
-            const paginatedCases = filteredCases.slice(offset, offset + LIMIT);
+            const pathParts = pathname.split("/");
+            const organizationId = pathParts[3];
+            if (!organizationId) {
+                throw new Error("Organization ID not found");
+            }
             
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // TypeScript now knows organizationId is string after the null check
+            const response = await getCasesByOrganizationID(
+                organizationId,
+                offset,
+                LIMIT,
+                searchTerm
+            );
             
-            setCases({
-                count: filteredCases.length,
-                data: paginatedCases
-            });
+            setCases(response.data);
         } catch (err) {
             setError(true);
         } finally {
             setIsLoading(false);
         }
-    }, [offset, getFilteredCases]);
+    }, [pathname, offset, searchTerm]);
 
     useEffect(() => {
         getCasesList();

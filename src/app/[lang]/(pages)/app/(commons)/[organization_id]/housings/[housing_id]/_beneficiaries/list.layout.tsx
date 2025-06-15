@@ -150,14 +150,14 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
                     )}
                 </div>
             </div>
-            <div className="flex items-center gap-2">
-                <MdSearch className="text-slate-400 text-2xl" />
+            <div className="relative">
+                <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
                 <Input
                     type="text"
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={dict.housingOverview.searchBeneficiaryPlaceholder || "Search"}
-                    className="w-full h-8"
+                    className="w-full h-8 pl-10"
                 />
             </div>
             <div className="w-full h-[calc(100vh-394px)] border border-slate-200 rounded-md overflow-hidden">
