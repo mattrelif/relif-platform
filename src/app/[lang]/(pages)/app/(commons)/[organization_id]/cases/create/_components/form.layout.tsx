@@ -21,7 +21,7 @@ import { CalendarDays, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags } from "react-icons/fa";
-import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, createCase } from "@/repository/organization.repository";
+import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, createCase, generateCaseDocumentUploadLink, createCaseDocument } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
 import { CreateCasePayload } from "@/types/case.types";
@@ -283,17 +283,49 @@ export const CreateCaseForm = (): ReactNode => {
 
             // Create the case
             const response = await createCase(casePayload);
+            const newCaseId = response.data.id;
+            
+            // Handle document uploads if any documents were added
+            if (formData.documents.length > 0) {
+                for (const doc of formData.documents) {
+                    try {
+                        // Step 1: Get S3 upload link
+                        const { data: uploadLinkData } = await generateCaseDocumentUploadLink(doc.file.type);
+                        
+                        // Step 2: Upload file directly to S3
+                        await fetch(uploadLinkData.link, {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": doc.file.type,
+                            },
+                            body: doc.file,
+                        });
+                        
+                        // Step 3: Get S3 URL without query parameters
+                        const s3Url = uploadLinkData.link.split("?")[0];
+                        
+                        // Step 4: Create document record in database
+                        await createCaseDocument(newCaseId, {
+                            document_name: doc.name,
+                            document_type: doc.type,
+                            description: doc.description,
+                            tags: doc.tags,
+                            file_url: s3Url,
+                            file_name: doc.file.name,
+                            file_size: doc.file.size,
+                            mime_type: doc.file.type,
+                        });
+                    } catch (docError) {
+                        console.error(`Error uploading document ${doc.name}:`, docError);
+                        // Continue with other documents even if one fails
+                    }
+                }
+            }
             
             toast({
                 title: "Success",
                 description: "Case created successfully",
             });
-
-            // TODO: Handle document uploads if any documents were added
-            if (formData.documents.length > 0) {
-                console.log("Documents to upload:", formData.documents);
-                // Document upload will be implemented separately
-            }
             
             // Redirect back to cases list
             const casesPath = pathname.replace('/create', '');

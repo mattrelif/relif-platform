@@ -60,11 +60,20 @@ const NotesContent = (): ReactNode => {
             try {
                 if (caseId) {
                     const response = await getCaseNotes(caseId);
-                    setNotes(response.data || []);
+                    // Ensure we always set an array, even if response.data is undefined/null
+                    const notesData = response?.data;
+                    if (Array.isArray(notesData)) {
+                        setNotes(notesData);
+                    } else {
+                        console.warn("API returned non-array data for notes:", notesData);
+                        setNotes([]);
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching case notes:", err);
                 setError(true);
+                // Ensure notes is always an array even on error
+                setNotes([]);
             } finally {
                 setIsLoading(false);
             }
@@ -364,7 +373,7 @@ const NotesContent = (): ReactNode => {
             )}
 
             {/* Updates List */}
-            {notes.length === 0 ? (
+            {!Array.isArray(notes) || notes.length === 0 ? (
                 <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
                     <div className="text-center py-8 text-slate-500">
                         <FaStickyNote className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -407,7 +416,7 @@ const NotesContent = (): ReactNode => {
                                 {note.content}
                             </p>
                             
-                            {note.tags.length > 0 && (
+                            {Array.isArray(note.tags) && note.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1">
                                     {note.tags.map((tag, index) => (
                                         <Badge key={index} className="bg-relif-orange-500 text-xs">

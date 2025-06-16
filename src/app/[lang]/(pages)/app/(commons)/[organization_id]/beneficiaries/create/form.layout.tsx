@@ -124,10 +124,15 @@ const Form = (): ReactNode => {
                 emergencyEmail: string;
             } = Object.fromEntries(formData);
 
+            // Validate required fields
+            if (!data.fullName || !data.birthdate || !data.email) {
+                throw new Error("Missing required fields: fullName, birthdate, or email");
+            }
+
             const today = new Date();
             const birthdate = new Date(data.birthdate);
             if (birthdate >= today) {
-                throw new Error();
+                throw new Error("Birthdate must be in the past");
             }
 
             if (currentUser?.organization_id) {
@@ -144,7 +149,7 @@ const Form = (): ReactNode => {
                         education:
                             data.education === "other" ? data.otherEducation : data.education,
                         occupation: data.occupation,
-                        spoken_languages: data.languages.split(","),
+                        spoken_languages: data.languages ? data.languages.split(",").filter(lang => lang.trim()) : [],
                         phones: [`${data.countryCode}_${data.phone}`],
                         address: {
                             address_line_1: data.addressLine1,
@@ -155,18 +160,18 @@ const Form = (): ReactNode => {
                             country: data.country,
                         },
                         medical_information: {
-                            allergies: data.allergies.split(","),
-                            current_medications: data.currentMedications.split(","),
-                            recurrent_medical_conditions: data.chronicMedicalConditions.split(","),
-                            health_insurance_plans: data.healthInsurance.split(","),
-                            blood_type: data.bloodType,
-                            taken_vaccines: data.vaccinations.split(","),
-                            mental_health_history: data.mentalHealth.split(","),
-                            height: Number(data.height),
-                            weight: Number(data.weight),
-                            addictions: data.addictions.split(","),
-                            disabilities: data.disabilities.split(","),
-                            prothesis_or_medical_devices: data.prothesisOrMedicalDevices.split(","),
+                            allergies: data.allergies ? data.allergies.split(",").filter(item => item.trim()) : [],
+                            current_medications: data.currentMedications ? data.currentMedications.split(",").filter(item => item.trim()) : [],
+                            recurrent_medical_conditions: data.chronicMedicalConditions ? data.chronicMedicalConditions.split(",").filter(item => item.trim()) : [],
+                            health_insurance_plans: data.healthInsurance ? data.healthInsurance.split(",").filter(item => item.trim()) : [],
+                            blood_type: data.bloodType || "",
+                            taken_vaccines: data.vaccinations ? data.vaccinations.split(",").filter(item => item.trim()) : [],
+                            mental_health_history: data.mentalHealth ? data.mentalHealth.split(",").filter(item => item.trim()) : [],
+                            height: Number(data.height) || 0,
+                            weight: Number(data.weight) || 0,
+                            addictions: data.addictions ? data.addictions.split(",").filter(item => item.trim()) : [],
+                            disabilities: data.disabilities ? data.disabilities.split(",").filter(item => item.trim()) : [],
+                            prothesis_or_medical_devices: data.prothesisOrMedicalDevices ? data.prothesisOrMedicalDevices.split(",").filter(item => item.trim()) : [],
                         },
                         notes: data.notes,
                         documents: [
@@ -199,10 +204,18 @@ const Form = (): ReactNode => {
             } else {
                 throw new Error();
             }
-        } catch (err) {
+        } catch (err: any) {
+            console.error("Beneficiary creation error:", err);
+            console.error("Error details:", {
+                message: err instanceof Error ? err.message : 'Unknown error',
+                response: err?.response?.data,
+                status: err?.response?.status,
+                organizationId: (await getFromLocalStorage("r_ud"))?.organization_id
+            });
+            
             toast({
                 title: dict.commons.beneficiaries.create.toastErrorTitle,
-                description: dict.commons.beneficiaries.create.toastErrorDescription,
+                description: `${dict.commons.beneficiaries.create.toastErrorDescription} ${err instanceof Error ? err.message : ''}`,
                 variant: "destructive",
             });
         }

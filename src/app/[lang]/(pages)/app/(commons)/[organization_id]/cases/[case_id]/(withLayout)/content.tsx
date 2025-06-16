@@ -24,7 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCalendarAlt, FaEdit, FaFileAlt, FaStickyNote, FaUser, FaClock, FaDollarSign, FaFlag, FaTrash, FaTags } from "react-icons/fa";
-import { getCaseById, getCaseDocuments, uploadCaseDocument } from "@/repository/organization.repository";
+import { getCaseById, getCaseDocuments, uploadCaseDocument, generateCaseDocumentUploadLink, createCaseDocument } from "@/repository/organization.repository";
 import { CreateCaseDocumentPayload } from "@/types/case.types";
 
 const CaseOverview = (): ReactNode => {
@@ -152,14 +152,32 @@ const CaseOverview = (): ReactNode => {
         setIsUploading(true);
         try {
             for (const file of uploadFiles) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('document_name', uploadFormData.document_name);
-                formData.append('document_type', uploadFormData.document_type);
-                formData.append('description', uploadFormData.description);
-                formData.append('tags', JSON.stringify(uploadFormData.tags));
-
-                await uploadCaseDocument(caseId, formData);
+                // Step 1: Get S3 upload link
+                const { data: uploadLinkData } = await generateCaseDocumentUploadLink(file.type);
+                
+                // Step 2: Upload file directly to S3
+                await fetch(uploadLinkData.link, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": file.type,
+                    },
+                    body: file,
+                });
+                
+                // Step 3: Get S3 URL without query parameters
+                const s3Url = uploadLinkData.link.split("?")[0];
+                
+                // Step 4: Create document record in database
+                await createCaseDocument(caseId, {
+                    document_name: uploadFormData.document_name || file.name.replace(/\.[^/.]+$/, ""),
+                    document_type: uploadFormData.document_type,
+                    description: uploadFormData.description,
+                    tags: uploadFormData.tags,
+                    file_url: s3Url,
+                    file_name: file.name,
+                    file_size: file.size,
+                    mime_type: file.type,
+                });
             }
             
             // Refresh documents list
