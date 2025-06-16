@@ -149,7 +149,9 @@ const Form = (): ReactNode => {
                         education:
                             data.education === "other" ? data.otherEducation : data.education,
                         occupation: data.occupation,
-                        spoken_languages: data.languages ? data.languages.split(",").filter(lang => lang.trim()) : [],
+                        spoken_languages: data.languages
+                            ? data.languages.split(",").filter(lang => lang.trim())
+                            : [],
                         phones: [`${data.countryCode}_${data.phone}`],
                         address: {
                             address_line_1: data.addressLine1,
@@ -160,18 +162,40 @@ const Form = (): ReactNode => {
                             country: data.country,
                         },
                         medical_information: {
-                            allergies: data.allergies ? data.allergies.split(",").filter(item => item.trim()) : [],
-                            current_medications: data.currentMedications ? data.currentMedications.split(",").filter(item => item.trim()) : [],
-                            recurrent_medical_conditions: data.chronicMedicalConditions ? data.chronicMedicalConditions.split(",").filter(item => item.trim()) : [],
-                            health_insurance_plans: data.healthInsurance ? data.healthInsurance.split(",").filter(item => item.trim()) : [],
+                            allergies: data.allergies
+                                ? data.allergies.split(",").filter(item => item.trim())
+                                : [],
+                            current_medications: data.currentMedications
+                                ? data.currentMedications.split(",").filter(item => item.trim())
+                                : [],
+                            recurrent_medical_conditions: data.chronicMedicalConditions
+                                ? data.chronicMedicalConditions
+                                      .split(",")
+                                      .filter(item => item.trim())
+                                : [],
+                            health_insurance_plans: data.healthInsurance
+                                ? data.healthInsurance.split(",").filter(item => item.trim())
+                                : [],
                             blood_type: data.bloodType || "",
-                            taken_vaccines: data.vaccinations ? data.vaccinations.split(",").filter(item => item.trim()) : [],
-                            mental_health_history: data.mentalHealth ? data.mentalHealth.split(",").filter(item => item.trim()) : [],
+                            taken_vaccines: data.vaccinations
+                                ? data.vaccinations.split(",").filter(item => item.trim())
+                                : [],
+                            mental_health_history: data.mentalHealth
+                                ? data.mentalHealth.split(",").filter(item => item.trim())
+                                : [],
                             height: Number(data.height) || 0,
                             weight: Number(data.weight) || 0,
-                            addictions: data.addictions ? data.addictions.split(",").filter(item => item.trim()) : [],
-                            disabilities: data.disabilities ? data.disabilities.split(",").filter(item => item.trim()) : [],
-                            prothesis_or_medical_devices: data.prothesisOrMedicalDevices ? data.prothesisOrMedicalDevices.split(",").filter(item => item.trim()) : [],
+                            addictions: data.addictions
+                                ? data.addictions.split(",").filter(item => item.trim())
+                                : [],
+                            disabilities: data.disabilities
+                                ? data.disabilities.split(",").filter(item => item.trim())
+                                : [],
+                            prothesis_or_medical_devices: data.prothesisOrMedicalDevices
+                                ? data.prothesisOrMedicalDevices
+                                      .split(",")
+                                      .filter(item => item.trim())
+                                : [],
                         },
                         notes: data.notes,
                         documents: [
@@ -207,15 +231,15 @@ const Form = (): ReactNode => {
         } catch (err: any) {
             console.error("Beneficiary creation error:", err);
             console.error("Error details:", {
-                message: err instanceof Error ? err.message : 'Unknown error',
+                message: err instanceof Error ? err.message : "Unknown error",
                 response: err?.response?.data,
                 status: err?.response?.status,
-                organizationId: (await getFromLocalStorage("r_ud"))?.organization_id
+                organizationId: (await getFromLocalStorage("r_ud"))?.organization_id,
             });
-            
+
             toast({
                 title: dict.commons.beneficiaries.create.toastErrorTitle,
-                description: `${dict.commons.beneficiaries.create.toastErrorDescription} ${err instanceof Error ? err.message : ''}`,
+                description: `${dict.commons.beneficiaries.create.toastErrorDescription} ${err instanceof Error ? err.message : ""}`,
                 variant: "destructive",
             });
         }

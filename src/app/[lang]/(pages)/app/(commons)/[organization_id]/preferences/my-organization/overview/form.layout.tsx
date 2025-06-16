@@ -34,7 +34,7 @@ const Form = (): ReactNode => {
                 if (currentUser.organization_id) {
                     const response = await findOrganizationByID(currentUser.organization_id);
                     setOrgData(response.data);
-                    
+
                     // Set initial logo and areas
                     if (response.data.logo) {
                         setLogoPreview(response.data.logo);
@@ -66,9 +66,7 @@ const Form = (): ReactNode => {
 
     const handleAreaToggle = (area: string) => {
         setSelectedAreas((prev: string[]) =>
-            prev.includes(area)
-                ? prev.filter((a: string) => a !== area)
-                : [...prev, area]
+            prev.includes(area) ? prev.filter((a: string) => a !== area) : [...prev, area]
         );
     };
 
@@ -197,7 +195,10 @@ const Form = (): ReactNode => {
                                             className="cursor-pointer flex items-center gap-2 text-sm text-relif-orange-200 hover:underline"
                                         >
                                             <FaUpload size={12} />
-                                            {dict.commons.preferences.myOrganization.overview.uploadLogo}
+                                            {
+                                                dict.commons.preferences.myOrganization.overview
+                                                    .uploadLogo
+                                            }
                                         </Label>
                                         <Input
                                             id="logo"
@@ -218,26 +219,31 @@ const Form = (): ReactNode => {
                                 {dict.commons.preferences.myOrganization.overview.areasOfWork}
                             </Label>
                             <div className="flex flex-wrap gap-2">
-                                {dict.createOrganization.areasOfOperationList.map((area: string) => (
-                                    <button
-                                        key={area}
-                                        type="button"
-                                        disabled={platformRole !== "ORG_ADMIN"}
-                                        className={`px-3 py-1 mb-1 rounded-full border text-sm transition font-medium ${
-                                            selectedAreas.includes(area)
-                                                ? "bg-relif-orange-200 text-white border-relif-orange-200 shadow"
-                                                : "bg-white text-relif-orange-200 border-relif-orange-200 hover:bg-relif-orange-100"
-                                        } ${
-                                            platformRole !== "ORG_ADMIN" 
-                                                ? "opacity-50 cursor-not-allowed" 
-                                                : "cursor-pointer"
-                                        }`}
-                                        onClick={() => platformRole === "ORG_ADMIN" && handleAreaToggle(area)}
-                                        aria-pressed={selectedAreas.includes(area)}
-                                    >
-                                        {area}
-                                    </button>
-                                ))}
+                                {dict.createOrganization.areasOfOperationList.map(
+                                    (area: string) => (
+                                        <button
+                                            key={area}
+                                            type="button"
+                                            disabled={platformRole !== "ORG_ADMIN"}
+                                            className={`px-3 py-1 mb-1 rounded-full border text-sm transition font-medium ${
+                                                selectedAreas.includes(area)
+                                                    ? "bg-relif-orange-200 text-white border-relif-orange-200 shadow"
+                                                    : "bg-white text-relif-orange-200 border-relif-orange-200 hover:bg-relif-orange-100"
+                                            } ${
+                                                platformRole !== "ORG_ADMIN"
+                                                    ? "opacity-50 cursor-not-allowed"
+                                                    : "cursor-pointer"
+                                            }`}
+                                            onClick={() =>
+                                                platformRole === "ORG_ADMIN" &&
+                                                handleAreaToggle(area)
+                                            }
+                                            aria-pressed={selectedAreas.includes(area)}
+                                        >
+                                            {area}
+                                        </button>
+                                    )
+                                )}
                             </div>
                         </div>
 

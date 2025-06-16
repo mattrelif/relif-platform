@@ -5,7 +5,13 @@ import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,15 +20,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags, FaArrowLeft } from "react-icons/fa";
+import {
+    FaFileAlt,
+    FaUsers,
+    FaTag,
+    FaStickyNote,
+    FaFlag,
+    FaUserTie,
+    FaTags,
+    FaArrowLeft,
+} from "react-icons/fa";
 import Link from "next/link";
-import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, updateCase, getCaseById } from "@/repository/organization.repository";
+import {
+    getBeneficiariesByOrganizationID,
+    findUsersByOrganizationId,
+    updateCase,
+    getCaseById,
+} from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
 import { UpdateCasePayload } from "@/types/case.types";
 import { useToast } from "@/components/ui/use-toast";
-
-
 
 const EditCasePage = (): ReactNode => {
     const router = useRouter();
@@ -34,7 +52,7 @@ const EditCasePage = (): ReactNode => {
     const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[]>([]);
     const [users, setUsers] = useState<UserSchema[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
-    
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -61,7 +79,7 @@ const EditCasePage = (): ReactNode => {
                     const response = await getCaseById(caseId);
                     const caseData = response.data;
                     const dueDate = caseData.due_date ? new Date(caseData.due_date) : undefined;
-                    
+
                     setFormData({
                         title: caseData.title,
                         description: caseData.description,
@@ -95,7 +113,7 @@ const EditCasePage = (): ReactNode => {
             try {
                 setIsLoadingData(true);
                 const organizationId = pathname.split("/")[3];
-                
+
                 if (!organizationId) {
                     console.error("Organization ID not found");
                     return;
@@ -104,7 +122,7 @@ const EditCasePage = (): ReactNode => {
                 // Load beneficiaries and users in parallel
                 const [beneficiariesResponse, usersResponse] = await Promise.all([
                     getBeneficiariesByOrganizationID(organizationId, 0, 1000, ""),
-                    findUsersByOrganizationId(organizationId, 0, 1000)
+                    findUsersByOrganizationId(organizationId, 0, 1000),
                 ]);
 
                 setBeneficiaries(beneficiariesResponse.data.data || []);
@@ -122,23 +140,26 @@ const EditCasePage = (): ReactNode => {
     const handleInputChange = (field: string, value: string | boolean | Date | undefined) => {
         setFormData(prev => ({
             ...prev,
-            [field]: value
+            [field]: value,
         }));
     };
 
     const handleTagsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const values = event.target.value.split(",").map(value => value.trim()).filter(value => value);
+        const values = event.target.value
+            .split(",")
+            .map(value => value.trim())
+            .filter(value => value);
         setTags(values);
         setFormData(prev => ({
             ...prev,
-            tags: values
+            tags: values,
         }));
     };
 
     const handleDateChange = (date: Date | undefined) => {
         setFormData(prev => ({
             ...prev,
-            due_date: date
+            due_date: date,
         }));
     };
 
@@ -146,14 +167,14 @@ const EditCasePage = (): ReactNode => {
         setFormData(prev => ({
             ...prev,
             has_due_date: checked,
-            due_date: checked ? prev.due_date : undefined
+            due_date: checked ? prev.due_date : undefined,
         }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
-        
+
         try {
             if (!caseId) {
                 toast({
@@ -169,10 +190,12 @@ const EditCasePage = (): ReactNode => {
             const updatePayload: UpdateCasePayload = {
                 title: formData.title,
                 description: formData.description,
-                case_type: formData.case_type as UpdateCasePayload['case_type'],
-                status: formData.status as UpdateCasePayload['status'],
-                priority: formData.priority as UpdateCasePayload['priority'],
-                urgency_level: formData.urgency_level ? formData.urgency_level as UpdateCasePayload['urgency_level'] : undefined,
+                case_type: formData.case_type as UpdateCasePayload["case_type"],
+                status: formData.status as UpdateCasePayload["status"],
+                priority: formData.priority as UpdateCasePayload["priority"],
+                urgency_level: formData.urgency_level
+                    ? (formData.urgency_level as UpdateCasePayload["urgency_level"])
+                    : undefined,
                 assigned_to_id: formData.assigned_to_id,
                 due_date: formData.due_date ? formData.due_date.toISOString() : undefined,
                 estimated_duration: formData.estimated_duration || undefined,
@@ -182,12 +205,12 @@ const EditCasePage = (): ReactNode => {
 
             // Update the case
             await updateCase(caseId, updatePayload);
-            
+
             toast({
                 title: "Success",
                 description: "Case updated successfully",
             });
-            
+
             // Redirect back to case overview
             router.push(backPath);
         } catch (error) {
@@ -221,12 +244,13 @@ const EditCasePage = (): ReactNode => {
                     <FaFileAlt />
                     Edit Case
                 </h1>
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <p className="text-sm text-amber-800">
-                    <strong>Important:</strong> Once a case has a beneficiary assigned, the beneficiary cannot be changed to maintain case integrity. 
-                    You can edit all other case information including the assigned user, status, and details.
-                </p>
-            </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="text-sm text-amber-800">
+                        <strong>Important:</strong> Once a case has a beneficiary assigned, the
+                        beneficiary cannot be changed to maintain case integrity. You can edit all
+                        other case information including the assigned user, status, and details.
+                    </p>
+                </div>
             </div>
 
             <form
@@ -245,14 +269,17 @@ const EditCasePage = (): ReactNode => {
                                 id="title"
                                 placeholder="e.g. Emergency Housing Request"
                                 value={formData.title}
-                                onChange={(e) => handleInputChange("title", e.target.value)}
+                                onChange={e => handleInputChange("title", e.target.value)}
                                 required
                             />
                         </div>
 
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="case_type">Case Type *</Label>
-                            <Select value={formData.case_type} onValueChange={(value) => handleInputChange("case_type", value)}>
+                            <Select
+                                value={formData.case_type}
+                                onValueChange={value => handleInputChange("case_type", value)}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select case type..." />
                                 </SelectTrigger>
@@ -264,7 +291,9 @@ const EditCasePage = (): ReactNode => {
                                     <SelectItem value="EDUCATION">Education</SelectItem>
                                     <SelectItem value="EMPLOYMENT">Employment</SelectItem>
                                     <SelectItem value="FINANCIAL">Financial</SelectItem>
-                                    <SelectItem value="FAMILY_REUNIFICATION">Family Reunification</SelectItem>
+                                    <SelectItem value="FAMILY_REUNIFICATION">
+                                        Family Reunification
+                                    </SelectItem>
                                     <SelectItem value="DOCUMENTATION">Documentation</SelectItem>
                                     <SelectItem value="MENTAL_HEALTH">Mental Health</SelectItem>
                                     <SelectItem value="OTHER">Other</SelectItem>
@@ -275,7 +304,10 @@ const EditCasePage = (): ReactNode => {
                         <div className="w-full flex items-center gap-2">
                             <div className="flex flex-col gap-3 w-full">
                                 <Label htmlFor="priority">Priority *</Label>
-                                <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
+                                <Select
+                                    value={formData.priority}
+                                    onValueChange={value => handleInputChange("priority", value)}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select priority..." />
                                     </SelectTrigger>
@@ -290,7 +322,12 @@ const EditCasePage = (): ReactNode => {
 
                             <div className="flex flex-col gap-3 w-full">
                                 <Label htmlFor="urgency_level">Urgency Level</Label>
-                                <Select value={formData.urgency_level} onValueChange={(value) => handleInputChange("urgency_level", value)}>
+                                <Select
+                                    value={formData.urgency_level}
+                                    onValueChange={value =>
+                                        handleInputChange("urgency_level", value)
+                                    }
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select urgency..." />
                                     </SelectTrigger>
@@ -306,7 +343,10 @@ const EditCasePage = (): ReactNode => {
 
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="status">Status</Label>
-                            <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+                            <Select
+                                value={formData.status}
+                                onValueChange={value => handleInputChange("status", value)}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select status..." />
                                 </SelectTrigger>
@@ -329,7 +369,7 @@ const EditCasePage = (): ReactNode => {
                                 />
                                 <Label htmlFor="has_due_date">Set due date</Label>
                             </div>
-                            
+
                             {formData.has_due_date && (
                                 <Popover>
                                     <PopoverTrigger asChild>
@@ -341,7 +381,9 @@ const EditCasePage = (): ReactNode => {
                                             )}
                                         >
                                             <CalendarDays className="mr-2 h-4 w-4" />
-                                            {formData.due_date ? format(formData.due_date, "PPP") : "Pick a date"}
+                                            {formData.due_date
+                                                ? format(formData.due_date, "PPP")
+                                                : "Pick a date"}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0">
@@ -359,7 +401,12 @@ const EditCasePage = (): ReactNode => {
                         <div className="w-full flex items-center gap-2">
                             <div className="flex flex-col gap-3 w-full">
                                 <Label htmlFor="estimated_duration">Estimated Duration</Label>
-                                <Select value={formData.estimated_duration} onValueChange={(value) => handleInputChange("estimated_duration", value)}>
+                                <Select
+                                    value={formData.estimated_duration}
+                                    onValueChange={value =>
+                                        handleInputChange("estimated_duration", value)
+                                    }
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select duration..." />
                                     </SelectTrigger>
@@ -382,7 +429,9 @@ const EditCasePage = (): ReactNode => {
                                     id="budget_allocated"
                                     placeholder="e.g. $500"
                                     value={formData.budget_allocated}
-                                    onChange={(e) => handleInputChange("budget_allocated", e.target.value)}
+                                    onChange={e =>
+                                        handleInputChange("budget_allocated", e.target.value)
+                                    }
                                 />
                             </div>
                         </div>
@@ -393,7 +442,7 @@ const EditCasePage = (): ReactNode => {
                                 id="description"
                                 placeholder="Describe the case details, background, and any relevant information..."
                                 value={formData.description}
-                                onChange={(e) => handleInputChange("description", e.target.value)}
+                                onChange={e => handleInputChange("description", e.target.value)}
                                 rows={4}
                             />
                         </div>
@@ -418,11 +467,13 @@ const EditCasePage = (): ReactNode => {
                                 <div className="text-sm text-slate-500">Loading beneficiary...</div>
                             ) : (
                                 <div className="w-full p-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700">
-                                    {beneficiaries.find(b => b.id === formData.beneficiary_id)?.full_name || "Beneficiary not found"}
+                                    {beneficiaries.find(b => b.id === formData.beneficiary_id)
+                                        ?.full_name || "Beneficiary not found"}
                                 </div>
                             )}
                             <p className="text-xs text-gray-500">
-                                The beneficiary cannot be changed once assigned to maintain case integrity.
+                                The beneficiary cannot be changed once assigned to maintain case
+                                integrity.
                             </p>
                         </div>
 
@@ -430,19 +481,27 @@ const EditCasePage = (): ReactNode => {
                             <Label htmlFor="assigned_to_id" className="flex items-center gap-2">
                                 <FaUserTie className="text-relif-orange-200" />
                                 Assign to User
-                                <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                                <Badge
+                                    variant="outline"
+                                    className="text-xs bg-green-50 text-green-700"
+                                >
                                     Can be changed
                                 </Badge>
                             </Label>
                             {isLoadingData ? (
                                 <div className="text-sm text-slate-500">Loading users...</div>
                             ) : (
-                                <Select value={formData.assigned_to_id} onValueChange={(value) => handleInputChange("assigned_to_id", value)}>
+                                <Select
+                                    value={formData.assigned_to_id}
+                                    onValueChange={value =>
+                                        handleInputChange("assigned_to_id", value)
+                                    }
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select user..." />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {users.map((user) => (
+                                        {users.map(user => (
                                             <SelectItem key={user.id} value={user.id}>
                                                 {user.first_name} {user.last_name}
                                             </SelectItem>
@@ -484,10 +543,7 @@ const EditCasePage = (): ReactNode => {
                         >
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            disabled={!isFormValid || isSaving}
-                        >
+                        <Button type="submit" disabled={!isFormValid || isSaving}>
                             {isSaving ? "Saving..." : "Save Changes"}
                         </Button>
                     </div>
@@ -497,4 +553,4 @@ const EditCasePage = (): ReactNode => {
     );
 };
 
-export default EditCasePage; 
+export default EditCasePage;

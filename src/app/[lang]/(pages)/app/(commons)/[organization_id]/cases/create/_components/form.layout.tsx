@@ -21,7 +21,13 @@ import { CalendarDays, X, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags } from "react-icons/fa";
-import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, createCase, generateCaseDocumentUploadLink, createCaseDocument } from "@/repository/organization.repository";
+import {
+    getBeneficiariesByOrganizationID,
+    findUsersByOrganizationId,
+    createCase,
+    generateCaseDocumentUploadLink,
+    createCaseDocument,
+} from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
 import { CreateCasePayload } from "@/types/case.types";
@@ -71,7 +77,7 @@ export const CreateCaseForm = (): ReactNode => {
     const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[]>([]);
     const [users, setUsers] = useState<UserSchema[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
-    
+
     const [formData, setFormData] = useState<CaseFormData>({
         title: "",
         description: "",
@@ -102,7 +108,7 @@ export const CreateCaseForm = (): ReactNode => {
             try {
                 setIsLoadingData(true);
                 const organizationId = pathname.split("/")[3];
-                
+
                 if (!organizationId) {
                     console.error("Organization ID not found");
                     return;
@@ -111,7 +117,7 @@ export const CreateCaseForm = (): ReactNode => {
                 // Load beneficiaries and users in parallel
                 const [beneficiariesResponse, usersResponse] = await Promise.all([
                     getBeneficiariesByOrganizationID(organizationId, 0, 1000, ""),
-                    findUsersByOrganizationId(organizationId, 0, 1000)
+                    findUsersByOrganizationId(organizationId, 0, 1000),
                 ]);
 
                 setBeneficiaries(beneficiariesResponse.data.data || []);
@@ -126,34 +132,47 @@ export const CreateCaseForm = (): ReactNode => {
         loadData();
     }, [pathname]);
 
-    const handleInputChange = (field: keyof CaseFormData, value: string | boolean | Date | undefined) => {
+    const handleInputChange = (
+        field: keyof CaseFormData,
+        value: string | boolean | Date | undefined
+    ) => {
         setFormData(prev => ({
             ...prev,
-            [field]: value
+            [field]: value,
         }));
     };
 
-    const handleNoteChange = (field: keyof typeof formData.initial_note, value: string | boolean | string[]) => {
+    const handleNoteChange = (
+        field: keyof typeof formData.initial_note,
+        value: string | boolean | string[]
+    ) => {
         setFormData(prev => ({
             ...prev,
             initial_note: {
                 ...prev.initial_note,
-                [field]: value
-            }
+                [field]: value,
+            },
         }));
     };
 
-    const handleTagsChange = (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
-        const values = event.target.value.split(",").map(value => value.trim()).filter(value => value);
-        setter(values);
-        setFormData(prev => ({
-            ...prev,
-            tags: values
-        }));
-    };
+    const handleTagsChange =
+        (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
+            const values = event.target.value
+                .split(",")
+                .map(value => value.trim())
+                .filter(value => value);
+            setter(values);
+            setFormData(prev => ({
+                ...prev,
+                tags: values,
+            }));
+        };
 
     const handleNoteTagsChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const values = event.target.value.split(",").map(value => value.trim()).filter(value => value);
+        const values = event.target.value
+            .split(",")
+            .map(value => value.trim())
+            .filter(value => value);
         setNoteTags(values);
         handleNoteChange("tags", values);
     };
@@ -161,7 +180,7 @@ export const CreateCaseForm = (): ReactNode => {
     const handleDateChange = (date: Date | undefined) => {
         setFormData(prev => ({
             ...prev,
-            due_date: date
+            due_date: date,
         }));
     };
 
@@ -169,7 +188,7 @@ export const CreateCaseForm = (): ReactNode => {
         setFormData(prev => ({
             ...prev,
             has_due_date: checked,
-            due_date: checked ? prev.due_date : undefined
+            due_date: checked ? prev.due_date : undefined,
         }));
     };
 
@@ -181,21 +200,25 @@ export const CreateCaseForm = (): ReactNode => {
             type: "OTHER",
             description: "",
             tags: [],
-            isFinalized: false
+            isFinalized: false,
         }));
-        
+
         setFormData(prev => ({
             ...prev,
-            documents: [...prev.documents, ...newDocuments]
+            documents: [...prev.documents, ...newDocuments],
         }));
     };
 
-    const updateDocument = (index: number, field: keyof DocumentData, value: string | string[] | boolean) => {
+    const updateDocument = (
+        index: number,
+        field: keyof DocumentData,
+        value: string | string[] | boolean
+    ) => {
         setFormData(prev => ({
             ...prev,
-            documents: prev.documents.map((doc, i) => 
+            documents: prev.documents.map((doc, i) =>
                 i === index ? { ...doc, [field]: value } : doc
-            )
+            ),
         }));
     };
 
@@ -210,17 +233,17 @@ export const CreateCaseForm = (): ReactNode => {
     const removeDocument = (index: number) => {
         setFormData(prev => ({
             ...prev,
-            documents: prev.documents.filter((_, i) => i !== index)
+            documents: prev.documents.filter((_, i) => i !== index),
         }));
     };
 
     const addNewDocument = () => {
         // Create a file input element to trigger file selection
-        const input = document.createElement('input');
-        input.type = 'file';
+        const input = document.createElement("input");
+        input.type = "file";
         input.multiple = true;
-        input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt';
-        input.onchange = (e) => {
+        input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt";
+        input.onchange = e => {
             const files = Array.from((e.target as HTMLInputElement).files || []);
             const newDocuments: DocumentData[] = files.map(file => ({
                 file,
@@ -228,12 +251,12 @@ export const CreateCaseForm = (): ReactNode => {
                 type: "OTHER",
                 description: "",
                 tags: [],
-                isFinalized: false
+                isFinalized: false,
             }));
-            
+
             setFormData(prev => ({
                 ...prev,
-                documents: [...prev.documents, ...newDocuments]
+                documents: [...prev.documents, ...newDocuments],
             }));
         };
         input.click();
@@ -245,7 +268,7 @@ export const CreateCaseForm = (): ReactNode => {
 
         try {
             const organizationId = pathname.split("/")[3];
-            
+
             if (!organizationId) {
                 toast({
                     title: "Error",
@@ -261,9 +284,11 @@ export const CreateCaseForm = (): ReactNode => {
                 assigned_to_id: formData.assigned_to_id,
                 title: formData.title,
                 description: formData.description,
-                case_type: formData.case_type as CreateCasePayload['case_type'],
-                priority: formData.priority as CreateCasePayload['priority'],
-                urgency_level: formData.urgency_level ? formData.urgency_level as CreateCasePayload['urgency_level'] : undefined,
+                case_type: formData.case_type as CreateCasePayload["case_type"],
+                priority: formData.priority as CreateCasePayload["priority"],
+                urgency_level: formData.urgency_level
+                    ? (formData.urgency_level as CreateCasePayload["urgency_level"])
+                    : undefined,
                 due_date: formData.due_date ? formData.due_date.toISOString() : undefined,
                 estimated_duration: formData.estimated_duration || undefined,
                 budget_allocated: formData.budget_allocated || undefined,
@@ -275,7 +300,12 @@ export const CreateCaseForm = (): ReactNode => {
                 casePayload.initial_note = {
                     title: formData.initial_note.title,
                     content: formData.initial_note.content,
-                    note_type: formData.initial_note.note_type as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER",
+                    note_type: formData.initial_note.note_type as
+                        | "CALL"
+                        | "MEETING"
+                        | "UPDATE"
+                        | "APPOINTMENT"
+                        | "OTHER",
                     is_important: formData.initial_note.is_important,
                     tags: formData.initial_note.tags,
                 };
@@ -284,14 +314,16 @@ export const CreateCaseForm = (): ReactNode => {
             // Create the case
             const response = await createCase(casePayload);
             const newCaseId = response.data.id;
-            
+
             // Handle document uploads if any documents were added
             if (formData.documents.length > 0) {
                 for (const doc of formData.documents) {
                     try {
                         // Step 1: Get S3 upload link
-                        const { data: uploadLinkData } = await generateCaseDocumentUploadLink(doc.file.type);
-                        
+                        const { data: uploadLinkData } = await generateCaseDocumentUploadLink(
+                            doc.file.type
+                        );
+
                         // Step 2: Upload file directly to S3
                         await fetch(uploadLinkData.link, {
                             method: "PUT",
@@ -300,10 +332,10 @@ export const CreateCaseForm = (): ReactNode => {
                             },
                             body: doc.file,
                         });
-                        
+
                         // Step 3: Get S3 URL without query parameters
                         const s3Url = uploadLinkData.link.split("?")[0];
-                        
+
                         // Step 4: Create document record in database
                         await createCaseDocument(newCaseId, {
                             document_name: doc.name,
@@ -321,14 +353,14 @@ export const CreateCaseForm = (): ReactNode => {
                     }
                 }
             }
-            
+
             toast({
                 title: "Success",
                 description: "Case created successfully",
             });
-            
+
             // Redirect back to cases list
-            const casesPath = pathname.replace('/create', '');
+            const casesPath = pathname.replace("/create", "");
             router.push(casesPath);
         } catch (error) {
             console.error("Error creating case:", error);
@@ -342,7 +374,8 @@ export const CreateCaseForm = (): ReactNode => {
         }
     };
 
-    const isFormValid = formData.title && formData.case_type && formData.priority && formData.beneficiary_id;
+    const isFormValid =
+        formData.title && formData.case_type && formData.priority && formData.beneficiary_id;
 
     return (
         <form
@@ -361,14 +394,17 @@ export const CreateCaseForm = (): ReactNode => {
                             id="title"
                             placeholder="e.g. Emergency Housing Request"
                             value={formData.title}
-                            onChange={(e) => handleInputChange("title", e.target.value)}
+                            onChange={e => handleInputChange("title", e.target.value)}
                             required
                         />
                     </div>
 
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="case_type">Case Type *</Label>
-                        <Select value={formData.case_type} onValueChange={(value) => handleInputChange("case_type", value)}>
+                        <Select
+                            value={formData.case_type}
+                            onValueChange={value => handleInputChange("case_type", value)}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select case type..." />
                             </SelectTrigger>
@@ -380,7 +416,9 @@ export const CreateCaseForm = (): ReactNode => {
                                 <SelectItem value="EDUCATION">Education</SelectItem>
                                 <SelectItem value="EMPLOYMENT">Employment</SelectItem>
                                 <SelectItem value="FINANCIAL">Financial</SelectItem>
-                                <SelectItem value="FAMILY_REUNIFICATION">Family Reunification</SelectItem>
+                                <SelectItem value="FAMILY_REUNIFICATION">
+                                    Family Reunification
+                                </SelectItem>
                                 <SelectItem value="DOCUMENTATION">Documentation</SelectItem>
                                 <SelectItem value="MENTAL_HEALTH">Mental Health</SelectItem>
                                 <SelectItem value="OTHER">Other</SelectItem>
@@ -391,7 +429,10 @@ export const CreateCaseForm = (): ReactNode => {
                     <div className="w-full flex items-center gap-2">
                         <div className="flex flex-col gap-3 w-full">
                             <Label htmlFor="priority">Priority *</Label>
-                            <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
+                            <Select
+                                value={formData.priority}
+                                onValueChange={value => handleInputChange("priority", value)}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select priority..." />
                                 </SelectTrigger>
@@ -406,7 +447,10 @@ export const CreateCaseForm = (): ReactNode => {
 
                         <div className="flex flex-col gap-3 w-full">
                             <Label htmlFor="urgency_level">Urgency Level</Label>
-                            <Select value={formData.urgency_level} onValueChange={(value) => handleInputChange("urgency_level", value)}>
+                            <Select
+                                value={formData.urgency_level}
+                                onValueChange={value => handleInputChange("urgency_level", value)}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select urgency..." />
                                 </SelectTrigger>
@@ -422,7 +466,10 @@ export const CreateCaseForm = (): ReactNode => {
 
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="status">Status</Label>
-                        <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
+                        <Select
+                            value={formData.status}
+                            onValueChange={value => handleInputChange("status", value)}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select status..." />
                             </SelectTrigger>
@@ -444,7 +491,7 @@ export const CreateCaseForm = (): ReactNode => {
                             />
                             <Label htmlFor="has_due_date">Set due date</Label>
                         </div>
-                        
+
                         {formData.has_due_date && (
                             <Popover>
                                 <PopoverTrigger asChild>
@@ -456,7 +503,9 @@ export const CreateCaseForm = (): ReactNode => {
                                         )}
                                     >
                                         <CalendarDays className="mr-2 h-4 w-4" />
-                                        {formData.due_date ? format(formData.due_date, "PPP") : "Pick a date"}
+                                        {formData.due_date
+                                            ? format(formData.due_date, "PPP")
+                                            : "Pick a date"}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0">
@@ -474,7 +523,12 @@ export const CreateCaseForm = (): ReactNode => {
                     <div className="w-full flex items-center gap-2">
                         <div className="flex flex-col gap-3 w-full">
                             <Label htmlFor="estimated_duration">Estimated Duration</Label>
-                            <Select value={formData.estimated_duration} onValueChange={(value) => handleInputChange("estimated_duration", value)}>
+                            <Select
+                                value={formData.estimated_duration}
+                                onValueChange={value =>
+                                    handleInputChange("estimated_duration", value)
+                                }
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select duration..." />
                                 </SelectTrigger>
@@ -497,7 +551,9 @@ export const CreateCaseForm = (): ReactNode => {
                                 id="budget_allocated"
                                 placeholder="e.g. $500"
                                 value={formData.budget_allocated}
-                                onChange={(e) => handleInputChange("budget_allocated", e.target.value)}
+                                onChange={e =>
+                                    handleInputChange("budget_allocated", e.target.value)
+                                }
                             />
                         </div>
                     </div>
@@ -508,7 +564,7 @@ export const CreateCaseForm = (): ReactNode => {
                             id="description"
                             placeholder="Describe the case details, background, and any relevant information..."
                             value={formData.description}
-                            onChange={(e) => handleInputChange("description", e.target.value)}
+                            onChange={e => handleInputChange("description", e.target.value)}
                             rows={4}
                         />
                     </div>
@@ -521,12 +577,15 @@ export const CreateCaseForm = (): ReactNode => {
 
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="beneficiary_id">Beneficiary *</Label>
-                        <Select value={formData.beneficiary_id} onValueChange={(value) => handleInputChange("beneficiary_id", value)}>
+                        <Select
+                            value={formData.beneficiary_id}
+                            onValueChange={value => handleInputChange("beneficiary_id", value)}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select beneficiary..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {beneficiaries.map((beneficiary) => (
+                                {beneficiaries.map(beneficiary => (
                                     <SelectItem key={beneficiary.id} value={beneficiary.id}>
                                         {beneficiary.full_name}
                                     </SelectItem>
@@ -537,12 +596,15 @@ export const CreateCaseForm = (): ReactNode => {
 
                     <div className="flex flex-col gap-3">
                         <Label htmlFor="assigned_to_id">Assign to User</Label>
-                        <Select value={formData.assigned_to_id} onValueChange={(value) => handleInputChange("assigned_to_id", value)}>
+                        <Select
+                            value={formData.assigned_to_id}
+                            onValueChange={value => handleInputChange("assigned_to_id", value)}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select user..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {users.map((user) => (
+                                {users.map(user => (
                                     <SelectItem key={user.id} value={user.id}>
                                         {user.first_name} {user.last_name}
                                     </SelectItem>
@@ -612,14 +674,21 @@ export const CreateCaseForm = (): ReactNode => {
                         <div className="space-y-4">
                             <Label>Document Details</Label>
                             {formData.documents.map((doc, index) => (
-                                <div key={index} className={`p-4 border rounded-lg space-y-3 ${doc.isFinalized ? 'border-green-200 bg-green-50/30' : 'border-gray-200'}`}>
+                                <div
+                                    key={index}
+                                    className={`p-4 border rounded-lg space-y-3 ${doc.isFinalized ? "border-green-200 bg-green-50/30" : "border-gray-200"}`}
+                                >
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm font-medium text-gray-700">
-                                            {doc.file.name} ({(doc.file.size / 1024 / 1024).toFixed(2)} MB)
+                                            {doc.file.name} (
+                                            {(doc.file.size / 1024 / 1024).toFixed(2)} MB)
                                         </span>
                                         <div className="flex items-center gap-2">
                                             {doc.isFinalized && (
-                                                <Badge variant="outline" className="text-green-600 border-green-600">
+                                                <Badge
+                                                    variant="outline"
+                                                    className="text-green-600 border-green-600"
+                                                >
                                                     Finalized
                                                 </Badge>
                                             )}
@@ -634,61 +703,102 @@ export const CreateCaseForm = (): ReactNode => {
                                             </Button>
                                         </div>
                                     </div>
-                                    
+
                                     {!doc.isFinalized ? (
                                         <>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 <div>
-                                                    <Label htmlFor={`doc-name-${index}`}>Document Name</Label>
+                                                    <Label htmlFor={`doc-name-${index}`}>
+                                                        Document Name
+                                                    </Label>
                                                     <Input
                                                         id={`doc-name-${index}`}
                                                         value={doc.name}
-                                                        onChange={(e) => updateDocument(index, "name", e.target.value)}
+                                                        onChange={e =>
+                                                            updateDocument(
+                                                                index,
+                                                                "name",
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         placeholder="Enter document name"
                                                     />
                                                 </div>
-                                                
+
                                                 <div>
-                                                    <Label htmlFor={`doc-type-${index}`}>Document Type</Label>
-                                                    <Select 
-                                                        value={doc.type} 
-                                                        onValueChange={(value) => updateDocument(index, "type", value)}
+                                                    <Label htmlFor={`doc-type-${index}`}>
+                                                        Document Type
+                                                    </Label>
+                                                    <Select
+                                                        value={doc.type}
+                                                        onValueChange={value =>
+                                                            updateDocument(index, "type", value)
+                                                        }
                                                     >
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Select type..." />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="FORM">Form</SelectItem>
-                                                            <SelectItem value="REPORT">Report</SelectItem>
-                                                            <SelectItem value="EVIDENCE">Evidence</SelectItem>
-                                                            <SelectItem value="CORRESPONDENCE">Correspondence</SelectItem>
-                                                            <SelectItem value="IDENTIFICATION">Identification</SelectItem>
-                                                            <SelectItem value="LEGAL">Legal Document</SelectItem>
-                                                            <SelectItem value="MEDICAL">Medical Document</SelectItem>
-                                                            <SelectItem value="OTHER">Other</SelectItem>
+                                                            <SelectItem value="FORM">
+                                                                Form
+                                                            </SelectItem>
+                                                            <SelectItem value="REPORT">
+                                                                Report
+                                                            </SelectItem>
+                                                            <SelectItem value="EVIDENCE">
+                                                                Evidence
+                                                            </SelectItem>
+                                                            <SelectItem value="CORRESPONDENCE">
+                                                                Correspondence
+                                                            </SelectItem>
+                                                            <SelectItem value="IDENTIFICATION">
+                                                                Identification
+                                                            </SelectItem>
+                                                            <SelectItem value="LEGAL">
+                                                                Legal Document
+                                                            </SelectItem>
+                                                            <SelectItem value="MEDICAL">
+                                                                Medical Document
+                                                            </SelectItem>
+                                                            <SelectItem value="OTHER">
+                                                                Other
+                                                            </SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
                                             </div>
-                                            
+
                                             <div>
-                                                <Label htmlFor={`doc-description-${index}`}>Description</Label>
+                                                <Label htmlFor={`doc-description-${index}`}>
+                                                    Description
+                                                </Label>
                                                 <Textarea
                                                     id={`doc-description-${index}`}
                                                     value={doc.description}
-                                                    onChange={(e) => updateDocument(index, "description", e.target.value)}
+                                                    onChange={e =>
+                                                        updateDocument(
+                                                            index,
+                                                            "description",
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     placeholder="Brief description of the document"
                                                     rows={2}
                                                 />
                                             </div>
-                                            
+
                                             <div>
-                                                <Label htmlFor={`doc-tags-${index}`}>Tags (comma separated)</Label>
+                                                <Label htmlFor={`doc-tags-${index}`}>
+                                                    Tags (comma separated)
+                                                </Label>
                                                 <Input
                                                     id={`doc-tags-${index}`}
                                                     value={doc.tags.join(", ")}
-                                                    onChange={(e) => {
-                                                        const tags = e.target.value.split(",").map(tag => tag.trim()).filter(tag => tag);
+                                                    onChange={e => {
+                                                        const tags = e.target.value
+                                                            .split(",")
+                                                            .map(tag => tag.trim())
+                                                            .filter(tag => tag);
                                                         updateDocument(index, "tags", tags);
                                                     }}
                                                     placeholder="e.g. important, legal, housing"
@@ -696,7 +806,11 @@ export const CreateCaseForm = (): ReactNode => {
                                                 {doc.tags.length > 0 && (
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {doc.tags.map((tag, tagIndex) => (
-                                                            <Badge variant="outline" key={tagIndex} className="text-xs">
+                                                            <Badge
+                                                                variant="outline"
+                                                                key={tagIndex}
+                                                                className="text-xs"
+                                                            >
                                                                 #{tag}
                                                             </Badge>
                                                         ))}
@@ -719,21 +833,30 @@ export const CreateCaseForm = (): ReactNode => {
                                         <div className="space-y-2">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                                 <div>
-                                                    <span className="font-medium">Name:</span> {doc.name}
+                                                    <span className="font-medium">Name:</span>{" "}
+                                                    {doc.name}
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">Type:</span> {doc.type}
+                                                    <span className="font-medium">Type:</span>{" "}
+                                                    {doc.type}
                                                 </div>
                                             </div>
                                             {doc.description && (
                                                 <div className="text-sm">
-                                                    <span className="font-medium">Description:</span> {doc.description}
+                                                    <span className="font-medium">
+                                                        Description:
+                                                    </span>{" "}
+                                                    {doc.description}
                                                 </div>
                                             )}
                                             {doc.tags.length > 0 && (
                                                 <div className="flex flex-wrap gap-1">
                                                     {doc.tags.map((tag, tagIndex) => (
-                                                        <Badge variant="outline" key={tagIndex} className="text-xs">
+                                                        <Badge
+                                                            variant="outline"
+                                                            key={tagIndex}
+                                                            className="text-xs"
+                                                        >
                                                             #{tag}
                                                         </Badge>
                                                     ))}
@@ -766,7 +889,7 @@ export const CreateCaseForm = (): ReactNode => {
                         <Input
                             id="note_title"
                             value={formData.initial_note.title}
-                            onChange={(e) => handleNoteChange("title", e.target.value)}
+                            onChange={e => handleNoteChange("title", e.target.value)}
                             placeholder="e.g. Case creation details"
                         />
                     </div>
@@ -776,7 +899,7 @@ export const CreateCaseForm = (): ReactNode => {
                         <Textarea
                             id="note_content"
                             value={formData.initial_note.content}
-                            onChange={(e) => handleNoteChange("content", e.target.value)}
+                            onChange={e => handleNoteChange("content", e.target.value)}
                             placeholder="Add any initial observations, next steps, or important information..."
                             rows={3}
                         />
@@ -785,9 +908,9 @@ export const CreateCaseForm = (): ReactNode => {
                     <div className="w-full flex items-center gap-2">
                         <div className="flex flex-col gap-3 w-full">
                             <Label htmlFor="note_type">Note Type</Label>
-                            <Select 
-                                value={formData.initial_note.note_type} 
-                                onValueChange={(value) => handleNoteChange("note_type", value)}
+                            <Select
+                                value={formData.initial_note.note_type}
+                                onValueChange={value => handleNoteChange("note_type", value)}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
@@ -801,7 +924,7 @@ export const CreateCaseForm = (): ReactNode => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        
+
                         <div className="flex flex-col gap-3 w-full">
                             <Label htmlFor="note_tags">Note Tags</Label>
                             <Input
@@ -827,7 +950,9 @@ export const CreateCaseForm = (): ReactNode => {
                         <Checkbox
                             id="note_important"
                             checked={formData.initial_note.is_important}
-                            onCheckedChange={(checked) => handleNoteChange("is_important", checked as boolean)}
+                            onCheckedChange={checked =>
+                                handleNoteChange("is_important", checked as boolean)
+                            }
                         />
                         <Label htmlFor="note_important" className="flex items-center gap-1">
                             <FaFlag className="w-3 h-3 text-red-500" />
@@ -841,20 +966,17 @@ export const CreateCaseForm = (): ReactNode => {
                         type="button"
                         variant="outline"
                         onClick={() => {
-                            const casesPath = pathname.replace('/create', '');
+                            const casesPath = pathname.replace("/create", "");
                             router.push(casesPath);
                         }}
                     >
                         Cancel
                     </Button>
-                    <Button
-                        type="submit"
-                        disabled={!isFormValid || isLoading}
-                    >
+                    <Button type="submit" disabled={!isFormValid || isLoading}>
                         {isLoading ? "Creating..." : "Create Case"}
                     </Button>
                 </div>
             </div>
         </form>
     );
-}; 
+};

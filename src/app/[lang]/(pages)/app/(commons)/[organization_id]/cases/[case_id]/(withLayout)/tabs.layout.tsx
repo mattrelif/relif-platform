@@ -17,18 +17,14 @@ const TabsLayout = (): ReactNode => {
         <Tabs defaultValue={activeOption} className="w-full">
             <TabsList>
                 <TabsTrigger value="overview" asChild>
-                    <Link href={`${urlPath}`}>
-                        Overview
-                    </Link>
+                    <Link href={`${urlPath}`}>Overview</Link>
                 </TabsTrigger>
                 <TabsTrigger value="notes" asChild>
-                    <Link href={`${urlPath}/notes`}>
-                        Updates
-                    </Link>
+                    <Link href={`${urlPath}/notes`}>Updates</Link>
                 </TabsTrigger>
             </TabsList>
         </Tabs>
     );
 };
 
-export { TabsLayout }; 
+export { TabsLayout };

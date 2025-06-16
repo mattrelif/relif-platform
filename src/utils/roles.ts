@@ -171,7 +171,7 @@ export const roles = {
         "Interim Manager",
         "Temporary Staff",
         "Volunteer Coordinator",
-        "Intern"
+        "Intern",
     ],
     es: [
         "Director Ejecutivo",
@@ -344,7 +344,7 @@ export const roles = {
         "Gerente Interino",
         "Personal Temporal",
         "Coordenador de Voluntarios",
-        "Intern"
+        "Intern",
     ],
     pt: [
         "Diretor Executivo",
@@ -517,6 +517,6 @@ export const roles = {
         "Gerente Interino",
         "Pessoal Temporário",
         "Coordenador de Voluntários",
-        "Estagiário/a"
-    ]
+        "Estagiário/a",
+    ],
 };

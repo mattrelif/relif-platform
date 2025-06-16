@@ -25,7 +25,17 @@ import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaCalendarAlt, FaEdit, FaFileAlt, FaStickyNote, FaTrash, FaUser, FaClock, FaDollarSign, FaEye } from "react-icons/fa";
+import {
+    FaCalendarAlt,
+    FaEdit,
+    FaFileAlt,
+    FaStickyNote,
+    FaTrash,
+    FaUser,
+    FaClock,
+    FaDollarSign,
+    FaEye,
+} from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 import Link from "next/link";
 import { deleteCase } from "@/repository/organization.repository";
@@ -57,24 +67,19 @@ const URGENCY_COLORS = {
     FLEXIBLE: "bg-green-100 text-green-700 border-green-200",
 };
 
-
-
 const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void }): ReactNode => {
     const router = useRouter();
     const pathname = usePathname();
     const platformRole = usePlatformRole();
     const { toast } = useToast();
-    
+
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    
+
     const casePath = pathname.split("/").slice(0, 5).join("/");
     const locale = pathname.split("/")[1] as string;
 
-    const handleDropdownItemClick = (
-        e: React.MouseEvent<HTMLDivElement>,
-        route: string
-    ) => {
+    const handleDropdownItemClick = (e: React.MouseEvent<HTMLDivElement>, route: string) => {
         e.stopPropagation();
         router.push(route);
     };
@@ -86,15 +91,15 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
-        
+
         try {
             await deleteCase(data.id);
-            
+
             toast({
                 title: "Case deleted successfully",
                 description: `Case "${data.title}" has been permanently deleted.`,
             });
-            
+
             // Refresh the cases list
             refreshList();
             setShowDeleteDialog(false);
@@ -111,8 +116,9 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
     };
 
     // Check if case is overdue - only for active cases (not closed/cancelled)
-    const isOverdue = data.due_date && 
-        (data.status === "IN_PROGRESS" || data.status === "PENDING" || data.status === "ON_HOLD") && 
+    const isOverdue =
+        data.due_date &&
+        (data.status === "IN_PROGRESS" || data.status === "PENDING" || data.status === "ON_HOLD") &&
         new Date() > new Date(data.due_date);
 
     return (
@@ -122,34 +128,38 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                     <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold text-slate-900">{data?.title}</h3>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm text-slate-500">{data?.case_number}</span>
                         <span className="text-sm text-slate-500">•</span>
-                        <span className="text-sm text-slate-500">{data?.beneficiary?.full_name}</span>
+                        <span className="text-sm text-slate-500">
+                            {data?.beneficiary?.full_name}
+                        </span>
                         <span className="text-sm text-slate-500">•</span>
-                        <span className="text-sm text-slate-500">{convertToTitleCase(data?.case_type?.replace('_', ' '))}</span>
+                        <span className="text-sm text-slate-500">
+                            {convertToTitleCase(data?.case_type?.replace("_", " "))}
+                        </span>
                     </div>
 
                     <div className="flex gap-2 mb-3 flex-wrap">
-                        <Badge 
+                        <Badge
                             variant="outline"
-                            className={`text-xs ${STATUS_COLORS[data?.status as keyof typeof STATUS_COLORS] || 'text-slate-600'}`}
+                            className={`text-xs ${STATUS_COLORS[data?.status as keyof typeof STATUS_COLORS] || "text-slate-600"}`}
                         >
-                            {convertToTitleCase(data?.status?.replace('_', ' '))}
+                            {convertToTitleCase(data?.status?.replace("_", " "))}
                         </Badge>
-                        <Badge 
+                        <Badge
                             variant="outline"
-                            className={`text-xs ${PRIORITY_COLORS[data?.priority as keyof typeof PRIORITY_COLORS] || 'text-slate-600'}`}
+                            className={`text-xs ${PRIORITY_COLORS[data?.priority as keyof typeof PRIORITY_COLORS] || "text-slate-600"}`}
                         >
                             {convertToTitleCase(data?.priority)}
                         </Badge>
                         {data?.urgency_level && (
-                            <Badge 
+                            <Badge
                                 variant="outline"
-                                className={`text-xs ${URGENCY_COLORS[data?.urgency_level as keyof typeof URGENCY_COLORS] || 'text-slate-600'}`}
+                                className={`text-xs ${URGENCY_COLORS[data?.urgency_level as keyof typeof URGENCY_COLORS] || "text-slate-600"}`}
                             >
-                                {convertToTitleCase(data?.urgency_level?.replace('_', ' '))}
+                                {convertToTitleCase(data?.urgency_level?.replace("_", " "))}
                             </Badge>
                         )}
                         {isOverdue && (
@@ -163,12 +173,19 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                     {data?.tags && data.tags.length > 0 && (
                         <div className="flex gap-1 mb-3 flex-wrap">
                             {data.tags.slice(0, 3).map((tag, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs bg-slate-100 text-slate-700">
+                                <Badge
+                                    key={index}
+                                    variant="secondary"
+                                    className="text-xs bg-slate-100 text-slate-700"
+                                >
                                     #{tag}
                                 </Badge>
                             ))}
                             {data.tags.length > 3 && (
-                                <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-700">
+                                <Badge
+                                    variant="secondary"
+                                    className="text-xs bg-slate-100 text-slate-700"
+                                >
                                     +{data.tags.length - 3} more
                                 </Badge>
                             )}
@@ -178,12 +195,17 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                     <div className="flex items-center gap-4 text-sm text-slate-500 flex-wrap">
                         <div className="flex items-center gap-1">
                             <FaCalendarAlt className="text-xs" />
-                            <span>Due: {formatDate(data?.due_date || "", locale as "en" | "es" | "pt")}</span>
+                            <span>
+                                Due:{" "}
+                                {formatDate(data?.due_date || "", locale as "en" | "es" | "pt")}
+                            </span>
                         </div>
                         {data?.estimated_duration && (
                             <div className="flex items-center gap-1">
                                 <FaClock className="text-xs" />
-                                <span>{convertToTitleCase(data.estimated_duration.replace('_', ' '))}</span>
+                                <span>
+                                    {convertToTitleCase(data.estimated_duration.replace("_", " "))}
+                                </span>
                             </div>
                         )}
                         {data?.budget_allocated && (
@@ -202,7 +224,10 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                                 {data?.documents_count || 0}
                             </span>
                         </div>
-                        <span className="ml-auto">Updated {formatDate(data?.updated_at || "", locale as "en" | "es" | "pt")}</span>
+                        <span className="ml-auto">
+                            Updated{" "}
+                            {formatDate(data?.updated_at || "", locale as "en" | "es" | "pt")}
+                        </span>
                     </div>
                 </div>
 
@@ -228,7 +253,7 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                     className="text-red-600"
                                     onClick={handleDeleteClick}
                                 >
@@ -250,7 +275,7 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                             Are you sure you want to delete this case? This action cannot be undone.
                         </DialogDescription>
                     </DialogHeader>
-                    
+
                     <div className="py-4">
                         <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                             <h4 className="font-medium text-red-900 mb-1">{data.title}</h4>
@@ -258,21 +283,22 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                                 Case #{data.case_number} • {data.beneficiary?.full_name}
                             </p>
                             <p className="text-sm text-red-600 mt-2">
-                                This will permanently delete the case and all associated documents, notes, and data.
+                                This will permanently delete the case and all associated documents,
+                                notes, and data.
                             </p>
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={() => setShowDeleteDialog(false)}
                             disabled={isDeleting}
                         >
                             Cancel
                         </Button>
-                        <Button 
-                            variant="destructive" 
+                        <Button
+                            variant="destructive"
                             onClick={handleDeleteConfirm}
                             disabled={isDeleting}
                         >
@@ -285,4 +311,4 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
     );
 };
 
-export { Card }; 
+export { Card };

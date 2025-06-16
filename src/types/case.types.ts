@@ -6,7 +6,18 @@ export interface CaseSchema {
     status: "IN_PROGRESS" | "PENDING" | "ON_HOLD" | "CLOSED" | "CANCELLED";
     priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     urgency_level?: "IMMEDIATE" | "WITHIN_WEEK" | "WITHIN_MONTH" | "FLEXIBLE";
-    case_type: "HOUSING" | "LEGAL" | "MEDICAL" | "SUPPORT" | "EDUCATION" | "EMPLOYMENT" | "FINANCIAL" | "FAMILY_REUNIFICATION" | "DOCUMENTATION" | "MENTAL_HEALTH" | "OTHER";
+    case_type:
+        | "HOUSING"
+        | "LEGAL"
+        | "MEDICAL"
+        | "SUPPORT"
+        | "EDUCATION"
+        | "EMPLOYMENT"
+        | "FINANCIAL"
+        | "FAMILY_REUNIFICATION"
+        | "DOCUMENTATION"
+        | "MENTAL_HEALTH"
+        | "OTHER";
     beneficiary_id: string;
     beneficiary: {
         id: string;
@@ -57,7 +68,15 @@ export interface CaseDocumentSchema {
     case_id: string;
     document_name: string;
     file_name: string;
-    document_type: "FORM" | "REPORT" | "EVIDENCE" | "CORRESPONDENCE" | "IDENTIFICATION" | "LEGAL" | "MEDICAL" | "OTHER";
+    document_type:
+        | "FORM"
+        | "REPORT"
+        | "EVIDENCE"
+        | "CORRESPONDENCE"
+        | "IDENTIFICATION"
+        | "LEGAL"
+        | "MEDICAL"
+        | "OTHER";
     file_size: number;
     mime_type: string;
     description: string;
@@ -84,7 +103,18 @@ export interface CreateCasePayload {
     assigned_to_id: string;
     title: string;
     description: string;
-    case_type: "HOUSING" | "LEGAL" | "MEDICAL" | "SUPPORT" | "EDUCATION" | "EMPLOYMENT" | "FINANCIAL" | "FAMILY_REUNIFICATION" | "DOCUMENTATION" | "MENTAL_HEALTH" | "OTHER";
+    case_type:
+        | "HOUSING"
+        | "LEGAL"
+        | "MEDICAL"
+        | "SUPPORT"
+        | "EDUCATION"
+        | "EMPLOYMENT"
+        | "FINANCIAL"
+        | "FAMILY_REUNIFICATION"
+        | "DOCUMENTATION"
+        | "MENTAL_HEALTH"
+        | "OTHER";
     priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     urgency_level?: "IMMEDIATE" | "WITHIN_WEEK" | "WITHIN_MONTH" | "FLEXIBLE";
     due_date?: string;
@@ -100,7 +130,15 @@ export interface CreateCasePayload {
     };
     documents?: {
         document_name: string;
-        document_type: "FORM" | "REPORT" | "EVIDENCE" | "CORRESPONDENCE" | "IDENTIFICATION" | "LEGAL" | "MEDICAL" | "OTHER";
+        document_type:
+            | "FORM"
+            | "REPORT"
+            | "EVIDENCE"
+            | "CORRESPONDENCE"
+            | "IDENTIFICATION"
+            | "LEGAL"
+            | "MEDICAL"
+            | "OTHER";
         description: string;
         tags: string[];
         file: File;
@@ -113,7 +151,18 @@ export interface UpdateCasePayload {
     status?: "IN_PROGRESS" | "PENDING" | "ON_HOLD" | "CLOSED" | "CANCELLED";
     priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     urgency_level?: "IMMEDIATE" | "WITHIN_WEEK" | "WITHIN_MONTH" | "FLEXIBLE";
-    case_type?: "HOUSING" | "LEGAL" | "MEDICAL" | "SUPPORT" | "EDUCATION" | "EMPLOYMENT" | "FINANCIAL" | "FAMILY_REUNIFICATION" | "DOCUMENTATION" | "MENTAL_HEALTH" | "OTHER";
+    case_type?:
+        | "HOUSING"
+        | "LEGAL"
+        | "MEDICAL"
+        | "SUPPORT"
+        | "EDUCATION"
+        | "EMPLOYMENT"
+        | "FINANCIAL"
+        | "FAMILY_REUNIFICATION"
+        | "DOCUMENTATION"
+        | "MENTAL_HEALTH"
+        | "OTHER";
     assigned_to_id?: string;
     due_date?: string;
     estimated_duration?: string;
@@ -131,8 +180,16 @@ export interface CreateCaseNotePayload {
 
 export interface CreateCaseDocumentPayload {
     document_name: string;
-    document_type: "FORM" | "REPORT" | "EVIDENCE" | "CORRESPONDENCE" | "IDENTIFICATION" | "LEGAL" | "MEDICAL" | "OTHER";
+    document_type:
+        | "FORM"
+        | "REPORT"
+        | "EVIDENCE"
+        | "CORRESPONDENCE"
+        | "IDENTIFICATION"
+        | "LEGAL"
+        | "MEDICAL"
+        | "OTHER";
     description: string;
     tags: string[];
     file: File;
-} 
+}

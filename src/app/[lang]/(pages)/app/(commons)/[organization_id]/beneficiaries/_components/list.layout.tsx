@@ -16,7 +16,13 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState, useCallback } from "react";
 import { MdError, MdSearch } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +47,7 @@ const initialFilters: BeneficiaryFilters = {
     civil_status: [],
     age_range: [],
     date_from: null,
-    date_to: null
+    date_to: null,
 };
 
 // Available filter options
@@ -50,14 +56,14 @@ const filterOptions = {
         { value: "ACTIVE", label: "Active" },
         { value: "INACTIVE", label: "Inactive" },
         { value: "PENDING", label: "Pending" },
-        { value: "ARCHIVED", label: "Archived" }
+        { value: "ARCHIVED", label: "Archived" },
     ],
     civil_status: [
         { value: "SINGLE", label: "Single" },
         { value: "MARRIED", label: "Married" },
         { value: "DIVORCED", label: "Divorced" },
         { value: "WIDOWED", label: "Widowed" },
-        { value: "SEPARATED", label: "Separated" }
+        { value: "SEPARATED", label: "Separated" },
     ],
     age_range: [
         { value: "0-17", label: "0-17 years" },
@@ -66,8 +72,8 @@ const filterOptions = {
         { value: "36-45", label: "36-45 years" },
         { value: "46-55", label: "46-55 years" },
         { value: "56-65", label: "56-65 years" },
-        { value: "65+", label: "65+ years" }
-    ]
+        { value: "65+", label: "65+ years" },
+    ],
 };
 
 const BeneficiaryList = (): ReactNode => {
@@ -101,42 +107,56 @@ const BeneficiaryList = (): ReactNode => {
     // Helper function to check if age falls within range
     const isAgeInRange = (dateOfBirth: string, ageRange: string): boolean => {
         const age = calculateAge(dateOfBirth);
-        
+
         switch (ageRange) {
-            case "0-17": return age >= 0 && age <= 17;
-            case "18-25": return age >= 18 && age <= 25;
-            case "26-35": return age >= 26 && age <= 35;
-            case "36-45": return age >= 36 && age <= 45;
-            case "46-55": return age >= 46 && age <= 55;
-            case "56-65": return age >= 56 && age <= 65;
-            case "65+": return age >= 65;
-            default: return true;
+            case "0-17":
+                return age >= 0 && age <= 17;
+            case "18-25":
+                return age >= 18 && age <= 25;
+            case "26-35":
+                return age >= 26 && age <= 35;
+            case "36-45":
+                return age >= 36 && age <= 45;
+            case "46-55":
+                return age >= 46 && age <= 55;
+            case "56-65":
+                return age >= 56 && age <= 65;
+            case "65+":
+                return age >= 65;
+            default:
+                return true;
         }
     };
 
     // Helper function to apply client-side filtering
-    const applyBeneficiaryFilters = (beneficiariesData: BeneficiarySchema[]): BeneficiarySchema[] => {
+    const applyBeneficiaryFilters = (
+        beneficiariesData: BeneficiarySchema[]
+    ): BeneficiarySchema[] => {
         return beneficiariesData.filter(beneficiary => {
             // Status filter
             if (filters.status.length > 0 && !filters.status.includes(beneficiary.status)) {
                 return false;
             }
-            
+
             // Civil status filter
-            if (filters.civil_status.length > 0 && beneficiary.civil_status && !filters.civil_status.includes(beneficiary.civil_status)) {
+            if (
+                filters.civil_status.length > 0 &&
+                beneficiary.civil_status &&
+                !filters.civil_status.includes(beneficiary.civil_status)
+            ) {
                 return false;
             }
-            
+
             // Age range filter
             if (filters.age_range.length > 0 && beneficiary.birthdate) {
-                const matchesAnyRange = filters.age_range.some(range => 
+                const matchesAnyRange = filters.age_range.some(range =>
                     isAgeInRange(beneficiary.birthdate, range)
                 );
                 if (!matchesAnyRange) {
                     return false;
                 }
             }
-            
+
             // Date from filter (using created_at)
             if (filters.date_from && beneficiary.created_at) {
                 const beneficiaryDate = new Date(beneficiary.created_at);
@@ -144,7 +164,7 @@ const BeneficiaryList = (): ReactNode => {
                     return false;
                 }
             }
-            
+
             // Date to filter (using created_at)
             if (filters.date_to && beneficiary.created_at) {
                 const beneficiaryDate = new Date(beneficiary.created_at);
@@ -155,7 +175,7 @@ const BeneficiaryList = (): ReactNode => {
                     return false;
                 }
             }
-            
+
             return true;
         });
     };
@@ -173,20 +193,23 @@ const BeneficiaryList = (): ReactNode => {
                         1000, // Get more beneficiaries to apply filters client-side
                         filter
                     );
-                    
+
                     // Apply client-side filtering
                     const allBeneficiaries = response.data.data || [];
                     const filteredBeneficiaries = applyBeneficiaryFilters(allBeneficiaries);
-                    
+
                     // Apply pagination to filtered results
                     const startIndex = offset;
                     const endIndex = offset + LIMIT;
-                    const paginatedBeneficiaries = filteredBeneficiaries.slice(startIndex, endIndex);
-                    
+                    const paginatedBeneficiaries = filteredBeneficiaries.slice(
+                        startIndex,
+                        endIndex
+                    );
+
                     // Update beneficiaries with paginated filtered results
                     setBeneficiaries({
                         count: filteredBeneficiaries.length,
-                        data: paginatedBeneficiaries
+                        data: paginatedBeneficiaries,
                     });
                 } else {
                     throw new Error();
@@ -216,14 +239,14 @@ const BeneficiaryList = (): ReactNode => {
     const handleFilterChange = (filterType: keyof BeneficiaryFilters, value: any) => {
         setFilters(prev => ({
             ...prev,
-            [filterType]: value
+            [filterType]: value,
         }));
         setOffset(0); // Reset to first page when filtering
     };
 
     const addFilterValue = (filterType: keyof BeneficiaryFilters, value: string) => {
-        if (filterType === 'date_from' || filterType === 'date_to') return;
-        
+        if (filterType === "date_from" || filterType === "date_to") return;
+
         const currentValues = filters[filterType] as string[];
         if (!currentValues.includes(value)) {
             handleFilterChange(filterType, [...currentValues, value]);
@@ -231,13 +254,16 @@ const BeneficiaryList = (): ReactNode => {
     };
 
     const removeFilterValue = (filterType: keyof BeneficiaryFilters, value: string) => {
-        if (filterType === 'date_from' || filterType === 'date_to') {
+        if (filterType === "date_from" || filterType === "date_to") {
             handleFilterChange(filterType, null);
             return;
         }
-        
+
         const currentValues = filters[filterType] as string[];
-        handleFilterChange(filterType, currentValues.filter(v => v !== value));
+        handleFilterChange(
+            filterType,
+            currentValues.filter(v => v !== value)
+        );
     };
 
     const clearAllFilters = () => {
@@ -251,7 +277,7 @@ const BeneficiaryList = (): ReactNode => {
             filters.civil_status.length,
             filters.age_range.length,
             filters.date_from ? 1 : 0,
-            filters.date_to ? 1 : 0
+            filters.date_to ? 1 : 0,
         ];
         return counts.reduce((sum, count) => sum + count, 0);
     };
@@ -320,14 +346,22 @@ const BeneficiaryList = (): ReactNode => {
                                 <div className="p-4 space-y-4 overflow-y-auto min-h-0">
                                     {/* Status Filter */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">Status</label>
-                                        <Select onValueChange={(value) => addFilterValue('status', value)}>
+                                        <label className="text-xs font-medium text-slate-700">
+                                            Status
+                                        </label>
+                                        <Select
+                                            onValueChange={value => addFilterValue("status", value)}
+                                        >
                                             <SelectTrigger className="w-full h-8 text-xs">
                                                 <SelectValue placeholder="Select status..." />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {filterOptions.status.map(option => (
-                                                    <SelectItem key={option.value} value={option.value} className="text-xs">
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                        className="text-xs"
+                                                    >
                                                         {option.label}
                                                     </SelectItem>
                                                 ))}
@@ -337,14 +371,24 @@ const BeneficiaryList = (): ReactNode => {
 
                                     {/* Civil Status Filter */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">Civil Status</label>
-                                        <Select onValueChange={(value) => addFilterValue('civil_status', value)}>
+                                        <label className="text-xs font-medium text-slate-700">
+                                            Civil Status
+                                        </label>
+                                        <Select
+                                            onValueChange={value =>
+                                                addFilterValue("civil_status", value)
+                                            }
+                                        >
                                             <SelectTrigger className="w-full h-8 text-xs">
                                                 <SelectValue placeholder="Select civil status..." />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {filterOptions.civil_status.map(option => (
-                                                    <SelectItem key={option.value} value={option.value} className="text-xs">
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                        className="text-xs"
+                                                    >
                                                         {option.label}
                                                     </SelectItem>
                                                 ))}
@@ -354,14 +398,24 @@ const BeneficiaryList = (): ReactNode => {
 
                                     {/* Age Range Filter */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">Age Range</label>
-                                        <Select onValueChange={(value) => addFilterValue('age_range', value)}>
+                                        <label className="text-xs font-medium text-slate-700">
+                                            Age Range
+                                        </label>
+                                        <Select
+                                            onValueChange={value =>
+                                                addFilterValue("age_range", value)
+                                            }
+                                        >
                                             <SelectTrigger className="w-full h-8 text-xs">
                                                 <SelectValue placeholder="Select age range..." />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {filterOptions.age_range.map(option => (
-                                                    <SelectItem key={option.value} value={option.value} className="text-xs">
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                        className="text-xs"
+                                                    >
                                                         {option.label}
                                                     </SelectItem>
                                                 ))}
@@ -373,12 +427,16 @@ const BeneficiaryList = (): ReactNode => {
 
                                     {/* Date Filters */}
                                     <div className="space-y-3">
-                                        <label className="text-xs font-medium text-slate-700">Date Range</label>
-                                        
+                                        <label className="text-xs font-medium text-slate-700">
+                                            Date Range
+                                        </label>
+
                                         <div className="grid grid-cols-2 gap-2">
                                             {/* Date From */}
                                             <div className="space-y-1">
-                                                <label className="text-xs text-slate-600">From</label>
+                                                <label className="text-xs text-slate-600">
+                                                    From
+                                                </label>
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <Button
@@ -386,14 +444,29 @@ const BeneficiaryList = (): ReactNode => {
                                                             className="w-full h-8 justify-start text-left font-normal text-xs"
                                                         >
                                                             <FaCalendarAlt className="mr-1 h-3 w-3" />
-                                                            {filters.date_from ? format(filters.date_from, "MMM dd") : "Pick..."}
+                                                            {filters.date_from
+                                                                ? format(
+                                                                      filters.date_from,
+                                                                      "MMM dd"
+                                                                  )
+                                                                : "Pick..."}
                                                         </Button>
                                                     </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                    <PopoverContent
+                                                        className="w-auto p-0"
+                                                        align="start"
+                                                    >
                                                         <Calendar
                                                             mode="single"
-                                                            selected={filters.date_from || undefined}
-                                                            onSelect={(date) => handleFilterChange('date_from', date || null)}
+                                                            selected={
+                                                                filters.date_from || undefined
+                                                            }
+                                                            onSelect={date =>
+                                                                handleFilterChange(
+                                                                    "date_from",
+                                                                    date || null
+                                                                )
+                                                            }
                                                             initialFocus
                                                         />
                                                     </PopoverContent>
@@ -410,14 +483,24 @@ const BeneficiaryList = (): ReactNode => {
                                                             className="w-full h-8 justify-start text-left font-normal text-xs"
                                                         >
                                                             <FaCalendarAlt className="mr-1 h-3 w-3" />
-                                                            {filters.date_to ? format(filters.date_to, "MMM dd") : "Pick..."}
+                                                            {filters.date_to
+                                                                ? format(filters.date_to, "MMM dd")
+                                                                : "Pick..."}
                                                         </Button>
                                                     </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                    <PopoverContent
+                                                        className="w-auto p-0"
+                                                        align="start"
+                                                    >
                                                         <Calendar
                                                             mode="single"
                                                             selected={filters.date_to || undefined}
-                                                            onSelect={(date) => handleFilterChange('date_to', date || null)}
+                                                            onSelect={date =>
+                                                                handleFilterChange(
+                                                                    "date_to",
+                                                                    date || null
+                                                                )
+                                                            }
                                                             initialFocus
                                                         />
                                                     </PopoverContent>
@@ -437,13 +520,13 @@ const BeneficiaryList = (): ReactNode => {
             {activeFiltersCount > 0 && (
                 <div className="flex flex-wrap gap-2 items-center py-2">
                     <span className="text-xs font-medium text-slate-600">Active filters:</span>
-                    
+
                     {/* Status badges */}
                     {filters.status.map(status => (
                         <Badge key={`status-${status}`} variant="secondary" className="text-xs h-6">
                             Status: {filterOptions.status.find(o => o.value === status)?.label}
                             <button
-                                onClick={() => removeFilterValue('status', status)}
+                                onClick={() => removeFilterValue("status", status)}
                                 className="ml-1 hover:text-red-600"
                             >
                                 ×
@@ -453,10 +536,15 @@ const BeneficiaryList = (): ReactNode => {
 
                     {/* Civil Status badges */}
                     {filters.civil_status.map(civilStatus => (
-                        <Badge key={`civil-status-${civilStatus}`} variant="secondary" className="text-xs h-6">
-                            Civil Status: {filterOptions.civil_status.find(o => o.value === civilStatus)?.label}
+                        <Badge
+                            key={`civil-status-${civilStatus}`}
+                            variant="secondary"
+                            className="text-xs h-6"
+                        >
+                            Civil Status:{" "}
+                            {filterOptions.civil_status.find(o => o.value === civilStatus)?.label}
                             <button
-                                onClick={() => removeFilterValue('civil_status', civilStatus)}
+                                onClick={() => removeFilterValue("civil_status", civilStatus)}
                                 className="ml-1 hover:text-red-600"
                             >
                                 ×
@@ -466,10 +554,14 @@ const BeneficiaryList = (): ReactNode => {
 
                     {/* Age Range badges */}
                     {filters.age_range.map(ageRange => (
-                        <Badge key={`age-range-${ageRange}`} variant="secondary" className="text-xs h-6">
+                        <Badge
+                            key={`age-range-${ageRange}`}
+                            variant="secondary"
+                            className="text-xs h-6"
+                        >
                             Age: {filterOptions.age_range.find(o => o.value === ageRange)?.label}
                             <button
-                                onClick={() => removeFilterValue('age_range', ageRange)}
+                                onClick={() => removeFilterValue("age_range", ageRange)}
                                 className="ml-1 hover:text-red-600"
                             >
                                 ×
@@ -482,7 +574,7 @@ const BeneficiaryList = (): ReactNode => {
                         <Badge variant="secondary" className="text-xs h-6">
                             From: {format(filters.date_from, "MMM dd, yyyy")}
                             <button
-                                onClick={() => removeFilterValue('date_from', '')}
+                                onClick={() => removeFilterValue("date_from", "")}
                                 className="ml-1 hover:text-red-600"
                             >
                                 ×
@@ -493,7 +585,7 @@ const BeneficiaryList = (): ReactNode => {
                         <Badge variant="secondary" className="text-xs h-6">
                             To: {format(filters.date_to, "MMM dd, yyyy")}
                             <button
-                                onClick={() => removeFilterValue('date_to', '')}
+                                onClick={() => removeFilterValue("date_to", "")}
                                 className="ml-1 hover:text-red-600"
                             >
                                 ×

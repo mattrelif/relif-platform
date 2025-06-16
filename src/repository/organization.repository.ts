@@ -318,7 +318,7 @@ export async function generateCaseDocumentUploadLink(
 }
 
 export async function createCaseDocument(
-    caseId: string, 
+    caseId: string,
     data: {
         document_name: string;
         document_type: string;
@@ -341,13 +341,16 @@ export async function createCaseDocument(
 }
 
 // Legacy direct upload function (keep for compatibility)
-export async function uploadCaseDocument(caseId: string, data: FormData): Promise<AxiosResponse<any>> {
+export async function uploadCaseDocument(
+    caseId: string,
+    data: FormData
+): Promise<AxiosResponse<any>> {
     return client.request({
         url: `cases/${caseId}/documents`,
         method: "POST",
         data,
         headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
         },
     });
 }
@@ -375,7 +378,11 @@ export async function createCaseNote(caseId: string, data: any): Promise<AxiosRe
     });
 }
 
-export async function updateCaseNote(caseId: string, noteId: string, data: any): Promise<AxiosResponse<any>> {
+export async function updateCaseNote(
+    caseId: string,
+    noteId: string,
+    data: any
+): Promise<AxiosResponse<any>> {
     return client.request({
         url: `cases/${caseId}/notes/${noteId}`,
         method: "PUT",

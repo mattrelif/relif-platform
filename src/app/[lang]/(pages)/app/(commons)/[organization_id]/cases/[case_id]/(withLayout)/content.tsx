@@ -3,19 +3,25 @@
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogDescription, 
-    DialogFooter, 
-    DialogHeader, 
-    DialogTitle, 
-    DialogTrigger 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CaseSchema } from "@/types/case.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
@@ -23,8 +29,25 @@ import { formatDate } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
-import { FaCalendarAlt, FaEdit, FaFileAlt, FaStickyNote, FaUser, FaClock, FaDollarSign, FaFlag, FaTrash, FaTags } from "react-icons/fa";
-import { getCaseById, getCaseDocuments, uploadCaseDocument, generateCaseDocumentUploadLink, createCaseDocument } from "@/repository/organization.repository";
+import {
+    FaCalendarAlt,
+    FaEdit,
+    FaFileAlt,
+    FaStickyNote,
+    FaUser,
+    FaClock,
+    FaDollarSign,
+    FaFlag,
+    FaTrash,
+    FaTags,
+} from "react-icons/fa";
+import {
+    getCaseById,
+    getCaseDocuments,
+    uploadCaseDocument,
+    generateCaseDocumentUploadLink,
+    createCaseDocument,
+} from "@/repository/organization.repository";
 import { CreateCaseDocumentPayload } from "@/types/case.types";
 
 const CaseOverview = (): ReactNode => {
@@ -39,13 +62,13 @@ const CaseOverview = (): ReactNode => {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [documentToEdit, setDocumentToEdit] = useState<any>(null);
     const [editFormData, setEditFormData] = useState({
-        document_name: '',
-        description: '',
-        document_type: '',
+        document_name: "",
+        description: "",
+        document_type: "",
         tags: [] as string[],
-        is_finalized: false
+        is_finalized: false,
     });
-    
+
     // Upload dialog state
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [uploadFiles, setUploadFiles] = useState<File[]>([]);
@@ -55,10 +78,10 @@ const CaseOverview = (): ReactNode => {
         description: string;
         tags: string[];
     }>({
-        document_name: '',
-        document_type: 'OTHER',
-        description: '',
-        tags: []
+        document_name: "",
+        document_type: "OTHER",
+        description: "",
+        tags: [],
     });
     const [isUploading, setIsUploading] = useState(false);
 
@@ -88,7 +111,7 @@ const CaseOverview = (): ReactNode => {
             description: doc.description,
             document_type: doc.document_type,
             tags: doc.tags || [],
-            is_finalized: doc.is_finalized
+            is_finalized: doc.is_finalized,
         });
         setEditDialogOpen(true);
     };
@@ -96,11 +119,11 @@ const CaseOverview = (): ReactNode => {
     const confirmEditDocument = () => {
         if (documentToEdit && Array.isArray(documents)) {
             // Update document in the list
-            setDocuments(documents.map(doc => 
-                doc.id === documentToEdit.id 
-                    ? { ...doc, ...editFormData }
-                    : doc
-            ));
+            setDocuments(
+                documents.map(doc =>
+                    doc.id === documentToEdit.id ? { ...doc, ...editFormData } : doc
+                )
+            );
             setEditDialogOpen(false);
             setDocumentToEdit(null);
             // Here you would also make an API call to update the document
@@ -112,7 +135,7 @@ const CaseOverview = (): ReactNode => {
         if (tag.trim() && !editFormData.tags.includes(tag.trim())) {
             setEditFormData(prev => ({
                 ...prev,
-                tags: [...prev.tags, tag.trim()]
+                tags: [...prev.tags, tag.trim()],
             }));
         }
     };
@@ -120,25 +143,25 @@ const CaseOverview = (): ReactNode => {
     const handleTagRemove = (tagToRemove: string) => {
         setEditFormData(prev => ({
             ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
+            tags: prev.tags.filter(tag => tag !== tagToRemove),
         }));
     };
 
     const handleUploadDocument = () => {
         // Create a file input element to trigger file selection
-        const input = document.createElement('input');
-        input.type = 'file';
+        const input = document.createElement("input");
+        input.type = "file";
         input.multiple = true;
-        input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt';
-        input.onchange = (e) => {
+        input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt";
+        input.onchange = e => {
             const files = Array.from((e.target as HTMLInputElement).files || []);
             if (files.length > 0) {
                 setUploadFiles(files);
                 setUploadFormData({
                     document_name: files[0].name.replace(/\.[^/.]+$/, ""), // Remove extension for default name
-                    document_type: 'OTHER',
-                    description: '',
-                    tags: []
+                    document_type: "OTHER",
+                    description: "",
+                    tags: [],
                 });
                 setUploadDialogOpen(true);
             }
@@ -148,13 +171,13 @@ const CaseOverview = (): ReactNode => {
 
     const handleUploadSubmit = async () => {
         if (uploadFiles.length === 0) return;
-        
+
         setIsUploading(true);
         try {
             for (const file of uploadFiles) {
                 // Step 1: Get S3 upload link
                 const { data: uploadLinkData } = await generateCaseDocumentUploadLink(file.type);
-                
+
                 // Step 2: Upload file directly to S3
                 await fetch(uploadLinkData.link, {
                     method: "PUT",
@@ -163,13 +186,14 @@ const CaseOverview = (): ReactNode => {
                     },
                     body: file,
                 });
-                
+
                 // Step 3: Get S3 URL without query parameters
                 const s3Url = uploadLinkData.link.split("?")[0];
-                
+
                 // Step 4: Create document record in database
                 await createCaseDocument(caseId, {
-                    document_name: uploadFormData.document_name || file.name.replace(/\.[^/.]+$/, ""),
+                    document_name:
+                        uploadFormData.document_name || file.name.replace(/\.[^/.]+$/, ""),
                     document_type: uploadFormData.document_type,
                     description: uploadFormData.description,
                     tags: uploadFormData.tags,
@@ -179,27 +203,27 @@ const CaseOverview = (): ReactNode => {
                     mime_type: file.type,
                 });
             }
-            
+
             // Refresh documents list
             const documentsResult = await getCaseDocuments(caseId);
             if (Array.isArray(documentsResult?.data)) {
                 setDocuments(documentsResult.data);
             }
-            
+
             // Reset form and close dialog
             setUploadFiles([]);
             setUploadFormData({
-                document_name: '',
-                document_type: 'OTHER',
-                description: '',
-                tags: []
+                document_name: "",
+                document_type: "OTHER",
+                description: "",
+                tags: [],
             });
             setUploadDialogOpen(false);
-            
+
             alert(`Successfully uploaded ${uploadFiles.length} document(s)!`);
         } catch (error) {
-            console.error('Error uploading documents:', error);
-            alert('Error uploading documents. Please try again.');
+            console.error("Error uploading documents:", error);
+            alert("Error uploading documents. Please try again.");
         } finally {
             setIsUploading(false);
         }
@@ -209,7 +233,7 @@ const CaseOverview = (): ReactNode => {
         if (tag.trim() && !uploadFormData.tags.includes(tag.trim())) {
             setUploadFormData(prev => ({
                 ...prev,
-                tags: [...prev.tags, tag.trim()]
+                tags: [...prev.tags, tag.trim()],
             }));
         }
     };
@@ -217,7 +241,7 @@ const CaseOverview = (): ReactNode => {
     const handleUploadTagRemove = (tagToRemove: string) => {
         setUploadFormData(prev => ({
             ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
+            tags: prev.tags.filter(tag => tag !== tagToRemove),
         }));
     };
 
@@ -227,10 +251,10 @@ const CaseOverview = (): ReactNode => {
                 if (caseId) {
                     const [caseResult, documentsResult] = await Promise.all([
                         getCaseById(caseId),
-                        getCaseDocuments(caseId)
+                        getCaseDocuments(caseId),
                     ]);
                     setCaseData(caseResult.data);
-                    
+
                     // Ensure documents is always an array
                     const documentsData = documentsResult?.data;
                     if (Array.isArray(documentsData)) {
@@ -262,9 +286,7 @@ const CaseOverview = (): ReactNode => {
 
     if (error || !caseData) {
         return (
-            <div className="p-4 text-red-600 font-medium text-sm">
-                Error loading case details
-            </div>
+            <div className="p-4 text-red-600 font-medium text-sm">Error loading case details</div>
         );
     }
 
@@ -302,7 +324,8 @@ const CaseOverview = (): ReactNode => {
                             {convertToTitleCase(caseData.title)}
                         </h2>
                         <span className="text-sm text-slate-500">
-                            {caseData.case_number} • {convertToTitleCase(caseData.case_type.replace('_', ' '))}
+                            {caseData.case_number} •{" "}
+                            {convertToTitleCase(caseData.case_type.replace("_", " "))}
                         </span>
                     </div>
                     <Button variant="outline" size="sm" asChild>
@@ -316,18 +339,26 @@ const CaseOverview = (): ReactNode => {
                     <Badge className={STATUS_COLORS[caseData.status as keyof typeof STATUS_COLORS]}>
                         {caseData.status.replace("_", " ")}
                     </Badge>
-                    <Badge className={PRIORITY_COLORS[caseData.priority as keyof typeof PRIORITY_COLORS]}>
+                    <Badge
+                        className={
+                            PRIORITY_COLORS[caseData.priority as keyof typeof PRIORITY_COLORS]
+                        }
+                    >
                         {caseData.priority}
                     </Badge>
                     {caseData.urgency_level && (
-                        <Badge className={URGENCY_COLORS[caseData.urgency_level as keyof typeof URGENCY_COLORS]}>
+                        <Badge
+                            className={
+                                URGENCY_COLORS[
+                                    caseData.urgency_level as keyof typeof URGENCY_COLORS
+                                ]
+                            }
+                        >
                             {caseData.urgency_level.replace("_", " ")}
                         </Badge>
                     )}
                     {isOverdue && (
-                        <Badge className="bg-red-200 text-red-900 hover:bg-red-300">
-                            OVERDUE
-                        </Badge>
+                        <Badge className="bg-red-200 text-red-900 hover:bg-red-300">OVERDUE</Badge>
                     )}
                 </div>
             </div>
@@ -345,11 +376,15 @@ const CaseOverview = (): ReactNode => {
                             <strong>Description:</strong> {caseData.description}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Due Date:</strong> {caseData.due_date ? formatDate(caseData.due_date, locale) : "No due date set"}
+                            <strong>Due Date:</strong>{" "}
+                            {caseData.due_date
+                                ? formatDate(caseData.due_date, locale)
+                                : "No due date set"}
                         </li>
                         {caseData.estimated_duration && (
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Estimated Duration:</strong> {convertToTitleCase(caseData.estimated_duration.replace('_', ' '))}
+                                <strong>Estimated Duration:</strong>{" "}
+                                {convertToTitleCase(caseData.estimated_duration.replace("_", " "))}
                             </li>
                         )}
                         {caseData.budget_allocated && (
@@ -359,7 +394,8 @@ const CaseOverview = (): ReactNode => {
                         )}
                         {caseData.urgency_level && (
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Urgency Level:</strong> {convertToTitleCase(caseData.urgency_level.replace('_', ' '))}
+                                <strong>Urgency Level:</strong>{" "}
+                                {convertToTitleCase(caseData.urgency_level.replace("_", " "))}
                             </li>
                         )}
                         {caseData.tags && caseData.tags.length > 0 && (
@@ -386,7 +422,8 @@ const CaseOverview = (): ReactNode => {
                             <strong>Beneficiary:</strong> {caseData.beneficiary.full_name}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Assigned To:</strong> {caseData.assigned_to.first_name} {caseData.assigned_to.last_name}
+                            <strong>Assigned To:</strong> {caseData.assigned_to.first_name}{" "}
+                            {caseData.assigned_to.last_name}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Created:</strong> {formatDate(caseData.created_at, locale)}
@@ -419,32 +456,37 @@ const CaseOverview = (): ReactNode => {
                         Case Documents ({Array.isArray(documents) ? documents.length : 0})
                     </h3>
                     <div className="flex gap-2">
-                        <Button 
-                            size="sm" 
+                        <Button
+                            size="sm"
                             className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
                             onClick={handleUploadDocument}
                         >
                             <FaFileAlt className="w-4 h-4 mr-2" />
                             Upload Document
                         </Button>
-                        <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
+                        <Button
+                            size="sm"
+                            className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                        >
                             <FaEdit className="w-4 h-4 mr-2" />
                             Manage All
                         </Button>
                     </div>
                 </div>
-                
+
                 {!Array.isArray(documents) || documents.length === 0 ? (
                     <div className="text-center py-8 text-slate-500">
                         <FaFileAlt className="w-12 h-12 mx-auto mb-4 text-slate-300" />
                         <p>No documents uploaded yet</p>
-                        <p className="text-sm text-slate-400 mt-1">Upload your first document to get started.</p>
+                        <p className="text-sm text-slate-400 mt-1">
+                            Upload your first document to get started.
+                        </p>
                     </div>
                 ) : (
                     <>
                         {/* Documents List */}
                         <div className="space-y-3">
-                            {documents.map((doc) => (
+                            {documents.map(doc => (
                                 <div
                                     key={doc.id}
                                     className="border border-gray-200 bg-white rounded-lg p-3"
@@ -468,54 +510,65 @@ const CaseOverview = (): ReactNode => {
                                                     </Badge>
                                                 )}
                                             </div>
-                                            
+
                                             <p className="text-xs text-slate-600 mb-2">
                                                 {doc.description}
                                             </p>
-                                            
+
                                             {doc.tags && doc.tags.length > 0 && (
                                                 <div className="flex gap-1 mb-2 flex-wrap">
                                                     {doc.tags.map((tag: string, index: number) => (
-                                                        <Badge key={index} className="bg-relif-orange-500 text-xs">
+                                                        <Badge
+                                                            key={index}
+                                                            className="bg-relif-orange-500 text-xs"
+                                                        >
                                                             #{tag}
                                                         </Badge>
                                                     ))}
                                                 </div>
                                             )}
-                                            
+
                                             <div className="flex items-center gap-3 text-xs text-slate-500">
-                                                <span>{doc.file_type} • {doc.file_size}</span>
+                                                <span>
+                                                    {doc.file_type} • {doc.file_size}
+                                                </span>
                                                 <span>By {doc.uploaded_by}</span>
                                                 <span>{formatDate(doc.uploaded_at, locale)}</span>
                                             </div>
                                         </div>
-                                        
-                                                                <div className="flex gap-1 ml-3">
-                            <Button size="sm" className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
-                                View
-                            </Button>
-                            <Button size="sm" className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
-                                Download
-                            </Button>
-                            {!doc.is_finalized && (
-                                <Button 
-                                    size="sm" 
-                                    className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
-                                    onClick={() => handleEditDocument(doc)}
-                                >
-                                    <FaEdit className="w-3 h-3 mr-1" />
-                                    Edit
-                                </Button>
-                            )}
-                            <Button 
-                                size="sm" 
-                                className="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white"
-                                onClick={() => handleDeleteDocument(doc)}
-                            >
-                                <FaTrash className="w-3 h-3 mr-1" />
-                                Delete
-                            </Button>
-                        </div>
+
+                                        <div className="flex gap-1 ml-3">
+                                            <Button
+                                                size="sm"
+                                                className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                            >
+                                                View
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                            >
+                                                Download
+                                            </Button>
+                                            {!doc.is_finalized && (
+                                                <Button
+                                                    size="sm"
+                                                    className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                                    onClick={() => handleEditDocument(doc)}
+                                                >
+                                                    <FaEdit className="w-3 h-3 mr-1" />
+                                                    Edit
+                                                </Button>
+                                            )}
+                                            <Button
+                                                size="sm"
+                                                className="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white"
+                                                onClick={() => handleDeleteDocument(doc)}
+                                            >
+                                                <FaTrash className="w-3 h-3 mr-1" />
+                                                Delete
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -539,21 +592,15 @@ const CaseOverview = (): ReactNode => {
                     <DialogHeader>
                         <DialogTitle>Delete Document</DialogTitle>
                         <DialogDescription>
-                            Are you sure you want to delete "{documentToDelete?.document_name}"? 
+                            Are you sure you want to delete "{documentToDelete?.document_name}"?
                             This action cannot be undone.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button 
-                            variant="outline" 
-                            onClick={() => setDeleteDialogOpen(false)}
-                        >
+                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
-                        <Button 
-                            variant="destructive" 
-                            onClick={confirmDeleteDocument}
-                        >
+                        <Button variant="destructive" onClick={confirmDeleteDocument}>
                             Delete Document
                         </Button>
                     </DialogFooter>
@@ -569,7 +616,7 @@ const CaseOverview = (): ReactNode => {
                             Update the document information below.
                         </DialogDescription>
                     </DialogHeader>
-                    
+
                     <div className="w-full h-max flex flex-col gap-6">
                         {/* Document Details Section */}
                         <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
@@ -577,7 +624,7 @@ const CaseOverview = (): ReactNode => {
                                 <FaFileAlt />
                                 Document Details
                             </h2>
-                            
+
                             <div className="w-full flex items-center gap-2">
                                 {/* Document Name */}
                                 <div className="flex flex-col gap-3 w-full">
@@ -586,34 +633,52 @@ const CaseOverview = (): ReactNode => {
                                         id="document_name"
                                         placeholder="Enter document name"
                                         value={editFormData.document_name}
-                                        onChange={(e) => setEditFormData(prev => ({
-                                            ...prev,
-                                            document_name: e.target.value
-                                        }))}
+                                        onChange={e =>
+                                            setEditFormData(prev => ({
+                                                ...prev,
+                                                document_name: e.target.value,
+                                            }))
+                                        }
                                     />
                                 </div>
 
                                 {/* Document Type */}
                                 <div className="flex flex-col gap-3 w-full">
                                     <Label htmlFor="document_type">Document Type</Label>
-                                    <Select 
-                                        value={editFormData.document_type} 
-                                        onValueChange={(value) => setEditFormData(prev => ({
-                                            ...prev,
-                                            document_type: value
-                                        }))}
+                                    <Select
+                                        value={editFormData.document_type}
+                                        onValueChange={value =>
+                                            setEditFormData(prev => ({
+                                                ...prev,
+                                                document_type: value,
+                                            }))
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select document type..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Application Form">Application Form</SelectItem>
-                                            <SelectItem value="Verification Letter">Verification Letter</SelectItem>
-                                            <SelectItem value="Background Check">Background Check</SelectItem>
-                                            <SelectItem value="Medical Records">Medical Records</SelectItem>
-                                            <SelectItem value="Reference Letter">Reference Letter</SelectItem>
-                                            <SelectItem value="Legal Document">Legal Document</SelectItem>
-                                            <SelectItem value="Financial Document">Financial Document</SelectItem>
+                                            <SelectItem value="Application Form">
+                                                Application Form
+                                            </SelectItem>
+                                            <SelectItem value="Verification Letter">
+                                                Verification Letter
+                                            </SelectItem>
+                                            <SelectItem value="Background Check">
+                                                Background Check
+                                            </SelectItem>
+                                            <SelectItem value="Medical Records">
+                                                Medical Records
+                                            </SelectItem>
+                                            <SelectItem value="Reference Letter">
+                                                Reference Letter
+                                            </SelectItem>
+                                            <SelectItem value="Legal Document">
+                                                Legal Document
+                                            </SelectItem>
+                                            <SelectItem value="Financial Document">
+                                                Financial Document
+                                            </SelectItem>
                                             <SelectItem value="Other">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -627,10 +692,12 @@ const CaseOverview = (): ReactNode => {
                                     id="description"
                                     placeholder="Enter document description"
                                     value={editFormData.description}
-                                    onChange={(e) => setEditFormData(prev => ({
-                                        ...prev,
-                                        description: e.target.value
-                                    }))}
+                                    onChange={e =>
+                                        setEditFormData(prev => ({
+                                            ...prev,
+                                            description: e.target.value,
+                                        }))
+                                    }
                                     rows={3}
                                 />
                             </div>
@@ -642,14 +709,14 @@ const CaseOverview = (): ReactNode => {
                                 <FaTags />
                                 Tags & Status
                             </h2>
-                            
+
                             {/* Tags */}
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="tags">Tags</Label>
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {editFormData.tags.map((tag, index) => (
-                                        <Badge 
-                                            key={index} 
+                                        <Badge
+                                            key={index}
                                             className="bg-relif-orange-500 text-xs flex items-center gap-1"
                                         >
                                             #{tag}
@@ -666,11 +733,11 @@ const CaseOverview = (): ReactNode => {
                                 <Input
                                     id="tags"
                                     placeholder="Add a tag and press Enter"
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
+                                    onKeyPress={e => {
+                                        if (e.key === "Enter") {
                                             e.preventDefault();
                                             handleTagAdd(e.currentTarget.value);
-                                            e.currentTarget.value = '';
+                                            e.currentTarget.value = "";
                                         }
                                     }}
                                 />
@@ -681,10 +748,12 @@ const CaseOverview = (): ReactNode => {
                                 <Checkbox
                                     id="is_finalized"
                                     checked={editFormData.is_finalized}
-                                    onCheckedChange={(checked) => setEditFormData(prev => ({
-                                        ...prev,
-                                        is_finalized: checked as boolean
-                                    }))}
+                                    onCheckedChange={checked =>
+                                        setEditFormData(prev => ({
+                                            ...prev,
+                                            is_finalized: checked as boolean,
+                                        }))
+                                    }
                                 />
                                 <Label htmlFor="is_finalized">Mark as finalized</Label>
                             </div>
@@ -692,17 +761,10 @@ const CaseOverview = (): ReactNode => {
                     </div>
 
                     <div className="flex gap-4 pt-5">
-                        <Button 
-                            variant="outline" 
-                            onClick={() => setEditDialogOpen(false)}
-                        >
+                        <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
                             Cancel
                         </Button>
-                        <Button 
-                            onClick={confirmEditDocument}
-                        >
-                            Save Changes
-                        </Button>
+                        <Button onClick={confirmEditDocument}>Save Changes</Button>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -716,7 +778,7 @@ const CaseOverview = (): ReactNode => {
                             Categorize and upload your document(s) to this case.
                         </DialogDescription>
                     </DialogHeader>
-                    
+
                     <div className="w-full h-max flex flex-col gap-6">
                         {/* Selected Files */}
                         <div className="w-full h-max flex flex-col gap-3 p-4 border border-dashed border-relif-orange-200 rounded-lg">
@@ -737,7 +799,7 @@ const CaseOverview = (): ReactNode => {
                                 <FaFileAlt />
                                 Document Details
                             </h2>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {/* Document Name */}
                                 <div className="flex flex-col gap-3">
@@ -746,22 +808,26 @@ const CaseOverview = (): ReactNode => {
                                         id="upload_document_name"
                                         placeholder="Enter document name"
                                         value={uploadFormData.document_name}
-                                        onChange={(e) => setUploadFormData(prev => ({
-                                            ...prev,
-                                            document_name: e.target.value
-                                        }))}
+                                        onChange={e =>
+                                            setUploadFormData(prev => ({
+                                                ...prev,
+                                                document_name: e.target.value,
+                                            }))
+                                        }
                                     />
                                 </div>
 
                                 {/* Document Type */}
                                 <div className="flex flex-col gap-3">
                                     <Label htmlFor="upload_document_type">Document Type</Label>
-                                    <Select 
-                                        value={uploadFormData.document_type} 
-                                        onValueChange={(value) => setUploadFormData(prev => ({
-                                            ...prev,
-                                            document_type: value
-                                        }))}
+                                    <Select
+                                        value={uploadFormData.document_type}
+                                        onValueChange={value =>
+                                            setUploadFormData(prev => ({
+                                                ...prev,
+                                                document_type: value,
+                                            }))
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select document type..." />
@@ -770,16 +836,22 @@ const CaseOverview = (): ReactNode => {
                                             <SelectItem value="FORM">Form</SelectItem>
                                             <SelectItem value="REPORT">Report</SelectItem>
                                             <SelectItem value="EVIDENCE">Evidence</SelectItem>
-                                            <SelectItem value="CORRESPONDENCE">Correspondence</SelectItem>
-                                            <SelectItem value="IDENTIFICATION">Identification</SelectItem>
+                                            <SelectItem value="CORRESPONDENCE">
+                                                Correspondence
+                                            </SelectItem>
+                                            <SelectItem value="IDENTIFICATION">
+                                                Identification
+                                            </SelectItem>
                                             <SelectItem value="LEGAL">Legal Document</SelectItem>
-                                            <SelectItem value="MEDICAL">Medical Document</SelectItem>
+                                            <SelectItem value="MEDICAL">
+                                                Medical Document
+                                            </SelectItem>
                                             <SelectItem value="OTHER">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
-                            
+
                             {/* Description */}
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="upload_description">Description</Label>
@@ -787,21 +859,23 @@ const CaseOverview = (): ReactNode => {
                                     id="upload_description"
                                     placeholder="Brief description of the document"
                                     value={uploadFormData.description}
-                                    onChange={(e) => setUploadFormData(prev => ({
-                                        ...prev,
-                                        description: e.target.value
-                                    }))}
+                                    onChange={e =>
+                                        setUploadFormData(prev => ({
+                                            ...prev,
+                                            description: e.target.value,
+                                        }))
+                                    }
                                     rows={3}
                                 />
                             </div>
-                            
+
                             {/* Tags */}
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="upload_tags">Tags</Label>
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {uploadFormData.tags.map((tag, index) => (
-                                        <Badge 
-                                            key={index} 
+                                        <Badge
+                                            key={index}
                                             className="bg-relif-orange-500 text-xs flex items-center gap-1"
                                         >
                                             #{tag}
@@ -818,11 +892,11 @@ const CaseOverview = (): ReactNode => {
                                 <Input
                                     id="upload_tags"
                                     placeholder="Add a tag and press Enter (e.g. important, legal, housing)"
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
+                                    onKeyPress={e => {
+                                        if (e.key === "Enter") {
                                             e.preventDefault();
                                             handleUploadTagAdd(e.currentTarget.value);
-                                            e.currentTarget.value = '';
+                                            e.currentTarget.value = "";
                                         }
                                     }}
                                 />
@@ -831,18 +905,20 @@ const CaseOverview = (): ReactNode => {
                     </div>
 
                     <div className="flex gap-4 pt-5">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={() => setUploadDialogOpen(false)}
                             disabled={isUploading}
                         >
                             Cancel
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleUploadSubmit}
                             disabled={isUploading || !uploadFormData.document_name.trim()}
                         >
-                            {isUploading ? 'Uploading...' : `Upload ${uploadFiles.length} Document(s)`}
+                            {isUploading
+                                ? "Uploading..."
+                                : `Upload ${uploadFiles.length} Document(s)`}
                         </Button>
                     </div>
                 </DialogContent>
@@ -851,4 +927,4 @@ const CaseOverview = (): ReactNode => {
     );
 };
 
-export { CaseOverview }; 
+export { CaseOverview };

@@ -32,9 +32,7 @@ const TabsLayout = (): ReactNode => {
                     </Link>
                 </TabsTrigger>
                 <TabsTrigger value="cases" asChild>
-                    <Link href={`${urlPath}/cases`}>
-                        Cases
-                    </Link>
+                    <Link href={`${urlPath}/cases`}>Cases</Link>
                 </TabsTrigger>
             </TabsList>
         </Tabs>

@@ -13,7 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import Creatable from 'react-select/creatable';
+import Creatable from "react-select/creatable";
 import { ActionMeta, OnChangeValue } from "react-select";
 import { roles } from "@/utils/roles";
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ const Form = (): ReactNode => {
 
     const roleOptions: RoleOption[] = englishRoles.map((role: string, index: number) => ({
         value: role,
-        label: translatedRoles[index]
+        label: translatedRoles[index],
     }));
 
     const handleSubmit = async (e: any): Promise<void> => {
@@ -97,9 +97,10 @@ const Form = (): ReactNode => {
             });
             window.location.href = "https://app.relifaid.org/";
         } catch (err: any) {
-            const errorMessage = err.message === "signup.emailAlreadyExists"
-                ? dict.signup.emailAlreadyExists
-                : dict.signup.toastErrorGenericDescription;
+            const errorMessage =
+                err.message === "signup.emailAlreadyExists"
+                    ? dict.signup.emailAlreadyExists
+                    : dict.signup.toastErrorGenericDescription;
 
             toast({
                 title: dict.signup.toastErrorTitle,
@@ -133,7 +134,9 @@ const Form = (): ReactNode => {
                         id="role"
                         name="role"
                         options={roleOptions}
-                        onChange={(selectedOption: OnChangeValue<RoleOption, false>) => setSelectedRole(selectedOption?.value || null)}
+                        onChange={(selectedOption: OnChangeValue<RoleOption, false>) =>
+                            setSelectedRole(selectedOption?.value || null)
+                        }
                         placeholder={dict.signup.rolePlaceholder}
                         isClearable
                         required
@@ -152,24 +155,24 @@ const Form = (): ReactNode => {
                                     borderColor: state.isFocused ? "#E5855B" : "#e2e8f0",
                                 },
                             }),
-                            input: (base) => ({
+                            input: base => ({
                                 ...base,
                                 margin: "0",
                                 padding: "0",
                                 color: "#0f172a",
                                 fontSize: "0.8rem",
                             }),
-                            valueContainer: (base) => ({
+                            valueContainer: base => ({
                                 ...base,
                                 padding: "0 0.75rem",
                                 gap: "0.25rem",
                             }),
-                            placeholder: (base) => ({
+                            placeholder: base => ({
                                 ...base,
                                 color: "#94a3b8",
                                 fontSize: "0.8rem",
                             }),
-                            singleValue: (base) => ({
+                            singleValue: base => ({
                                 ...base,
                                 color: "#0f172a",
                                 fontSize: "0.8rem",

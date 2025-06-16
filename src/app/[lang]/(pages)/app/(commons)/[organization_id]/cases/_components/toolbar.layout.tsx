@@ -43,8 +43,10 @@ const Toolbar = (): ReactNode => {
 
     // For testing purposes, show the Create Case button more liberally
     // In production, you'd want to keep the strict role checking
-    const showCreateButton = platformRole === "ORG_ADMIN" || platformRole === "ORG_MEMBER" || !currentUser;
-    const isMyOrganization = !currentUser || (currentUser && currentUser?.organization_id === organizationId);
+    const showCreateButton =
+        platformRole === "ORG_ADMIN" || platformRole === "ORG_MEMBER" || !currentUser;
+    const isMyOrganization =
+        !currentUser || (currentUser && currentUser?.organization_id === organizationId);
 
     return (
         <div className="flex flex-wrap items-center gap-4">
@@ -78,4 +80,4 @@ const Toolbar = (): ReactNode => {
 };
 
 export { Toolbar };
-export { Toolbar as CaseToolbar }; 
+export { Toolbar as CaseToolbar };

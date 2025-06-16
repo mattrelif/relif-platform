@@ -14,15 +14,16 @@ import { getCasesByOrganizationID } from "@/repository/organization.repository";
 import { getBeneficiaryById } from "@/repository/beneficiary.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 
-
-
 // Get cases for a specific beneficiary
-const getBeneficiaryCases = async (beneficiaryId: string, organizationId: string): Promise<CaseSchema[]> => {
+const getBeneficiaryCases = async (
+    beneficiaryId: string,
+    organizationId: string
+): Promise<CaseSchema[]> => {
     try {
         // Get all cases for the organization and filter by beneficiary
         const response = await getCasesByOrganizationID(organizationId, 0, 1000, "");
         const allCases = response.data.data || [];
-        
+
         // Filter cases for this specific beneficiary
         return allCases.filter(caseItem => caseItem.beneficiary_id === beneficiaryId);
     } catch (error) {
@@ -31,11 +32,11 @@ const getBeneficiaryCases = async (beneficiaryId: string, organizationId: string
     }
 };
 
-// Mock function - replace with actual API call  
+// Mock function - replace with actual API call
 const getBeneficiaryCasesMock = async (beneficiaryId: string): Promise<CaseSchema[]> => {
     // For now, return empty array - this will be replaced with real API call
     return [];
-    
+
     /* Mock data structure (keeping for reference but commented out due to missing beneficiary object)
     const casesData: { [key: string]: CaseSchema[] } = {
         "ben-001": [
@@ -385,19 +386,11 @@ const BeneficiaryCasesPage = (): ReactNode => {
     };
 
     if (isLoading) {
-        return (
-            <div className="text-relif-orange-400 font-medium text-sm">
-                Loading cases...
-            </div>
-        );
+        return <div className="text-relif-orange-400 font-medium text-sm">Loading cases...</div>;
     }
 
     if (error) {
-        return (
-            <div className="text-red-600 font-medium text-sm">
-                Error loading cases
-            </div>
-        );
+        return <div className="text-red-600 font-medium text-sm">Error loading cases</div>;
     }
 
     return (
@@ -410,7 +403,10 @@ const BeneficiaryCasesPage = (): ReactNode => {
                         Beneficiary Cases ({cases.length})
                     </h3>
                     <Link href={`/${locale}/app/${organizationId}/cases/create`}>
-                        <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
+                        <Button
+                            size="sm"
+                            className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                        >
                             <FaPlus className="w-4 h-4 mr-2" />
                             Create New Case
                         </Button>
@@ -424,16 +420,22 @@ const BeneficiaryCasesPage = (): ReactNode => {
                     <div className="text-center py-8 text-slate-500">
                         <FaFileAlt className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                         <p>No cases found for this beneficiary.</p>
-                        <p className="text-sm text-slate-400 mt-1">Create a new case to get started.</p>
+                        <p className="text-sm text-slate-400 mt-1">
+                            Create a new case to get started.
+                        </p>
                     </div>
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {cases.map((caseItem) => {
-                        const isOverdue = caseItem.due_date && new Date(caseItem.due_date) < new Date();
-                        
+                    {cases.map(caseItem => {
+                        const isOverdue =
+                            caseItem.due_date && new Date(caseItem.due_date) < new Date();
+
                         return (
-                            <div key={caseItem.id} className="w-full border-[1px] border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                            <div
+                                key={caseItem.id}
+                                className="w-full border-[1px] border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
+                            >
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-2">
@@ -444,20 +446,38 @@ const BeneficiaryCasesPage = (): ReactNode => {
                                                 {caseItem.case_number}
                                             </span>
                                         </div>
-                                        
+
                                         <p className="text-sm text-slate-600 mb-3 line-clamp-2">
                                             {caseItem.description}
                                         </p>
-                                        
+
                                         <div className="flex flex-wrap gap-2 mb-3">
-                                            <Badge className={STATUS_COLORS[caseItem.status as keyof typeof STATUS_COLORS]}>
+                                            <Badge
+                                                className={
+                                                    STATUS_COLORS[
+                                                        caseItem.status as keyof typeof STATUS_COLORS
+                                                    ]
+                                                }
+                                            >
                                                 {caseItem.status.replace("_", " ")}
                                             </Badge>
-                                            <Badge className={PRIORITY_COLORS[caseItem.priority as keyof typeof PRIORITY_COLORS]}>
+                                            <Badge
+                                                className={
+                                                    PRIORITY_COLORS[
+                                                        caseItem.priority as keyof typeof PRIORITY_COLORS
+                                                    ]
+                                                }
+                                            >
                                                 {caseItem.priority}
                                             </Badge>
                                             {caseItem.urgency_level && (
-                                                <Badge className={URGENCY_COLORS[caseItem.urgency_level as keyof typeof URGENCY_COLORS]}>
+                                                <Badge
+                                                    className={
+                                                        URGENCY_COLORS[
+                                                            caseItem.urgency_level as keyof typeof URGENCY_COLORS
+                                                        ]
+                                                    }
+                                                >
                                                     {caseItem.urgency_level.replace("_", " ")}
                                                 </Badge>
                                             )}
@@ -467,11 +487,14 @@ const BeneficiaryCasesPage = (): ReactNode => {
                                                 </Badge>
                                             )}
                                         </div>
-                                        
+
                                         <div className="flex items-center gap-4 text-sm text-slate-500">
                                             <span className="flex items-center gap-1">
                                                 <FaClock className="w-3 h-3" />
-                                                Due: {caseItem.due_date ? formatDate(caseItem.due_date, locale) : "No due date"}
+                                                Due:{" "}
+                                                {caseItem.due_date
+                                                    ? formatDate(caseItem.due_date, locale)
+                                                    : "No due date"}
                                             </span>
                                             {caseItem.budget_allocated && (
                                                 <span className="flex items-center gap-1">
@@ -479,24 +502,35 @@ const BeneficiaryCasesPage = (): ReactNode => {
                                                     {caseItem.budget_allocated}
                                                 </span>
                                             )}
-                                            <span>Assigned to: {caseItem.assigned_to.first_name} {caseItem.assigned_to.last_name}</span>
+                                            <span>
+                                                Assigned to: {caseItem.assigned_to.first_name}{" "}
+                                                {caseItem.assigned_to.last_name}
+                                            </span>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center gap-2 ml-4">
-                                        <Link href={`/${locale}/app/${organizationId}/cases/${caseItem.id}`}>
-                                            <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
+                                        <Link
+                                            href={`/${locale}/app/${organizationId}/cases/${caseItem.id}`}
+                                        >
+                                            <Button
+                                                size="sm"
+                                                className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                            >
                                                 <FaEye className="w-3 h-3 mr-1" />
                                                 View
                                             </Button>
                                         </Link>
                                     </div>
                                 </div>
-                                
+
                                 {caseItem.tags && caseItem.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 pt-3 border-t border-slate-100">
                                         {caseItem.tags.slice(0, 3).map((tag, index) => (
-                                            <Badge key={index} className="bg-relif-orange-500 text-xs">
+                                            <Badge
+                                                key={index}
+                                                className="bg-relif-orange-500 text-xs"
+                                            >
                                                 #{tag}
                                             </Badge>
                                         ))}
@@ -516,4 +550,4 @@ const BeneficiaryCasesPage = (): ReactNode => {
     );
 };
 
-export default BeneficiaryCasesPage; 
+export default BeneficiaryCasesPage;
