@@ -368,23 +368,47 @@ const CaseOverview = (): ReactNode => {
         const fetchCaseData = async () => {
             try {
                 if (caseId) {
+                    console.log("📋 Fetching case data for caseId:", caseId);
+                    
                     const [caseResult, documentsResult] = await Promise.all([
                         getCaseById(caseId),
                         getCaseDocuments(caseId),
                     ]);
+                    
+                    console.log("✅ Case data fetched:", caseResult.data);
                     setCaseData(caseResult.data);
+
+                    // Enhanced documents debugging
+                    console.log("📄 Documents API response:", {
+                        status: documentsResult?.status,
+                        data: documentsResult?.data,
+                        dataType: typeof documentsResult?.data,
+                        isArray: Array.isArray(documentsResult?.data),
+                        length: Array.isArray(documentsResult?.data) ? documentsResult.data.length : 'N/A'
+                    });
 
                     // Ensure documents is always an array
                     const documentsData = documentsResult?.data;
                     if (Array.isArray(documentsData)) {
+                        console.log("✅ Setting documents array with", documentsData.length, "items");
                         setDocuments(documentsData);
+                    } else if (documentsData && typeof documentsData === 'object' && documentsData.data && Array.isArray(documentsData.data)) {
+                        // Handle case where documents are nested in a data property
+                        console.log("✅ Setting documents from nested data property with", documentsData.data.length, "items");
+                        setDocuments(documentsData.data);
                     } else {
-                        console.warn("Documents data is not an array:", documentsData);
+                        console.warn("⚠️ Documents data is not an array:", documentsData);
                         setDocuments([]);
                     }
                 }
-            } catch (err) {
-                console.error("Error fetching case data:", err);
+            } catch (err: any) {
+                console.error("❌ Error fetching case data:", {
+                    error: err,
+                    message: err?.message,
+                    response: err?.response?.data,
+                    status: err?.response?.status,
+                    caseId
+                });
                 setError(true);
                 setDocuments([]); // Ensure documents is empty array on error
             } finally {

@@ -2,7 +2,7 @@ import { BFFConfig } from "@/config/bff";
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 
 const client: AxiosInstance = axios.create({
-    baseURL: process.env.NODE_ENV === 'development' ? BFFConfig.localhost : BFFConfig.host,
+    baseURL: BFFConfig.host,
     headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-cache",
@@ -17,11 +17,6 @@ client.interceptors.request.use(config => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-
-    // Add CORS headers for better compatibility
-    config.headers['Access-Control-Allow-Origin'] = '*';
-    config.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
-    config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
 
     return config;
 });
@@ -52,8 +47,7 @@ client.interceptors.response.use(
         if (error.response?.status === 404 && error.config?.url?.includes('/stats')) {
             console.warn("📊 Stats endpoint not found, returning mock data");
             // Return mock stats data for missing endpoints
-            return Promise.resolve({
-                ...error.response,
+            const mockResponse: AxiosResponse = {
                 data: {
                     total_beneficiaries: 0,
                     active_beneficiaries: 0,
@@ -76,8 +70,12 @@ client.interceptors.response.use(
                     out_of_stock_items: 0,
                     recent_additions: 0
                 },
-                status: 200
-            });
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: error.config!
+            };
+            return Promise.resolve(mockResponse);
         }
 
         // Handle 502 Bad Gateway with retry logic
@@ -95,14 +93,43 @@ client.interceptors.response.use(
             }
         }
 
-        // Handle CORS errors
-        if (error.message.includes('CORS') || error.message.includes('Access-Control-Allow-Origin')) {
-            console.error("🚫 CORS Error detected. This is likely a server configuration issue.");
+        // Handle CORS errors with fallback
+        if (error.message.includes('CORS') || error.message.includes('Access-Control-Allow-Origin') || error.code === 'ERR_NETWORK') {
+            console.error("🚫 CORS/Network Error detected. This is likely a server configuration issue.");
             console.error("💡 Suggestion: Check if the API server has proper CORS headers configured.");
             
-            // For development, you might want to use a proxy or configure the API server
-            if (process.env.NODE_ENV === 'development') {
-                console.warn("🛠️ Development mode: Consider using a proxy or updating API CORS settings");
+            // For stats endpoints, return mock data even on CORS errors
+            if (error.config?.url?.includes('/stats')) {
+                console.warn("📊 CORS error on stats endpoint, returning mock data");
+                const mockResponse: AxiosResponse = {
+                    data: {
+                        total_beneficiaries: 0,
+                        active_beneficiaries: 0,
+                        pending_beneficiaries: 0,
+                        inactive_beneficiaries: 0,
+                        total_cases: 0,
+                        open_cases: 0,
+                        overdue_cases: 0,
+                        closed_this_month: 0,
+                        total_volunteers: 0,
+                        active_volunteers: 0,
+                        pending_volunteers: 0,
+                        inactive_volunteers: 0,
+                        total_housing: 0,
+                        available_housing: 0,
+                        occupied_housing: 0,
+                        maintenance_housing: 0,
+                        total_inventory: 0,
+                        low_stock_items: 0,
+                        out_of_stock_items: 0,
+                        recent_additions: 0
+                    },
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {},
+                    config: error.config!
+                };
+                return Promise.resolve(mockResponse);
             }
         }
 

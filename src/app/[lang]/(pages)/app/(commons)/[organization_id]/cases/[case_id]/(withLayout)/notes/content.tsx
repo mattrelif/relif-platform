@@ -75,13 +75,29 @@ const NotesContent = (): ReactNode => {
         const fetchNotes = async () => {
             try {
                 if (caseId) {
+                    console.log("📝 Fetching case notes for caseId:", caseId);
                     const response = await getCaseNotes(caseId);
+                    
+                    // Enhanced notes debugging
+                    console.log("📝 Notes API response:", {
+                        status: response?.status,
+                        data: response?.data,
+                        dataType: typeof response?.data,
+                        isArray: Array.isArray(response?.data),
+                        length: Array.isArray(response?.data) ? response.data.length : 'N/A'
+                    });
+                    
                     // Ensure we always set an array, even if response.data is undefined/null
                     const notesData = response?.data;
                     if (Array.isArray(notesData)) {
+                        console.log("✅ Setting notes array with", notesData.length, "items");
                         setNotes(notesData);
+                    } else if (notesData && typeof notesData === 'object' && notesData.data && Array.isArray(notesData.data)) {
+                        // Handle case where notes are nested in a data property
+                        console.log("✅ Setting notes from nested data property with", notesData.data.length, "items");
+                        setNotes(notesData.data);
                     } else {
-                        console.warn("API returned non-array data for notes:", notesData);
+                        console.warn("⚠️ Notes data is not an array:", notesData);
                         setNotes([]);
                     }
                 }
