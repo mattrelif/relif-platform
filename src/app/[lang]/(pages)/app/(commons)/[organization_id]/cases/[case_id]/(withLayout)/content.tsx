@@ -24,7 +24,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCalendarAlt, FaEdit, FaFileAlt, FaStickyNote, FaUser, FaClock, FaDollarSign, FaFlag, FaTrash, FaTags } from "react-icons/fa";
-import { getCaseById, getCaseDocuments } from "@/repository/organization.repository";
+import { getCaseById, getCaseDocuments, uploadCaseDocument } from "@/repository/organization.repository";
+import { CreateCaseDocumentPayload } from "@/types/case.types";
 
 const CaseOverview = (): ReactNode => {
     const pathname = usePathname();
@@ -44,6 +45,22 @@ const CaseOverview = (): ReactNode => {
         tags: [] as string[],
         is_finalized: false
     });
+    
+    // Upload dialog state
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+    const [uploadFormData, setUploadFormData] = useState<{
+        document_name: string;
+        document_type: string;
+        description: string;
+        tags: string[];
+    }>({
+        document_name: '',
+        document_type: 'OTHER',
+        description: '',
+        tags: []
+    });
+    const [isUploading, setIsUploading] = useState(false);
 
     const caseId = pathname.split("/")[5];
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
@@ -102,6 +119,85 @@ const CaseOverview = (): ReactNode => {
 
     const handleTagRemove = (tagToRemove: string) => {
         setEditFormData(prev => ({
+            ...prev,
+            tags: prev.tags.filter(tag => tag !== tagToRemove)
+        }));
+    };
+
+    const handleUploadDocument = () => {
+        // Create a file input element to trigger file selection
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt';
+        input.onchange = (e) => {
+            const files = Array.from((e.target as HTMLInputElement).files || []);
+            if (files.length > 0) {
+                setUploadFiles(files);
+                setUploadFormData({
+                    document_name: files[0].name.replace(/\.[^/.]+$/, ""), // Remove extension for default name
+                    document_type: 'OTHER',
+                    description: '',
+                    tags: []
+                });
+                setUploadDialogOpen(true);
+            }
+        };
+        input.click();
+    };
+
+    const handleUploadSubmit = async () => {
+        if (uploadFiles.length === 0) return;
+        
+        setIsUploading(true);
+        try {
+            for (const file of uploadFiles) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('document_name', uploadFormData.document_name);
+                formData.append('document_type', uploadFormData.document_type);
+                formData.append('description', uploadFormData.description);
+                formData.append('tags', JSON.stringify(uploadFormData.tags));
+
+                await uploadCaseDocument(caseId, formData);
+            }
+            
+            // Refresh documents list
+            const documentsResult = await getCaseDocuments(caseId);
+            if (Array.isArray(documentsResult?.data)) {
+                setDocuments(documentsResult.data);
+            }
+            
+            // Reset form and close dialog
+            setUploadFiles([]);
+            setUploadFormData({
+                document_name: '',
+                document_type: 'OTHER',
+                description: '',
+                tags: []
+            });
+            setUploadDialogOpen(false);
+            
+            alert(`Successfully uploaded ${uploadFiles.length} document(s)!`);
+        } catch (error) {
+            console.error('Error uploading documents:', error);
+            alert('Error uploading documents. Please try again.');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleUploadTagAdd = (tag: string) => {
+        if (tag.trim() && !uploadFormData.tags.includes(tag.trim())) {
+            setUploadFormData(prev => ({
+                ...prev,
+                tags: [...prev.tags, tag.trim()]
+            }));
+        }
+    };
+
+    const handleUploadTagRemove = (tagToRemove: string) => {
+        setUploadFormData(prev => ({
             ...prev,
             tags: prev.tags.filter(tag => tag !== tagToRemove)
         }));
@@ -305,7 +401,11 @@ const CaseOverview = (): ReactNode => {
                         Case Documents ({Array.isArray(documents) ? documents.length : 0})
                     </h3>
                     <div className="flex gap-2">
-                        <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
+                        <Button 
+                            size="sm" 
+                            className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                            onClick={handleUploadDocument}
+                        >
                             <FaFileAlt className="w-4 h-4 mr-2" />
                             Upload Document
                         </Button>
@@ -446,10 +546,7 @@ const CaseOverview = (): ReactNode => {
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl text-slate-900 font-bold flex items-center gap-3">
-                            <FaEdit className="text-relif-orange-200" />
-                            Edit Document
-                        </DialogTitle>
+                        <DialogTitle className="pb-3">Edit Document</DialogTitle>
                         <DialogDescription>
                             Update the document information below.
                         </DialogDescription>
@@ -576,7 +673,7 @@ const CaseOverview = (): ReactNode => {
                         </div>
                     </div>
 
-                    <DialogFooter className="flex flex-row justify-end space-x-2">
+                    <div className="flex gap-4 pt-5">
                         <Button 
                             variant="outline" 
                             onClick={() => setEditDialogOpen(false)}
@@ -585,11 +682,151 @@ const CaseOverview = (): ReactNode => {
                         </Button>
                         <Button 
                             onClick={confirmEditDocument}
-                            className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
                         >
                             Save Changes
                         </Button>
-                    </DialogFooter>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Upload Document Dialog */}
+            <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="pb-3">Upload Document</DialogTitle>
+                        <DialogDescription>
+                            Categorize and upload your document(s) to this case.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="w-full h-max flex flex-col gap-6">
+                        {/* Selected Files */}
+                        <div className="w-full h-max flex flex-col gap-3 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                            <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                                <FaFileAlt />
+                                Selected Files ({uploadFiles.length})
+                            </h2>
+                            {uploadFiles.map((file, index) => (
+                                <div key={index} className="text-sm text-slate-600">
+                                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Document Details */}
+                        <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                            <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                                <FaFileAlt />
+                                Document Details
+                            </h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {/* Document Name */}
+                                <div className="flex flex-col gap-3">
+                                    <Label htmlFor="upload_document_name">Document Name</Label>
+                                    <Input
+                                        id="upload_document_name"
+                                        placeholder="Enter document name"
+                                        value={uploadFormData.document_name}
+                                        onChange={(e) => setUploadFormData(prev => ({
+                                            ...prev,
+                                            document_name: e.target.value
+                                        }))}
+                                    />
+                                </div>
+
+                                {/* Document Type */}
+                                <div className="flex flex-col gap-3">
+                                    <Label htmlFor="upload_document_type">Document Type</Label>
+                                    <Select 
+                                        value={uploadFormData.document_type} 
+                                        onValueChange={(value) => setUploadFormData(prev => ({
+                                            ...prev,
+                                            document_type: value
+                                        }))}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select document type..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="FORM">Form</SelectItem>
+                                            <SelectItem value="REPORT">Report</SelectItem>
+                                            <SelectItem value="EVIDENCE">Evidence</SelectItem>
+                                            <SelectItem value="CORRESPONDENCE">Correspondence</SelectItem>
+                                            <SelectItem value="IDENTIFICATION">Identification</SelectItem>
+                                            <SelectItem value="LEGAL">Legal Document</SelectItem>
+                                            <SelectItem value="MEDICAL">Medical Document</SelectItem>
+                                            <SelectItem value="OTHER">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            
+                            {/* Description */}
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="upload_description">Description</Label>
+                                <Textarea
+                                    id="upload_description"
+                                    placeholder="Brief description of the document"
+                                    value={uploadFormData.description}
+                                    onChange={(e) => setUploadFormData(prev => ({
+                                        ...prev,
+                                        description: e.target.value
+                                    }))}
+                                    rows={3}
+                                />
+                            </div>
+                            
+                            {/* Tags */}
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="upload_tags">Tags</Label>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {uploadFormData.tags.map((tag, index) => (
+                                        <Badge 
+                                            key={index} 
+                                            className="bg-relif-orange-500 text-xs flex items-center gap-1"
+                                        >
+                                            #{tag}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleUploadTagRemove(tag)}
+                                                className="ml-1 text-xs hover:text-red-200"
+                                            >
+                                                ×
+                                            </button>
+                                        </Badge>
+                                    ))}
+                                </div>
+                                <Input
+                                    id="upload_tags"
+                                    placeholder="Add a tag and press Enter (e.g. important, legal, housing)"
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            handleUploadTagAdd(e.currentTarget.value);
+                                            e.currentTarget.value = '';
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-5">
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setUploadDialogOpen(false)}
+                            disabled={isUploading}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleUploadSubmit}
+                            disabled={isUploading || !uploadFormData.document_name.trim()}
+                        >
+                            {isUploading ? 'Uploading...' : `Upload ${uploadFiles.length} Document(s)`}
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>

@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaHome, FaUsers, FaBars, FaTimes } from "react-icons/fa";
+import { FaHome, FaUsers, FaBars, FaTimes, FaFileAlt } from "react-icons/fa";
 import { FaBoxesPacking, FaHouseChimneyUser, FaUserNurse } from "react-icons/fa6";
 import { MdSettings } from "react-icons/md";
 
@@ -95,6 +95,21 @@ const SidebarMobile = (): ReactNode => {
                         >
                             <FaHome size={15} />
                             {dict.sidebar.home}
+                        </li>
+                    </Link>
+
+                    <Link href={`/${currentLanguage || "en"}/app/${organizationID}/cases`}>
+                        <li
+                            className={cn(
+                                BASE_LIST_ITEM_CLASSES,
+                                activeOption !== "cases"
+                                    ? BASE_LIST_ITEM_HOVER_CLASSES
+                                    : BASE_LIST_ITEM_ACTIVE_CLASSES
+                            )}
+                            onClick={toggleSidebar}
+                        >
+                            <FaFileAlt size={15} />
+                            Cases
                         </li>
                     </Link>
 

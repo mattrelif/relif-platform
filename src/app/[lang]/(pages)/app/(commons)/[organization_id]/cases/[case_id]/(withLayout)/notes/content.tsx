@@ -17,7 +17,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from "@/components/ui/use-toast";
 import { MdError } from "react-icons/md";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getCaseNotes } from "@/repository/organization.repository";
+import { getCaseNotes, createCaseNote, updateCaseNote, deleteCaseNote } from "@/repository/organization.repository";
+import { CreateCaseNotePayload } from "@/types/case.types";
 
 
 
@@ -76,27 +77,48 @@ const NotesContent = (): ReactNode => {
         e.preventDefault();
         setIsSubmitting(true);
         
-        // TODO: Implement API call to add update
-        console.log("Add update:", formData);
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        setShowAddForm(false);
-        setFormData({
-            title: "",
-            content: "",
-            tags: "",
-            note_type: "UPDATE",
-            is_important: false
-        });
-        setIsSubmitting(false);
-        
-        toast({
-            title: "Update added successfully",
-            description: "The case update has been added.",
-            variant: "success",
-        });
+        try {
+            // Prepare the payload
+            const payload: CreateCaseNotePayload = {
+                title: formData.title,
+                content: formData.content,
+                tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                note_type: formData.note_type,
+                is_important: formData.is_important
+            };
+
+            // Call the API to create the note
+            const response = await createCaseNote(caseId, payload);
+            
+            // Add the new note to the local state
+            if (response.data) {
+                setNotes(prev => [response.data, ...prev]);
+            }
+            
+            setShowAddForm(false);
+            setFormData({
+                title: "",
+                content: "",
+                tags: "",
+                note_type: "UPDATE",
+                is_important: false
+            });
+            
+            toast({
+                title: "Update added successfully",
+                description: "The case update has been added.",
+                variant: "success",
+            });
+        } catch (error) {
+            console.error("Error creating case note:", error);
+            toast({
+                title: "Error adding update",
+                description: "Something went wrong. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleEdit = (note: CaseNoteSchema) => {
@@ -116,11 +138,19 @@ const NotesContent = (): ReactNode => {
         setIsSubmitting(true);
         
         try {
-            // TODO: Implement API call to update note
-            console.log("Update note:", selectedNote?.id, editFormData);
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!selectedNote) return;
+
+            // Prepare the payload
+            const payload: CreateCaseNotePayload = {
+                title: editFormData.title,
+                content: editFormData.content,
+                tags: editFormData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                note_type: editFormData.note_type,
+                is_important: editFormData.is_important
+            };
+
+            // Call the API to update the note
+            const response = await updateCaseNote(caseId, selectedNote.id, payload);
             
             // Update local state
             setNotes(prev => prev.map(note => 
@@ -165,11 +195,10 @@ const NotesContent = (): ReactNode => {
         setIsSubmitting(true);
         
         try {
-            // TODO: Implement API call to delete note
-            console.log("Delete note:", selectedNote?.id);
-            
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!selectedNote) return;
+
+            // Call the API to delete the note
+            await deleteCaseNote(caseId, selectedNote.id);
             
             // Update local state
             setNotes(prev => prev.filter(note => note.id !== selectedNote?.id));
