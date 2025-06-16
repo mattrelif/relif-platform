@@ -627,10 +627,7 @@ const BeneficiaryList = (): ReactNode => {
         },
     ];
 
-    const handleCreateBeneficiary = () => {
-        const organizationId = pathname.split("/")[3];
-        router.push(`/${pathname.split("/")[1]}/app/${organizationId}/beneficiaries/create`);
-    };
+
 
     return (
         <>
@@ -651,9 +648,6 @@ const BeneficiaryList = (): ReactNode => {
                 onFilterClear={clearAllFilters}
                 activeFiltersCount={activeFiltersCount}
                 activeFilters={getActiveFilters()}
-                createButtonText="Create Beneficiary"
-                onCreateClick={handleCreateBeneficiary}
-                createButtonIcon={<MdAdd />}
                 additionalActions={<Toolbar />}
             />
             {/* Beneficiaries List */}
