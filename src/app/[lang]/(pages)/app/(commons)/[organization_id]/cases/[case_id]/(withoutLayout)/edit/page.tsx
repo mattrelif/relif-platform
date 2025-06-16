@@ -16,32 +16,13 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { FaFileAlt, FaUsers, FaTag, FaStickyNote, FaFlag, FaUserTie, FaTags, FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
-import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, updateCase } from "@/repository/organization.repository";
+import { getBeneficiariesByOrganizationID, findUsersByOrganizationId, updateCase, getCaseById } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
 import { UpdateCasePayload } from "@/types/case.types";
 import { useToast } from "@/components/ui/use-toast";
 
-// Mock function to get case data - replace with actual API call
-const getCaseById = async (caseId: string) => {
-    return {
-        id: "case-123",
-        case_number: "CASE-2024-001",
-        title: "Housing Support Case",
-        description: "Help with housing application process. The beneficiary needs assistance with completing the housing authority application forms and gathering necessary documentation.",
-        status: "IN_PROGRESS",
-        priority: "HIGH",
-        urgency_level: "WITHIN_WEEK",
-        case_type: "HOUSING",
-        estimated_duration: "1_MONTH",
-        budget_allocated: "$500",
-        tags: ["urgent", "housing", "documentation", "family"],
-        due_date: "2024-03-15",
-        beneficiary_id: "ben-001",
-        assigned_to_id: "user-001",
-        has_due_date: true,
-    };
-};
+
 
 const EditCasePage = (): ReactNode => {
     const router = useRouter();
@@ -77,7 +58,8 @@ const EditCasePage = (): ReactNode => {
         const fetchCaseData = async () => {
             try {
                 if (caseId) {
-                    const caseData = await getCaseById(caseId);
+                    const response = await getCaseById(caseId);
+                    const caseData = response.data;
                     const dueDate = caseData.due_date ? new Date(caseData.due_date) : undefined;
                     
                     setFormData({
@@ -86,16 +68,16 @@ const EditCasePage = (): ReactNode => {
                         case_type: caseData.case_type,
                         status: caseData.status,
                         priority: caseData.priority,
-                        urgency_level: caseData.urgency_level,
-                        estimated_duration: caseData.estimated_duration,
-                        budget_allocated: caseData.budget_allocated,
-                        tags: caseData.tags,
+                        urgency_level: caseData.urgency_level || "",
+                        estimated_duration: caseData.estimated_duration || "",
+                        budget_allocated: caseData.budget_allocated || "",
+                        tags: caseData.tags || [],
                         due_date: dueDate,
-                        has_due_date: caseData.has_due_date,
+                        has_due_date: !!caseData.due_date,
                         beneficiary_id: caseData.beneficiary_id,
                         assigned_to_id: caseData.assigned_to_id,
                     });
-                    setTags(caseData.tags);
+                    setTags(caseData.tags || []);
                 }
             } catch (error) {
                 console.error("Error fetching case data:", error);

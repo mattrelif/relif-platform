@@ -10,70 +10,33 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaFileAlt, FaPlus, FaEye, FaClock, FaDollarSign, FaFlag } from "react-icons/fa";
+import { getCasesByOrganizationID } from "@/repository/organization.repository";
+import { getBeneficiaryById } from "@/repository/beneficiary.repository";
+import { BeneficiarySchema } from "@/types/beneficiary.types";
 
-// Mock beneficiaries data
-const mockBeneficiaries = {
-    "ben-001": {
-        id: "ben-001",
-        first_name: "Maria",
-        last_name: "Santos",
-        full_name: "Maria Santos",
-        phone: "+1234567890",
-        email: "maria.santos@email.com",
-        current_address: "456 Oak Street, Springfield, IL 62701",
-        image_url: ""
-    },
-    "ben-002": {
-        id: "ben-002",
-        first_name: "Ahmed",
-        last_name: "Hassan",
-        full_name: "Ahmed Hassan",
-        phone: "+1234567891",
-        email: "ahmed.hassan@email.com",
-        current_address: "789 Pine Avenue, Chicago, IL 60601",
-        image_url: ""
-    },
-    "ben-003": {
-        id: "ben-003",
-        first_name: "Elena",
-        last_name: "Rodriguez",
-        full_name: "Elena Rodriguez",
-        phone: "+1234567892",
-        email: "elena.rodriguez@email.com",
-        current_address: "321 Maple Drive, Aurora, IL 60502",
-        image_url: ""
-    },
-    "ben-004": {
-        id: "ben-004",
-        first_name: "David",
-        last_name: "Kim",
-        full_name: "David Kim",
-        phone: "+1234567893",
-        email: "david.kim@email.com",
-        current_address: "654 Elm Street, Rockford, IL 61101",
-        image_url: ""
-    },
-    "ben-005": {
-        id: "ben-005",
-        first_name: "Fatima",
-        last_name: "Al-Zahra",
-        full_name: "Fatima Al-Zahra",
-        phone: "+1234567894",
-        email: "fatima.alzahra@email.com",
-        current_address: "987 Cedar Lane, Peoria, IL 61601",
-        image_url: ""
+
+
+// Get cases for a specific beneficiary
+const getBeneficiaryCases = async (beneficiaryId: string, organizationId: string): Promise<CaseSchema[]> => {
+    try {
+        // Get all cases for the organization and filter by beneficiary
+        const response = await getCasesByOrganizationID(organizationId, 0, 1000, "");
+        const allCases = response.data.data || [];
+        
+        // Filter cases for this specific beneficiary
+        return allCases.filter(caseItem => caseItem.beneficiary_id === beneficiaryId);
+    } catch (error) {
+        console.error("Error fetching beneficiary cases:", error);
+        return [];
     }
 };
 
-// Mock function - replace with actual API call
-const getBeneficiaryCases = async (beneficiaryId: string): Promise<CaseSchema[]> => {
-    const beneficiary = mockBeneficiaries[beneficiaryId as keyof typeof mockBeneficiaries];
+// Mock function - replace with actual API call  
+const getBeneficiaryCasesMock = async (beneficiaryId: string): Promise<CaseSchema[]> => {
+    // For now, return empty array - this will be replaced with real API call
+    return [];
     
-    if (!beneficiary) {
-        return [];
-    }
-
-    // Different case scenarios for each beneficiary
+    /* Mock data structure (keeping for reference but commented out due to missing beneficiary object)
     const casesData: { [key: string]: CaseSchema[] } = {
         "ben-001": [
             {
@@ -368,6 +331,7 @@ const getBeneficiaryCases = async (beneficiaryId: string): Promise<CaseSchema[]>
     };
 
     return casesData[beneficiaryId] || [];
+    */
 };
 
 const BeneficiaryCasesPage = (): ReactNode => {
@@ -384,8 +348,8 @@ const BeneficiaryCasesPage = (): ReactNode => {
     useEffect(() => {
         const fetchCases = async () => {
             try {
-                if (beneficiaryId) {
-                    const data = await getBeneficiaryCases(beneficiaryId);
+                if (beneficiaryId && organizationId) {
+                    const data = await getBeneficiaryCases(beneficiaryId, organizationId);
                     setCases(data);
                 }
             } catch (err) {

@@ -24,114 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCalendarAlt, FaEdit, FaFileAlt, FaStickyNote, FaUser, FaClock, FaDollarSign, FaFlag, FaTrash, FaTags } from "react-icons/fa";
-
-// Mock function - replace with actual API call
-const getCaseById = async (caseId: string): Promise<CaseSchema> => {
-    // Mock data with all the new fields
-    return {
-        id: "case-123",
-        case_number: "CASE-2024-001",
-        title: "Housing Support Case",
-        description: "Help with housing application process. The beneficiary needs assistance with completing the housing authority application forms and gathering necessary documentation. This includes helping with income verification, background checks, and scheduling the required interviews.",
-        status: "IN_PROGRESS",
-        priority: "HIGH",
-        urgency_level: "WITHIN_WEEK",
-        case_type: "HOUSING",
-        beneficiary_id: "ben-456",
-        beneficiary: {
-            id: "ben-456",
-            first_name: "John",
-            last_name: "Doe",
-            full_name: "John Doe",
-            phone: "+1234567890",
-            email: "john@example.com",
-            current_address: "123 Main St, City, State 12345",
-            image_url: ""
-        },
-        assigned_to_id: "user-789",
-        assigned_to: {
-            id: "user-789",
-            first_name: "Jane",
-            last_name: "Smith",
-            email: "jane@org.com"
-        },
-        due_date: "2024-03-15",
-        estimated_duration: "1_MONTH",
-        budget_allocated: "$500",
-        tags: ["urgent", "housing", "documentation", "family"],
-        notes_count: 8,
-        documents_count: 5,
-        last_activity: "2024-01-10T14:30:00Z",
-        created_at: "2024-01-01T09:00:00Z",
-        updated_at: "2024-01-10T14:30:00Z"
-    };
-};
-
-// Mock documents data
-const getCaseDocuments = async (caseId: string) => {
-    return [
-        {
-            id: "doc-1",
-            document_name: "Housing Application Form",
-            document_type: "FORM",
-            description: "Completed housing authority application form with all required fields",
-            tags: ["housing", "application", "required"],
-            file_size: "2.3 MB",
-            file_type: "PDF",
-            uploaded_at: "2024-01-05T10:30:00Z",
-            uploaded_by: "Jane Smith",
-            is_finalized: true
-        },
-        {
-            id: "doc-2",
-            document_name: "Income Verification Letter",
-            document_type: "EVIDENCE",
-            description: "Official letter from employer confirming current income and employment status",
-            tags: ["income", "verification", "employment"],
-            file_size: "1.1 MB",
-            file_type: "PDF",
-            uploaded_at: "2024-01-08T14:15:00Z",
-            uploaded_by: "Jane Smith",
-            is_finalized: true
-        },
-        {
-            id: "doc-3",
-            document_name: "Background Check Results",
-            document_type: "LEGAL",
-            description: "Criminal background check results required for housing application",
-            tags: ["background", "legal", "verification"],
-            file_size: "856 KB",
-            file_type: "PDF",
-            uploaded_at: "2024-01-10T09:45:00Z",
-            uploaded_by: "John Doe",
-            is_finalized: false
-        },
-        {
-            id: "doc-4",
-            document_name: "Medical Records Summary",
-            document_type: "MEDICAL",
-            description: "Summary of medical conditions relevant to housing accommodation needs",
-            tags: ["medical", "accommodation", "health"],
-            file_size: "3.2 MB",
-            file_type: "PDF",
-            uploaded_at: "2024-01-12T16:20:00Z",
-            uploaded_by: "Jane Smith",
-            is_finalized: true
-        },
-        {
-            id: "doc-5",
-            document_name: "Reference Letters",
-            document_type: "CORRESPONDENCE",
-            description: "Character reference letters from previous landlords and community members",
-            tags: ["references", "character", "community"],
-            file_size: "1.8 MB",
-            file_type: "PDF",
-            uploaded_at: "2024-01-15T11:30:00Z",
-            uploaded_by: "Jane Smith",
-            is_finalized: true
-        }
-    ];
-};
+import { getCaseById, getCaseDocuments } from "@/repository/organization.repository";
 
 const CaseOverview = (): ReactNode => {
     const pathname = usePathname();
@@ -222,10 +115,11 @@ const CaseOverview = (): ReactNode => {
                         getCaseById(caseId),
                         getCaseDocuments(caseId)
                     ]);
-                    setCaseData(caseResult);
-                    setDocuments(documentsResult);
+                    setCaseData(caseResult.data);
+                    setDocuments(documentsResult.data || []);
                 }
             } catch (err) {
+                console.error("Error fetching case data:", err);
                 setError(true);
             } finally {
                 setIsLoading(false);

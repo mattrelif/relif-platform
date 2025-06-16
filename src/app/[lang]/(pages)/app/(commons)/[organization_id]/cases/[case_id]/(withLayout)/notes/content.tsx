@@ -17,43 +17,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from "@/components/ui/use-toast";
 import { MdError } from "react-icons/md";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getCaseNotes } from "@/repository/organization.repository";
 
-// Mock function - replace with actual API call
-const getCaseNotes = async (caseId: string): Promise<CaseNoteSchema[]> => {
-    // Mock data
-    return [
-        {
-            id: "note-123",
-            case_id: caseId,
-            title: "Follow-up call completed",
-            content: "Spoke with beneficiary about housing application status. Documents submitted successfully to housing authority. Expecting response within 2 weeks.",
-            tags: ["follow-up", "phone-call", "housing"],
-            note_type: "CALL",
-            is_important: true,
-            created_by: {
-                id: "user-1",
-                name: "Jane Smith"
-            },
-            created_at: "2024-01-10T14:30:00Z",
-            updated_at: "2024-01-10T14:30:00Z"
-        },
-        {
-            id: "note-124",
-            case_id: caseId,
-            title: "Document review",
-            content: "Reviewed submitted documents. All forms complete and ready for processing.",
-            tags: ["documents", "review"],
-            note_type: "UPDATE",
-            is_important: false,
-            created_by: {
-                id: "user-1",
-                name: "John Admin"
-            },
-            created_at: "2024-01-08T11:20:00Z",
-            updated_at: "2024-01-08T11:20:00Z"
-        }
-    ];
-};
+
 
 const NotesContent = (): ReactNode => {
     const pathname = usePathname();
@@ -92,10 +58,11 @@ const NotesContent = (): ReactNode => {
         const fetchNotes = async () => {
             try {
                 if (caseId) {
-                    const data = await getCaseNotes(caseId);
-                    setNotes(data);
+                    const response = await getCaseNotes(caseId);
+                    setNotes(response.data || []);
                 }
             } catch (err) {
+                console.error("Error fetching case notes:", err);
                 setError(true);
             } finally {
                 setIsLoading(false);
