@@ -302,11 +302,13 @@ export async function getCaseDocuments(caseId: string): Promise<AxiosResponse<an
     });
 }
 
+// Step 1: Generate presigned upload URL
 export async function generateCaseDocumentUploadLink(
+    caseId: string,
     fileType: string
 ): Promise<AxiosResponse<{ link: string }>> {
     return client.request({
-        url: `cases/generate-document-upload-link`,
+        url: `cases/${caseId}/documents/generate-upload-link`,
         method: "POST",
         data: {
             file_type: fileType,
@@ -317,6 +319,7 @@ export async function generateCaseDocumentUploadLink(
     });
 }
 
+// Step 3: Save document metadata after S3 upload
 export async function createCaseDocument(
     caseId: string,
     data: {
@@ -324,10 +327,10 @@ export async function createCaseDocument(
         document_type: string;
         description: string;
         tags: string[];
-        file_url: string;
         file_name: string;
         file_size: number;
         mime_type: string;
+        file_key: string;
     }
 ): Promise<AxiosResponse<any>> {
     return client.request({
@@ -340,26 +343,10 @@ export async function createCaseDocument(
     });
 }
 
-// Legacy direct upload function (keep for compatibility)
-export async function uploadCaseDocument(
-    caseId: string,
-    data: FormData
-): Promise<AxiosResponse<any>> {
-    return client.request({
-        url: `cases/${caseId}/documents`,
-        method: "POST",
-        data,
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
-}
-
-export async function deleteCaseDocument(caseId: string, docId: string): Promise<AxiosResponse> {
-    return client.request({
-        url: `cases/${caseId}/documents/${docId}`,
-        method: "DELETE",
-    });
+// Helper function to extract file key from S3 URL
+export function extractFileKeyFromS3Url(presignedUrl: string): string {
+    const url = new URL(presignedUrl);
+    return url.pathname.substring(1); // Remove leading slash
 }
 
 // Case Notes API Functions

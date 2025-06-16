@@ -44,15 +44,17 @@ import {
 import {
     getCaseById,
     getCaseDocuments,
-    uploadCaseDocument,
     generateCaseDocumentUploadLink,
     createCaseDocument,
+    extractFileKeyFromS3Url,
 } from "@/repository/organization.repository";
 import { CreateCaseDocumentPayload } from "@/types/case.types";
+import { useToast } from "@/components/ui/use-toast";
 
 const CaseOverview = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
+    const { toast } = useToast();
     const [caseData, setCaseData] = useState<CaseSchema | null>(null);
     const [documents, setDocuments] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -175,10 +177,10 @@ const CaseOverview = (): ReactNode => {
         setIsUploading(true);
         try {
             for (const file of uploadFiles) {
-                // Step 1: Get S3 upload link
-                const { data: uploadLinkData } = await generateCaseDocumentUploadLink(file.type);
+                // Step 1: Get presigned upload URL
+                const { data: uploadLinkData } = await generateCaseDocumentUploadLink(caseId, file.type);
 
-                // Step 2: Upload file directly to S3
+                // Step 2: Upload directly to S3
                 await fetch(uploadLinkData.link, {
                     method: "PUT",
                     headers: {
@@ -187,20 +189,19 @@ const CaseOverview = (): ReactNode => {
                     body: file,
                 });
 
-                // Step 3: Get S3 URL without query parameters
-                const s3Url = uploadLinkData.link.split("?")[0];
-
-                // Step 4: Create document record in database
+                // Step 3: Extract file key from S3 URL and save metadata
+                const fileKey = extractFileKeyFromS3Url(uploadLinkData.link);
+                
                 await createCaseDocument(caseId, {
                     document_name:
                         uploadFormData.document_name || file.name.replace(/\.[^/.]+$/, ""),
                     document_type: uploadFormData.document_type,
                     description: uploadFormData.description,
                     tags: uploadFormData.tags,
-                    file_url: s3Url,
                     file_name: file.name,
                     file_size: file.size,
                     mime_type: file.type,
+                    file_key: fileKey,
                 });
             }
 
@@ -220,10 +221,17 @@ const CaseOverview = (): ReactNode => {
             });
             setUploadDialogOpen(false);
 
-            alert(`Successfully uploaded ${uploadFiles.length} document(s)!`);
+            toast({
+                title: "Success",
+                description: `Successfully uploaded ${uploadFiles.length} document(s)!`,
+            });
         } catch (error) {
             console.error("Error uploading documents:", error);
-            alert("Error uploading documents. Please try again.");
+            toast({
+                title: "Upload Failed",
+                description: "Error uploading documents. Please try again.",
+                variant: "destructive",
+            });
         } finally {
             setIsUploading(false);
         }

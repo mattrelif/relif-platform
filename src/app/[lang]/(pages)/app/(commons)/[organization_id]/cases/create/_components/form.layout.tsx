@@ -27,6 +27,7 @@ import {
     createCase,
     generateCaseDocumentUploadLink,
     createCaseDocument,
+    extractFileKeyFromS3Url,
 } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { UserSchema } from "@/types/user.types";
@@ -319,12 +320,13 @@ export const CreateCaseForm = (): ReactNode => {
             if (formData.documents.length > 0) {
                 for (const doc of formData.documents) {
                     try {
-                        // Step 1: Get S3 upload link
+                        // Step 1: Get presigned upload URL
                         const { data: uploadLinkData } = await generateCaseDocumentUploadLink(
+                            newCaseId,
                             doc.file.type
                         );
 
-                        // Step 2: Upload file directly to S3
+                        // Step 2: Upload directly to S3
                         await fetch(uploadLinkData.link, {
                             method: "PUT",
                             headers: {
@@ -333,19 +335,18 @@ export const CreateCaseForm = (): ReactNode => {
                             body: doc.file,
                         });
 
-                        // Step 3: Get S3 URL without query parameters
-                        const s3Url = uploadLinkData.link.split("?")[0];
+                        // Step 3: Extract file key and save metadata
+                        const fileKey = extractFileKeyFromS3Url(uploadLinkData.link);
 
-                        // Step 4: Create document record in database
                         await createCaseDocument(newCaseId, {
                             document_name: doc.name,
                             document_type: doc.type,
                             description: doc.description,
                             tags: doc.tags,
-                            file_url: s3Url,
                             file_name: doc.file.name,
                             file_size: doc.file.size,
                             mime_type: doc.file.type,
+                            file_key: fileKey,
                         });
                     } catch (docError) {
                         console.error(`Error uploading document ${doc.name}:`, docError);
