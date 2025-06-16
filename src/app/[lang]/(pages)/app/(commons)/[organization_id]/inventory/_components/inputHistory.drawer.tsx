@@ -70,8 +70,8 @@ const InputHistory = ({ productType, openState, setOpenState }: Props): ReactNod
 
                     {!isLoading && !error && (
                         <>
-                            {data?.map(entry => (
-                                <div className="w-full h-max p-4 border-b-[1px]">
+                            {data?.map((entry, index) => (
+                                <div key={entry.id || index} className="w-full h-max p-4 border-b-[1px]">
                                     <div className="flex gap-2 items-center">
                                         {entry?.type === "ENTRANCE" ? (
                                             <span>

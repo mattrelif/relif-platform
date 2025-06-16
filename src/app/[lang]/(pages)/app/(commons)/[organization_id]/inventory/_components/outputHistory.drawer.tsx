@@ -68,8 +68,8 @@ const OutputHistory = ({ productType, openState, setOpenState }: Props): ReactNo
                     )}
                     {!isLoading && !error && (
                         <>
-                            {data?.map(entry => (
-                                <div className="w-full h-max p-4 border-b-[1px]">
+                            {data?.map((entry, index) => (
+                                <div key={entry.id || index} className="w-full h-max p-4 border-b-[1px]">
                                     <div className="flex gap-2 items-center">
                                         <span className="text-slate-900 text-sm font-bold">
                                             {formatDate(entry?.created_at, locale || "en")}

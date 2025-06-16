@@ -289,12 +289,20 @@ export async function deleteCase(caseId: string): Promise<AxiosResponse> {
 
 export async function getCaseStats(orgId: string): Promise<AxiosResponse<any>> {
     try {
-        return await client.request({
-            url: `${PREFIX}/${orgId}/cases/stats`,
+        console.log("📊 Fetching case stats for org:", orgId);
+        const response = await client.request({
+            url: `cases/stats?organization_id=${orgId}`,
             method: "GET",
         });
+        console.log("✅ Case stats fetched successfully:", response.data);
+        return response;
     } catch (error: any) {
-        console.warn("📊 Case stats endpoint failed, using fallback data");
+        console.warn("📊 Case stats endpoint failed, using fallback data:", {
+            error: error.message,
+            status: error?.response?.status,
+            orgId,
+            url: `cases/stats?organization_id=${orgId}`
+        });
         return {
             data: {
                 total_cases: 0,
@@ -406,7 +414,7 @@ export async function getInventoryStats(orgId: string): Promise<AxiosResponse<an
     }
 }
 
-// Case Documents API Functions with fallback
+// Case Documents API Functions with better error handling
 export async function getCaseDocuments(caseId: string): Promise<AxiosResponse<any>> {
     try {
         console.log("📄 Fetching documents for case:", caseId);
@@ -414,23 +422,38 @@ export async function getCaseDocuments(caseId: string): Promise<AxiosResponse<an
             url: `cases/${caseId}/documents`,
             method: "GET",
         });
-        console.log("✅ Documents API response:", response.data);
+        console.log("✅ Documents API response:", {
+            status: response.status,
+            dataType: typeof response.data,
+            isArray: Array.isArray(response.data),
+            length: Array.isArray(response.data) ? response.data.length : 'N/A',
+            data: response.data
+        });
         return response;
     } catch (error: any) {
-        console.warn("📄 Case documents endpoint failed, using fallback data:", {
+        console.error("❌ Case documents endpoint failed:", {
             error: error.message,
             status: error?.response?.status,
-            caseId
+            statusText: error?.response?.statusText,
+            responseData: error?.response?.data,
+            caseId,
+            url: `cases/${caseId}/documents`
         });
         
-        // Return empty documents array as fallback
-        return {
-            data: [],
-            status: 200,
-            statusText: 'OK',
-            headers: {},
-            config: error.config || {}
-        } as AxiosResponse<any>;
+        // Only return fallback for 404 (not found) - other errors should bubble up
+        if (error?.response?.status === 404) {
+            console.warn("📄 Documents not found for case, returning empty array");
+            return {
+                data: [],
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: error.config || {}
+            } as AxiosResponse<any>;
+        }
+        
+        // For other errors, throw them so they can be properly handled
+        throw error;
     }
 }
 
@@ -465,14 +488,28 @@ export async function createCaseDocument(
         file_key: string;
     }
 ): Promise<AxiosResponse<any>> {
-    return client.request({
-        url: `cases/${caseId}/documents`,
-        method: "POST",
-        data,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+    try {
+        console.log("📤 Creating case document:", { caseId, data });
+        const response = await client.request({
+            url: `cases/${caseId}/documents`,
+            method: "POST",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Case document created successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error creating case document:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            documentData: data
+        });
+        throw error;
+    }
 }
 
 // Update document metadata
@@ -514,7 +551,7 @@ export function extractFileKeyFromS3Url(presignedUrl: string): string {
     return url.pathname.substring(1); // Remove leading slash
 }
 
-// Case Notes API Functions with fallback
+// Case Notes API Functions with better error handling
 export async function getCaseNotes(caseId: string): Promise<AxiosResponse<any>> {
     try {
         console.log("📝 Fetching notes for case:", caseId);
@@ -522,32 +559,61 @@ export async function getCaseNotes(caseId: string): Promise<AxiosResponse<any>> 
             url: `cases/${caseId}/notes`,
             method: "GET",
         });
-        console.log("✅ Notes API response:", response.data);
+        console.log("✅ Notes API response:", {
+            status: response.status,
+            dataType: typeof response.data,
+            isArray: Array.isArray(response.data),
+            length: Array.isArray(response.data) ? response.data.length : 'N/A',
+            data: response.data
+        });
         return response;
     } catch (error: any) {
-        console.warn("📝 Case notes endpoint failed, using fallback data:", {
+        console.error("❌ Case notes endpoint failed:", {
             error: error.message,
             status: error?.response?.status,
-            caseId
+            statusText: error?.response?.statusText,
+            responseData: error?.response?.data,
+            caseId,
+            url: `cases/${caseId}/notes`
         });
         
-        // Return empty notes array as fallback
-        return {
-            data: [],
-            status: 200,
-            statusText: 'OK',
-            headers: {},
-            config: error.config || {}
-        } as AxiosResponse<any>;
+        // Only return fallback for 404 (not found) - other errors should bubble up
+        if (error?.response?.status === 404) {
+            console.warn("📝 Notes not found for case, returning empty array");
+            return {
+                data: [],
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: error.config || {}
+            } as AxiosResponse<any>;
+        }
+        
+        // For other errors, throw them so they can be properly handled
+        throw error;
     }
 }
 
 export async function createCaseNote(caseId: string, data: any): Promise<AxiosResponse<any>> {
-    return client.request({
-        url: `cases/${caseId}/notes`,
-        method: "POST",
-        data,
-    });
+    try {
+        console.log("📝 Creating case note:", { caseId, data });
+        const response = await client.request({
+            url: `cases/${caseId}/notes`,
+            method: "POST",
+            data,
+        });
+        console.log("✅ Case note created successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error creating case note:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            noteData: data
+        });
+        throw error;
+    }
 }
 
 export async function updateCaseNote(

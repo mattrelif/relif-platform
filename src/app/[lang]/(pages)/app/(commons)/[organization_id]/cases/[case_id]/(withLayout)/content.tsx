@@ -291,17 +291,34 @@ const CaseOverview = (): ReactNode => {
 
                 const createDocResponse = await createCaseDocument(caseId, documentData);
                 console.log("✅ Document metadata saved:", createDocResponse);
+                
+                // Check if the response is actually successful even if it doesn't have expected format
+                if (createDocResponse.status >= 200 && createDocResponse.status < 300) {
+                    console.log("✅ Document creation confirmed successful");
+                } else {
+                    console.warn("⚠️ Unexpected response format:", createDocResponse);
+                }
             }
 
             // Refresh documents list
             console.log("🔄 Refreshing documents list...");
-            const documentsResult = await getCaseDocuments(caseId);
-            if (Array.isArray(documentsResult?.data)) {
-                setDocuments(documentsResult.data);
-                console.log("✅ Documents list refreshed");
-            } else {
-                console.warn("⚠️ Documents result is not an array:", documentsResult);
-                setDocuments([]);
+            try {
+                const documentsResult = await getCaseDocuments(caseId);
+                const documentsData = documentsResult?.data;
+                
+                if (Array.isArray(documentsData)) {
+                    setDocuments(documentsData);
+                    console.log("✅ Documents list refreshed with", documentsData.length, "items");
+                } else if (documentsData && typeof documentsData === 'object' && documentsData.data && Array.isArray(documentsData.data)) {
+                    setDocuments(documentsData.data);
+                    console.log("✅ Documents list refreshed from nested data with", documentsData.data.length, "items");
+                } else {
+                    console.warn("⚠️ Documents result is not an array:", documentsData);
+                    setDocuments([]);
+                }
+            } catch (refreshError: any) {
+                console.warn("⚠️ Could not refresh documents list:", refreshError.message);
+                // Don't throw error here - document upload was successful, just refresh failed
             }
 
             // Reset form and close dialog
@@ -376,8 +393,10 @@ const CaseOverview = (): ReactNode => {
                     ]);
                     
                     console.log("✅ Case data fetched:", caseResult.data);
-                    setCaseData(caseResult.data);
-
+                    
+                    // Update case data with actual document counts
+                    const fetchedCaseData = { ...caseResult.data };
+                    
                     // Enhanced documents debugging
                     console.log("📄 Documents API response:", {
                         status: documentsResult?.status,
@@ -387,19 +406,34 @@ const CaseOverview = (): ReactNode => {
                         length: Array.isArray(documentsResult?.data) ? documentsResult.data.length : 'N/A'
                     });
 
-                    // Ensure documents is always an array
+                    // Ensure documents is always an array and update counts
                     const documentsData = documentsResult?.data;
+                    let documentsArray: any[] = [];
+                    
                     if (Array.isArray(documentsData)) {
                         console.log("✅ Setting documents array with", documentsData.length, "items");
-                        setDocuments(documentsData);
+                        documentsArray = documentsData;
                     } else if (documentsData && typeof documentsData === 'object' && documentsData.data && Array.isArray(documentsData.data)) {
                         // Handle case where documents are nested in a data property
                         console.log("✅ Setting documents from nested data property with", documentsData.data.length, "items");
-                        setDocuments(documentsData.data);
+                        documentsArray = documentsData.data;
                     } else {
                         console.warn("⚠️ Documents data is not an array:", documentsData);
-                        setDocuments([]);
+                        documentsArray = [];
                     }
+                    
+                    setDocuments(documentsArray);
+                    
+                    // Update case data with actual document count
+                    fetchedCaseData.documents_count = documentsArray.length;
+                    
+                    // If notes_count is 0 or undefined, we could also fetch notes to get accurate count
+                    // For now, just ensure it's at least 0
+                    if (typeof fetchedCaseData.notes_count !== 'number') {
+                        fetchedCaseData.notes_count = 0;
+                    }
+                    
+                    setCaseData(fetchedCaseData);
                 }
             } catch (err: any) {
                 console.error("❌ Error fetching case data:", {

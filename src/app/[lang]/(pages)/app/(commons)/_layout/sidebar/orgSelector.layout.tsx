@@ -71,8 +71,8 @@ const OrgSelector = (): ReactNode => {
                                 {currentUser?.organization.name}
                             </span>
                         </SelectItem>
-                        {orgs?.data.map(org => (
-                            <SelectItem value={org.target_organization_id}>
+                        {orgs?.data.map((org, index) => (
+                            <SelectItem key={index} value={org.target_organization_id}>
                                 <span className="flex items-center gap-2">
                                     {org.target_organization.name}
                                     {currentUser?.organization_id === org.id ? (

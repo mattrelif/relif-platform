@@ -1,5 +1,15 @@
 const formatDate = (dateString: string, locale: "en" | "pt" | "es"): string => {
+    // Handle null, undefined, or empty strings
+    if (!dateString || dateString.trim() === "") {
+        return "No date set";
+    }
+
     const date = new Date(dateString);
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+        return "Invalid date";
+    }
 
     switch (locale) {
         case "en":

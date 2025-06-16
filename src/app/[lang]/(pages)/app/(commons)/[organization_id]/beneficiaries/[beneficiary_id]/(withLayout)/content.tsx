@@ -229,8 +229,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                             {dict.commons.beneficiaries.beneficiaryId.phones}
                                         </h3>
                                         <ul>
-                                            {data.phones.map(phone => (
-                                                <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                            {data.phones.map((phone, index) => (
+                                                <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
                                                     <MdPhone /> {phone.split("_").join(" ")}
                                                 </li>
                                             ))}
@@ -250,8 +250,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.languagesSpoken}:
                                 </strong>{" "}
-                                {data.spoken_languages?.map(language => (
-                                    <Badge className="bg-relif-orange-500">
+                                {data.spoken_languages?.map((language, index) => (
+                                    <Badge key={index} className="bg-relif-orange-500">
                                         {convertToTitleCase(language)}
                                     </Badge>
                                 ))}
@@ -354,8 +354,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                             E-mails
                                         </h3>
                                         <ul>
-                                            {data.emergency_contacts[0].emails.map(email => (
-                                                <li className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
+                                            {data.emergency_contacts[0].emails.map((email, index) => (
+                                                <li key={index} className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
                                                     <MdMail /> {email}
                                                 </li>
                                             ))}
@@ -382,8 +382,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                             {dict.commons.beneficiaries.beneficiaryId.phones}
                                         </h3>
                                         <ul>
-                                            {data.emergency_contacts[0].phones.map(phone => (
-                                                <li className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
+                                            {data.emergency_contacts[0].phones.map((phone, index) => (
+                                                <li key={index} className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
                                                     <MdPhone /> {phone.split("_").join(" ")}
                                                 </li>
                                             ))}

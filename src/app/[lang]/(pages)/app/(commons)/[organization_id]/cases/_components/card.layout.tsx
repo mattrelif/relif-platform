@@ -197,7 +197,10 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                             <FaCalendarAlt className="text-xs" />
                             <span>
                                 Due:{" "}
-                                {formatDate(data?.due_date || "", locale as "en" | "es" | "pt")}
+                                {data?.due_date 
+                                    ? formatDate(data.due_date, locale as "en" | "es" | "pt")
+                                    : "No due date set"
+                                }
                             </span>
                         </div>
                         {data?.estimated_duration && (
@@ -226,7 +229,10 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                         </div>
                         <span className="ml-auto">
                             Updated{" "}
-                            {formatDate(data?.updated_at || "", locale as "en" | "es" | "pt")}
+                            {data?.updated_at 
+                                ? formatDate(data.updated_at, locale as "en" | "es" | "pt")
+                                : "Unknown"
+                            }
                         </span>
                     </div>
                 </div>

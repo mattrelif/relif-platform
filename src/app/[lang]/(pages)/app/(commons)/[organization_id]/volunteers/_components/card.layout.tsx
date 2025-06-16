@@ -53,10 +53,8 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                         {voluntary?.email}
                     </span>
                     <div className="flex mt-2 gap-2 flex-wrap">
-                        {voluntary?.segments.map(segment => (
-                            <span>
-                                <Badge className="bg-yellow-300 text-slate-900">{segment}</Badge>
-                            </span>
+                        {voluntary?.segments.map((segment, index) => (
+                            <Badge key={index} className="bg-yellow-300 text-slate-900">{segment}</Badge>
                         ))}
                     </div>
                 </div>

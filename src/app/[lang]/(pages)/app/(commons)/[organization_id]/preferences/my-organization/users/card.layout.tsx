@@ -80,8 +80,8 @@ const UserCard = ({ currentUserId, refreshList, ...data }: Props): ReactNode => 
                                     {dict.commons.preferences.myOrganization.users.card.phonesTitle}
                                 </h3>
                                 <ul>
-                                    {data.phones.map(phone => (
-                                        <li className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                    {data.phones.map((phone, index) => (
+                                        <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
                                             <MdPhone /> {phone.split("_").join(" ")}
                                         </li>
                                     ))}

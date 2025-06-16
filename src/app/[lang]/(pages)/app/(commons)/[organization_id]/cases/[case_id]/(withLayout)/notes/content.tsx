@@ -146,6 +146,21 @@ const NotesContent = (): ReactNode => {
             if (response.data) {
                 setNotes(prev => [response.data, ...prev]);
                 console.log("✅ Note added to local state");
+            } else if (response.status >= 200 && response.status < 300) {
+                // Even if no data returned, but status is successful, consider it a success
+                console.log("✅ Note creation successful (no data returned but status OK)");
+                // Refresh notes list to get updated data
+                try {
+                    const notesResponse = await getCaseNotes(caseId);
+                    const notesData = notesResponse?.data;
+                    if (Array.isArray(notesData)) {
+                        setNotes(notesData);
+                    } else if (notesData && typeof notesData === 'object' && notesData.data && Array.isArray(notesData.data)) {
+                        setNotes(notesData.data);
+                    }
+                } catch (refreshError) {
+                    console.warn("⚠️ Could not refresh notes after creation:", refreshError);
+                }
             } else {
                 console.warn("⚠️ No data returned from createCaseNote:", response);
             }
