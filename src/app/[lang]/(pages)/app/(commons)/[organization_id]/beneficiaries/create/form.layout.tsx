@@ -3,32 +3,65 @@
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { generateProfileImageUploadLink } from "@/repository/beneficiary.repository";
 import { createBeneficiary } from "@/repository/organization.repository";
 import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState } from "react";
-import { FaMapMarkerAlt, FaUsers } from "react-icons/fa";
-import { MdAdd, MdContacts } from "react-icons/md";
+import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState, useEffect } from "react";
+import { FaUsers, FaMapMarkerAlt, FaUpload, FaUser } from "react-icons/fa";
+import { MdContacts } from "react-icons/md";
+import Image from "next/image";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import Creatable from "react-select/creatable";
+import { ActionMeta, OnChangeValue, MultiValue } from "react-select";
 
+// Components
 import { CivilStatus } from "./civilStatus.layout";
 import { Education } from "./education.layout";
 import { Gender } from "./gender.layout";
 import { Medical } from "./medical.layout";
 import { RelationshipDegree } from "./relationship.layout";
 
+interface LanguageOption {
+    value: string;
+    label: string;
+}
+
 const Form = (): ReactNode => {
     const router = useRouter();
     const { toast } = useToast();
     const dict = useDictionary();
 
-    const [languages, setLanguages] = useState<string[] | []>([]);
+    const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
+    const [languages, setLanguages] = useState<LanguageOption[]>([]);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [phone, setPhone] = useState<string>("");
+    const [emergencyPhone, setEmergencyPhone] = useState<string>("");
+    const [skipMedicalInfo, setSkipMedicalInfo] = useState<boolean>(false);
+
+    useEffect(() => {
+        try {
+            const user: UserSchema = getFromLocalStorage("r_ud");
+            setCurrentUser(user);
+        } catch (err) {
+            console.error("Error loading current user:", err);
+        }
+    }, []);
 
     const handleInputChange =
         (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -37,10 +70,17 @@ const Form = (): ReactNode => {
         };
 
     const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-        try {
-            const file = event.target.files?.[0];
-            if (!file) return;
+        const file = event.target.files?.[0];
+        if (!file) return;
 
+        setIsUploading(true);
+        try {
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreview(reader.result as string);
+            reader.readAsDataURL(file);
+
+            // Upload to S3
             const { data } = await generateProfileImageUploadLink(file.type);
 
             await fetch(data.link, {
@@ -60,13 +100,21 @@ const Form = (): ReactNode => {
                 variant: "success",
             });
         } catch (err) {
-            setIsUploading(false);
             toast({
                 title: "Upload Failed",
                 description: "There was an error uploading the image.",
                 variant: "destructive",
             });
+        } finally {
+            setIsUploading(false);
         }
+    };
+
+    const handleLanguageChange = (
+        newValue: OnChangeValue<LanguageOption, true>,
+        actionMeta: ActionMeta<LanguageOption>
+    ) => {
+        setLanguages([...(newValue || [])]);
     };
 
     const pathname = usePathname();
@@ -76,26 +124,19 @@ const Form = (): ReactNode => {
         e.preventDefault();
 
         try {
-            const currentUser: UserSchema = await getFromLocalStorage("r_ud");
-
             const formData: FormData = new FormData(e.target);
 
             // @ts-ignore
             const data: {
                 fullName: string;
                 birthdate: string;
-                email: string;
-                gender: string;
-                otherGender: string;
-                civilStatus: string;
-                otherCivilStatus: string;
-                education: string;
-                otherEducation: string;
-                occupation: string;
                 documentType: string;
                 documentValue: string;
-                countryCode: string;
-                phone: string;
+                email: string;
+                gender: string;
+                civilStatus: string;
+                education: string;
+                occupation: string;
                 languages: string;
                 addressLine1: string;
                 addressLine2: string;
@@ -103,6 +144,9 @@ const Form = (): ReactNode => {
                 postalCode: string;
                 state: string;
                 country: string;
+                emergencyName: string;
+                relationshipDegree: string;
+                // Medical fields
                 allergies: string;
                 currentMedications: string;
                 chronicMedicalConditions: string;
@@ -110,18 +154,11 @@ const Form = (): ReactNode => {
                 bloodType: string;
                 vaccinations: string;
                 mentalHealth: string;
-                height: number;
-                weight: number;
+                height: string;
+                weight: string;
                 addictions: string;
                 disabilities: string;
                 prothesisOrMedicalDevices: string;
-                notes: string;
-                emergencyName: string;
-                emergencyRelationship: string;
-                otherEmergencyRelationship: string;
-                emergencyCountryCode: string;
-                emergencyPhone: string;
-                emergencyEmail: string;
             } = Object.fromEntries(formData);
 
             // Validate required fields
@@ -135,106 +172,88 @@ const Form = (): ReactNode => {
                 throw new Error("Birthdate must be in the past");
             }
 
-            if (currentUser?.organization_id) {
-                const { data: newBeneficiary } = await createBeneficiary(
-                    currentUser.organization_id,
-                    {
-                        full_name: data.fullName,
-                        image_url: imageUrl || "",
-                        birthdate: data.birthdate,
-                        email: data.email,
-                        gender: data.gender === "other" ? data.otherGender : data.gender,
-                        civil_status:
-                            data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
-                        education:
-                            data.education === "other" ? data.otherEducation : data.education,
-                        occupation: data.occupation,
-                        spoken_languages: data.languages
-                            ? data.languages.split(",").filter(lang => lang.trim())
-                            : [],
-                        phones: [`${data.countryCode}_${data.phone}`],
-                        address: {
-                            address_line_1: data.addressLine1,
-                            address_line_2: data.addressLine2,
-                            city: data.city,
-                            district: data.state,
-                            zip_code: data.postalCode,
-                            country: data.country,
-                        },
-                        medical_information: {
-                            allergies: data.allergies
-                                ? data.allergies.split(",").filter(item => item.trim())
-                                : [],
-                            current_medications: data.currentMedications
-                                ? data.currentMedications.split(",").filter(item => item.trim())
-                                : [],
-                            recurrent_medical_conditions: data.chronicMedicalConditions
-                                ? data.chronicMedicalConditions
-                                      .split(",")
-                                      .filter(item => item.trim())
-                                : [],
-                            health_insurance_plans: data.healthInsurance
-                                ? data.healthInsurance.split(",").filter(item => item.trim())
-                                : [],
-                            blood_type: data.bloodType || "",
-                            taken_vaccines: data.vaccinations
-                                ? data.vaccinations.split(",").filter(item => item.trim())
-                                : [],
-                            mental_health_history: data.mentalHealth
-                                ? data.mentalHealth.split(",").filter(item => item.trim())
-                                : [],
-                            height: Number(data.height) || 0,
-                            weight: Number(data.weight) || 0,
-                            addictions: data.addictions
-                                ? data.addictions.split(",").filter(item => item.trim())
-                                : [],
-                            disabilities: data.disabilities
-                                ? data.disabilities.split(",").filter(item => item.trim())
-                                : [],
-                            prothesis_or_medical_devices: data.prothesisOrMedicalDevices
-                                ? data.prothesisOrMedicalDevices
-                                      .split(",")
-                                      .filter(item => item.trim())
-                                : [],
-                        },
-                        notes: data.notes,
-                        documents: [
-                            {
-                                type: data.documentType,
-                                value: data.documentValue,
-                            },
-                        ],
-                        emergency_contacts: [
-                            {
-                                phones: [`${data.emergencyCountryCode}_${data.emergencyPhone}`],
-                                emails: [data.emergencyEmail],
-                                full_name: data.emergencyName,
-                                relationship:
-                                    data.emergencyRelationship === "other"
-                                        ? data.otherEmergencyRelationship
-                                        : data.emergencyRelationship,
-                            },
-                        ],
-                    }
-                );
-
-                toast({
-                    title: dict.commons.beneficiaries.create.toastSuccessTitle,
-                    description: dict.commons.beneficiaries.create.toastSuccessDescription,
-                    variant: "success",
-                });
-
-                router.push(`${urlPath}/create/${newBeneficiary.id}/allocate`);
-            } else {
-                throw new Error();
+            if (!currentUser?.organization_id) {
+                throw new Error("Organization ID is required");
             }
+
+            const medicalData = skipMedicalInfo ? {
+                allergies: [],
+                current_medications: [],
+                recurrent_medical_conditions: [],
+                health_insurance_plans: [],
+                blood_type: "",
+                taken_vaccines: [],
+                mental_health_history: [],
+                height: 0,
+                weight: 0,
+                addictions: [],
+                disabilities: [],
+                prothesis_or_medical_devices: [],
+            } : {
+                allergies: data.allergies ? data.allergies.split(",").filter(item => item.trim()) : [],
+                current_medications: data.currentMedications ? data.currentMedications.split(",").filter(item => item.trim()) : [],
+                recurrent_medical_conditions: data.chronicMedicalConditions ? data.chronicMedicalConditions.split(",").filter(item => item.trim()) : [],
+                health_insurance_plans: data.healthInsurance ? data.healthInsurance.split(",").filter(item => item.trim()) : [],
+                blood_type: data.bloodType || "",
+                taken_vaccines: data.vaccinations ? data.vaccinations.split(",").filter(item => item.trim()) : [],
+                mental_health_history: data.mentalHealth ? data.mentalHealth.split(",").filter(item => item.trim()) : [],
+                height: Number(data.height) || 0,
+                weight: Number(data.weight) || 0,
+                addictions: data.addictions ? data.addictions.split(",").filter(item => item.trim()) : [],
+                disabilities: data.disabilities ? data.disabilities.split(",").filter(item => item.trim()) : [],
+                prothesis_or_medical_devices: data.prothesisOrMedicalDevices ? data.prothesisOrMedicalDevices.split(",").filter(item => item.trim()) : [],
+            };
+
+            await createBeneficiary(currentUser.organization_id, {
+                full_name: data.fullName,
+                image_url: imageUrl || "",
+                birthdate: data.birthdate,
+                email: data.email,
+                gender: data.gender,
+                civil_status: data.civilStatus,
+                education: data.education,
+                occupation: data.occupation,
+                spoken_languages: languages.map(lang => lang.value),
+                phones: phone ? [phone] : [],
+                address: {
+                    address_line_1: data.addressLine1 || "",
+                    address_line_2: data.addressLine2 || "",
+                    city: data.city || "",
+                    district: data.state || "",
+                    zip_code: data.postalCode || "",
+                    country: data.country || "",
+                },
+                medical_information: medicalData,
+                notes: "",
+                documents: [
+                    {
+                        type: data.documentType,
+                        value: data.documentValue,
+                    },
+                ],
+                emergency_contacts: [
+                    {
+                        full_name: data.emergencyName,
+                        relationship: data.relationshipDegree,
+                        phones: emergencyPhone ? [emergencyPhone] : [],
+                        emails: [],
+                    },
+                ],
+            });
+
+            toast({
+                title: dict.commons.beneficiaries.create.toastSuccessTitle,
+                description: dict.commons.beneficiaries.create.toastSuccessDescription,
+            });
+
+            router.push(urlPath);
         } catch (err: any) {
             console.error("Beneficiary creation error:", err);
             console.error("Error details:", {
                 message: err instanceof Error ? err.message : "Unknown error",
                 response: err?.response?.data,
                 status: err?.response?.status,
-                organizationId: (await getFromLocalStorage("r_ud"))?.organization_id,
+                organizationId: currentUser?.organization_id,
             });
 
             toast({
@@ -256,103 +275,181 @@ const Form = (): ReactNode => {
                     {dict.commons.beneficiaries.create.title}
                 </h1>
 
-                <div className="flex flex-col gap-3 border border-slate-200 p-4 rounded-lg">
-                    <Label htmlFor="picture">Picture</Label>
-                    <Input id="picture" type="file" onChange={handleImageUpload} />
-                    {isUploading && <p>Uploading image...</p>}
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="fullName">{dict.commons.beneficiaries.create.fullName} *</Label>
-                    <Input id="fullName" name="fullName" type="text" required />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="birthdate">
-                        {dict.commons.beneficiaries.create.birthdate} *
-                    </Label>
-                    <input
-                        id="birthdate"
-                        name="birthdate"
-                        type="date"
-                        className="w-full px-3 py-2 border rounded-md text-sm text-slate-900 placeholder-slate-400 border-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-relif-orange-200"
-                        required
-                    />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="document">{dict.commons.beneficiaries.create.document} *</Label>
-                    <div className="w-full flex gap-2">
-                        <Input
-                            id="documentType"
-                            name="documentType"
-                            type="text"
-                            placeholder={dict.commons.beneficiaries.create.documentTypePlaceholder}
-                            className="w-[50%]"
-                            required
-                        />
-                        <Input
-                            id="documentValue"
-                            name="documentValue"
-                            type="text"
-                            className="w-[50%]"
-                            placeholder={dict.commons.beneficiaries.create.documentValuePlaceholder}
-                            required
-                        />
+                {/* Profile Image Section with styled border */}
+                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                        <FaUser /> Profile Picture
+                    </h2>
+                    
+                    <div className="flex items-center gap-4">
+                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-relif-orange-200 bg-slate-50 flex items-center justify-center">
+                            {imagePreview ? (
+                                <Image
+                                    src={imagePreview}
+                                    alt="Profile Preview"
+                                    fill
+                                    className="object-cover"
+                                />
+                            ) : (
+                                <FaUser size={32} className="text-slate-300" />
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label
+                                htmlFor="picture"
+                                className="cursor-pointer flex items-center gap-2 text-sm text-relif-orange-200 hover:underline"
+                            >
+                                <FaUpload size={12} />
+                                Upload Picture
+                            </Label>
+                            <Input 
+                                id="picture" 
+                                type="file" 
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImageUpload} 
+                            />
+                            {isUploading && <p className="text-sm text-slate-500">Uploading...</p>}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="email">{dict.commons.beneficiaries.create.email} *</Label>
-                    <Input id="email" name="email" type="email" required />
-                </div>
+                {/* Basic Information Section */}
+                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                        <FaUser /> Basic Information
+                    </h2>
 
-                <Gender />
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="fullName">{dict.commons.beneficiaries.create.fullName} *</Label>
+                        <Input id="fullName" name="fullName" type="text" required />
+                    </div>
 
-                <CivilStatus />
-
-                <Education />
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="occupation">
-                        {dict.commons.beneficiaries.create.occupation} *
-                    </Label>
-                    <Input id="occupation" name="occupation" type="text" required />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="phone">{dict.commons.beneficiaries.create.phone} *</Label>
-                    <div className="w-full flex gap-2">
-                        <Input
-                            id="countryCode"
-                            name="countryCode"
-                            type="text"
-                            placeholder={dict.commons.beneficiaries.create.countryCodePlaceholder}
-                            className="w-[30%]"
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="birthdate">
+                            {dict.commons.beneficiaries.create.birthdate} *
+                        </Label>
+                        <input
+                            id="birthdate"
+                            name="birthdate"
+                            type="date"
+                            className="w-full px-3 py-2 border rounded-md text-sm text-slate-900 placeholder-slate-400 border-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-relif-orange-200"
                             required
                         />
-                        <Input id="phone" name="phone" type="text" required />
                     </div>
-                </div>
 
-                <div className="flex flex-col gap-3">
-                    <Label htmlFor="languages">
-                        {dict.commons.beneficiaries.create.languages} *
-                    </Label>
-                    <Input
-                        id="languages"
-                        name="languages"
-                        type="text"
-                        placeholder={dict.commons.beneficiaries.create.languagesPlaceholder}
-                        onChange={handleInputChange(setLanguages)}
-                        required
-                    />
-                    <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
-                        {languages?.map((language, index) => (
-                            <Badge variant="outline" key={index}>
-                                {language}
-                            </Badge>
-                        ))}
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="document">{dict.commons.beneficiaries.create.document} *</Label>
+                        <div className="w-full flex gap-2">
+                            <Select name="documentType" required>
+                                <SelectTrigger className="w-[50%]">
+                                    <SelectValue placeholder="Document Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="passport">Passport</SelectItem>
+                                    <SelectItem value="national_id">National ID</SelectItem>
+                                    <SelectItem value="drivers_license">Driver's License</SelectItem>
+                                    <SelectItem value="cpf">CPF</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Input
+                                id="documentValue"
+                                name="documentValue"
+                                type="text"
+                                className="w-[50%]"
+                                placeholder={dict.commons.beneficiaries.create.documentValuePlaceholder}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="email">{dict.commons.beneficiaries.create.email} *</Label>
+                        <Input id="email" name="email" type="email" required />
+                    </div>
+
+                    <Gender />
+
+                    <CivilStatus />
+
+                    <Education />
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="occupation">
+                            {dict.commons.beneficiaries.create.occupation} *
+                        </Label>
+                        <Input id="occupation" name="occupation" type="text" required />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="phone">{dict.commons.beneficiaries.create.phone} *</Label>
+                        <PhoneInput
+                            country={"us"}
+                            value={phone}
+                            onChange={(value: string) => setPhone(value)}
+                            containerClass="w-full"
+                            inputStyle={{
+                                height: "40px",
+                                width: "100%",
+                                borderColor: "#e2e8f0",
+                                borderRadius: "0.375rem",
+                                fontSize: "0.875rem",
+                            }}
+                            buttonStyle={{
+                                borderColor: "#e2e8f0",
+                                borderRadius: "0.375rem 0 0 0.375rem",
+                            }}
+                            inputProps={{
+                                name: "phone",
+                                required: true,
+                            }}
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="languages">
+                            {dict.commons.beneficiaries.create.languages} *
+                        </Label>
+                        <Creatable
+                            isMulti
+                            value={languages}
+                            onChange={handleLanguageChange}
+                            placeholder="Select or create languages..."
+                            options={[
+                                { value: "english", label: "English" },
+                                { value: "spanish", label: "Spanish" },
+                                { value: "portuguese", label: "Portuguese" },
+                                { value: "french", label: "French" },
+                                { value: "arabic", label: "Arabic" },
+                                { value: "mandarin", label: "Mandarin" },
+                                { value: "hindi", label: "Hindi" },
+                                { value: "russian", label: "Russian" },
+                                { value: "german", label: "German" },
+                                { value: "italian", label: "Italian" },
+                            ]}
+                            styles={{
+                                control: base => ({
+                                    ...base,
+                                    borderColor: "#e2e8f0",
+                                    fontSize: "0.875rem",
+                                    minHeight: "40px",
+                                }),
+                                placeholder: base => ({
+                                    ...base,
+                                    color: "#94a3b8",
+                                    fontSize: "0.875rem",
+                                }),
+                                multiValue: base => ({
+                                    ...base,
+                                    backgroundColor: "#f1f5f9",
+                                    borderRadius: "0.375rem",
+                                }),
+                                multiValueLabel: base => ({
+                                    ...base,
+                                    fontSize: "0.875rem",
+                                }),
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -424,44 +521,61 @@ const Form = (): ReactNode => {
                         <Label htmlFor="emergencyPhone">
                             {dict.commons.beneficiaries.create.emergencyPhone} *
                         </Label>
-                        <div className="w-full flex gap-2">
-                            <Input
-                                id="emergencyCountryCode"
-                                name="emergencyCountryCode"
-                                type="text"
-                                placeholder="e.g. +55"
-                                className="w-[30%]"
-                                required
+                        <PhoneInput
+                            country={"us"}
+                            value={emergencyPhone}
+                            onChange={(value: string) => setEmergencyPhone(value)}
+                            containerClass="w-full"
+                            inputStyle={{
+                                height: "40px",
+                                width: "100%",
+                                borderColor: "#e2e8f0",
+                                borderRadius: "0.375rem",
+                                fontSize: "0.875rem",
+                            }}
+                            buttonStyle={{
+                                borderColor: "#e2e8f0",
+                                borderRadius: "0.375rem 0 0 0.375rem",
+                            }}
+                            inputProps={{
+                                name: "emergencyPhone",
+                                required: true,
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* Medical Information Section with Skip Option */}
+                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <MdContacts /> Medical Information
+                        </h2>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox 
+                                id="skipMedical" 
+                                checked={skipMedicalInfo}
+                                onCheckedChange={(checked) => setSkipMedicalInfo(checked as boolean)}
                             />
-                            <Input id="emergencyPhone" name="emergencyPhone" type="text" required />
+                            <Label htmlFor="skipMedical" className="text-sm font-normal">
+                                Skip medical information
+                            </Label>
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="emergencyEmail">
-                            {dict.commons.beneficiaries.create.emergencyEmail} *
-                        </Label>
-                        <Input id="emergencyEmail" name="emergencyEmail" type="text" />
+                    <div className={skipMedicalInfo ? "opacity-50 pointer-events-none" : ""}>
+                        <Medical />
                     </div>
                 </div>
-            </div>
 
-            <div className="flex flex-col gap-6">
-                <Medical />
-
-                <div className="flex flex-col gap-3 w-full">
-                    <Label htmlFor="notes">{dict.commons.beneficiaries.create.notes}</Label>
-                    <textarea
-                        className="flex min-h-32 resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-relif-orange-200 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        id="notes"
-                        name="notes"
-                    />
+                <div className="flex gap-4 pt-5">
+                    <Button variant="outline" type="button" onClick={() => router.push(urlPath)}>
+                        Cancel
+                    </Button>
+                    <Button type="submit">
+                        Create Beneficiary
+                    </Button>
                 </div>
-
-                <Button className="flex items-center gap-2">
-                    <MdAdd size={16} />
-                    {dict.commons.beneficiaries.create.createBeneficiaryButton}
-                </Button>
             </div>
         </form>
     );
