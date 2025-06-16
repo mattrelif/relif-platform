@@ -49,9 +49,9 @@ const initialFilters: CaseFilters = {
 // Available filter options
 const filterOptions = {
     status: [
-        { value: "OPEN", label: "Open" },
         { value: "IN_PROGRESS", label: "In Progress" },
         { value: "PENDING", label: "Pending" },
+        { value: "ON_HOLD", label: "On Hold" },
         { value: "CLOSED", label: "Closed" },
         { value: "CANCELLED", label: "Cancelled" }
     ],
@@ -109,6 +109,57 @@ const CaseList = (): ReactNode => {
 
 
 
+    // Helper function to apply client-side filtering
+    const applyFilters = (casesData: CaseSchema[]): CaseSchema[] => {
+        return casesData.filter(caseItem => {
+            // Status filter
+            if (filters.status.length > 0 && !filters.status.includes(caseItem.status)) {
+                return false;
+            }
+            
+            // Priority filter
+            if (filters.priority.length > 0 && !filters.priority.includes(caseItem.priority)) {
+                return false;
+            }
+            
+            // Case type filter
+            if (filters.case_type.length > 0 && !filters.case_type.includes(caseItem.case_type)) {
+                return false;
+            }
+            
+            // Urgency level filter
+            if (filters.urgency_level.length > 0 && caseItem.urgency_level && !filters.urgency_level.includes(caseItem.urgency_level)) {
+                return false;
+            }
+            
+            // Assigned to filter
+            if (filters.assigned_to.length > 0 && !filters.assigned_to.includes(caseItem.assigned_to_id)) {
+                return false;
+            }
+            
+            // Date from filter
+            if (filters.date_from && caseItem.created_at) {
+                const caseDate = new Date(caseItem.created_at);
+                if (caseDate < filters.date_from) {
+                    return false;
+                }
+            }
+            
+            // Date to filter
+            if (filters.date_to && caseItem.created_at) {
+                const caseDate = new Date(caseItem.created_at);
+                // Set time to end of day for date_to comparison
+                const endOfDay = new Date(filters.date_to);
+                endOfDay.setHours(23, 59, 59, 999);
+                if (caseDate > endOfDay) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    };
+
     const getCasesList = useCallback(async () => {
         try {
             setIsLoading(true);
@@ -120,21 +171,34 @@ const CaseList = (): ReactNode => {
                 throw new Error("Organization ID not found");
             }
             
-            // TypeScript now knows organizationId is string after the null check
+            // Get all cases first (with a higher limit to ensure we get all cases for filtering)
             const response = await getCasesByOrganizationID(
                 organizationId,
-                offset,
-                LIMIT,
+                0, // Always start from 0 to get all cases for filtering
+                1000, // Get more cases to apply filters client-side
                 searchTerm
             );
             
-            setCases(response.data);
+            // Apply client-side filtering
+            const allCases = response.data.data || [];
+            const filteredCases = applyFilters(allCases);
+            
+            // Apply pagination to filtered results
+            const startIndex = offset;
+            const endIndex = offset + LIMIT;
+            const paginatedCases = filteredCases.slice(startIndex, endIndex);
+            
+            // Update cases with paginated filtered results
+            setCases({
+                count: filteredCases.length,
+                data: paginatedCases
+            });
         } catch (err) {
             setError(true);
         } finally {
             setIsLoading(false);
         }
-    }, [pathname, offset, searchTerm]);
+    }, [pathname, offset, searchTerm, filters]);
 
     const getCasesStats = useCallback(async () => {
         try {
@@ -337,6 +401,9 @@ const CaseList = (): ReactNode => {
                                     {/* Status Filter */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-medium text-slate-700">Status</label>
+                                        <p className="text-xs text-slate-500 mb-2">
+                                            Note: All cases except "Closed" and "Cancelled" are considered active/open
+                                        </p>
                                         <Select onValueChange={(value) => addFilterValue('status', value)}>
                                             <SelectTrigger className="w-full h-8 text-xs">
                                                 <SelectValue placeholder="Select status..." />

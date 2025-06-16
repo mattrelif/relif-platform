@@ -165,6 +165,7 @@ const EditCasePage = (): ReactNode => {
             }
 
             // Prepare the update payload according to UpdateCasePayload interface
+            // Note: beneficiary_id is not included as it cannot be changed once assigned
             const updatePayload: UpdateCasePayload = {
                 title: formData.title,
                 description: formData.description,
@@ -211,14 +212,22 @@ const EditCasePage = (): ReactNode => {
         );
     }
 
-    const isFormValid = formData.title && formData.case_type && formData.priority && formData.beneficiary_id;
+    const isFormValid = formData.title && formData.case_type && formData.priority;
 
     return (
         <div className="w-full h-max p-4 flex flex-col gap-4 lg:p-2">
-            <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
-                <FaFileAlt />
-                Edit Case
-            </h1>
+            <div className="flex flex-col gap-2">
+                <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
+                    <FaFileAlt />
+                    Edit Case
+                </h1>
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-800">
+                    <strong>Important:</strong> Once a case has a beneficiary assigned, the beneficiary cannot be changed to maintain case integrity. 
+                    You can edit all other case information including the assigned user, status, and details.
+                </p>
+            </div>
+            </div>
 
             <form
                 className="w-full h-max grid grid-cols-2 gap-4 lg:flex lg:flex-col"
@@ -302,11 +311,11 @@ const EditCasePage = (): ReactNode => {
                                     <SelectValue placeholder="Select status..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="OPEN">Open</SelectItem>
                                     <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                                     <SelectItem value="PENDING">Pending</SelectItem>
                                     <SelectItem value="ON_HOLD">On Hold</SelectItem>
                                     <SelectItem value="CLOSED">Closed</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -398,35 +407,49 @@ const EditCasePage = (): ReactNode => {
                         </h2>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="beneficiary_id">Beneficiary *</Label>
-                            <Select value={formData.beneficiary_id} onValueChange={(value) => handleInputChange("beneficiary_id", value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select beneficiary..." />
-                                </SelectTrigger>
-                                                            <SelectContent>
-                                {beneficiaries.map((beneficiary) => (
-                                    <SelectItem key={beneficiary.id} value={beneficiary.id}>
-                                        {beneficiary.full_name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
+                            <Label htmlFor="beneficiary_id" className="flex items-center gap-2">
+                                <FaUsers className="text-relif-orange-200" />
+                                Beneficiary *
+                                <Badge variant="outline" className="text-xs bg-red-50 text-red-700">
+                                    Cannot be changed
+                                </Badge>
+                            </Label>
+                            {isLoadingData ? (
+                                <div className="text-sm text-slate-500">Loading beneficiary...</div>
+                            ) : (
+                                <div className="w-full p-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700">
+                                    {beneficiaries.find(b => b.id === formData.beneficiary_id)?.full_name || "Beneficiary not found"}
+                                </div>
+                            )}
+                            <p className="text-xs text-gray-500">
+                                The beneficiary cannot be changed once assigned to maintain case integrity.
+                            </p>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="assigned_to_id">Assign to User</Label>
-                            <Select value={formData.assigned_to_id} onValueChange={(value) => handleInputChange("assigned_to_id", value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select user..." />
-                                </SelectTrigger>
-                                                            <SelectContent>
-                                {users.map((user) => (
-                                    <SelectItem key={user.id} value={user.id}>
-                                        {user.first_name} {user.last_name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
+                            <Label htmlFor="assigned_to_id" className="flex items-center gap-2">
+                                <FaUserTie className="text-relif-orange-200" />
+                                Assign to User
+                                <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                                    Can be changed
+                                </Badge>
+                            </Label>
+                            {isLoadingData ? (
+                                <div className="text-sm text-slate-500">Loading users...</div>
+                            ) : (
+                                <Select value={formData.assigned_to_id} onValueChange={(value) => handleInputChange("assigned_to_id", value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select user..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {users.map((user) => (
+                                            <SelectItem key={user.id} value={user.id}>
+                                                {user.first_name} {user.last_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
                         </div>
                     </div>
 

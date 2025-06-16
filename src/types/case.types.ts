@@ -3,7 +3,7 @@ export interface CaseSchema {
     case_number: string;
     title: string;
     description: string;
-    status: "OPEN" | "IN_PROGRESS" | "PENDING" | "ON_HOLD" | "CLOSED";
+    status: "IN_PROGRESS" | "PENDING" | "ON_HOLD" | "CLOSED" | "CANCELLED";
     priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     urgency_level?: "IMMEDIATE" | "WITHIN_WEEK" | "WITHIN_MONTH" | "FLEXIBLE";
     case_type: "HOUSING" | "LEGAL" | "MEDICAL" | "SUPPORT" | "EDUCATION" | "EMPLOYMENT" | "FINANCIAL" | "FAMILY_REUNIFICATION" | "DOCUMENTATION" | "MENTAL_HEALTH" | "OTHER";
@@ -110,7 +110,7 @@ export interface CreateCasePayload {
 export interface UpdateCasePayload {
     title?: string;
     description?: string;
-    status?: "OPEN" | "IN_PROGRESS" | "PENDING" | "ON_HOLD" | "CLOSED";
+    status?: "IN_PROGRESS" | "PENDING" | "ON_HOLD" | "CLOSED" | "CANCELLED";
     priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     urgency_level?: "IMMEDIATE" | "WITHIN_WEEK" | "WITHIN_MONTH" | "FLEXIBLE";
     case_type?: "HOUSING" | "LEGAL" | "MEDICAL" | "SUPPORT" | "EDUCATION" | "EMPLOYMENT" | "FINANCIAL" | "FAMILY_REUNIFICATION" | "DOCUMENTATION" | "MENTAL_HEALTH" | "OTHER";

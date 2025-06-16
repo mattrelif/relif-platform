@@ -26,11 +26,11 @@ type Props = CaseSchema & {
 };
 
 const STATUS_COLORS = {
-    OPEN: "bg-blue-100 text-blue-800 border-blue-200",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    IN_PROGRESS: "bg-blue-100 text-blue-800 border-blue-200",
     PENDING: "bg-orange-100 text-orange-800 border-orange-200",
     ON_HOLD: "bg-purple-100 text-purple-800 border-purple-200",
     CLOSED: "bg-gray-100 text-gray-800 border-gray-200",
+    CANCELLED: "bg-gray-100 text-gray-800 border-gray-200",
 };
 
 const PRIORITY_COLORS = {
@@ -65,9 +65,9 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
         router.push(route);
     };
 
-    // Check if case is overdue - only for open/in-progress cases
+    // Check if case is overdue - only for active cases (not closed/cancelled)
     const isOverdue = data.due_date && 
-        (data.status === "OPEN" || data.status === "IN_PROGRESS" || data.status === "PENDING") && 
+        (data.status === "IN_PROGRESS" || data.status === "PENDING" || data.status === "ON_HOLD") && 
         new Date() > new Date(data.due_date);
 
     return (

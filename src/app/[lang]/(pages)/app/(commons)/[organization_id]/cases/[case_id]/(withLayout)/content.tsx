@@ -153,11 +153,11 @@ const CaseOverview = (): ReactNode => {
     };
 
     const STATUS_COLORS = {
-        OPEN: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-        IN_PROGRESS: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-        PENDING: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        ON_HOLD: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+        IN_PROGRESS: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+        PENDING: "bg-orange-100 text-orange-800 hover:bg-orange-200",
+        ON_HOLD: "bg-purple-100 text-purple-800 hover:bg-purple-200",
         CLOSED: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+        CANCELLED: "bg-gray-100 text-gray-800 hover:bg-gray-200",
     };
 
     const URGENCY_COLORS = {
