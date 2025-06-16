@@ -145,7 +145,12 @@ const Form = (): ReactNode => {
                 state: string;
                 country: string;
                 emergencyName: string;
-                relationshipDegree: string;
+                emergencyRelationship: string;
+                otherEmergencyRelationship: string;
+                emergencyEmail: string;
+                otherGender: string;
+                otherCivilStatus: string;
+                otherEducation: string;
                 // Medical fields
                 allergies: string;
                 currentMedications: string;
@@ -164,6 +169,61 @@ const Form = (): ReactNode => {
             // Validate required fields
             if (!data.fullName || !data.birthdate || !data.email) {
                 throw new Error("Missing required fields: fullName, birthdate, or email");
+            }
+
+            // Validate document fields
+            if (!data.documentType || !data.documentValue) {
+                throw new Error("Document type and document value are required");
+            }
+
+            // Validate other required fields
+            if (!data.occupation) {
+                throw new Error("Occupation is required");
+            }
+
+            if (!phone || phone.trim() === "") {
+                throw new Error("Phone number is required");
+            }
+
+            if (!languages || languages.length === 0) {
+                throw new Error("At least one language is required");
+            }
+
+            // Validate address fields
+            if (!data.addressLine1 || !data.city || !data.postalCode || !data.state || !data.country) {
+                throw new Error("Address fields (address line 1, city, postal code, state, country) are required");
+            }
+
+            // Validate emergency contact fields
+            if (!data.emergencyName) {
+                throw new Error("Emergency contact name is required");
+            }
+
+            if (!emergencyPhone || emergencyPhone.trim() === "") {
+                throw new Error("Emergency contact phone is required");
+            }
+
+            if (!data.emergencyEmail) {
+                throw new Error("Emergency contact email is required");
+            }
+
+            // Validate "other" options
+            if (data.gender === "other" && (!data.otherGender || data.otherGender.trim() === "")) {
+                throw new Error("Please specify the gender when 'Other' is selected");
+            }
+
+            if (data.civilStatus === "other" && (!data.otherCivilStatus || data.otherCivilStatus.trim() === "")) {
+                throw new Error("Please specify the civil status when 'Other' is selected");
+            }
+
+            if (data.education === "other" && (!data.otherEducation || data.otherEducation.trim() === "")) {
+                throw new Error("Please specify the education when 'Other' is selected");
+            }
+
+            // Validate emergency contact relationship
+            const relationship = data.emergencyRelationship === "other" ? data.otherEmergencyRelationship : data.emergencyRelationship;
+            if (!relationship || relationship.trim() === "") {
+                throw new Error("Emergency contact relationship is required");
             }
 
             const today = new Date();
@@ -209,9 +269,9 @@ const Form = (): ReactNode => {
                 image_url: imageUrl || "",
                 birthdate: data.birthdate,
                 email: data.email,
-                gender: data.gender,
-                civil_status: data.civilStatus,
-                education: data.education,
+                gender: data.gender === "other" ? data.otherGender : data.gender,
+                civil_status: data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
+                education: data.education === "other" ? data.otherEducation : data.education,
                 occupation: data.occupation,
                 spoken_languages: languages.map(lang => lang.value),
                 phones: phone ? [phone] : [],
@@ -234,9 +294,9 @@ const Form = (): ReactNode => {
                 emergency_contacts: [
                     {
                         full_name: data.emergencyName,
-                        relationship: data.relationshipDegree,
+                        relationship: relationship,
                         phones: emergencyPhone ? [emergencyPhone] : [],
-                        emails: [],
+                        emails: [data.emergencyEmail],
                     },
                 ],
             });
@@ -452,7 +512,9 @@ const Form = (): ReactNode => {
                         />
                     </div>
                 </div>
+            </div>
 
+            <div className="w-full h-max flex flex-col gap-6">
                 <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                     <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
                         <FaMapMarkerAlt /> {dict.commons.beneficiaries.create.lastAddress}
@@ -542,6 +604,13 @@ const Form = (): ReactNode => {
                                 required: true,
                             }}
                         />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="emergencyEmail">
+                            {dict.commons.beneficiaries.create.emergencyEmail} *
+                        </Label>
+                        <Input id="emergencyEmail" name="emergencyEmail" type="email" required />
                     </div>
                 </div>
 
