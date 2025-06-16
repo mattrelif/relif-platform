@@ -248,60 +248,176 @@ export async function getCasesByOrganizationID(
     limit: number,
     search: string
 ): Promise<AxiosResponse<{ count: number; data: CaseSchema[] }>> {
-    return client.request({
-        url: `cases?organization_id=${orgId}&offset=${offset}&limit=${limit}&search=${search}`,
-        method: "GET",
-    });
+    try {
+        console.log("📋 Fetching cases for organization:", orgId, { offset, limit, search });
+        const response = await client.request({
+            url: `cases?organization_id=${orgId}&offset=${offset}&limit=${limit}&search=${search}`,
+            method: "GET",
+        });
+        console.log("✅ Cases fetched successfully:", {
+            count: response.data?.count || 0,
+            dataLength: response.data?.data?.length || 0
+        });
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error fetching cases:", {
+            error: error.message,
+            status: error?.response?.status,
+            statusText: error?.response?.statusText,
+            responseData: error?.response?.data,
+            orgId,
+            offset,
+            limit,
+            search
+        });
+        throw error;
+    }
 }
 
 export async function getCaseById(caseId: string): Promise<AxiosResponse<CaseSchema>> {
-    return client.request({
-        url: `cases/${caseId}`,
-        method: "GET",
-    });
+    try {
+        console.log("📋 Fetching case by ID:", caseId);
+        const response = await client.request({
+            url: `cases/${caseId}`,
+            method: "GET",
+        });
+        console.log("✅ Case fetched successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error fetching case:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId
+        });
+        throw error;
+    }
 }
 
 export async function createCase(data: CreateCasePayload): Promise<AxiosResponse<CaseSchema>> {
-    return client.request({
-        url: `cases`,
-        method: "POST",
-        data,
-    });
+    try {
+        console.log("🏗️ Creating case with data:", data);
+        const response = await client.request({
+            url: `cases`,
+            method: "POST",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Case created successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error creating case:", {
+            error: error.message,
+            status: error?.response?.status,
+            statusText: error?.response?.statusText,
+            responseData: error?.response?.data,
+            caseData: data
+        });
+        throw error;
+    }
 }
 
 export async function updateCase(
     caseId: string,
     data: UpdateCasePayload
 ): Promise<AxiosResponse<CaseSchema>> {
-    return client.request({
-        url: `cases/${caseId}`,
-        method: "PUT",
-        data,
-    });
+    try {
+        console.log("📝 Updating case:", caseId, "with data:", data);
+        const response = await client.request({
+            url: `cases/${caseId}`,
+            method: "PUT",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Case updated successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error updating case:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            updateData: data
+        });
+        throw error;
+    }
 }
 
 export async function deleteCase(caseId: string): Promise<AxiosResponse> {
-    return client.request({
-        url: `cases/${caseId}`,
-        method: "DELETE",
-    });
+    try {
+        console.log("🗑️ Deleting case:", caseId);
+        const response = await client.request({
+            url: `cases/${caseId}`,
+            method: "DELETE",
+        });
+        console.log("✅ Case deleted successfully");
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error deleting case:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId
+        });
+        throw error;
+    }
 }
 
 export async function getCaseStats(orgId: string): Promise<AxiosResponse<any>> {
     try {
         console.log("📊 Fetching case stats for org:", orgId);
-        const response = await client.request({
-            url: `cases/stats?organization_id=${orgId}`,
-            method: "GET",
-        });
-        console.log("✅ Case stats fetched successfully:", response.data);
-        return response;
+        
+        // Try the stats endpoint first
+        try {
+            const response = await client.request({
+                url: `cases/stats?organization_id=${orgId}`,
+                method: "GET",
+            });
+            console.log("✅ Case stats fetched successfully:", response.data);
+            return response;
+        } catch (statsError: any) {
+            console.warn("📊 Case stats endpoint failed, calculating from data:", statsError.message);
+            
+            // Fallback: Get actual cases data and calculate stats
+            const casesResponse = await getCasesByOrganizationID(orgId, 0, 9999, "");
+            const cases = casesResponse.data.data || [];
+            
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            const stats = {
+                total_cases: cases.length,
+                open_cases: cases.filter((c: any) => c.status !== 'CLOSED' && c.status !== 'CANCELLED').length,
+                overdue_cases: cases.filter((c: any) => {
+                    if (!c.due_date) return false;
+                    const dueDate = new Date(c.due_date);
+                    return dueDate < now && c.status !== 'CLOSED' && c.status !== 'CANCELLED';
+                }).length,
+                closed_this_month: cases.filter((c: any) => {
+                    if (c.status !== 'CLOSED') return false;
+                    const updatedDate = new Date(c.updated_at);
+                    return updatedDate >= startOfMonth;
+                }).length,
+            };
+            
+            console.log("✅ Calculated case stats from data:", stats);
+            return {
+                data: stats,
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: {}
+            } as AxiosResponse<any>;
+        }
     } catch (error: any) {
-        console.warn("📊 Case stats endpoint failed, using fallback data:", {
+        console.warn("📊 All case stats methods failed, using fallback data:", {
             error: error.message,
             status: error?.response?.status,
-            orgId,
-            url: `cases/stats?organization_id=${orgId}`
+            orgId
         });
         return {
             data: {
@@ -594,16 +710,30 @@ export async function generateCaseDocumentUploadLink(
     caseId: string,
     fileType: string
 ): Promise<AxiosResponse<{ link: string }>> {
-    return client.request({
-        url: `cases/${caseId}/documents/generate-upload-link`,
-        method: "POST",
-        data: {
-            file_type: fileType,
-        },
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+    try {
+        console.log("🔗 Generating upload link for case:", caseId, "fileType:", fileType);
+        const response = await client.request({
+            url: `cases/${caseId}/documents/generate-upload-link`,
+            method: "POST",
+            data: {
+                file_type: fileType,
+            },
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Upload link generated successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error generating upload link:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            fileType
+        });
+        throw error;
+    }
 }
 
 // Step 3: Save document metadata after S3 upload
@@ -656,14 +786,29 @@ export async function updateCaseDocument(
         is_finalized?: boolean;
     }
 ): Promise<AxiosResponse<any>> {
-    return client.request({
-        url: `cases/${caseId}/documents/${documentId}`,
-        method: "PUT",
-        data,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+    try {
+        console.log("📝 Updating document:", documentId, "for case:", caseId, "with data:", data);
+        const response = await client.request({
+            url: `cases/${caseId}/documents/${documentId}`,
+            method: "PUT",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Document updated successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error updating document:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            documentId,
+            updateData: data
+        });
+        throw error;
+    }
 }
 
 // Delete document
@@ -671,10 +816,24 @@ export async function deleteCaseDocument(
     caseId: string,
     documentId: string
 ): Promise<AxiosResponse> {
-    return client.request({
-        url: `cases/${caseId}/documents/${documentId}`,
-        method: "DELETE",
-    });
+    try {
+        console.log("🗑️ Deleting document:", documentId, "from case:", caseId);
+        const response = await client.request({
+            url: `cases/${caseId}/documents/${documentId}`,
+            method: "DELETE",
+        });
+        console.log("✅ Document deleted successfully");
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error deleting document:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            documentId
+        });
+        throw error;
+    }
 }
 
 // Helper function to extract file key from S3 URL
@@ -733,14 +892,22 @@ export async function createCaseNote(caseId: string, data: any): Promise<AxiosRe
             url: `cases/${caseId}/notes`,
             method: "POST",
             data,
+            headers: {
+                "Content-Type": "application/json",
+            },
         });
-        console.log("✅ Case note created successfully:", response.data);
+        console.log("✅ Case note created successfully:", {
+            status: response.status,
+            data: response.data,
+            hasData: !!response.data
+        });
         return response;
     } catch (error: any) {
         console.error("❌ Error creating case note:", {
             error: error.message,
             status: error?.response?.status,
-            data: error?.response?.data,
+            statusText: error?.response?.statusText,
+            responseData: error?.response?.data,
             caseId,
             noteData: data
         });
@@ -753,16 +920,48 @@ export async function updateCaseNote(
     noteId: string,
     data: any
 ): Promise<AxiosResponse<any>> {
-    return client.request({
-        url: `cases/${caseId}/notes/${noteId}`,
-        method: "PUT",
-        data,
-    });
+    try {
+        console.log("📝 Updating case note:", noteId, "for case:", caseId, "with data:", data);
+        const response = await client.request({
+            url: `cases/${caseId}/notes/${noteId}`,
+            method: "PUT",
+            data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Case note updated successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error updating case note:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            noteId,
+            updateData: data
+        });
+        throw error;
+    }
 }
 
 export async function deleteCaseNote(caseId: string, noteId: string): Promise<AxiosResponse> {
-    return client.request({
-        url: `cases/${caseId}/notes/${noteId}`,
-        method: "DELETE",
-    });
+    try {
+        console.log("🗑️ Deleting case note:", noteId, "from case:", caseId);
+        const response = await client.request({
+            url: `cases/${caseId}/notes/${noteId}`,
+            method: "DELETE",
+        });
+        console.log("✅ Case note deleted successfully");
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error deleting case note:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            noteId
+        });
+        throw error;
+    }
 }
