@@ -321,12 +321,45 @@ export async function getCaseStats(orgId: string): Promise<AxiosResponse<any>> {
 // Enhanced Beneficiary Stats API Function with fallback
 export async function getBeneficiaryStats(orgId: string): Promise<AxiosResponse<any>> {
     try {
-        return await client.request({
-            url: `${PREFIX}/${orgId}/beneficiaries/stats`,
-            method: "GET",
-        });
+        console.log("📊 Fetching beneficiary stats for org:", orgId);
+        
+        // Try the stats endpoint first
+        try {
+            const response = await client.request({
+                url: `${PREFIX}/${orgId}/beneficiaries/stats`,
+                method: "GET",
+            });
+            console.log("✅ Beneficiary stats fetched successfully:", response.data);
+            return response;
+        } catch (statsError: any) {
+            console.warn("📊 Stats endpoint failed, calculating from data:", statsError.message);
+            
+            // Fallback: Get actual beneficiaries data and calculate stats
+            const beneficiariesResponse = await getBeneficiariesByOrganizationID(orgId, 0, 9999, "");
+            const beneficiaries = beneficiariesResponse.data.data || [];
+            
+            const stats = {
+                total_beneficiaries: beneficiaries.length,
+                active_beneficiaries: beneficiaries.filter(b => b.status === 'ACTIVE').length,
+                pending_beneficiaries: beneficiaries.filter(b => b.status === 'PENDING').length,
+                inactive_beneficiaries: beneficiaries.filter(b => b.status === 'INACTIVE').length,
+            };
+            
+            console.log("✅ Calculated beneficiary stats from data:", stats);
+            return {
+                data: stats,
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: {}
+            } as AxiosResponse<any>;
+        }
     } catch (error: any) {
-        console.warn("📊 Beneficiary stats endpoint failed, using fallback data");
+        console.warn("📊 All beneficiary stats methods failed, using fallback data:", {
+            error: error.message,
+            status: error?.response?.status,
+            orgId
+        });
         return {
             data: {
                 total_beneficiaries: 0,
@@ -345,12 +378,45 @@ export async function getBeneficiaryStats(orgId: string): Promise<AxiosResponse<
 // Enhanced Volunteer Stats API Function with fallback
 export async function getVolunteerStats(orgId: string): Promise<AxiosResponse<any>> {
     try {
-        return await client.request({
-            url: `${PREFIX}/${orgId}/volunteers/stats`,
-            method: "GET",
-        });
+        console.log("📊 Fetching volunteer stats for org:", orgId);
+        
+        // Try the stats endpoint first
+        try {
+            const response = await client.request({
+                url: `${PREFIX}/${orgId}/volunteers/stats`,
+                method: "GET",
+            });
+            console.log("✅ Volunteer stats fetched successfully:", response.data);
+            return response;
+        } catch (statsError: any) {
+            console.warn("📊 Volunteer stats endpoint failed, calculating from data:", statsError.message);
+            
+            // Fallback: Get actual volunteers data and calculate stats
+            const volunteersResponse = await getVoluntariesByOrganizationID(orgId, 0, 9999, "");
+            const volunteers = volunteersResponse.data.data || [];
+            
+            const stats = {
+                total_volunteers: volunteers.length,
+                active_volunteers: volunteers.filter(v => v.status === 'active').length,
+                pending_volunteers: volunteers.filter(v => v.status === 'pending').length,
+                inactive_volunteers: volunteers.filter(v => v.status === 'inactive').length,
+            };
+            
+            console.log("✅ Calculated volunteer stats from data:", stats);
+            return {
+                data: stats,
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: {}
+            } as AxiosResponse<any>;
+        }
     } catch (error: any) {
-        console.warn("📊 Volunteer stats endpoint failed, using fallback data");
+        console.warn("📊 All volunteer stats methods failed, using fallback data:", {
+            error: error.message,
+            status: error?.response?.status,
+            orgId
+        });
         return {
             data: {
                 total_volunteers: 0,
@@ -369,12 +435,45 @@ export async function getVolunteerStats(orgId: string): Promise<AxiosResponse<an
 // Enhanced Housing Stats API Function with fallback
 export async function getHousingStats(orgId: string): Promise<AxiosResponse<any>> {
     try {
-        return await client.request({
-            url: `${PREFIX}/${orgId}/housings/stats`,
-            method: "GET",
-        });
+        console.log("📊 Fetching housing stats for org:", orgId);
+        
+        // Try the stats endpoint first
+        try {
+            const response = await client.request({
+                url: `${PREFIX}/${orgId}/housings/stats`,
+                method: "GET",
+            });
+            console.log("✅ Housing stats fetched successfully:", response.data);
+            return response;
+        } catch (statsError: any) {
+            console.warn("📊 Housing stats endpoint failed, calculating from data:", statsError.message);
+            
+            // Fallback: Get actual housing data and calculate stats
+            const housingResponse = await findHousingsByOrganizationId(orgId, 0, 9999, "");
+            const housings = housingResponse.data.data || [];
+            
+            const stats = {
+                total_housing: housings.length,
+                available_housing: housings.filter(h => h.status === 'available').length,
+                occupied_housing: housings.filter(h => h.status === 'occupied').length,
+                maintenance_housing: housings.filter(h => h.status === 'maintenance').length,
+            };
+            
+            console.log("✅ Calculated housing stats from data:", stats);
+            return {
+                data: stats,
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: {}
+            } as AxiosResponse<any>;
+        }
     } catch (error: any) {
-        console.warn("📊 Housing stats endpoint failed, using fallback data");
+        console.warn("📊 All housing stats methods failed, using fallback data:", {
+            error: error.message,
+            status: error?.response?.status,
+            orgId
+        });
         return {
             data: {
                 total_housing: 0,
@@ -393,18 +492,51 @@ export async function getHousingStats(orgId: string): Promise<AxiosResponse<any>
 // Enhanced Inventory Stats API Function with fallback
 export async function getInventoryStats(orgId: string): Promise<AxiosResponse<any>> {
     try {
-        return await client.request({
-            url: `${PREFIX}/${orgId}/inventory/stats`,
-            method: "GET",
-        });
+        console.log("📊 Fetching inventory stats for org:", orgId);
+        
+        // Try the stats endpoint first
+        try {
+            const response = await client.request({
+                url: `${PREFIX}/${orgId}/inventory/stats`,
+                method: "GET",
+            });
+            console.log("✅ Inventory stats fetched successfully:", response.data);
+            return response;
+        } catch (statsError: any) {
+            console.warn("📊 Inventory stats endpoint failed, calculating from data:", statsError.message);
+            
+            // Fallback: Get actual products data and calculate stats
+            const productsResponse = await getProductsByOrganizationID(orgId, 0, 9999, "");
+            const products = productsResponse.data.data || [];
+            
+            const stats = {
+                total_products: products.length,
+                in_stock_products: products.filter((p: any) => p.total_in_storage > 10).length,
+                low_stock_products: products.filter((p: any) => p.total_in_storage > 0 && p.total_in_storage <= 10).length,
+                out_of_stock_products: products.filter((p: any) => p.total_in_storage === 0).length,
+            };
+            
+            console.log("✅ Calculated inventory stats from data:", stats);
+            return {
+                data: stats,
+                status: 200,
+                statusText: 'OK',
+                headers: {},
+                config: {}
+            } as AxiosResponse<any>;
+        }
     } catch (error: any) {
-        console.warn("📊 Inventory stats endpoint failed, using fallback data");
+        console.warn("📊 All inventory stats methods failed, using fallback data:", {
+            error: error.message,
+            status: error?.response?.status,
+            orgId
+        });
         return {
             data: {
-                total_inventory: 0,
-                low_stock_items: 0,
-                out_of_stock_items: 0,
-                recent_additions: 0
+                total_products: 0,
+                in_stock_products: 0,
+                low_stock_products: 0,
+                out_of_stock_products: 0
             },
             status: 200,
             statusText: 'OK',

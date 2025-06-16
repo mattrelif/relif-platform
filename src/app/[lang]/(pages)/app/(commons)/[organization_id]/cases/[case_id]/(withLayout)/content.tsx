@@ -587,7 +587,7 @@ const CaseOverview = (): ReactNode => {
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2 flex-wrap">
                                 <strong>Tags:</strong>
                                 {caseData.tags.map((tag, index) => (
-                                    <Badge key={index} className="bg-relif-orange-500 text-xs">
+                                    <Badge key={`case-tag-${index}`} className="bg-relif-orange-500 text-xs">
                                         #{tag}
                                     </Badge>
                                 ))}
@@ -704,7 +704,7 @@ const CaseOverview = (): ReactNode => {
                                                 <div className="flex gap-1 mb-2 flex-wrap">
                                                     {doc.tags.map((tag: string, index: number) => (
                                                         <Badge
-                                                            key={index}
+                                                            key={`doc-${doc.id}-tag-${index}`}
                                                             className="bg-relif-orange-500 text-xs"
                                                         >
                                                             #{tag}
@@ -901,7 +901,7 @@ const CaseOverview = (): ReactNode => {
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {editFormData.tags.map((tag, index) => (
                                         <Badge
-                                            key={index}
+                                            key={`edit-tag-${index}`}
                                             className="bg-relif-orange-500 text-xs flex items-center gap-1"
                                         >
                                             #{tag}
@@ -972,7 +972,7 @@ const CaseOverview = (): ReactNode => {
                                 Selected Files ({uploadFiles.length})
                             </h2>
                             {uploadFiles.map((file, index) => (
-                                <div key={index} className="text-sm text-slate-600">
+                                <div key={`upload-file-${index}`} className="text-sm text-slate-600">
                                     {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
                                 </div>
                             ))}
@@ -1060,7 +1060,7 @@ const CaseOverview = (): ReactNode => {
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {uploadFormData.tags.map((tag, index) => (
                                         <Badge
-                                            key={index}
+                                            key={`upload-tag-${index}`}
                                             className="bg-relif-orange-500 text-xs flex items-center gap-1"
                                         >
                                             #{tag}

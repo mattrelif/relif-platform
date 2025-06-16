@@ -174,7 +174,7 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                         <div className="flex gap-1 mb-3 flex-wrap">
                             {data.tags.slice(0, 3).map((tag, index) => (
                                 <Badge
-                                    key={index}
+                                    key={`case-card-tag-${index}`}
                                     variant="secondary"
                                     className="text-xs bg-slate-100 text-slate-700"
                                 >
