@@ -54,7 +54,7 @@ const CaseOverview = (): ReactNode => {
     };
 
     const confirmDeleteDocument = () => {
-        if (documentToDelete) {
+        if (documentToDelete && Array.isArray(documents)) {
             // Remove document from the list
             setDocuments(documents.filter(doc => doc.id !== documentToDelete.id));
             setDeleteDialogOpen(false);
@@ -77,7 +77,7 @@ const CaseOverview = (): ReactNode => {
     };
 
     const confirmEditDocument = () => {
-        if (documentToEdit) {
+        if (documentToEdit && Array.isArray(documents)) {
             // Update document in the list
             setDocuments(documents.map(doc => 
                 doc.id === documentToEdit.id 
@@ -116,11 +116,20 @@ const CaseOverview = (): ReactNode => {
                         getCaseDocuments(caseId)
                     ]);
                     setCaseData(caseResult.data);
-                    setDocuments(documentsResult.data || []);
+                    
+                    // Ensure documents is always an array
+                    const documentsData = documentsResult?.data;
+                    if (Array.isArray(documentsData)) {
+                        setDocuments(documentsData);
+                    } else {
+                        console.warn("Documents data is not an array:", documentsData);
+                        setDocuments([]);
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching case data:", err);
                 setError(true);
+                setDocuments([]); // Ensure documents is empty array on error
             } finally {
                 setIsLoading(false);
             }
@@ -293,7 +302,7 @@ const CaseOverview = (): ReactNode => {
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-relif-orange-200 font-bold text-base flex items-center gap-2">
                         <FaFileAlt />
-                        Case Documents ({documents.length})
+                        Case Documents ({Array.isArray(documents) ? documents.length : 0})
                     </h3>
                     <div className="flex gap-2">
                         <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
@@ -307,7 +316,7 @@ const CaseOverview = (): ReactNode => {
                     </div>
                 </div>
                 
-                {documents.length === 0 ? (
+                {!Array.isArray(documents) || documents.length === 0 ? (
                     <div className="text-center py-8 text-slate-500">
                         <FaFileAlt className="w-12 h-12 mx-auto mb-4 text-slate-300" />
                         <p>No documents uploaded yet</p>
@@ -395,7 +404,7 @@ const CaseOverview = (): ReactNode => {
                         </div>
 
                         {/* Show More Button if many documents */}
-                        {documents.length > 5 && (
+                        {Array.isArray(documents) && documents.length > 5 && (
                             <div className="text-center mt-4">
                                 <Button variant="outline" size="sm">
                                     View All Documents ({documents.length})

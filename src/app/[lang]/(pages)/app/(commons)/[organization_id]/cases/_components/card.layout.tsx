@@ -12,6 +12,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { CaseSchema } from "@/types/case.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
@@ -20,6 +28,8 @@ import { ReactNode, useState } from "react";
 import { FaCalendarAlt, FaEdit, FaFileAlt, FaStickyNote, FaTrash, FaUser, FaClock, FaDollarSign, FaEye } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 import Link from "next/link";
+import { deleteCase } from "@/repository/organization.repository";
+import { useToast } from "@/components/ui/use-toast";
 
 type Props = CaseSchema & {
     refreshList: () => void;
@@ -53,6 +63,10 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
     const router = useRouter();
     const pathname = usePathname();
     const platformRole = usePlatformRole();
+    const { toast } = useToast();
+    
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     
     const casePath = pathname.split("/").slice(0, 5).join("/");
     const locale = pathname.split("/")[1] as string;
@@ -63,6 +77,37 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
     ) => {
         e.stopPropagation();
         router.push(route);
+    };
+
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowDeleteDialog(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        setIsDeleting(true);
+        
+        try {
+            await deleteCase(data.id);
+            
+            toast({
+                title: "Case deleted successfully",
+                description: `Case "${data.title}" has been permanently deleted.`,
+            });
+            
+            // Refresh the cases list
+            refreshList();
+            setShowDeleteDialog(false);
+        } catch (error) {
+            console.error("Error deleting case:", error);
+            toast({
+                title: "Error deleting case",
+                description: "There was a problem deleting the case. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     // Check if case is overdue - only for active cases (not closed/cancelled)
@@ -183,7 +228,10 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuItem 
+                                    className="text-red-600"
+                                    onClick={handleDeleteClick}
+                                >
                                     <FaTrash className="mr-2 h-4 w-4" />
                                     Delete Case
                                 </DropdownMenuItem>
@@ -192,6 +240,47 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Case</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this case? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="py-4">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <h4 className="font-medium text-red-900 mb-1">{data.title}</h4>
+                            <p className="text-sm text-red-700">
+                                Case #{data.case_number} • {data.beneficiary?.full_name}
+                            </p>
+                            <p className="text-sm text-red-600 mt-2">
+                                This will permanently delete the case and all associated documents, notes, and data.
+                            </p>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setShowDeleteDialog(false)}
+                            disabled={isDeleting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="destructive" 
+                            onClick={handleDeleteConfirm}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete Case"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </li>
     );
 };
