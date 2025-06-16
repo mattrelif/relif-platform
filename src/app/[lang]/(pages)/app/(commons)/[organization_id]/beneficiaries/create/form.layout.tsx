@@ -326,7 +326,7 @@ const Form = (): ReactNode => {
 
     return (
         <form
-            className="w-full h-max p-4 grid grid-cols-2 gap-4 lg:flex lg:flex-col"
+            className="w-full h-max p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-6"
             onSubmit={handleSubmit}
         >
             <div className="w-full h-max flex flex-col gap-6">
@@ -341,8 +341,8 @@ const Form = (): ReactNode => {
                         <FaUser /> Profile Picture
                     </h2>
                     
-                    <div className="flex items-center gap-4">
-                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-relif-orange-200 bg-slate-50 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-relif-orange-200 bg-slate-50 flex items-center justify-center">
                             {imagePreview ? (
                                 <Image
                                     src={imagePreview}
@@ -351,10 +351,10 @@ const Form = (): ReactNode => {
                                     className="object-cover"
                                 />
                             ) : (
-                                <FaUser size={32} className="text-slate-300" />
+                                <FaUser size={36} className="text-slate-300" />
                             )}
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col items-center gap-2">
                             <Label
                                 htmlFor="picture"
                                 className="cursor-pointer flex items-center gap-2 text-sm text-relif-orange-200 hover:underline"
@@ -512,9 +512,7 @@ const Form = (): ReactNode => {
                         />
                     </div>
                 </div>
-            </div>
 
-            <div className="w-full h-max flex flex-col gap-6">
                 <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                     <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
                         <FaMapMarkerAlt /> {dict.commons.beneficiaries.create.lastAddress}
@@ -613,7 +611,9 @@ const Form = (): ReactNode => {
                         <Input id="emergencyEmail" name="emergencyEmail" type="email" required />
                     </div>
                 </div>
+            </div>
 
+            <div className="w-full h-max flex flex-col gap-6">
                 {/* Medical Information Section with Skip Option */}
                 <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                     <div className="flex items-center justify-between">
