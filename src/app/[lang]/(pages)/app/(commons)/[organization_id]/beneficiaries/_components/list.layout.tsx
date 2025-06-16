@@ -2,7 +2,6 @@
 
 import { Toolbar } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/beneficiaries/_components/toolbar.layout";
 import { useDictionary } from "@/app/context/dictionaryContext";
-import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
@@ -10,26 +9,14 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
+import { getBeneficiariesByOrganizationID, getBeneficiaryStats } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState, useCallback } from "react";
-import { MdError, MdSearch } from "react-icons/md";
-import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { MdFilterList, MdClear } from "react-icons/md";
-import { FaCalendarAlt } from "react-icons/fa";
-import { format } from "date-fns";
+import { MdError, MdAdd } from "react-icons/md";
+import { FaUsers, FaUserCheck, FaUserClock, FaUserTimes } from "react-icons/fa";
+import { StatisticsCards } from "@/components/ui/statistics-cards";
+import { SearchFilterBar } from "@/components/ui/search-filter-bar";
 
 import { Card } from "./card.layout";
 
@@ -38,16 +25,26 @@ interface BeneficiaryFilters {
     status: string[];
     civil_status: string[];
     age_range: string[];
+    gender: string[];
+    housing_status: string[];
+    education: string[];
     date_from: Date | null;
     date_to: Date | null;
+    age_min: number | null;
+    age_max: number | null;
 }
 
 const initialFilters: BeneficiaryFilters = {
     status: [],
     civil_status: [],
     age_range: [],
+    gender: [],
+    housing_status: [],
+    education: [],
     date_from: null,
     date_to: null,
+    age_min: null,
+    age_max: null,
 };
 
 // Available filter options
@@ -64,28 +61,56 @@ const filterOptions = {
         { value: "DIVORCED", label: "Divorced" },
         { value: "WIDOWED", label: "Widowed" },
         { value: "SEPARATED", label: "Separated" },
+        { value: "COMMON_LAW", label: "Common Law" },
+        { value: "IN_RELATIONSHIP", label: "In Relationship" },
     ],
     age_range: [
-        { value: "0-17", label: "0-17 years" },
-        { value: "18-25", label: "18-25 years" },
+        { value: "0-17", label: "0-17 years (Minors)" },
+        { value: "18-25", label: "18-25 years (Young Adults)" },
         { value: "26-35", label: "26-35 years" },
         { value: "36-45", label: "36-45 years" },
         { value: "46-55", label: "46-55 years" },
         { value: "56-65", label: "56-65 years" },
-        { value: "65+", label: "65+ years" },
+        { value: "65+", label: "65+ years (Seniors)" },
+    ],
+    gender: [
+        { value: "MALE", label: "Male" },
+        { value: "FEMALE", label: "Female" },
+        { value: "NON_BINARY", label: "Non-Binary" },
+        { value: "TRANSGENDER", label: "Transgender" },
+        { value: "PREFER_NOT_TO_SAY", label: "Prefer Not to Say" },
+        { value: "OTHER", label: "Other" },
+    ],
+    housing_status: [
+        { value: "ALLOCATED", label: "Allocated to Housing" },
+        { value: "UNALLOCATED", label: "Unallocated" },
+        { value: "TEMPORARY", label: "Temporary Housing" },
+        { value: "PERMANENT", label: "Permanent Housing" },
+    ],
+    education: [
+        { value: "NO_EDUCATION", label: "No Formal Education" },
+        { value: "PRIMARY", label: "Primary Education" },
+        { value: "SECONDARY", label: "Secondary Education" },
+        { value: "HIGH_SCHOOL", label: "High School" },
+        { value: "VOCATIONAL", label: "Vocational Training" },
+        { value: "UNIVERSITY", label: "University" },
+        { value: "POSTGRADUATE", label: "Postgraduate" },
     ],
 };
 
 const BeneficiaryList = (): ReactNode => {
     const pathname = usePathname();
+    const router = useRouter();
     const dict = useDictionary();
 
     const [beneficiaries, setBeneficiaries] = useState<{
         count: number;
         data: BeneficiarySchema[];
     } | null>(null);
+    const [stats, setStats] = useState<any>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filters, setFilters] = useState<BeneficiaryFilters>(initialFilters);
@@ -157,6 +182,43 @@ const BeneficiaryList = (): ReactNode => {
                 }
             }
 
+            // Custom age range filter
+            if ((filters.age_min !== null || filters.age_max !== null) && beneficiary.birthdate) {
+                const age = calculateAge(beneficiary.birthdate);
+                if (filters.age_min !== null && age < filters.age_min) {
+                    return false;
+                }
+                if (filters.age_max !== null && age > filters.age_max) {
+                    return false;
+                }
+            }
+
+            // Gender filter
+            if (
+                filters.gender.length > 0 &&
+                beneficiary.gender &&
+                !filters.gender.includes(beneficiary.gender.toUpperCase())
+            ) {
+                return false;
+            }
+
+            // Housing status filter
+            if (filters.housing_status.length > 0) {
+                const isAllocated = beneficiary.current_housing_id ? "ALLOCATED" : "UNALLOCATED";
+                if (!filters.housing_status.includes(isAllocated)) {
+                    return false;
+                }
+            }
+
+            // Education filter
+            if (
+                filters.education.length > 0 &&
+                beneficiary.education &&
+                !filters.education.includes(beneficiary.education.toUpperCase())
+            ) {
+                return false;
+            }
+
             // Date from filter (using created_at)
             if (filters.date_from && beneficiary.created_at) {
                 const beneficiaryDate = new Date(beneficiary.created_at);
@@ -180,7 +242,7 @@ const BeneficiaryList = (): ReactNode => {
         });
     };
 
-    const getHousingList = useCallback(
+    const getBeneficiaryList = useCallback(
         async (filter: string = "") => {
             try {
                 const organizationId = pathname.split("/")[3];
@@ -223,16 +285,35 @@ const BeneficiaryList = (): ReactNode => {
         [pathname, offset, filters]
     );
 
+    const getBeneficiaryStatsData = useCallback(async () => {
+        try {
+            setIsLoadingStats(true);
+            const organizationId = pathname.split("/")[3];
+            if (organizationId) {
+                const response = await getBeneficiaryStats(organizationId);
+                setStats(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching beneficiary stats:", error);
+        } finally {
+            setIsLoadingStats(false);
+        }
+    }, [pathname]);
+
+    useEffect(() => {
+        getBeneficiaryStatsData();
+    }, [getBeneficiaryStatsData]);
+
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            getHousingList(searchTerm);
+            getBeneficiaryList(searchTerm);
         }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm, getHousingList]);
+    }, [searchTerm, getBeneficiaryList]);
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
+    const handleSearchChange = (value: string) => {
+        setSearchTerm(value);
         setOffset(0); // Reset to first page when searching
     };
 
@@ -244,24 +325,42 @@ const BeneficiaryList = (): ReactNode => {
         setOffset(0); // Reset to first page when filtering
     };
 
-    const addFilterValue = (filterType: keyof BeneficiaryFilters, value: string) => {
-        if (filterType === "date_from" || filterType === "date_to") return;
+    const addFilterValue = (filterType: string, value: string) => {
+        const typedFilterType = filterType as keyof BeneficiaryFilters;
 
-        const currentValues = filters[filterType] as string[];
-        if (!currentValues.includes(value)) {
-            handleFilterChange(filterType, [...currentValues, value]);
+        // Handle date filters
+        if (filterType === "date_from" || filterType === "date_to") {
+            handleFilterChange(typedFilterType, new Date(value));
+        }
+        // Handle number filters
+        else if (filterType === "age_min" || filterType === "age_max") {
+            handleFilterChange(typedFilterType, parseInt(value));
+        }
+        // Handle array filters
+        else {
+            const currentValues = filters[typedFilterType] as string[];
+            if (!currentValues.includes(value)) {
+                handleFilterChange(typedFilterType, [...currentValues, value]);
+            }
         }
     };
 
-    const removeFilterValue = (filterType: keyof BeneficiaryFilters, value: string) => {
+    const removeFilterValue = (filterType: string, value: string) => {
+        const typedFilterType = filterType as keyof BeneficiaryFilters;
+        
         if (filterType === "date_from" || filterType === "date_to") {
-            handleFilterChange(filterType, null);
+            handleFilterChange(typedFilterType, null);
             return;
         }
 
-        const currentValues = filters[filterType] as string[];
+        if (filterType === "age_min" || filterType === "age_max") {
+            handleFilterChange(typedFilterType, null);
+            return;
+        }
+
+        const currentValues = filters[typedFilterType] as string[];
         handleFilterChange(
-            filterType,
+            typedFilterType,
             currentValues.filter(v => v !== value)
         );
     };
@@ -276,16 +375,148 @@ const BeneficiaryList = (): ReactNode => {
             filters.status.length,
             filters.civil_status.length,
             filters.age_range.length,
+            filters.gender.length,
+            filters.housing_status.length,
+            filters.education.length,
             filters.date_from ? 1 : 0,
             filters.date_to ? 1 : 0,
+            filters.age_min !== null ? 1 : 0,
+            filters.age_max !== null ? 1 : 0,
         ];
         return counts.reduce((sum, count) => sum + count, 0);
     };
 
+    const getActiveFilters = () => {
+        const activeFilters: Array<{
+            type: string;
+            value: string;
+            label: string;
+            displayLabel: string;
+        }> = [];
+
+        // Status filters
+        filters.status.forEach(status => {
+            const option = filterOptions.status.find(opt => opt.value === status);
+            if (option) {
+                activeFilters.push({
+                    type: 'status',
+                    value: status,
+                    label: option.label,
+                    displayLabel: `Status: ${option.label}`
+                });
+            }
+        });
+
+        // Civil status filters
+        filters.civil_status.forEach(civilStatus => {
+            const option = filterOptions.civil_status.find(opt => opt.value === civilStatus);
+            if (option) {
+                activeFilters.push({
+                    type: 'civil_status',
+                    value: civilStatus,
+                    label: option.label,
+                    displayLabel: `Civil Status: ${option.label}`
+                });
+            }
+        });
+
+        // Age range filters
+        filters.age_range.forEach(ageRange => {
+            const option = filterOptions.age_range.find(opt => opt.value === ageRange);
+            if (option) {
+                activeFilters.push({
+                    type: 'age_range',
+                    value: ageRange,
+                    label: option.label,
+                    displayLabel: `Age Range: ${option.label}`
+                });
+            }
+        });
+
+        // Gender filters
+        filters.gender.forEach(gender => {
+            const option = filterOptions.gender.find(opt => opt.value === gender);
+            if (option) {
+                activeFilters.push({
+                    type: 'gender',
+                    value: gender,
+                    label: option.label,
+                    displayLabel: `Gender: ${option.label}`
+                });
+            }
+        });
+
+        // Housing status filters
+        filters.housing_status.forEach(housingStatus => {
+            const option = filterOptions.housing_status.find(opt => opt.value === housingStatus);
+            if (option) {
+                activeFilters.push({
+                    type: 'housing_status',
+                    value: housingStatus,
+                    label: option.label,
+                    displayLabel: `Housing: ${option.label}`
+                });
+            }
+        });
+
+        // Education filters
+        filters.education.forEach(education => {
+            const option = filterOptions.education.find(opt => opt.value === education);
+            if (option) {
+                activeFilters.push({
+                    type: 'education',
+                    value: education,
+                    label: option.label,
+                    displayLabel: `Education: ${option.label}`
+                });
+            }
+        });
+
+        // Date filters
+        if (filters.date_from) {
+            activeFilters.push({
+                type: 'date_from',
+                value: filters.date_from.toISOString(),
+                label: filters.date_from.toLocaleDateString(),
+                displayLabel: `From: ${filters.date_from.toLocaleDateString()}`
+            });
+        }
+
+        if (filters.date_to) {
+            activeFilters.push({
+                type: 'date_to',
+                value: filters.date_to.toISOString(),
+                label: filters.date_to.toLocaleDateString(),
+                displayLabel: `To: ${filters.date_to.toLocaleDateString()}`
+            });
+        }
+
+        // Age filters
+        if (filters.age_min !== null) {
+            activeFilters.push({
+                type: 'age_min',
+                value: filters.age_min.toString(),
+                label: filters.age_min.toString(),
+                displayLabel: `Min Age: ${filters.age_min}`
+            });
+        }
+
+        if (filters.age_max !== null) {
+            activeFilters.push({
+                type: 'age_max',
+                value: filters.age_max.toString(),
+                label: filters.age_max.toString(),
+                displayLabel: `Max Age: ${filters.age_max}`
+            });
+        }
+
+        return activeFilters;
+    };
+
     useEffect(() => {
         setIsLoading(true);
-        getHousingList();
-    }, [offset, getHousingList]);
+        getBeneficiaryList();
+    }, [offset, getBeneficiaryList]);
 
     const totalPages = beneficiaries ? Math.ceil(beneficiaries.count / LIMIT) : 0;
     const currentPage = offset / LIMIT + 1;
@@ -296,305 +527,137 @@ const BeneficiaryList = (): ReactNode => {
 
     const activeFiltersCount = getActiveFiltersCount();
 
+    // Statistics cards data
+    const statisticsCards = [
+        {
+            title: "Total Beneficiaries",
+            value: stats?.total_beneficiaries || 0,
+            icon: <FaUsers />,
+            color: "blue" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Active",
+            value: stats?.active_beneficiaries || 0,
+            icon: <FaUserCheck />,
+            color: "green" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Pending",
+            value: stats?.pending_beneficiaries || 0,
+            icon: <FaUserClock />,
+            color: "orange" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Inactive",
+            value: stats?.inactive_beneficiaries || 0,
+            icon: <FaUserTimes />,
+            color: "red" as const,
+            isLoading: isLoadingStats,
+        },
+    ];
+
+    // Filter sections for the search bar
+    const filterSections = [
+        {
+            key: "status",
+            label: "Status",
+            options: filterOptions.status,
+            placeholder: "Select status...",
+        },
+        {
+            key: "civil_status",
+            label: "Civil Status",
+            options: filterOptions.civil_status,
+            placeholder: "Select civil status...",
+        },
+        {
+            key: "age_range",
+            label: "Age Range",
+            options: filterOptions.age_range,
+            placeholder: "Select age range...",
+        },
+        {
+            key: "gender",
+            label: "Gender",
+            options: filterOptions.gender,
+            placeholder: "Select gender...",
+        },
+        {
+            key: "housing_status",
+            label: "Housing Status",
+            options: filterOptions.housing_status,
+            placeholder: "Select housing status...",
+        },
+        {
+            key: "education",
+            label: "Education Level",
+            options: filterOptions.education,
+            placeholder: "Select education level...",
+        },
+        {
+            key: "date_from",
+            label: "Created From",
+            type: "date" as const,
+            placeholder: "Select start date...",
+        },
+        {
+            key: "date_to",
+            label: "Created To",
+            type: "date" as const,
+            placeholder: "Select end date...",
+        },
+        {
+            key: "age_min",
+            label: "Min Age",
+            type: "number" as const,
+            placeholder: "Min age...",
+            min: 0,
+            max: 120,
+        },
+        {
+            key: "age_max",
+            label: "Max Age",
+            type: "number" as const,
+            placeholder: "Max age...",
+            min: 0,
+            max: 120,
+        },
+    ];
+
+    const handleCreateBeneficiary = () => {
+        const organizationId = pathname.split("/")[3];
+        router.push(`/${pathname.split("/")[1]}/app/${organizationId}/beneficiaries/create`);
+    };
+
     return (
         <>
-            <div className="flex items-end gap-4 justify-between lg:flex-row-reverse">
-                <div className="relative lg:grow">
-                    <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
-                    <Input
-                        type="text"
-                        placeholder={dict.commons.beneficiaries.list.searchPlaceholder}
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="w-[300px] lg:w-full pl-10"
-                    />
-                </div>
-                <div className="flex items-center gap-3">
-                    {/* Filter Dropdown */}
-                    <Popover open={showFilters} onOpenChange={setShowFilters}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="flex items-center gap-2 text-sm border-slate-200"
-                            >
-                                <MdFilterList />
-                                Filters
-                                {activeFiltersCount > 0 && (
-                                    <Badge className="ml-1 h-4 w-4 p-0 text-xs bg-relif-orange-400 text-white hover:bg-relif-orange-500 flex items-center justify-center rounded-full">
-                                        {activeFiltersCount}
-                                    </Badge>
-                                )}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80 p-0" align="end" sideOffset={5}>
-                            <div className="flex flex-col max-h-[50vh]">
-                                <div className="flex items-center justify-between p-4 border-b border-slate-200 flex-shrink-0">
-                                    <h4 className="font-medium text-sm">Filter Beneficiaries</h4>
-                                    {activeFiltersCount > 0 && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={clearAllFilters}
-                                            className="text-xs hover:text-red-600 h-6 px-2"
-                                        >
-                                            <MdClear className="mr-1 h-3 w-3" />
-                                            Clear all
-                                        </Button>
-                                    )}
-                                </div>
+            {/* Statistics Cards */}
+            <StatisticsCards cards={statisticsCards} />
 
-                                <div className="p-4 space-y-4 overflow-y-auto min-h-0">
-                                    {/* Status Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Status
-                                        </label>
-                                        <Select
-                                            onValueChange={value => addFilterValue("status", value)}
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select status..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.status.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Civil Status Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Civil Status
-                                        </label>
-                                        <Select
-                                            onValueChange={value =>
-                                                addFilterValue("civil_status", value)
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select civil status..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.civil_status.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Age Range Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Age Range
-                                        </label>
-                                        <Select
-                                            onValueChange={value =>
-                                                addFilterValue("age_range", value)
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select age range..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.age_range.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <Separator />
-
-                                    {/* Date Filters */}
-                                    <div className="space-y-3">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Date Range
-                                        </label>
-
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {/* Date From */}
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-slate-600">
-                                                    From
-                                                </label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className="w-full h-8 justify-start text-left font-normal text-xs"
-                                                        >
-                                                            <FaCalendarAlt className="mr-1 h-3 w-3" />
-                                                            {filters.date_from
-                                                                ? format(
-                                                                      filters.date_from,
-                                                                      "MMM dd"
-                                                                  )
-                                                                : "Pick..."}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="w-auto p-0"
-                                                        align="start"
-                                                    >
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={
-                                                                filters.date_from || undefined
-                                                            }
-                                                            onSelect={date =>
-                                                                handleFilterChange(
-                                                                    "date_from",
-                                                                    date || null
-                                                                )
-                                                            }
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-
-                                            {/* Date To */}
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-slate-600">To</label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className="w-full h-8 justify-start text-left font-normal text-xs"
-                                                        >
-                                                            <FaCalendarAlt className="mr-1 h-3 w-3" />
-                                                            {filters.date_to
-                                                                ? format(filters.date_to, "MMM dd")
-                                                                : "Pick..."}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="w-auto p-0"
-                                                        align="start"
-                                                    >
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={filters.date_to || undefined}
-                                                            onSelect={date =>
-                                                                handleFilterChange(
-                                                                    "date_to",
-                                                                    date || null
-                                                                )
-                                                            }
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                    <Toolbar />
-                </div>
-            </div>
-
-            {/* Active Filters Display */}
-            {activeFiltersCount > 0 && (
-                <div className="flex flex-wrap gap-2 items-center py-2">
-                    <span className="text-xs font-medium text-slate-600">Active filters:</span>
-
-                    {/* Status badges */}
-                    {filters.status.map(status => (
-                        <Badge key={`status-${status}`} variant="secondary" className="text-xs h-6">
-                            Status: {filterOptions.status.find(o => o.value === status)?.label}
-                            <button
-                                onClick={() => removeFilterValue("status", status)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Civil Status badges */}
-                    {filters.civil_status.map(civilStatus => (
-                        <Badge
-                            key={`civil-status-${civilStatus}`}
-                            variant="secondary"
-                            className="text-xs h-6"
-                        >
-                            Civil Status:{" "}
-                            {filterOptions.civil_status.find(o => o.value === civilStatus)?.label}
-                            <button
-                                onClick={() => removeFilterValue("civil_status", civilStatus)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Age Range badges */}
-                    {filters.age_range.map(ageRange => (
-                        <Badge
-                            key={`age-range-${ageRange}`}
-                            variant="secondary"
-                            className="text-xs h-6"
-                        >
-                            Age: {filterOptions.age_range.find(o => o.value === ageRange)?.label}
-                            <button
-                                onClick={() => removeFilterValue("age_range", ageRange)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Date badges */}
-                    {filters.date_from && (
-                        <Badge variant="secondary" className="text-xs h-6">
-                            From: {format(filters.date_from, "MMM dd, yyyy")}
-                            <button
-                                onClick={() => removeFilterValue("date_from", "")}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    )}
-                    {filters.date_to && (
-                        <Badge variant="secondary" className="text-xs h-6">
-                            To: {format(filters.date_to, "MMM dd, yyyy")}
-                            <button
-                                onClick={() => removeFilterValue("date_to", "")}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    )}
-                </div>
-            )}
-            <div className="h-[calc(100vh-172px)] lg:h-[calc(100vh-122px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+            {/* Search and Filter Bar */}
+            <SearchFilterBar
+                searchTerm={searchTerm}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder={dict.commons.beneficiaries.list.searchPlaceholder}
+                showFilters={showFilters}
+                onShowFiltersChange={setShowFilters}
+                filterSections={filterSections}
+                filterTitle="Filter Beneficiaries"
+                onFilterAdd={addFilterValue}
+                onFilterRemove={removeFilterValue}
+                onFilterClear={clearAllFilters}
+                activeFiltersCount={activeFiltersCount}
+                activeFilters={getActiveFilters()}
+                createButtonText="Create Beneficiary"
+                onCreateClick={handleCreateBeneficiary}
+                createButtonIcon={<MdAdd />}
+                additionalActions={<Toolbar />}
+            />
+            {/* Beneficiaries List */}
+            <div className="h-[calc(100vh-280px)] lg:h-[calc(100vh-300px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                         {dict.commons.beneficiaries.list.loading}
@@ -621,7 +684,7 @@ const BeneficiaryList = (): ReactNode => {
                                 <Card
                                     key={beneficiary.id}
                                     {...beneficiary}
-                                    refreshList={getHousingList}
+                                    refreshList={getBeneficiaryList}
                                 />
                             ))}
                         </ul>

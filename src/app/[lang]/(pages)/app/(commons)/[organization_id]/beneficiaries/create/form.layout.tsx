@@ -14,6 +14,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { CalendarDays } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { generateProfileImageUploadLink } from "@/repository/beneficiary.repository";
 import { createBeneficiary } from "@/repository/organization.repository";
 import { UserSchema } from "@/types/user.types";
@@ -53,6 +59,8 @@ const Form = (): ReactNode => {
     const [phone, setPhone] = useState<string>("");
     const [emergencyPhone, setEmergencyPhone] = useState<string>("");
     const [skipMedicalInfo, setSkipMedicalInfo] = useState<boolean>(false);
+    const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
+    const [notes, setNotes] = useState<string>("");
 
     useEffect(() => {
         try {
@@ -325,328 +333,404 @@ const Form = (): ReactNode => {
     };
 
     return (
-        <form
-            className="w-full h-max p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-6"
-            onSubmit={handleSubmit}
-        >
-            <div className="w-full h-max flex flex-col gap-6">
-                <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3">
-                    <FaUsers />
-                    {dict.commons.beneficiaries.create.title}
-                </h1>
+        <div className="w-full h-max p-4">
+            <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3 mb-6">
+                <FaUsers />
+                {dict.commons.beneficiaries.create.title}
+            </h1>
 
-                {/* Profile Image Section with styled border */}
-                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                        <FaUser /> Profile Picture
-                    </h2>
-                    
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-relif-orange-200 bg-slate-50 flex items-center justify-center">
-                            {imagePreview ? (
-                                <Image
-                                    src={imagePreview}
-                                    alt="Profile Preview"
-                                    fill
-                                    className="object-cover"
-                                />
-                            ) : (
-                                <FaUser size={36} className="text-slate-300" />
-                            )}
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <Label
-                                htmlFor="picture"
-                                className="cursor-pointer flex items-center gap-2 text-sm text-relif-orange-200 hover:underline"
-                            >
-                                <FaUpload size={12} />
-                                Upload Picture
-                            </Label>
-                            <Input 
-                                id="picture" 
-                                type="file" 
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleImageUpload} 
-                            />
-                            {isUploading && <p className="text-sm text-slate-500">Uploading...</p>}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Basic Information Section */}
-                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                        <FaUser /> Basic Information
-                    </h2>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="fullName">{dict.commons.beneficiaries.create.fullName} *</Label>
-                        <Input id="fullName" name="fullName" type="text" required />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="birthdate">
-                            {dict.commons.beneficiaries.create.birthdate} *
-                        </Label>
-                        <input
-                            id="birthdate"
-                            name="birthdate"
-                            type="date"
-                            className="w-full px-3 py-2 border rounded-md text-sm text-slate-900 placeholder-slate-400 border-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-relif-orange-200"
-                            required
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="document">{dict.commons.beneficiaries.create.document} *</Label>
-                        <div className="w-full flex gap-2">
-                            <Select name="documentType" required>
-                                <SelectTrigger className="w-[50%]">
-                                    <SelectValue placeholder="Document Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="passport">Passport</SelectItem>
-                                    <SelectItem value="national_id">National ID</SelectItem>
-                                    <SelectItem value="drivers_license">Driver's License</SelectItem>
-                                    <SelectItem value="cpf">CPF</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Input
-                                id="documentValue"
-                                name="documentValue"
-                                type="text"
-                                className="w-[50%]"
-                                placeholder={dict.commons.beneficiaries.create.documentValuePlaceholder}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="email">{dict.commons.beneficiaries.create.email} *</Label>
-                        <Input id="email" name="email" type="email" required />
-                    </div>
-
-                    <Gender />
-
-                    <CivilStatus />
-
-                    <Education />
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="occupation">
-                            {dict.commons.beneficiaries.create.occupation} *
-                        </Label>
-                        <Input id="occupation" name="occupation" type="text" required />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="phone">{dict.commons.beneficiaries.create.phone} *</Label>
-                        <PhoneInput
-                            country={"us"}
-                            value={phone}
-                            onChange={(value: string) => setPhone(value)}
-                            containerClass="w-full"
-                            inputStyle={{
-                                height: "40px",
-                                width: "100%",
-                                borderColor: "#e2e8f0",
-                                borderRadius: "0.375rem",
-                                fontSize: "0.875rem",
-                            }}
-                            buttonStyle={{
-                                borderColor: "#e2e8f0",
-                                borderRadius: "0.375rem 0 0 0.375rem",
-                            }}
-                            inputProps={{
-                                name: "phone",
-                                required: true,
-                            }}
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="languages">
-                            {dict.commons.beneficiaries.create.languages} *
-                        </Label>
-                        <Creatable
-                            isMulti
-                            value={languages}
-                            onChange={handleLanguageChange}
-                            placeholder="Select or create languages..."
-                            options={[
-                                { value: "english", label: "English" },
-                                { value: "spanish", label: "Spanish" },
-                                { value: "portuguese", label: "Portuguese" },
-                                { value: "french", label: "French" },
-                                { value: "arabic", label: "Arabic" },
-                                { value: "mandarin", label: "Mandarin" },
-                                { value: "hindi", label: "Hindi" },
-                                { value: "russian", label: "Russian" },
-                                { value: "german", label: "German" },
-                                { value: "italian", label: "Italian" },
-                            ]}
-                            styles={{
-                                control: base => ({
-                                    ...base,
-                                    borderColor: "#e2e8f0",
-                                    fontSize: "0.875rem",
-                                    minHeight: "40px",
-                                }),
-                                placeholder: base => ({
-                                    ...base,
-                                    color: "#94a3b8",
-                                    fontSize: "0.875rem",
-                                }),
-                                multiValue: base => ({
-                                    ...base,
-                                    backgroundColor: "#f1f5f9",
-                                    borderRadius: "0.375rem",
-                                }),
-                                multiValueLabel: base => ({
-                                    ...base,
-                                    fontSize: "0.875rem",
-                                }),
-                            }}
-                        />
-                    </div>
-                </div>
-
-                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                        <FaMapMarkerAlt /> {dict.commons.beneficiaries.create.lastAddress}
-                    </h2>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="addressLine1">
-                            {dict.commons.beneficiaries.create.addressLine} 1 *
-                        </Label>
-                        <Input id="addressLine1" name="addressLine1" type="text" required />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="addressLine2">
-                            {dict.commons.beneficiaries.create.addressLine} 2
-                        </Label>
-                        <Input id="addressLine2" name="addressLine2" type="text" />
-                    </div>
-
-                    <div className="w-full flex items-center gap-2">
-                        <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="city">{dict.commons.beneficiaries.create.city} *</Label>
-                            <Input id="city" name="city" type="text" required />
-                        </div>
-
-                        <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="postalCode">
-                                {dict.commons.beneficiaries.create.postalCode} *
-                            </Label>
-                            <Input id="postalCode" name="postalCode" type="text" required />
-                        </div>
-                    </div>
-
-                    <div className="w-full flex items-center gap-2">
-                        <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="state">
-                                {dict.commons.beneficiaries.create.state} *
-                            </Label>
-                            <Input id="state" name="state" type="text" required />
-                        </div>
-
-                        <div className="flex flex-col gap-3 w-full">
-                            <Label htmlFor="country">
-                                {dict.commons.beneficiaries.create.country} *
-                            </Label>
-                            <Input id="country" name="country" type="text" required />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                    <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                        <MdContacts /> {dict.commons.beneficiaries.create.emergencyContact}
-                    </h2>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="emergencyName">
-                            {dict.commons.beneficiaries.create.emergencyName} *
-                        </Label>
-                        <Input id="emergencyName" name="emergencyName" type="text" required />
-                    </div>
-
-                    <RelationshipDegree />
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="emergencyPhone">
-                            {dict.commons.beneficiaries.create.emergencyPhone} *
-                        </Label>
-                        <PhoneInput
-                            country={"us"}
-                            value={emergencyPhone}
-                            onChange={(value: string) => setEmergencyPhone(value)}
-                            containerClass="w-full"
-                            inputStyle={{
-                                height: "40px",
-                                width: "100%",
-                                borderColor: "#e2e8f0",
-                                borderRadius: "0.375rem",
-                                fontSize: "0.875rem",
-                            }}
-                            buttonStyle={{
-                                borderColor: "#e2e8f0",
-                                borderRadius: "0.375rem 0 0 0.375rem",
-                            }}
-                            inputProps={{
-                                name: "emergencyPhone",
-                                required: true,
-                            }}
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <Label htmlFor="emergencyEmail">
-                            {dict.commons.beneficiaries.create.emergencyEmail} *
-                        </Label>
-                        <Input id="emergencyEmail" name="emergencyEmail" type="email" required />
-                    </div>
-                </div>
-            </div>
-
-            <div className="w-full h-max flex flex-col gap-6">
-                {/* Medical Information Section with Skip Option */}
-                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                    <div className="flex items-center justify-between">
+            <form
+                id="beneficiary-form"
+                className="w-full h-max flex flex-col min-custom:flex-row gap-6"
+                onSubmit={handleSubmit}
+            >
+                {/* Left Column */}
+                <div className="w-full min-custom:w-1/2 h-max flex flex-col gap-6">
+                    {/* Profile Image Section */}
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                         <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                            <MdContacts /> Medical Information
+                            <FaUser /> Profile Picture
                         </h2>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox 
-                                id="skipMedical" 
-                                checked={skipMedicalInfo}
-                                onCheckedChange={(checked) => setSkipMedicalInfo(checked as boolean)}
-                            />
-                            <Label htmlFor="skipMedical" className="text-sm font-normal">
-                                Skip medical information
-                            </Label>
+                        
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-relif-orange-200 bg-slate-50 flex items-center justify-center">
+                                {imagePreview ? (
+                                    <Image
+                                        src={imagePreview}
+                                        alt="Profile Preview"
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <FaUser size={36} className="text-slate-300" />
+                                )}
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <Label
+                                    htmlFor="picture"
+                                    className="cursor-pointer flex items-center gap-2 text-sm text-relif-orange-200 hover:underline"
+                                >
+                                    <FaUpload size={12} />
+                                    Upload Picture
+                                </Label>
+                                <Input 
+                                    id="picture" 
+                                    type="file" 
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload} 
+                                />
+                                {isUploading && <p className="text-sm text-slate-500">Uploading...</p>}
+                            </div>
                         </div>
                     </div>
 
-                    <div className={skipMedicalInfo ? "opacity-50 pointer-events-none" : ""}>
-                        <Medical />
+                    {/* Basic Information Section */}
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <FaUser /> Basic Information
+                        </h2>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="fullName">{dict.commons.beneficiaries.create.fullName} *</Label>
+                            <Input id="fullName" name="fullName" type="text" required />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="birthdate">
+                                {dict.commons.beneficiaries.create.birthdate} *
+                            </Label>
+                            <div className="relative">
+                                <Input
+                                    id="birthdate"
+                                    name="birthdate"
+                                    type="text"
+                                    placeholder="DD/MM/YYYY or click calendar"
+                                    value={birthdate ? format(birthdate, "dd/MM/yyyy") : ""}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        // Try to parse different date formats
+                                        if (value) {
+                                            // Handle DD/MM/YYYY format
+                                            const parts = value.split('/');
+                                            if (parts.length === 3) {
+                                                const day = parseInt(parts[0]);
+                                                const month = parseInt(parts[1]) - 1; // Month is 0-indexed
+                                                const year = parseInt(parts[2]);
+                                                if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                                                    const date = new Date(year, month, day);
+                                                    if (date.getFullYear() === year && date.getMonth() === month && date.getDate() === day) {
+                                                        setBirthdate(date);
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            setBirthdate(undefined);
+                                        }
+                                    }}
+                                    className="pr-10"
+                                    required
+                                />
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 hover:bg-gray-100"
+                                        >
+                                            <CalendarDays className="h-4 w-4 text-gray-400" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={birthdate}
+                                            onSelect={setBirthdate}
+                                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="document">{dict.commons.beneficiaries.create.document} *</Label>
+                            <div className="w-full flex gap-2">
+                                <Select name="documentType" required>
+                                    <SelectTrigger className="w-[50%]">
+                                        <SelectValue placeholder="Document Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="passport">Passport</SelectItem>
+                                        <SelectItem value="national_id">National ID</SelectItem>
+                                        <SelectItem value="drivers_license">Driver's License</SelectItem>
+                                        <SelectItem value="cpf">CPF</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Input
+                                    id="documentValue"
+                                    name="documentValue"
+                                    type="text"
+                                    className="w-[50%]"
+                                    placeholder={dict.commons.beneficiaries.create.documentValuePlaceholder}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="email">{dict.commons.beneficiaries.create.email} *</Label>
+                            <Input id="email" name="email" type="email" required />
+                        </div>
+
+                        <Gender />
+
+                        <CivilStatus />
+
+                        <Education />
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="occupation">
+                                {dict.commons.beneficiaries.create.occupation} *
+                            </Label>
+                            <Input id="occupation" name="occupation" type="text" required />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="phone">{dict.commons.beneficiaries.create.phone} *</Label>
+                            <PhoneInput
+                                country={"us"}
+                                value={phone}
+                                onChange={(value: string) => setPhone(value)}
+                                containerClass="w-full"
+                                inputStyle={{
+                                    height: "40px",
+                                    width: "100%",
+                                    borderColor: "#e2e8f0",
+                                    borderRadius: "0.375rem",
+                                    fontSize: "0.875rem",
+                                }}
+                                buttonStyle={{
+                                    borderColor: "#e2e8f0",
+                                    borderRadius: "0.375rem 0 0 0.375rem",
+                                }}
+                                inputProps={{
+                                    name: "phone",
+                                    required: true,
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="languages">
+                                {dict.commons.beneficiaries.create.languages} *
+                            </Label>
+                            <Creatable
+                                isMulti
+                                value={languages}
+                                onChange={handleLanguageChange}
+                                placeholder="Select or create languages..."
+                                options={[
+                                    { value: "english", label: "English" },
+                                    { value: "spanish", label: "Spanish" },
+                                    { value: "portuguese", label: "Portuguese" },
+                                    { value: "french", label: "French" },
+                                    { value: "arabic", label: "Arabic" },
+                                    { value: "mandarin", label: "Mandarin" },
+                                    { value: "hindi", label: "Hindi" },
+                                    { value: "russian", label: "Russian" },
+                                    { value: "german", label: "German" },
+                                    { value: "italian", label: "Italian" },
+                                ]}
+                                styles={{
+                                    control: base => ({
+                                        ...base,
+                                        borderColor: "#e2e8f0",
+                                        fontSize: "0.875rem",
+                                        minHeight: "40px",
+                                    }),
+                                    placeholder: base => ({
+                                        ...base,
+                                        color: "#94a3b8",
+                                        fontSize: "0.875rem",
+                                    }),
+                                    multiValue: base => ({
+                                        ...base,
+                                        backgroundColor: "#f1f5f9",
+                                        borderRadius: "0.375rem",
+                                    }),
+                                    multiValueLabel: base => ({
+                                        ...base,
+                                        fontSize: "0.875rem",
+                                    }),
+                                }}
+                            />
+                        </div>
                     </div>
+
+                    {/* Last Address Section */}
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <FaMapMarkerAlt /> {dict.commons.beneficiaries.create.lastAddress}
+                        </h2>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="addressLine1">
+                                {dict.commons.beneficiaries.create.addressLine} 1 *
+                            </Label>
+                            <Input id="addressLine1" name="addressLine1" type="text" required />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="addressLine2">
+                                {dict.commons.beneficiaries.create.addressLine} 2
+                            </Label>
+                            <Input id="addressLine2" name="addressLine2" type="text" />
+                        </div>
+
+                        <div className="w-full flex items-center gap-2">
+                            <div className="flex flex-col gap-3 w-full">
+                                <Label htmlFor="city">{dict.commons.beneficiaries.create.city} *</Label>
+                                <Input id="city" name="city" type="text" required />
+                            </div>
+
+                            <div className="flex flex-col gap-3 w-full">
+                                <Label htmlFor="postalCode">
+                                    {dict.commons.beneficiaries.create.postalCode} *
+                                </Label>
+                                <Input id="postalCode" name="postalCode" type="text" required />
+                            </div>
+                        </div>
+
+                        <div className="w-full flex items-center gap-2">
+                            <div className="flex flex-col gap-3 w-full">
+                                <Label htmlFor="state">
+                                    {dict.commons.beneficiaries.create.state} *
+                                </Label>
+                                <Input id="state" name="state" type="text" required />
+                            </div>
+
+                            <div className="flex flex-col gap-3 w-full">
+                                <Label htmlFor="country">
+                                    {dict.commons.beneficiaries.create.country} *
+                                </Label>
+                                <Input id="country" name="country" type="text" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Emergency Contact Section */}
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <MdContacts /> {dict.commons.beneficiaries.create.emergencyContact}
+                        </h2>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="emergencyName">
+                                {dict.commons.beneficiaries.create.emergencyName} *
+                            </Label>
+                            <Input id="emergencyName" name="emergencyName" type="text" required />
+                        </div>
+
+                        <RelationshipDegree />
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="emergencyPhone">
+                                {dict.commons.beneficiaries.create.emergencyPhone} *
+                            </Label>
+                            <PhoneInput
+                                country={"us"}
+                                value={emergencyPhone}
+                                onChange={(value: string) => setEmergencyPhone(value)}
+                                containerClass="w-full"
+                                inputStyle={{
+                                    height: "40px",
+                                    width: "100%",
+                                    borderColor: "#e2e8f0",
+                                    borderRadius: "0.375rem",
+                                    fontSize: "0.875rem",
+                                }}
+                                buttonStyle={{
+                                    borderColor: "#e2e8f0",
+                                    borderRadius: "0.375rem 0 0 0.375rem",
+                                }}
+                                inputProps={{
+                                    name: "emergencyPhone",
+                                    required: true,
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="emergencyEmail">
+                                {dict.commons.beneficiaries.create.emergencyEmail} *
+                            </Label>
+                            <Input id="emergencyEmail" name="emergencyEmail" type="email" required />
+                        </div>
+                    </div>
+
                 </div>
 
-                <div className="flex gap-4 pt-5">
-                    <Button variant="outline" type="button" onClick={() => router.push(urlPath)}>
-                        Cancel
-                    </Button>
-                    <Button type="submit">
-                        Create Beneficiary
-                    </Button>
+                {/* Right Column */}
+                <div className="w-full min-custom:w-1/2 h-max flex flex-col gap-6">
+                    {/* Notes Section */}
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <FaUser /> Additional Notes
+                        </h2>
+                        
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="notes">
+                                Notes (Optional)
+                            </Label>
+                            <Textarea
+                                id="notes"
+                                name="notes"
+                                placeholder="Add any additional information about the beneficiary..."
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                className="min-h-[120px] resize-none"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Medical Information Section with Skip Option */}
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                                <MdContacts /> Beneficiary Health Information
+                            </h2>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox 
+                                    id="skipMedical" 
+                                    checked={skipMedicalInfo}
+                                    onCheckedChange={(checked) => setSkipMedicalInfo(checked as boolean)}
+                                />
+                                <Label htmlFor="skipMedical" className="text-sm font-normal">
+                                    Skip medical information
+                                </Label>
+                            </div>
+                        </div>
+
+                        <div className={skipMedicalInfo ? "opacity-50 pointer-events-none" : ""}>
+                            <Medical />
+                        </div>
+                    </div>
+
+                    {/* Action Buttons - After Medical Information */}
+                    <div className="flex justify-end gap-4">
+                        <Button variant="outline" type="button" onClick={() => router.push(urlPath)}>
+                            Cancel
+                        </Button>
+                        <Button type="submit">
+                            Create Beneficiary
+                        </Button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     );
 };
 

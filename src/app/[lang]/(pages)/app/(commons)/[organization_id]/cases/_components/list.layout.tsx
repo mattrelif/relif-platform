@@ -1,20 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useState, useCallback } from "react";
-import { MdError, MdSearch, MdFilterList, MdClear } from "react-icons/md";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { MdError, MdAdd } from "react-icons/md";
 import {
     Pagination,
     PaginationContent,
@@ -24,18 +11,19 @@ import {
 } from "@/components/ui/pagination";
 import { CaseSchema, CaseStatsSchema } from "@/types/case.types";
 import { getCasesByOrganizationID, getCaseStats } from "@/repository/organization.repository";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     FaFileAlt,
     FaClock,
     FaCheckCircle,
     FaExclamationTriangle,
-    FaCalendarAlt,
 } from "react-icons/fa";
-import { format } from "date-fns";
+import { StatisticsCards } from "@/components/ui/statistics-cards";
+import { SearchFilterBar } from "@/components/ui/search-filter-bar";
 
 import { Card as CaseCard } from "./card.layout";
 import { CaseToolbar as Toolbar } from "./toolbar.layout";
+import { DebugInfo } from "@/components/debug-info";
 
 // Filter types
 interface CaseFilters {
@@ -46,6 +34,8 @@ interface CaseFilters {
     urgency_level: string[];
     date_from: Date | null;
     date_to: Date | null;
+    due_date_from: Date | null;
+    due_date_to: Date | null;
 }
 
 const initialFilters: CaseFilters = {
@@ -56,6 +46,8 @@ const initialFilters: CaseFilters = {
     urgency_level: [],
     date_from: null,
     date_to: null,
+    due_date_from: null,
+    due_date_to: null,
 };
 
 // Available filter options
@@ -104,6 +96,7 @@ const getUniqueUsers = (casesData: CaseSchema[] | null) => {
 
 const CaseList = (): ReactNode => {
     const pathname = usePathname();
+    const router = useRouter();
     const [cases, setCases] = useState<{
         count: number;
         data: CaseSchema[];
@@ -173,6 +166,25 @@ const CaseList = (): ReactNode => {
                 }
             }
 
+            // Due date from filter
+            if (filters.due_date_from && caseItem.due_date) {
+                const dueDateCase = new Date(caseItem.due_date);
+                if (dueDateCase < filters.due_date_from) {
+                    return false;
+                }
+            }
+
+            // Due date to filter
+            if (filters.due_date_to && caseItem.due_date) {
+                const dueDateCase = new Date(caseItem.due_date);
+                // Set time to end of day for due_date_to comparison
+                const endOfDay = new Date(filters.due_date_to);
+                endOfDay.setHours(23, 59, 59, 999);
+                if (dueDateCase > endOfDay) {
+                    return false;
+                }
+            }
+
             return true;
         });
     };
@@ -201,26 +213,32 @@ const CaseList = (): ReactNode => {
             const filteredCases = applyFilters(allCases);
 
             // Apply pagination to filtered results
-            const startIndex = offset;
-            const endIndex = offset + LIMIT;
-            const paginatedCases = filteredCases.slice(startIndex, endIndex);
+            const paginatedCases = filteredCases.slice(offset, offset + LIMIT);
 
-            // Update cases with paginated filtered results
             setCases({
                 count: filteredCases.length,
                 data: paginatedCases,
             });
-        } catch (err) {
+        } catch (error: any) {
+            console.error("❌ Error fetching cases:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status,
+                organizationId: pathname.split("/")[3],
+                searchTerm,
+                filters
+            });
             setError(true);
+            setCases({ count: 0, data: [] }); // Ensure cases is set to empty state
         } finally {
             setIsLoading(false);
         }
-    }, [pathname, offset, searchTerm, filters]);
+    }, [pathname, searchTerm, filters, offset]);
 
     const getCasesStats = useCallback(async () => {
         try {
             setIsLoadingStats(true);
-
             const pathParts = pathname.split("/");
             const organizationId = pathParts[3];
             if (!organizationId) {
@@ -229,16 +247,13 @@ const CaseList = (): ReactNode => {
 
             const response = await getCaseStats(organizationId);
             setStats(response.data);
-        } catch (err) {
-            console.error("Error fetching case stats:", err);
-            // Set default stats on error
-            setStats({
-                total_cases: 0,
-                open_cases: 0,
-                in_progress_cases: 0,
-                overdue_cases: 0,
-                closed_this_month: 0,
-                avg_resolution_days: 0,
+        } catch (error: any) {
+            console.error("❌ Error fetching case stats:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status,
+                organizationId: pathname.split("/")[3]
             });
         } finally {
             setIsLoadingStats(false);
@@ -246,43 +261,51 @@ const CaseList = (): ReactNode => {
     }, [pathname]);
 
     useEffect(() => {
-        getCasesList();
         getCasesStats();
-    }, [getCasesList, getCasesStats]);
+    }, [getCasesStats]);
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setOffset(0); // Reset to first page when searching
-    };
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            getCasesList();
+        }, 500);
 
-    const handleFilterChange = (filterType: keyof CaseFilters, value: any) => {
-        setFilters(prev => ({
-            ...prev,
-            [filterType]: value,
-        }));
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, filters, offset]);
+
+    const addFilterValue = (filterType: string, value: string) => {
+        const typedFilterType = filterType as keyof CaseFilters;
+        
+        // Handle date filters
+        if (filterType === "date_from" || filterType === "date_to" || filterType === "due_date_from" || filterType === "due_date_to") {
+            setFilters(prev => ({
+                ...prev,
+                [typedFilterType]: new Date(value),
+            }));
+        } else {
+            // Handle array filters
+            setFilters(prev => ({
+                ...prev,
+                [typedFilterType]: [...(prev[typedFilterType] as string[]), value],
+            }));
+        }
         setOffset(0); // Reset to first page when filtering
     };
 
-    const addFilterValue = (filterType: keyof CaseFilters, value: string) => {
-        if (filterType === "date_from" || filterType === "date_to") return;
-
-        const currentValues = filters[filterType] as string[];
-        if (!currentValues.includes(value)) {
-            handleFilterChange(filterType, [...currentValues, value]);
+    const removeFilterValue = (filterType: string, value: string) => {
+        const typedFilterType = filterType as keyof CaseFilters;
+        
+        if (filterType === "date_from" || filterType === "date_to" || filterType === "due_date_from" || filterType === "due_date_to") {
+            setFilters(prev => ({
+                ...prev,
+                [typedFilterType]: null,
+            }));
+        } else {
+            setFilters(prev => ({
+                ...prev,
+                [typedFilterType]: (prev[typedFilterType] as string[]).filter(item => item !== value),
+            }));
         }
-    };
-
-    const removeFilterValue = (filterType: keyof CaseFilters, value: string) => {
-        if (filterType === "date_from" || filterType === "date_to") {
-            handleFilterChange(filterType, null);
-            return;
-        }
-
-        const currentValues = filters[filterType] as string[];
-        handleFilterChange(
-            filterType,
-            currentValues.filter(v => v !== value)
-        );
+        setOffset(0); // Reset to first page when filtering
     };
 
     const clearAllFilters = () => {
@@ -291,504 +314,291 @@ const CaseList = (): ReactNode => {
     };
 
     const getActiveFiltersCount = () => {
-        const counts = [
-            filters.status.length,
-            filters.priority.length,
-            filters.case_type.length,
-            filters.assigned_to.length,
-            filters.urgency_level.length,
-            filters.date_from ? 1 : 0,
-            filters.date_to ? 1 : 0,
-        ];
-        return counts.reduce((sum, count) => sum + count, 0);
+        return (
+            filters.status.length +
+            filters.priority.length +
+            filters.case_type.length +
+            filters.assigned_to.length +
+            filters.urgency_level.length +
+            (filters.date_from ? 1 : 0) +
+            (filters.date_to ? 1 : 0) +
+            (filters.due_date_from ? 1 : 0) +
+            (filters.due_date_to ? 1 : 0)
+        );
     };
 
-    const currentPage = Math.floor(offset / LIMIT) + 1;
-    const totalPages = cases ? Math.ceil(cases.count / LIMIT) : 1;
+    const getActiveFilters = () => {
+        const activeFilters: Array<{
+            type: string;
+            value: string;
+            label: string;
+            displayLabel: string;
+        }> = [];
+
+        // Status filters
+        filters.status.forEach(status => {
+            const option = filterOptions.status.find(opt => opt.value === status);
+            if (option) {
+                activeFilters.push({
+                    type: 'status',
+                    value: status,
+                    label: option.label,
+                    displayLabel: `Status: ${option.label}`
+                });
+            }
+        });
+
+        // Priority filters
+        filters.priority.forEach(priority => {
+            const option = filterOptions.priority.find(opt => opt.value === priority);
+            if (option) {
+                activeFilters.push({
+                    type: 'priority',
+                    value: priority,
+                    label: option.label,
+                    displayLabel: `Priority: ${option.label}`
+                });
+            }
+        });
+
+        // Case type filters
+        filters.case_type.forEach(caseType => {
+            const option = filterOptions.case_type.find(opt => opt.value === caseType);
+            if (option) {
+                activeFilters.push({
+                    type: 'case_type',
+                    value: caseType,
+                    label: option.label,
+                    displayLabel: `Type: ${option.label}`
+                });
+            }
+        });
+
+        // Urgency level filters
+        filters.urgency_level.forEach(urgency => {
+            const option = filterOptions.urgency_level.find(opt => opt.value === urgency);
+            if (option) {
+                activeFilters.push({
+                    type: 'urgency_level',
+                    value: urgency,
+                    label: option.label,
+                    displayLabel: `Urgency: ${option.label}`
+                });
+            }
+        });
+
+        // Assigned to filters
+        const userOptions = getUniqueUsers(cases?.data || null);
+        filters.assigned_to.forEach(userId => {
+            const option = userOptions.find(opt => opt.value === userId);
+            if (option) {
+                activeFilters.push({
+                    type: 'assigned_to',
+                    value: userId,
+                    label: option.label,
+                    displayLabel: `Assigned: ${option.label}`
+                });
+            }
+        });
+
+        // Date filters
+        if (filters.date_from) {
+            activeFilters.push({
+                type: 'date_from',
+                value: filters.date_from.toISOString(),
+                label: filters.date_from.toLocaleDateString(),
+                displayLabel: `Created From: ${filters.date_from.toLocaleDateString()}`
+            });
+        }
+
+        if (filters.date_to) {
+            activeFilters.push({
+                type: 'date_to',
+                value: filters.date_to.toISOString(),
+                label: filters.date_to.toLocaleDateString(),
+                displayLabel: `Created To: ${filters.date_to.toLocaleDateString()}`
+            });
+        }
+
+        if (filters.due_date_from) {
+            activeFilters.push({
+                type: 'due_date_from',
+                value: filters.due_date_from.toISOString(),
+                label: filters.due_date_from.toLocaleDateString(),
+                displayLabel: `Due From: ${filters.due_date_from.toLocaleDateString()}`
+            });
+        }
+
+        if (filters.due_date_to) {
+            activeFilters.push({
+                type: 'due_date_to',
+                value: filters.due_date_to.toISOString(),
+                label: filters.due_date_to.toLocaleDateString(),
+                displayLabel: `Due To: ${filters.due_date_to.toLocaleDateString()}`
+            });
+        }
+
+        return activeFilters;
+    };
 
     const handlePageChange = (page: number) => {
-        const newOffset = (page - 1) * LIMIT;
-        setOffset(newOffset);
+        setOffset((page - 1) * LIMIT);
     };
 
+    const totalPages = cases ? Math.ceil(cases.count / LIMIT) : 0;
+    const currentPage = offset / LIMIT + 1;
     const activeFiltersCount = getActiveFiltersCount();
+
+    // Statistics cards data
+    const statisticsCards = [
+        {
+            title: "Total Cases",
+            value: stats?.total_cases || 0,
+            icon: <FaFileAlt />,
+            color: "blue" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Open Cases",
+            value: stats?.open_cases || 0,
+            icon: <FaClock />,
+            color: "orange" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Overdue",
+            value: stats?.overdue_cases || 0,
+            icon: <FaExclamationTriangle />,
+            color: "red" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Closed This Month",
+            value: stats?.closed_this_month || 0,
+            icon: <FaCheckCircle />,
+            color: "green" as const,
+            isLoading: isLoadingStats,
+        },
+    ];
+
+    // Filter sections for the search bar
+    const filterSections = [
+        {
+            key: "status",
+            label: "Status",
+            options: filterOptions.status,
+            placeholder: "Select status...",
+            note: 'Note: All cases except "Closed" and "Cancelled" are considered active/open',
+        },
+        {
+            key: "priority",
+            label: "Priority",
+            options: filterOptions.priority,
+            placeholder: "Select priority...",
+        },
+        {
+            key: "case_type",
+            label: "Case Type",
+            options: filterOptions.case_type,
+            placeholder: "Select type...",
+        },
+        {
+            key: "urgency_level",
+            label: "Urgency",
+            options: filterOptions.urgency_level,
+            placeholder: "Select urgency...",
+        },
+        {
+            key: "assigned_to",
+            label: "Assigned To",
+            options: getUniqueUsers(cases?.data || null),
+            placeholder: "Select user...",
+        },
+        {
+            key: "date_from",
+            label: "Created From",
+            type: "date" as const,
+            placeholder: "Select start date...",
+        },
+        {
+            key: "date_to",
+            label: "Created To",
+            type: "date" as const,
+            placeholder: "Select end date...",
+        },
+        {
+            key: "due_date_from",
+            label: "Due Date From",
+            type: "date" as const,
+            placeholder: "Select due date start...",
+        },
+        {
+            key: "due_date_to",
+            label: "Due Date To",
+            type: "date" as const,
+            placeholder: "Select due date end...",
+        },
+    ];
+
+    const handleCreateCase = () => {
+        const organizationId = pathname.split("/")[3];
+        router.push(`/${pathname.split("/")[1]}/app/${organizationId}/cases/create`);
+    };
 
     return (
         <>
-            {/* Stats Cards - Horizontal Layout like Home Page */}
-            <div className="w-full grid grid-cols-4 gap-4 lg:flex lg:flex-wrap mb-4">
-                <div className="w-full h-max rounded-lg bg-blue-500 overflow-hidden flex flex-col">
-                    <div className="w-full py-1 px-5 bg-blue-600 lg:p-3">
-                        <span className="h-full text-white font-bold flex items-center justify-center gap-3">
-                            <FaFileAlt />
-                            Total Cases
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {isLoadingStats ? "..." : stats?.total_cases || 0}
-                        </span>
-                    </div>
-                </div>
-                <div className="w-full h-max rounded-lg bg-orange-500 overflow-hidden flex flex-col">
-                    <div className="w-full py-1 px-5 bg-orange-600 lg:p-3">
-                        <span className="h-full text-white font-bold flex items-center justify-center gap-3">
-                            <FaClock />
-                            Open Cases
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {isLoadingStats ? "..." : stats?.open_cases || 0}
-                        </span>
-                    </div>
-                </div>
-                <div className="w-full h-max rounded-lg bg-red-500 overflow-hidden flex flex-col">
-                    <div className="w-full py-1 px-5 bg-red-600 lg:p-3">
-                        <span className="h-full text-white font-bold flex items-center justify-center gap-3">
-                            <FaExclamationTriangle />
-                            Overdue
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {isLoadingStats ? "..." : stats?.overdue_cases || 0}
-                        </span>
-                    </div>
-                </div>
-                <div className="w-full h-max rounded-lg bg-green-500 overflow-hidden flex flex-col">
-                    <div className="w-full py-1 px-5 bg-green-600 lg:p-3">
-                        <span className="h-full text-white font-bold flex items-center justify-center gap-3">
-                            <FaCheckCircle />
-                            Closed This Month
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <span className="text-3xl text-white font-bold lg:text-2xl">
-                            {isLoadingStats ? "..." : stats?.closed_this_month || 0}
-                        </span>
-                    </div>
-                </div>
-            </div>
+            {/* Debug Info - Only shows in development */}
+            <DebugInfo 
+                title="Cases List"
+                data={{ cases, stats, searchTerm, filters, offset, currentPage, totalPages }}
+                error={error}
+                isLoading={isLoading}
+            />
+            
+            {/* Statistics Cards */}
+            <StatisticsCards cards={statisticsCards} />
 
-            {/* Search and Toolbar - Following Beneficiary Pattern */}
-            <div className="flex items-end gap-4 justify-between lg:flex-row-reverse">
-                <div className="relative lg:grow">
-                    <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
-                    <Input
-                        type="text"
-                        placeholder="Search cases..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="w-[300px] lg:w-full pl-10"
-                    />
-                </div>
-                <div className="flex items-center gap-3">
-                    {/* Compact Filter Dropdown */}
-                    <Popover open={showFilters} onOpenChange={setShowFilters}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="flex items-center gap-2 text-sm border-slate-200"
-                            >
-                                <MdFilterList />
-                                Filters
-                                {activeFiltersCount > 0 && (
-                                    <Badge className="ml-1 h-4 w-4 p-0 text-xs bg-relif-orange-400 text-white hover:bg-relif-orange-500 flex items-center justify-center rounded-full">
-                                        {activeFiltersCount}
-                                    </Badge>
-                                )}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80 p-0" align="end" sideOffset={5}>
-                            <div className="flex flex-col max-h-[50vh]">
-                                <div className="flex items-center justify-between p-4 border-b border-slate-200 flex-shrink-0">
-                                    <h4 className="font-medium text-sm">Filter Cases</h4>
-                                    {activeFiltersCount > 0 && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={clearAllFilters}
-                                            className="text-xs hover:text-red-600 h-6 px-2"
-                                        >
-                                            <MdClear className="mr-1 h-3 w-3" />
-                                            Clear all
-                                        </Button>
-                                    )}
-                                </div>
+            {/* Search and Filter Bar */}
+            <SearchFilterBar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                searchPlaceholder="Search cases..."
+                showFilters={showFilters}
+                onShowFiltersChange={setShowFilters}
+                filterSections={filterSections}
+                filterTitle="Filter Cases"
+                onFilterAdd={addFilterValue}
+                onFilterRemove={removeFilterValue}
+                onFilterClear={clearAllFilters}
+                activeFiltersCount={activeFiltersCount}
+                activeFilters={getActiveFilters()}
+                additionalActions={<Toolbar />}
+            />
 
-                                <div className="p-4 space-y-4 overflow-y-auto min-h-0">
-                                    {/* Status Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Status
-                                        </label>
-                                        <p className="text-xs text-slate-500 mb-2">
-                                            Note: All cases except "Closed" and "Cancelled" are
-                                            considered active/open
-                                        </p>
-                                        <Select
-                                            onValueChange={value => addFilterValue("status", value)}
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select status..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.status.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Priority Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Priority
-                                        </label>
-                                        <Select
-                                            onValueChange={value =>
-                                                addFilterValue("priority", value)
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select priority..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.priority.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Case Type Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Case Type
-                                        </label>
-                                        <Select
-                                            onValueChange={value =>
-                                                addFilterValue("case_type", value)
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select type..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.case_type.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Urgency Level Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Urgency
-                                        </label>
-                                        <Select
-                                            onValueChange={value =>
-                                                addFilterValue("urgency_level", value)
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select urgency..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filterOptions.urgency_level.map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Assigned To Filter */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Assigned To
-                                        </label>
-                                        <Select
-                                            onValueChange={value =>
-                                                addFilterValue("assigned_to", value)
-                                            }
-                                        >
-                                            <SelectTrigger className="w-full h-8 text-xs">
-                                                <SelectValue placeholder="Select user..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {getUniqueUsers(cases?.data || null).map(option => (
-                                                    <SelectItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                        className="text-xs"
-                                                    >
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <Separator />
-
-                                    {/* Date Filters */}
-                                    <div className="space-y-3">
-                                        <label className="text-xs font-medium text-slate-700">
-                                            Date Range
-                                        </label>
-
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {/* Date From */}
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-slate-600">
-                                                    From
-                                                </label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className="w-full h-8 justify-start text-left font-normal text-xs"
-                                                        >
-                                                            <FaCalendarAlt className="mr-1 h-3 w-3" />
-                                                            {filters.date_from
-                                                                ? format(
-                                                                      filters.date_from,
-                                                                      "MMM dd"
-                                                                  )
-                                                                : "Pick..."}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="w-auto p-0"
-                                                        align="start"
-                                                    >
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={
-                                                                filters.date_from || undefined
-                                                            }
-                                                            onSelect={date =>
-                                                                handleFilterChange(
-                                                                    "date_from",
-                                                                    date || null
-                                                                )
-                                                            }
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-
-                                            {/* Date To */}
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-slate-600">To</label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className="w-full h-8 justify-start text-left font-normal text-xs"
-                                                        >
-                                                            <FaCalendarAlt className="mr-1 h-3 w-3" />
-                                                            {filters.date_to
-                                                                ? format(filters.date_to, "MMM dd")
-                                                                : "Pick..."}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="w-auto p-0"
-                                                        align="start"
-                                                    >
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={filters.date_to || undefined}
-                                                            onSelect={date =>
-                                                                handleFilterChange(
-                                                                    "date_to",
-                                                                    date || null
-                                                                )
-                                                            }
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                    <Toolbar />
-                </div>
-            </div>
-
-            {/* Active Filters Display - Compact Row */}
-            {activeFiltersCount > 0 && (
-                <div className="flex flex-wrap gap-2 items-center py-2">
-                    <span className="text-xs font-medium text-slate-600">Active filters:</span>
-
-                    {/* Status badges */}
-                    {filters.status.map(status => (
-                        <Badge key={`status-${status}`} variant="secondary" className="text-xs h-6">
-                            Status: {filterOptions.status.find(o => o.value === status)?.label}
-                            <button
-                                onClick={() => removeFilterValue("status", status)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Priority badges */}
-                    {filters.priority.map(priority => (
-                        <Badge
-                            key={`priority-${priority}`}
-                            variant="secondary"
-                            className="text-xs h-6"
-                        >
-                            Priority:{" "}
-                            {filterOptions.priority.find(o => o.value === priority)?.label}
-                            <button
-                                onClick={() => removeFilterValue("priority", priority)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Case type badges */}
-                    {filters.case_type.map(type => (
-                        <Badge key={`type-${type}`} variant="secondary" className="text-xs h-6">
-                            Type: {filterOptions.case_type.find(o => o.value === type)?.label}
-                            <button
-                                onClick={() => removeFilterValue("case_type", type)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Urgency badges */}
-                    {filters.urgency_level.map(urgency => (
-                        <Badge
-                            key={`urgency-${urgency}`}
-                            variant="secondary"
-                            className="text-xs h-6"
-                        >
-                            Urgency:{" "}
-                            {filterOptions.urgency_level.find(o => o.value === urgency)?.label}
-                            <button
-                                onClick={() => removeFilterValue("urgency_level", urgency)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Assigned to badges */}
-                    {filters.assigned_to.map(userId => (
-                        <Badge
-                            key={`assigned-${userId}`}
-                            variant="secondary"
-                            className="text-xs h-6"
-                        >
-                            Assigned:{" "}
-                            {
-                                getUniqueUsers(cases?.data || null).find(u => u.value === userId)
-                                    ?.label
-                            }
-                            <button
-                                onClick={() => removeFilterValue("assigned_to", userId)}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    ))}
-
-                    {/* Date badges */}
-                    {filters.date_from && (
-                        <Badge variant="secondary" className="text-xs h-6">
-                            From: {format(filters.date_from, "MMM dd, yyyy")}
-                            <button
-                                onClick={() => removeFilterValue("date_from", "")}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    )}
-
-                    {filters.date_to && (
-                        <Badge variant="secondary" className="text-xs h-6">
-                            To: {format(filters.date_to, "MMM dd, yyyy")}
-                            <button
-                                onClick={() => removeFilterValue("date_to", "")}
-                                className="ml-1 hover:text-red-600"
-                            >
-                                ×
-                            </button>
-                        </Badge>
-                    )}
-                </div>
-            )}
-
-            {/* Cases List Container - Following Beneficiary Pattern */}
-            <div className="h-[calc(100vh-280px)] lg:h-[calc(100vh-230px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+            {/* Cases List */}
+            <div className="h-[calc(100vh-280px)] lg:h-[calc(100vh-300px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
-                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                        Loading cases...
-                    </h2>
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading cases...</h2>
                 )}
 
                 {!isLoading && error && (
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                         <MdError />
-                        Something went wrong. Please try again later.
+                        Error loading cases. Please try again.
                     </span>
                 )}
 
-                {!isLoading && !error && cases && cases.count <= 0 && (
+                {!isLoading && !error && cases && cases.data.length <= 0 && (
                     <span className="text-sm text-slate-900 font-medium p-4">
-                        No cases found...
+                        No cases found matching your criteria.
                     </span>
                 )}
 
-                {!isLoading && !error && cases && cases.count > 0 && (
+                {!isLoading && !error && cases && cases.data.length > 0 && (
                     <>
                         <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                            {cases?.data.map(case_ => (
-                                <CaseCard key={case_.id} data={case_} refreshList={getCasesList} />
+                            {cases.data.map(caseItem => (
+                                <CaseCard key={caseItem.id} data={caseItem} refreshList={getCasesList} />
                             ))}
                         </ul>
                         <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
@@ -797,9 +607,7 @@ const CaseList = (): ReactNode => {
                                     <PaginationItem>
                                         <PaginationPrevious
                                             onClick={() =>
-                                                handlePageChange(
-                                                    currentPage === 1 ? 1 : currentPage - 1
-                                                )
+                                                handlePageChange(currentPage === 1 ? 1 : currentPage - 1)
                                             }
                                         />
                                     </PaginationItem>
@@ -810,9 +618,7 @@ const CaseList = (): ReactNode => {
                                         <PaginationNext
                                             onClick={() =>
                                                 handlePageChange(
-                                                    currentPage === totalPages
-                                                        ? totalPages
-                                                        : currentPage + 1
+                                                    currentPage === totalPages ? totalPages : currentPage + 1
                                                 )
                                             }
                                         />
@@ -827,4 +633,4 @@ const CaseList = (): ReactNode => {
     );
 };
 
-export { CaseList };
+export { CaseList }; 

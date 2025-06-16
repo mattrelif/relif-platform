@@ -598,7 +598,7 @@
                 "active": "Active"
             },
             "list": {
-                "searchPlaceholder": "Search",
+                "searchPlaceholder": "Search beneficiaries",
                 "loading": "Loading...",
                 "error": "Something went wrong. Please try again later.",
                 "noBeneficiariesFound": "No beneficiaries found..."
@@ -819,7 +819,7 @@
         },
         "volunteers": {
             "list": {
-                "search": "Search",
+                "search": "Search volunteers",
                 "loading": "Loading...",
                 "error": "Something went wrong. Please try again later.",
                 "noVolunteersFound": "No volunteers found...",
@@ -1045,6 +1045,7 @@
         },
         "inventory": {
             "list": {
+                "searchPlaceholder": "Search products",
                 "loading": "Loading...",
                 "error": "Something went wrong. Please try again later.",
                 "noProducts": "No products found..."
@@ -1490,7 +1491,7 @@
     },
     "housingList": {
         "breadcrumb": "Housing",
-        "searchPlaceholder": "Search",
+        "searchPlaceholder": "Search housing",
         "btnCreate": "Create housing",
         "downloadCsv": "Download CSV",
         "downloadPdf": "Download PDF",

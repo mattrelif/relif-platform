@@ -62,7 +62,7 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
     return (
         <div className="flex items-center gap-4">
             {platformRole === "ORG_ADMIN" && (
-                <Button asChild>
+                <Button asChild className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
                     <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                         <MdAdd size={16} />
                         {dict.housingList.btnCreate}

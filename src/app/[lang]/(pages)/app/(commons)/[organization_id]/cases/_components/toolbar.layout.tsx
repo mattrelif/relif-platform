@@ -51,7 +51,7 @@ const Toolbar = (): ReactNode => {
     return (
         <div className="flex flex-wrap items-center gap-4">
             {showCreateButton && (
-                <Button asChild>
+                <Button asChild className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white">
                     <Link href={`${urlPath}/create`} className="flex items-center gap-2">
                         <MdAdd size={16} />
                         Create Case

@@ -2,7 +2,6 @@
 
 import { Toolbar } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/housings/_components/toolbar.layout";
 import { useDictionary } from "@/app/context/dictionaryContext";
-import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
@@ -10,25 +9,71 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { findHousingsByOrganizationId } from "@/repository/organization.repository";
+import { findHousingsByOrganizationId, getHousingStats } from "@/repository/organization.repository";
 import { HousingSchema } from "@/types/housing.types";
-import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState, useCallback, ChangeEvent } from "react";
-import { MdError, MdSearch } from "react-icons/md";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState, useCallback } from "react";
+import { MdError, MdAdd } from "react-icons/md";
+import { FaHome, FaCheckCircle, FaClock, FaExclamationTriangle } from "react-icons/fa";
+import { StatisticsCards } from "@/components/ui/statistics-cards";
+import { SearchFilterBar } from "@/components/ui/search-filter-bar";
 
 import { Card } from "./card.layout";
+
+// Filter types
+interface HousingFilters {
+    status: string[];
+    occupancy: string[];
+}
+
+const initialFilters: HousingFilters = {
+    status: [],
+    occupancy: [],
+};
 
 const HousingList = (): ReactNode => {
     const dict = useDictionary();
     const pathname = usePathname();
+    const router = useRouter();
     const organizationId = pathname.split("/")[3];
 
     const [housings, setHousings] = useState<{ count: number; data: HousingSchema[] } | null>(null);
+    const [stats, setStats] = useState<any>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const [filters, setFilters] = useState<HousingFilters>(initialFilters);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
     const LIMIT = 15;
+
+    // Helper function to apply client-side filtering
+    const applyHousingFilters = (
+        housingsData: HousingSchema[]
+    ): HousingSchema[] => {
+        return housingsData.filter(housing => {
+            // Status filter
+            if (filters.status.length > 0 && !filters.status.includes(housing.status)) {
+                return false;
+            }
+
+            // Occupancy filter (based on occupied vs total vacancies)
+            if (filters.occupancy.length > 0) {
+                const occupancyStatus = housing.occupied_vacancies === housing.total_vacancies 
+                    ? 'full' 
+                    : housing.occupied_vacancies > 0 
+                        ? 'partial' 
+                        : 'empty';
+                
+                if (!filters.occupancy.includes(occupancyStatus)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    };
 
     const getHousingList = useCallback(
         async (filter: string = "") => {
@@ -61,8 +106,26 @@ const HousingList = (): ReactNode => {
         return () => clearTimeout(delayDebounceFn);
     }, [searchTerm, getHousingList]);
 
-    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
+    const getHousingStatsData = useCallback(async () => {
+        try {
+            setIsLoadingStats(true);
+            if (organizationId) {
+                const response = await getHousingStats(organizationId);
+                setStats(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching housing stats:", error);
+        } finally {
+            setIsLoadingStats(false);
+        }
+    }, [organizationId]);
+
+    useEffect(() => {
+        getHousingStatsData();
+    }, [getHousingStatsData]);
+
+    const handleSearchChange = (value: string) => {
+        setSearchTerm(value);
     };
 
     useEffect(() => {
@@ -77,23 +140,156 @@ const HousingList = (): ReactNode => {
         setOffset((newPage - 1) * LIMIT);
     };
 
+    // Statistics cards data
+    const statisticsCards = [
+        {
+            title: "Total Housing",
+            value: stats?.total_housing || 0,
+            icon: <FaHome />,
+            color: "blue" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Available",
+            value: stats?.available_housing || 0,
+            icon: <FaCheckCircle />,
+            color: "green" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Occupied",
+            value: stats?.occupied_housing || 0,
+            icon: <FaClock />,
+            color: "orange" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Maintenance",
+            value: stats?.maintenance_housing || 0,
+            icon: <FaExclamationTriangle />,
+            color: "red" as const,
+            isLoading: isLoadingStats,
+        },
+    ];
+
+
+
+    const handleFilterAdd = (filterType: string, value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: [...prev[filterType as keyof HousingFilters], value]
+        }));
+    };
+
+    const handleFilterRemove = (filterType: string, value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: prev[filterType as keyof HousingFilters].filter(v => v !== value)
+        }));
+    };
+
+    const handleFilterClear = () => {
+        setFilters(initialFilters);
+    };
+
+    const getActiveFiltersCount = () => {
+        return Object.values(filters).reduce((count, filterArray) => count + filterArray.length, 0);
+    };
+
+    const getActiveFilters = () => {
+        const activeFilters: Array<{
+            type: string;
+            value: string;
+            label: string;
+            displayLabel: string;
+        }> = [];
+
+        // Status filters
+        filters.status.forEach(status => {
+            const statusOptions = [
+                { value: "available", label: "Available" },
+                { value: "occupied", label: "Occupied" },
+                { value: "maintenance", label: "Maintenance" },
+                { value: "inactive", label: "Inactive" },
+            ];
+            const option = statusOptions.find(opt => opt.value === status);
+            if (option) {
+                activeFilters.push({
+                    type: 'status',
+                    value: status,
+                    label: option.label,
+                    displayLabel: `Status: ${option.label}`
+                });
+            }
+        });
+
+        // Occupancy filters
+        filters.occupancy.forEach(occupancy => {
+            const occupancyOptions = [
+                { value: "full", label: "Full" },
+                { value: "partial", label: "Partial" },
+                { value: "empty", label: "Empty" },
+            ];
+            const option = occupancyOptions.find(opt => opt.value === occupancy);
+            if (option) {
+                activeFilters.push({
+                    type: 'occupancy',
+                    value: occupancy,
+                    label: option.label,
+                    displayLabel: `Occupancy: ${option.label}`
+                });
+            }
+        });
+
+        return activeFilters;
+    };
+
     return (
         <>
-            <div className="flex items-end gap-4 justify-between lg:flex-col lg:items-start">
-                <div className="relative">
-                    <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
-                    <Input
-                        type="text"
-                        placeholder="Search"
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="w-[300px] pl-10"
-                    />
-                </div>
-                <Toolbar organizationId={organizationId} />
-            </div>
+            {/* Statistics Cards */}
+            <StatisticsCards cards={statisticsCards} />
 
-            <div className="h-[calc(100vh-172px)] lg:h-[calc(100vh-195px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+            {/* Search and Filter Bar */}
+            <SearchFilterBar
+                searchTerm={searchTerm}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder={dict.housingList.searchPlaceholder}
+                showFilters={showFilters}
+                onShowFiltersChange={setShowFilters}
+                filterSections={[
+                    {
+                        key: "status",
+                        label: "Status",
+                        options: [
+                            { value: "available", label: "Available" },
+                            { value: "occupied", label: "Occupied" },
+                            { value: "maintenance", label: "Maintenance" },
+                            { value: "inactive", label: "Inactive" },
+                        ],
+                        placeholder: "Select status...",
+                    },
+                    {
+                        key: "occupancy",
+                        label: "Occupancy",
+                        options: [
+                            { value: "full", label: "Full" },
+                            { value: "partial", label: "Partial" },
+                            { value: "empty", label: "Empty" },
+                        ],
+                        placeholder: "Select occupancy...",
+                    },
+                ]}
+                filterTitle="Filter Housing"
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterClear={handleFilterClear}
+                activeFiltersCount={getActiveFiltersCount()}
+                activeFilters={getActiveFilters()}
+                additionalActions={<Toolbar organizationId={organizationId} />}
+            />
+
+            {/* Housing List */}
+            <div className="h-[calc(100vh-280px)] lg:h-[calc(100vh-300px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                         {dict.housingList.loading}

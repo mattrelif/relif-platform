@@ -598,7 +598,7 @@
                 "active": "Ativo"
             },
             "list": {
-                "searchPlaceholder": "Pesquisar",
+                "searchPlaceholder": "Pesquisar beneficiários",
                 "loading": "Carregando...",
                 "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
                 "noBeneficiariesFound": "Nenhum beneficiário encontrado..."
@@ -819,7 +819,7 @@
         },
         "volunteers": {
             "list": {
-                "search": "Pesquisar",
+                "search": "Pesquisar voluntários",
                 "loading": "Carregando...",
                 "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
                 "noVolunteersFound": "Nenhum voluntário encontrado...",
@@ -1045,6 +1045,7 @@
         },
         "inventory": {
             "list": {
+                "searchPlaceholder": "Pesquisar produtos",
                 "loading": "Carregando...",
                 "error": "Algo deu errado. Por favor, tente novamente mais tarde.",
                 "noProducts": "Nenhum produto encontrado..."
@@ -1400,7 +1401,7 @@
     },
     "housingList": {
         "breadcrumb": "Acomodações",
-        "searchPlaceholder": "Buscar",
+        "searchPlaceholder": "Buscar acomodações",
         "btnCreate": "Criar acomodação",
         "downloadCsv": "Baixar CSV",
         "downloadPdf": "Baixar PDF",

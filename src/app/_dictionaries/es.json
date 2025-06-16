@@ -598,7 +598,7 @@
                 "active": "Activo"
             },
             "list": {
-                "searchPlaceholder": "Buscar",
+                "searchPlaceholder": "Buscar beneficiarios",
                 "loading": "Cargando...",
                 "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
                 "noBeneficiariesFound": "No se encontraron beneficiarios..."
@@ -819,7 +819,7 @@
         },
         "volunteers": {
             "list": {
-                "search": "Buscar",
+                "search": "Buscar voluntarios",
                 "loading": "Cargando...",
                 "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
                 "noVolunteersFound": "No se encontraron voluntarios...",
@@ -1045,6 +1045,7 @@
         },
         "inventory": {
             "list": {
+                "searchPlaceholder": "Buscar productos",
                 "loading": "Cargando...",
                 "error": "Algo salió mal. Por favor, inténtelo de nuevo más tarde.",
                 "noProducts": "No se encontraron productos..."
@@ -1400,7 +1401,7 @@
     },
     "housingList": {
         "breadcrumb": "Alojamientos",
-        "searchPlaceholder": "Buscar",
+        "searchPlaceholder": "Buscar alojamientos",
         "btnCreate": "Crear alojamiento",
         "downloadCsv": "Descargar CSV",
         "downloadPdf": "Descargar PDF",

@@ -46,10 +46,13 @@ import {
     getCaseDocuments,
     generateCaseDocumentUploadLink,
     createCaseDocument,
+    updateCaseDocument,
+    deleteCaseDocument,
     extractFileKeyFromS3Url,
 } from "@/repository/organization.repository";
 import { CreateCaseDocumentPayload } from "@/types/case.types";
 import { useToast } from "@/components/ui/use-toast";
+import { DebugInfo } from "@/components/debug-info";
 
 const CaseOverview = (): ReactNode => {
     const pathname = usePathname();
@@ -95,14 +98,48 @@ const CaseOverview = (): ReactNode => {
         setDeleteDialogOpen(true);
     };
 
-    const confirmDeleteDocument = () => {
+    const confirmDeleteDocument = async () => {
         if (documentToDelete && Array.isArray(documents)) {
-            // Remove document from the list
-            setDocuments(documents.filter(doc => doc.id !== documentToDelete.id));
-            setDeleteDialogOpen(false);
-            setDocumentToDelete(null);
-            // Here you would also make an API call to delete the document
-            console.log("Deleting document:", documentToDelete.id);
+            try {
+                console.log("🗑️ Deleting document:", documentToDelete.id);
+                
+                // Call API to delete document
+                await deleteCaseDocument(caseId, documentToDelete.id);
+                console.log("✅ Document deleted from backend");
+                
+                // Remove document from the list
+                setDocuments(documents.filter(doc => doc.id !== documentToDelete.id));
+                setDeleteDialogOpen(false);
+                setDocumentToDelete(null);
+                
+                toast({
+                    title: "Success",
+                    description: "Document deleted successfully",
+                });
+            } catch (error: any) {
+                console.error("❌ Error deleting document:", {
+                    error,
+                    message: error?.message,
+                    response: error?.response?.data,
+                    status: error?.response?.status,
+                    documentId: documentToDelete.id
+                });
+                
+                let errorMessage = "Failed to delete document. Please try again.";
+                if (error?.response?.status === 403) {
+                    errorMessage = "You don't have permission to delete this document.";
+                } else if (error?.response?.status === 404) {
+                    errorMessage = "Document not found. It may have already been deleted.";
+                } else if (error?.response?.status >= 500) {
+                    errorMessage = "Server error. Please try again later.";
+                }
+                
+                toast({
+                    title: "Delete Failed",
+                    description: errorMessage,
+                    variant: "destructive",
+                });
+            }
         }
     };
 
@@ -118,18 +155,55 @@ const CaseOverview = (): ReactNode => {
         setEditDialogOpen(true);
     };
 
-    const confirmEditDocument = () => {
+    const confirmEditDocument = async () => {
         if (documentToEdit && Array.isArray(documents)) {
-            // Update document in the list
-            setDocuments(
-                documents.map(doc =>
-                    doc.id === documentToEdit.id ? { ...doc, ...editFormData } : doc
-                )
-            );
-            setEditDialogOpen(false);
-            setDocumentToEdit(null);
-            // Here you would also make an API call to update the document
-            console.log("Updating document:", documentToEdit.id, editFormData);
+            try {
+                console.log("✏️ Updating document:", documentToEdit.id, editFormData);
+                
+                // Call API to update document
+                await updateCaseDocument(caseId, documentToEdit.id, editFormData);
+                console.log("✅ Document updated in backend");
+                
+                // Update document in the list
+                setDocuments(
+                    documents.map(doc =>
+                        doc.id === documentToEdit.id ? { ...doc, ...editFormData } : doc
+                    )
+                );
+                setEditDialogOpen(false);
+                setDocumentToEdit(null);
+                
+                toast({
+                    title: "Success",
+                    description: "Document updated successfully",
+                });
+            } catch (error: any) {
+                console.error("❌ Error updating document:", {
+                    error,
+                    message: error?.message,
+                    response: error?.response?.data,
+                    status: error?.response?.status,
+                    documentId: documentToEdit.id,
+                    updateData: editFormData
+                });
+                
+                let errorMessage = "Failed to update document. Please try again.";
+                if (error?.response?.status === 400) {
+                    errorMessage = "Invalid document data. Please check your inputs.";
+                } else if (error?.response?.status === 403) {
+                    errorMessage = "You don't have permission to update this document.";
+                } else if (error?.response?.status === 404) {
+                    errorMessage = "Document not found. It may have been deleted.";
+                } else if (error?.response?.status >= 500) {
+                    errorMessage = "Server error. Please try again later.";
+                }
+                
+                toast({
+                    title: "Update Failed",
+                    description: errorMessage,
+                    variant: "destructive",
+                });
+            }
         }
     };
 
@@ -177,11 +251,17 @@ const CaseOverview = (): ReactNode => {
         setIsUploading(true);
         try {
             for (const file of uploadFiles) {
+                console.log(`📤 Starting upload for file: ${file.name}`);
+                
                 // Step 1: Get presigned upload URL
-                const { data: uploadLinkData } = await generateCaseDocumentUploadLink(caseId, file.type);
+                console.log("🔗 Getting presigned upload URL...");
+                const uploadLinkResponse = await generateCaseDocumentUploadLink(caseId, file.type);
+                const uploadLinkData = uploadLinkResponse.data;
+                console.log("✅ Got presigned URL:", uploadLinkData);
 
                 // Step 2: Upload directly to S3
-                await fetch(uploadLinkData.link, {
+                console.log("☁️ Uploading to S3...");
+                const s3Response = await fetch(uploadLinkData.link, {
                     method: "PUT",
                     headers: {
                         "Content-Type": file.type,
@@ -189,12 +269,17 @@ const CaseOverview = (): ReactNode => {
                     body: file,
                 });
 
+                if (!s3Response.ok) {
+                    throw new Error(`S3 upload failed: ${s3Response.status} ${s3Response.statusText}`);
+                }
+                console.log("✅ S3 upload successful");
+
                 // Step 3: Extract file key from S3 URL and save metadata
+                console.log("💾 Saving document metadata...");
                 const fileKey = extractFileKeyFromS3Url(uploadLinkData.link);
                 
-                await createCaseDocument(caseId, {
-                    document_name:
-                        uploadFormData.document_name || file.name.replace(/\.[^/.]+$/, ""),
+                const documentData = {
+                    document_name: uploadFormData.document_name || file.name.replace(/\.[^/.]+$/, ""),
                     document_type: uploadFormData.document_type,
                     description: uploadFormData.description,
                     tags: uploadFormData.tags,
@@ -202,13 +287,21 @@ const CaseOverview = (): ReactNode => {
                     file_size: file.size,
                     mime_type: file.type,
                     file_key: fileKey,
-                });
+                };
+
+                const createDocResponse = await createCaseDocument(caseId, documentData);
+                console.log("✅ Document metadata saved:", createDocResponse);
             }
 
             // Refresh documents list
+            console.log("🔄 Refreshing documents list...");
             const documentsResult = await getCaseDocuments(caseId);
             if (Array.isArray(documentsResult?.data)) {
                 setDocuments(documentsResult.data);
+                console.log("✅ Documents list refreshed");
+            } else {
+                console.warn("⚠️ Documents result is not an array:", documentsResult);
+                setDocuments([]);
             }
 
             // Reset form and close dialog
@@ -225,11 +318,29 @@ const CaseOverview = (): ReactNode => {
                 title: "Success",
                 description: `Successfully uploaded ${uploadFiles.length} document(s)!`,
             });
-        } catch (error) {
-            console.error("Error uploading documents:", error);
+        } catch (error: any) {
+            console.error("❌ Error uploading documents:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status
+            });
+            
+            // More specific error messages
+            let errorMessage = "Error uploading documents. Please try again.";
+            if (error?.response?.status === 413) {
+                errorMessage = "File is too large. Please choose a smaller file.";
+            } else if (error?.response?.status === 415) {
+                errorMessage = "File type not supported. Please choose a different file.";
+            } else if (error?.message?.includes("S3 upload failed")) {
+                errorMessage = "File upload to storage failed. Please try again.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+
             toast({
                 title: "Upload Failed",
-                description: "Error uploading documents. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -324,6 +435,14 @@ const CaseOverview = (): ReactNode => {
 
     return (
         <div className="w-full h-max flex flex-col gap-2">
+            {/* Debug Info - Only shows in development */}
+            <DebugInfo 
+                title="Case Overview"
+                data={{ caseData, documents, caseId, uploadFormData }}
+                error={error}
+                isLoading={isLoading}
+            />
+            
             {/* Case Header */}
             <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
                 <div className="flex items-center justify-between w-full">

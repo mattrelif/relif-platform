@@ -203,8 +203,11 @@ const EditCasePage = (): ReactNode => {
                 tags: formData.tags.length > 0 ? formData.tags : undefined,
             };
 
+            console.log("🔄 Updating case with payload:", updatePayload);
+
             // Update the case
-            await updateCase(caseId, updatePayload);
+            const updateResponse = await updateCase(caseId, updatePayload);
+            console.log("✅ Case update response:", updateResponse);
 
             toast({
                 title: "Success",
@@ -213,11 +216,31 @@ const EditCasePage = (): ReactNode => {
 
             // Redirect back to case overview
             router.push(backPath);
-        } catch (error) {
-            console.error("Error updating case:", error);
+        } catch (error: any) {
+            console.error("❌ Error updating case:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status
+            });
+
+            // More specific error messages
+            let errorMessage = "Failed to update case. Please try again.";
+            if (error?.response?.status === 400) {
+                errorMessage = "Invalid case data. Please check your inputs.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to update this case.";
+            } else if (error?.response?.status === 404) {
+                errorMessage = "Case not found. It may have been deleted.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            } else if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+
             toast({
                 title: "Error",
-                description: "Failed to update case. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {

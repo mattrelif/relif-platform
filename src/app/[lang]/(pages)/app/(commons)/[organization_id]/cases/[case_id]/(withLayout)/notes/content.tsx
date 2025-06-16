@@ -36,6 +36,7 @@ import {
     deleteCaseNote,
 } from "@/repository/organization.repository";
 import { CreateCaseNotePayload } from "@/types/case.types";
+import { DebugInfo } from "@/components/debug-info";
 
 const NotesContent = (): ReactNode => {
     const pathname = usePathname();
@@ -84,8 +85,14 @@ const NotesContent = (): ReactNode => {
                         setNotes([]);
                     }
                 }
-            } catch (err) {
-                console.error("Error fetching case notes:", err);
+            } catch (err: any) {
+                console.error("❌ Error fetching case notes:", {
+                    error: err,
+                    message: err?.message,
+                    response: err?.response?.data,
+                    status: err?.response?.status,
+                    caseId
+                });
                 setError(true);
                 // Ensure notes is always an array even on error
                 setNotes([]);
@@ -115,11 +122,16 @@ const NotesContent = (): ReactNode => {
             };
 
             // Call the API to create the note
+            console.log("📝 Creating case note:", payload);
             const response = await createCaseNote(caseId, payload);
+            console.log("✅ Case note created:", response);
 
             // Add the new note to the local state
             if (response.data) {
                 setNotes(prev => [response.data, ...prev]);
+                console.log("✅ Note added to local state");
+            } else {
+                console.warn("⚠️ No data returned from createCaseNote:", response);
             }
 
             setShowAddForm(false);
@@ -136,11 +148,26 @@ const NotesContent = (): ReactNode => {
                 description: "The case update has been added.",
                 variant: "success",
             });
-        } catch (error) {
-            console.error("Error creating case note:", error);
+        } catch (error: any) {
+            console.error("❌ Error creating case note:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status
+            });
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error?.response?.status === 400) {
+                errorMessage = "Invalid note data. Please check your inputs.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to add notes to this case.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+            
             toast({
                 title: "Error adding update",
-                description: "Something went wrong. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -180,7 +207,9 @@ const NotesContent = (): ReactNode => {
             };
 
             // Call the API to update the note
+            console.log("✏️ Updating case note:", selectedNote.id, payload);
             const response = await updateCaseNote(caseId, selectedNote.id, payload);
+            console.log("✅ Case note updated:", response);
 
             // Update local state
             setNotes(prev =>
@@ -210,10 +239,30 @@ const NotesContent = (): ReactNode => {
                 description: "The case update has been updated.",
                 variant: "success",
             });
-        } catch (error) {
+        } catch (error: any) {
+            console.error("❌ Error updating case note:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status,
+                noteId: selectedNote?.id,
+                updateData: editFormData
+            });
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error?.response?.status === 400) {
+                errorMessage = "Invalid note data. Please check your inputs.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to update this note.";
+            } else if (error?.response?.status === 404) {
+                errorMessage = "Note not found. It may have been deleted.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+            
             toast({
                 title: "Error updating note",
-                description: "Something went wrong. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -233,7 +282,9 @@ const NotesContent = (): ReactNode => {
             if (!selectedNote) return;
 
             // Call the API to delete the note
+            console.log("🗑️ Deleting case note:", selectedNote.id);
             await deleteCaseNote(caseId, selectedNote.id);
+            console.log("✅ Case note deleted from backend");
 
             // Update local state
             setNotes(prev => prev.filter(note => note.id !== selectedNote?.id));
@@ -246,10 +297,26 @@ const NotesContent = (): ReactNode => {
                 description: "The case update has been removed.",
                 variant: "success",
             });
-        } catch (error) {
+        } catch (error: any) {
+            console.error("❌ Error deleting case note:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status
+            });
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to delete this note.";
+            } else if (error?.response?.status === 404) {
+                errorMessage = "Note not found. It may have already been deleted.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+            
             toast({
                 title: "Error deleting note",
-                description: "Something went wrong. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -275,6 +342,14 @@ const NotesContent = (): ReactNode => {
 
     return (
         <div className="w-full h-max flex flex-col gap-2">
+            {/* Debug Info - Only shows in development */}
+            <DebugInfo 
+                title="Case Notes"
+                data={{ notes, caseId, formData, editFormData }}
+                error={error}
+                isLoading={isLoading}
+            />
+            
             {/* Header */}
             <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">

@@ -27,6 +27,7 @@ import {
     createCase,
     generateCaseDocumentUploadLink,
     createCaseDocument,
+    createCaseNote,
     extractFileKeyFromS3Url,
 } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
@@ -298,6 +299,7 @@ export const CreateCaseForm = (): ReactNode => {
 
             // Add initial note if provided
             if (formData.initial_note.title || formData.initial_note.content) {
+                console.log("📝 Adding initial note to case:", formData.initial_note);
                 casePayload.initial_note = {
                     title: formData.initial_note.title,
                     content: formData.initial_note.content,
@@ -313,21 +315,57 @@ export const CreateCaseForm = (): ReactNode => {
             }
 
             // Create the case
+            console.log("🏗️ Creating case with payload:", casePayload);
             const response = await createCase(casePayload);
             const newCaseId = response.data.id;
+            console.log("✅ Case created with ID:", newCaseId);
+
+            // Create initial note separately if backend doesn't handle it in case creation
+            // This is a fallback in case the initial_note in casePayload doesn't work
+            if (formData.initial_note.title || formData.initial_note.content) {
+                try {
+                    console.log("📝 Creating initial note separately...");
+                    const notePayload = {
+                        title: formData.initial_note.title,
+                        content: formData.initial_note.content,
+                        note_type: formData.initial_note.note_type as
+                            | "CALL"
+                            | "MEETING"
+                            | "UPDATE"
+                            | "APPOINTMENT"
+                            | "OTHER",
+                        is_important: formData.initial_note.is_important,
+                        tags: formData.initial_note.tags,
+                    };
+                    
+                    const noteResponse = await createCaseNote(newCaseId, notePayload);
+                    console.log("✅ Initial note created:", noteResponse);
+                } catch (noteError: any) {
+                    console.warn("⚠️ Failed to create initial note separately:", noteError);
+                    // Don't fail the entire case creation if note creation fails
+                }
+            }
 
             // Handle document uploads if any documents were added
             if (formData.documents.length > 0) {
+                console.log(`📄 Uploading ${formData.documents.length} documents for case ${newCaseId}`);
+                
                 for (const doc of formData.documents) {
                     try {
+                        console.log(`📤 Starting upload for document: ${doc.name}`);
+                        
                         // Step 1: Get presigned upload URL
-                        const { data: uploadLinkData } = await generateCaseDocumentUploadLink(
+                        console.log("🔗 Getting presigned upload URL...");
+                        const uploadLinkResponse = await generateCaseDocumentUploadLink(
                             newCaseId,
                             doc.file.type
                         );
+                        const uploadLinkData = uploadLinkResponse.data;
+                        console.log("✅ Got presigned URL:", uploadLinkData);
 
                         // Step 2: Upload directly to S3
-                        await fetch(uploadLinkData.link, {
+                        console.log("☁️ Uploading to S3...");
+                        const s3Response = await fetch(uploadLinkData.link, {
                             method: "PUT",
                             headers: {
                                 "Content-Type": doc.file.type,
@@ -335,10 +373,16 @@ export const CreateCaseForm = (): ReactNode => {
                             body: doc.file,
                         });
 
+                        if (!s3Response.ok) {
+                            throw new Error(`S3 upload failed: ${s3Response.status} ${s3Response.statusText}`);
+                        }
+                        console.log("✅ S3 upload successful");
+
                         // Step 3: Extract file key and save metadata
+                        console.log("💾 Saving document metadata...");
                         const fileKey = extractFileKeyFromS3Url(uploadLinkData.link);
 
-                        await createCaseDocument(newCaseId, {
+                        const documentData = {
                             document_name: doc.name,
                             document_type: doc.type,
                             description: doc.description,
@@ -347,9 +391,20 @@ export const CreateCaseForm = (): ReactNode => {
                             file_size: doc.file.size,
                             mime_type: doc.file.type,
                             file_key: fileKey,
+                        };
+
+                        const createDocResponse = await createCaseDocument(newCaseId, documentData);
+                        console.log("✅ Document metadata saved:", createDocResponse);
+                    } catch (docError: any) {
+                        console.error(`❌ Error uploading document ${doc.name}:`, {
+                            error: docError,
+                            message: docError?.message,
+                            response: docError?.response?.data,
+                            status: docError?.response?.status,
+                            documentName: doc.name,
+                            fileType: doc.file.type,
+                            fileSize: doc.file.size
                         });
-                    } catch (docError) {
-                        console.error(`Error uploading document ${doc.name}:`, docError);
                         // Continue with other documents even if one fails
                     }
                 }
@@ -363,11 +418,35 @@ export const CreateCaseForm = (): ReactNode => {
             // Redirect back to cases list
             const casesPath = pathname.replace("/create", "");
             router.push(casesPath);
-        } catch (error) {
-            console.error("Error creating case:", error);
+        } catch (error: any) {
+            console.error("❌ Error creating case:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status,
+                formData: {
+                    title: formData.title,
+                    case_type: formData.case_type,
+                    priority: formData.priority,
+                    beneficiary_id: formData.beneficiary_id,
+                    documentsCount: formData.documents.length
+                }
+            });
+            
+            let errorMessage = "Failed to create case. Please try again.";
+            if (error?.response?.status === 400) {
+                errorMessage = "Invalid case data. Please check your inputs.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to create cases.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            } else if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+            
             toast({
                 title: "Error",
-                description: "Failed to create case. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {

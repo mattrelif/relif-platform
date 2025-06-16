@@ -2,7 +2,6 @@
 
 import { Toolbar } from "@/app/[lang]/(pages)/app/(commons)/[organization_id]/volunteers/_components/toolbar.layout";
 import { useDictionary } from "@/app/context/dictionaryContext";
-import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
@@ -10,40 +9,103 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { getVoluntariesByOrganizationID } from "@/repository/organization.repository";
+import { getVoluntariesByOrganizationID, getVolunteerStats } from "@/repository/organization.repository";
 import { VoluntarySchema } from "@/types/voluntary.types";
-import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState, useCallback, ChangeEvent } from "react";
-import { MdError, MdSearch } from "react-icons/md";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState, useCallback } from "react";
+import { MdError, MdAdd } from "react-icons/md";
+import { FaUsers, FaUserCheck, FaUserClock, FaUserTimes } from "react-icons/fa";
+import { StatisticsCards } from "@/components/ui/statistics-cards";
+import { SearchFilterBar } from "@/components/ui/search-filter-bar";
 
 import { Card } from "./card.layout";
 
+// Filter types
+interface VolunteerFilters {
+    status: string[];
+    skills: string[];
+}
+
+const initialFilters: VolunteerFilters = {
+    status: [],
+    skills: [],
+};
+
 const VolunteersList = (): ReactNode => {
-    const dict = useDictionary();
     const pathname = usePathname();
+    const router = useRouter();
+    const dict = useDictionary();
     const organizationId = pathname.split("/")[3];
 
     const [volunteers, setVolunteers] = useState<{
         count: number;
         data: VoluntarySchema[];
     } | null>(null);
+    const [stats, setStats] = useState<any>(null);
     const [offset, setOffset] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const [filters, setFilters] = useState<VolunteerFilters>(initialFilters);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
     const LIMIT = 20;
+
+    // Helper function to apply client-side filtering
+    const applyVolunteerFilters = (
+        volunteersData: VoluntarySchema[]
+    ): VoluntarySchema[] => {
+        return volunteersData.filter(volunteer => {
+            // Status filter
+            if (filters.status.length > 0 && !filters.status.includes(volunteer.status)) {
+                return false;
+            }
+
+            // Skills filter (using segments property)
+            if (filters.skills.length > 0 && volunteer.segments) {
+                const hasMatchingSkill = filters.skills.some(skill => 
+                    volunteer.segments.includes(skill)
+                );
+                if (!hasMatchingSkill) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    };
 
     const getVoluntaryList = useCallback(
         async (filter: string = "") => {
             try {
+                const organizationId = pathname.split("/")[3];
+
                 if (organizationId) {
+                    // Get all volunteers first (with a higher limit to ensure we get all for filtering)
                     const response = await getVoluntariesByOrganizationID(
                         organizationId,
-                        offset,
-                        LIMIT,
+                        0, // Always start from 0 to get all volunteers for filtering
+                        1000, // Get more volunteers to apply filters client-side
                         filter
                     );
-                    setVolunteers(response.data);
+
+                    // Apply client-side filtering
+                    const allVolunteers = response.data.data || [];
+                    const filteredVolunteers = applyVolunteerFilters(allVolunteers);
+
+                    // Apply pagination to filtered results
+                    const startIndex = offset;
+                    const endIndex = offset + LIMIT;
+                    const paginatedVolunteers = filteredVolunteers.slice(
+                        startIndex,
+                        endIndex
+                    );
+
+                    // Update volunteers with paginated filtered results
+                    setVolunteers({
+                        count: filteredVolunteers.length,
+                        data: paginatedVolunteers,
+                    });
                 } else {
                     throw new Error();
                 }
@@ -53,7 +115,7 @@ const VolunteersList = (): ReactNode => {
                 setIsLoading(false);
             }
         },
-        [offset]
+        [pathname, offset, filters]
     );
 
     useEffect(() => {
@@ -64,8 +126,97 @@ const VolunteersList = (): ReactNode => {
         return () => clearTimeout(delayDebounceFn);
     }, [searchTerm, getVoluntaryList]);
 
-    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
+    const getVolunteerStatsData = useCallback(async () => {
+        try {
+            setIsLoadingStats(true);
+            if (organizationId) {
+                const response = await getVolunteerStats(organizationId);
+                setStats(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching volunteer stats:", error);
+        } finally {
+            setIsLoadingStats(false);
+        }
+    }, [organizationId]);
+
+    useEffect(() => {
+        getVolunteerStatsData();
+    }, [getVolunteerStatsData]);
+
+    const handleSearchChange = (value: string) => {
+        setSearchTerm(value);
+    };
+
+    const handleFilterAdd = (filterType: string, value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: [...prev[filterType as keyof VolunteerFilters], value]
+        }));
+    };
+
+    const handleFilterRemove = (filterType: string, value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: prev[filterType as keyof VolunteerFilters].filter(v => v !== value)
+        }));
+    };
+
+    const handleFilterClear = () => {
+        setFilters(initialFilters);
+    };
+
+    const getActiveFiltersCount = () => {
+        return Object.values(filters).reduce((count, filterArray) => count + filterArray.length, 0);
+    };
+
+    const getActiveFilters = () => {
+        const activeFilters: Array<{
+            type: string;
+            value: string;
+            label: string;
+            displayLabel: string;
+        }> = [];
+
+        // Status filters
+        filters.status.forEach(status => {
+            const statusOptions = [
+                { value: "active", label: "Active" },
+                { value: "pending", label: "Pending" },
+                { value: "inactive", label: "Inactive" },
+            ];
+            const option = statusOptions.find(opt => opt.value === status);
+            if (option) {
+                activeFilters.push({
+                    type: 'status',
+                    value: status,
+                    label: option.label,
+                    displayLabel: `Status: ${option.label}`
+                });
+            }
+        });
+
+        // Skills filters
+        filters.skills.forEach(skill => {
+            const skillOptions = [
+                { value: "counseling", label: "Counseling" },
+                { value: "translation", label: "Translation" },
+                { value: "medical", label: "Medical" },
+                { value: "legal", label: "Legal" },
+                { value: "education", label: "Education" },
+            ];
+            const option = skillOptions.find(opt => opt.value === skill);
+            if (option) {
+                activeFilters.push({
+                    type: 'skills',
+                    value: skill,
+                    label: option.label,
+                    displayLabel: `Skill: ${option.label}`
+                });
+            }
+        });
+
+        return activeFilters;
     };
 
     useEffect(() => {
@@ -80,23 +231,87 @@ const VolunteersList = (): ReactNode => {
         setOffset((newPage - 1) * LIMIT);
     };
 
+    // Statistics cards data
+    const statisticsCards = [
+        {
+            title: "Total Volunteers",
+            value: stats?.total_volunteers || 0,
+            icon: <FaUsers />,
+            color: "blue" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Active",
+            value: stats?.active_volunteers || 0,
+            icon: <FaUserCheck />,
+            color: "green" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Pending",
+            value: stats?.pending_volunteers || 0,
+            icon: <FaUserClock />,
+            color: "orange" as const,
+            isLoading: isLoadingStats,
+        },
+        {
+            title: "Inactive",
+            value: stats?.inactive_volunteers || 0,
+            icon: <FaUserTimes />,
+            color: "red" as const,
+            isLoading: isLoadingStats,
+        },
+    ];
+
+
+
     return (
         <>
-            <div className="flex items-end gap-4 justify-between lg:flex-col lg:items-start">
-                <div className="relative">
-                    <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl" />
-                    <Input
-                        type="text"
-                        placeholder={dict.commons.volunteers.list.searchPlaceholder}
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="w-[300px] pl-10"
-                    />
-                </div>
-                <Toolbar />
-            </div>
+            {/* Statistics Cards */}
+            <StatisticsCards cards={statisticsCards} />
 
-            <div className="h-[calc(100vh-172px)] lg:h-[calc(100vh-195px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
+            {/* Search and Filter Bar */}
+            <SearchFilterBar
+                searchTerm={searchTerm}
+                onSearchChange={handleSearchChange}
+                searchPlaceholder={dict.commons.volunteers.list.search}
+                showFilters={showFilters}
+                onShowFiltersChange={setShowFilters}
+                filterSections={[
+                    {
+                        key: "status",
+                        label: "Status",
+                        options: [
+                            { value: "active", label: "Active" },
+                            { value: "pending", label: "Pending" },
+                            { value: "inactive", label: "Inactive" },
+                        ],
+                        placeholder: "Select status...",
+                    },
+                    {
+                        key: "skills",
+                        label: "Skills",
+                        options: [
+                            { value: "counseling", label: "Counseling" },
+                            { value: "translation", label: "Translation" },
+                            { value: "medical", label: "Medical" },
+                            { value: "legal", label: "Legal" },
+                            { value: "education", label: "Education" },
+                        ],
+                        placeholder: "Select skills...",
+                    },
+                ]}
+                filterTitle="Filter Volunteers"
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterClear={handleFilterClear}
+                activeFiltersCount={getActiveFiltersCount()}
+                activeFilters={getActiveFilters()}
+                additionalActions={<Toolbar />}
+            />
+
+            {/* Volunteers List */}
+            <div className="h-[calc(100vh-280px)] lg:h-[calc(100vh-300px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
                         {dict.commons.volunteers.list.loading}

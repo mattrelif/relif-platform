@@ -294,6 +294,38 @@ export async function getCaseStats(orgId: string): Promise<AxiosResponse<any>> {
     });
 }
 
+// Beneficiary Stats API Function
+export async function getBeneficiaryStats(orgId: string): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/beneficiaries/stats`,
+        method: "GET",
+    });
+}
+
+// Volunteer Stats API Function
+export async function getVolunteerStats(orgId: string): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/volunteers/stats`,
+        method: "GET",
+    });
+}
+
+// Housing Stats API Function
+export async function getHousingStats(orgId: string): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/housings/stats`,
+        method: "GET",
+    });
+}
+
+// Inventory Stats API Function
+export async function getInventoryStats(orgId: string): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `${PREFIX}/${orgId}/inventory/stats`,
+        method: "GET",
+    });
+}
+
 // Case Documents API Functions
 export async function getCaseDocuments(caseId: string): Promise<AxiosResponse<any>> {
     return client.request({
@@ -340,6 +372,39 @@ export async function createCaseDocument(
         headers: {
             "Content-Type": "application/json",
         },
+    });
+}
+
+// Update document metadata
+export async function updateCaseDocument(
+    caseId: string,
+    documentId: string,
+    data: {
+        document_name?: string;
+        document_type?: string;
+        description?: string;
+        tags?: string[];
+        is_finalized?: boolean;
+    }
+): Promise<AxiosResponse<any>> {
+    return client.request({
+        url: `cases/${caseId}/documents/${documentId}`,
+        method: "PUT",
+        data,
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}
+
+// Delete document
+export async function deleteCaseDocument(
+    caseId: string,
+    documentId: string
+): Promise<AxiosResponse> {
+    return client.request({
+        url: `cases/${caseId}/documents/${documentId}`,
+        method: "DELETE",
     });
 }
 
