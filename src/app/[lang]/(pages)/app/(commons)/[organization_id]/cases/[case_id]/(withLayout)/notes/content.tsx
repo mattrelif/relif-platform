@@ -541,7 +541,7 @@ const NotesContent = (): ReactNode => {
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-slate-500">
-                                        <span>{note.created_by.name}</span>
+                                        <span>{note.created_by?.name || 'Unknown User'}</span>
                                         <span>•</span>
                                         <span>{formatDate(note.created_at, locale)}</span>
                                     </div>

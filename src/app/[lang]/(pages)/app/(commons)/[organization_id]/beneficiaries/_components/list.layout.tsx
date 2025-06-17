@@ -9,7 +9,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { getBeneficiariesByOrganizationID, getBeneficiaryStats } from "@/repository/organization.repository";
+import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState, useCallback } from "react";
@@ -103,14 +103,19 @@ const BeneficiaryList = (): ReactNode => {
     const router = useRouter();
     const dict = useDictionary();
 
-    const [beneficiaries, setBeneficiaries] = useState<{
-        count: number;
-        data: BeneficiarySchema[];
-    } | null>(null);
-    const [stats, setStats] = useState<any>(null);
+    const [allBeneficiaries, setAllBeneficiaries] = useState<BeneficiarySchema[]>([]);
+    const [filteredBeneficiaries, setFilteredBeneficiaries] = useState<BeneficiarySchema[]>([]);
+    const [paginatedBeneficiaries, setPaginatedBeneficiaries] = useState<BeneficiarySchema[]>([]);
+
+    const [stats, setStats] = useState({
+        total: 0,
+        active: 0,
+        pending: 0,
+        inactive: 0,
+    });
+    
     const [offset, setOffset] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filters, setFilters] = useState<BeneficiaryFilters>(initialFilters);
@@ -242,75 +247,60 @@ const BeneficiaryList = (): ReactNode => {
         });
     };
 
-    const getBeneficiaryList = useCallback(
-        async (filter: string = "") => {
-            try {
-                const organizationId = pathname.split("/")[3];
-
-                if (organizationId) {
-                    // Get all beneficiaries first (with a higher limit to ensure we get all for filtering)
-                    const response = await getBeneficiariesByOrganizationID(
-                        organizationId,
-                        0, // Always start from 0 to get all beneficiaries for filtering
-                        1000, // Get more beneficiaries to apply filters client-side
-                        filter
-                    );
-
-                    // Apply client-side filtering
-                    const allBeneficiaries = response.data.data || [];
-                    const filteredBeneficiaries = applyBeneficiaryFilters(allBeneficiaries);
-
-                    // Apply pagination to filtered results
-                    const startIndex = offset;
-                    const endIndex = offset + LIMIT;
-                    const paginatedBeneficiaries = filteredBeneficiaries.slice(
-                        startIndex,
-                        endIndex
-                    );
-
-                    // Update beneficiaries with paginated filtered results
-                    setBeneficiaries({
-                        count: filteredBeneficiaries.length,
-                        data: paginatedBeneficiaries,
-                    });
-                } else {
-                    throw new Error();
-                }
-            } catch {
-                setError(true);
-            } finally {
-                setIsLoading(false);
-            }
-        },
-        [pathname, offset, filters]
-    );
-
-    const getBeneficiaryStatsData = useCallback(async () => {
+    // Fetches all beneficiaries once and sets initial state
+    const fetchAllBeneficiaries = useCallback(async () => {
+        setIsLoading(true);
+        setError(false);
         try {
-            setIsLoadingStats(true);
             const organizationId = pathname.split("/")[3];
-            if (organizationId) {
-                const response = await getBeneficiaryStats(organizationId);
-                setStats(response.data);
+            if (!organizationId) {
+                throw new Error("Organization ID not found in URL");
             }
-        } catch (error) {
-            console.error("Error fetching beneficiary stats:", error);
+            
+            // Fetch ALL beneficiaries - high limit to get all data
+            const response = await getBeneficiariesByOrganizationID(organizationId, 0, 99999, "");
+            const beneficiariesData = response.data.data || [];
+            setAllBeneficiaries(beneficiariesData);
+
+        } catch (e) {
+            console.error("Failed to fetch beneficiaries:", e);
+            setError(true);
+            setAllBeneficiaries([]);
         } finally {
-            setIsLoadingStats(false);
+            setIsLoading(false);
         }
     }, [pathname]);
 
+    // Initial data fetch
     useEffect(() => {
-        getBeneficiaryStatsData();
-    }, [getBeneficiaryStatsData]);
-
+        fetchAllBeneficiaries();
+    }, [fetchAllBeneficiaries]);
+    
+    // This master effect runs whenever the source of truth or filters change
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            getBeneficiaryList(searchTerm);
-        }, 500);
+        // 1. Calculate and set statistics from the full, unfiltered list
+        const calculatedStats = {
+            total: allBeneficiaries.length,
+            active: allBeneficiaries.filter(b => b.status === 'ACTIVE').length,
+            pending: allBeneficiaries.filter(b => b.status === 'PENDING').length,
+            inactive: allBeneficiaries.filter(b => b.status === 'INACTIVE').length,
+        };
+        setStats(calculatedStats);
 
-        return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm, getBeneficiaryList]);
+        // 2. Apply search filter
+        const searched = allBeneficiaries.filter(b => 
+            b.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        // 3. Apply advanced filters
+        const fullyFiltered = applyBeneficiaryFilters(searched);
+        setFilteredBeneficiaries(fullyFiltered);
+
+        // 4. Apply pagination
+        const paginated = fullyFiltered.slice(offset, offset + LIMIT);
+        setPaginatedBeneficiaries(paginated);
+        
+    }, [allBeneficiaries, searchTerm, filters, offset]);
 
     const handleSearchChange = (value: string) => {
         setSearchTerm(value);
@@ -513,49 +503,42 @@ const BeneficiaryList = (): ReactNode => {
         return activeFilters;
     };
 
-    useEffect(() => {
-        setIsLoading(true);
-        getBeneficiaryList();
-    }, [offset, getBeneficiaryList]);
-
-    const totalPages = beneficiaries ? Math.ceil(beneficiaries.count / LIMIT) : 0;
+    const totalPages = Math.ceil(filteredBeneficiaries.length / LIMIT);
     const currentPage = offset / LIMIT + 1;
 
     const handlePageChange = (newPage: number) => {
-        setOffset((newPage - 1) * LIMIT);
+        if (newPage >= 1 && newPage <= totalPages) {
+            setOffset((newPage - 1) * LIMIT);
+        }
     };
 
     const activeFiltersCount = getActiveFiltersCount();
 
-    // Statistics cards data
+    // Statistics cards data is now derived from the state
     const statisticsCards = [
         {
             title: "Total Beneficiaries",
-            value: stats?.total_beneficiaries || 0,
+            value: isLoading ? "..." : stats.total,
             icon: <FaUsers />,
             color: "blue" as const,
-            isLoading: isLoadingStats,
         },
         {
             title: "Active",
-            value: stats?.active_beneficiaries || 0,
+            value: isLoading ? "..." : stats.active,
             icon: <FaUserCheck />,
             color: "green" as const,
-            isLoading: isLoadingStats,
         },
         {
             title: "Pending",
-            value: stats?.pending_beneficiaries || 0,
+            value: isLoading ? "..." : stats.pending,
             icon: <FaUserClock />,
             color: "orange" as const,
-            isLoading: isLoadingStats,
         },
         {
             title: "Inactive",
-            value: stats?.inactive_beneficiaries || 0,
+            value: isLoading ? "..." : stats.inactive,
             icon: <FaUserTimes />,
             color: "red" as const,
-            isLoading: isLoadingStats,
         },
     ];
 
@@ -627,8 +610,6 @@ const BeneficiaryList = (): ReactNode => {
         },
     ];
 
-
-
     return (
         <>
             {/* Statistics Cards */}
@@ -650,36 +631,31 @@ const BeneficiaryList = (): ReactNode => {
                 activeFilters={getActiveFilters()}
                 additionalActions={<Toolbar />}
             />
+
             {/* Beneficiaries List */}
             <div className="h-[calc(100vh-280px)] lg:h-[calc(100vh-300px)] w-full rounded-lg border-[1px] border-slate-200 flex flex-col justify-between overflow-hidden">
                 {isLoading && (
-                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">
-                        {dict.commons.beneficiaries.list.loading}
-                    </h2>
+                    <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading beneficiaries...</h2>
                 )}
 
                 {!isLoading && error && (
                     <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
                         <MdError />
-                        {dict.commons.beneficiaries.list.error}
+                        Error loading beneficiaries. Please try again.
                     </span>
                 )}
 
-                {!isLoading && !error && beneficiaries && beneficiaries.count <= 0 && (
+                {!isLoading && !error && paginatedBeneficiaries.length === 0 && (
                     <span className="text-sm text-slate-900 font-medium p-4">
-                        {dict.commons.beneficiaries.list.noBeneficiariesFound}
+                        No beneficiaries found matching your criteria.
                     </span>
                 )}
 
-                {!isLoading && !error && beneficiaries && beneficiaries.count > 0 && (
+                {!isLoading && !error && paginatedBeneficiaries.length > 0 && (
                     <>
                         <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                            {beneficiaries?.data.map(beneficiary => (
-                                <Card
-                                    key={beneficiary.id}
-                                    {...beneficiary}
-                                    refreshList={getBeneficiaryList}
-                                />
+                            {paginatedBeneficiaries.map(beneficiary => (
+                                <Card key={beneficiary.id} {...beneficiary} refreshList={fetchAllBeneficiaries} />
                             ))}
                         </ul>
                         <div className="w-full h-max border-t-[1px] border-slate-200 p-2">
@@ -687,25 +663,15 @@ const BeneficiaryList = (): ReactNode => {
                                 <PaginationContent>
                                     <PaginationItem>
                                         <PaginationPrevious
-                                            onClick={() =>
-                                                handlePageChange(
-                                                    currentPage === 1 ? 1 : currentPage - 1
-                                                )
-                                            }
+                                            onClick={() => handlePageChange(currentPage - 1)}
                                         />
                                     </PaginationItem>
                                     <PaginationItem className="rounded-md border border-relif-orange-200 px-2 py-1 text-sm text-relif-orange-200">
-                                        {currentPage} / {totalPages}
+                                        {currentPage} / {totalPages > 0 ? totalPages : 1}
                                     </PaginationItem>
                                     <PaginationItem>
                                         <PaginationNext
-                                            onClick={() =>
-                                                handlePageChange(
-                                                    currentPage === totalPages
-                                                        ? totalPages
-                                                        : currentPage + 1
-                                                )
-                                            }
+                                            onClick={() => handlePageChange(currentPage + 1)}
                                         />
                                     </PaginationItem>
                                 </PaginationContent>
