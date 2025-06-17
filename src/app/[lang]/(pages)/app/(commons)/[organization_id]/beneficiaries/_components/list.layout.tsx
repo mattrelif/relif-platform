@@ -736,7 +736,7 @@ const BeneficiaryList = (): ReactNode => {
                 onFilterClear={clearAllFilters}
                 activeFiltersCount={activeFiltersCount}
                 activeFilters={getActiveFilters()}
-                additionalActions={<Toolbar />}
+                additionalActions={<Toolbar filteredBeneficiaries={filteredBeneficiaries} searchTerm={searchTerm} />}
             />
 
             {/* Beneficiaries List */}

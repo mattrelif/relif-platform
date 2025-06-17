@@ -669,6 +669,24 @@ const EditNoteDialog = ({
         try {
             setIsLoading(true);
 
+            // Get case ID from the current pathname
+            const pathname = window.location.pathname;
+            const caseId = pathname.split("/")[5];
+
+            // Prepare the payload
+            const payload: CreateCaseNotePayload = {
+                title: formData.title,
+                content: formData.content,
+                tags: tagPreviews,
+                note_type: formData.note_type,
+                is_important: formData.is_important,
+            };
+
+            // Call the API to update the note
+            console.log("✏️ Updating case note:", note.id, payload);
+            const response = await updateCaseNote(caseId, note.id, payload);
+            console.log("✅ Case note updated:", response);
+
             const updatedNote: CaseNoteSchema = {
                 ...note,
                 title: formData.title,
@@ -679,9 +697,6 @@ const EditNoteDialog = ({
                 updated_at: new Date().toISOString(),
             };
 
-            // TODO: Replace with actual API call
-            await new Promise(resolve => setTimeout(resolve, 500));
-
             onSave(updatedNote);
             onClose();
 
@@ -690,10 +705,30 @@ const EditNoteDialog = ({
                 description: "The case update has been successfully modified.",
                 variant: "success",
             });
-        } catch (error) {
+        } catch (error: any) {
+            console.error("❌ Error updating case note:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status,
+                noteId: note?.id,
+                updateData: formData
+            });
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error?.response?.status === 400) {
+                errorMessage = "Invalid note data. Please check your inputs.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to update this note.";
+            } else if (error?.response?.status === 404) {
+                errorMessage = "Note not found. It may have been deleted.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+            
             toast({
                 title: "Error saving update",
-                description: "There was a problem saving your changes. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -849,8 +884,14 @@ const DeleteNoteDialog = ({
         try {
             setIsLoading(true);
 
-            // TODO: Replace with actual API call
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Get case ID from the current pathname
+            const pathname = window.location.pathname;
+            const caseId = pathname.split("/")[5];
+            
+            // Call the API to delete the note
+            console.log("🗑️ Deleting case note:", note.id);
+            await deleteCaseNote(caseId, note.id);
+            console.log("✅ Case note deleted from backend");
 
             onDelete(note.id);
             onClose();
@@ -860,10 +901,26 @@ const DeleteNoteDialog = ({
                 description: "The case update has been successfully removed.",
                 variant: "success",
             });
-        } catch (error) {
+        } catch (error: any) {
+            console.error("❌ Error deleting case note:", {
+                error,
+                message: error?.message,
+                response: error?.response?.data,
+                status: error?.response?.status
+            });
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to delete this note.";
+            } else if (error?.response?.status === 404) {
+                errorMessage = "Note not found. It may have already been deleted.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+            
             toast({
                 title: "Error deleting update",
-                description: "There was a problem deleting the update. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {

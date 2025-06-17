@@ -717,7 +717,7 @@ const CaseOverview = (): ReactNode => {
                                                 <span>
                                                     {doc.file_type} • {doc.file_size}
                                                 </span>
-                                                <span>By {doc.uploaded_by}</span>
+                                                <span>By {doc.uploaded_by?.name || 'Unknown User'}</span>
                                                 <span>{formatDate(doc.uploaded_at, locale)}</span>
                                             </div>
                                         </div>

@@ -101,6 +101,7 @@ const CaseList = (): ReactNode => {
         count: number;
         data: CaseSchema[];
     } | null>(null);
+    const [allFilteredCases, setAllFilteredCases] = useState<CaseSchema[]>([]);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
@@ -210,6 +211,9 @@ const CaseList = (): ReactNode => {
             let allCases = response.data.data || [];
             const filteredCases = applyFilters(allCases);
 
+            // Store all filtered cases for export
+            setAllFilteredCases(filteredCases);
+
             // Apply pagination to filtered results
             const paginatedCases = filteredCases.slice(offset, offset + LIMIT);
 
@@ -229,6 +233,7 @@ const CaseList = (): ReactNode => {
             });
             setError(true);
             setCases({ count: 0, data: [] }); // Ensure cases is set to empty state
+            setAllFilteredCases([]); // Reset filtered cases on error
         } finally {
             setIsLoading(false);
         }
@@ -641,7 +646,7 @@ const CaseList = (): ReactNode => {
                 onFilterClear={clearAllFilters}
                 activeFiltersCount={activeFiltersCount}
                 activeFilters={getActiveFilters()}
-                additionalActions={<Toolbar />}
+                additionalActions={<Toolbar filteredCases={allFilteredCases} searchTerm={searchTerm} />}
             />
 
             {/* Cases List */}
