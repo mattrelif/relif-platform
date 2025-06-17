@@ -140,39 +140,107 @@ const HousingList = (): ReactNode => {
         setOffset((newPage - 1) * LIMIT);
     };
 
-    // Statistics cards data
+    // DEV MOCK: Always inject mock housings in development mode if error or no data
+    let housingsData = housings?.data || [];
+    if (process.env.NODE_ENV === 'development' && (error || housingsData.length === 0)) {
+        housingsData = [
+            {
+                id: 'mock-housing-1',
+                organization_id: 'mock-org-1',
+                name: 'Mock Housing 1',
+                status: 'available',
+                address: {
+                    address_line_1: '123 Main St',
+                    address_line_2: '',
+                    city: 'Testville',
+                    zip_code: '12345',
+                    district: 'Central',
+                    country: 'Testland',
+                },
+                occupied_vacancies: 2,
+                total_vacancies: 10,
+                total_rooms: 5,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 'mock-housing-2',
+                organization_id: 'mock-org-1',
+                name: 'Mock Housing 2',
+                status: 'occupied',
+                address: {
+                    address_line_1: '456 Side St',
+                    address_line_2: '',
+                    city: 'Testville',
+                    zip_code: '12345',
+                    district: 'Central',
+                    country: 'Testland',
+                },
+                occupied_vacancies: 10,
+                total_vacancies: 10,
+                total_rooms: 3,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 'mock-housing-3',
+                organization_id: 'mock-org-1',
+                name: 'Mock Housing 3',
+                status: 'maintenance',
+                address: {
+                    address_line_1: '789 Repair Rd',
+                    address_line_2: '',
+                    city: 'Testville',
+                    zip_code: '12345',
+                    district: 'Central',
+                    country: 'Testland',
+                },
+                occupied_vacancies: 0,
+                total_vacancies: 8,
+                total_rooms: 2,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+        ];
+    }
+
+    // Calculate stats from the final housingsData
+    const total = housingsData.length;
+    const available = housingsData.filter(h => h.status === 'available').length;
+    const occupied = housingsData.filter(h => h.status === 'occupied').length;
+    const maintenance = housingsData.filter(h => h.status === 'maintenance').length;
+
+    // Use housingsData for both the stats and the list rendering
     const statisticsCards = [
         {
             title: "Total Housing",
-            value: stats?.total_housing || 0,
+            value: isLoading ? "..." : total,
             icon: <FaHome />,
             color: "blue" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Available",
-            value: stats?.available_housing || 0,
+            value: isLoading ? "..." : available,
             icon: <FaCheckCircle />,
             color: "green" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Occupied",
-            value: stats?.occupied_housing || 0,
+            value: isLoading ? "..." : occupied,
             icon: <FaClock />,
             color: "orange" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Maintenance",
-            value: stats?.maintenance_housing || 0,
+            value: isLoading ? "..." : maintenance,
             icon: <FaExclamationTriangle />,
             color: "red" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
     ];
-
-
 
     const handleFilterAdd = (filterType: string, value: string) => {
         setFilters(prev => ({

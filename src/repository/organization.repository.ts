@@ -17,7 +17,7 @@ import {
 import { UserSchema } from "@/types/user.types";
 import { CreateVoluntaryRequest, VoluntarySchema } from "@/types/voluntary.types";
 import { AxiosResponse } from "axios";
-import { CaseSchema, CreateCasePayload, UpdateCasePayload } from "@/types/case.types";
+import { CaseSchema, CreateCasePayload, UpdateCasePayload, CaseNoteSchema } from "@/types/case.types";
 
 const PREFIX = "organizations";
 
@@ -724,44 +724,45 @@ export function extractFileKeyFromS3Url(presignedUrl: string): string {
 }
 
 // Case Notes API Functions with better error handling
-export async function getCaseNotes(caseId: string): Promise<AxiosResponse<any>> {
+export async function getCaseNotes(caseId: string): Promise<AxiosResponse<{ data: CaseNoteSchema[] }>> {
     try {
-        console.log("📝 Fetching notes for case:", caseId);
+        console.log("📝 Fetching case notes for caseId:", caseId);
         const response = await client.request({
             url: `cases/${caseId}/notes`,
             method: "GET",
         });
-        console.log("✅ Notes API response:", {
-            status: response.status,
-            dataType: typeof response.data,
-            isArray: Array.isArray(response.data),
-            length: Array.isArray(response.data) ? response.data.length : 'N/A',
-            data: response.data
-        });
-        return response;
+        
+        // Ensure the response data is properly structured
+        const notesData = response.data?.data || [];
+        if (!Array.isArray(notesData)) {
+            console.warn("⚠️ Notes data is not an array:", notesData);
+            return {
+                ...response,
+                data: { data: [] }
+            };
+        }
+        
+        // Ensure each note has the required structure
+        const validatedNotes = notesData.map(note => ({
+            ...note,
+            created_by: note.created_by || { id: 'unknown', name: 'Unknown User' },
+            tags: Array.isArray(note.tags) ? note.tags : [],
+            is_important: Boolean(note.is_important),
+            note_type: note.note_type || 'UPDATE'
+        }));
+        
+        return {
+            ...response,
+            data: { data: validatedNotes }
+        };
     } catch (error: any) {
-        console.error("❌ Case notes endpoint failed:", {
+        console.error("❌ Error fetching case notes:", {
             error: error.message,
             status: error?.response?.status,
             statusText: error?.response?.statusText,
             responseData: error?.response?.data,
-            caseId,
-            url: `cases/${caseId}/notes`
+            caseId
         });
-        
-        // Only return fallback for 404 (not found) - other errors should bubble up
-        if (error?.response?.status === 404) {
-            console.warn("📝 Notes not found for case, returning empty array");
-            return {
-                data: [],
-                status: 200,
-                statusText: 'OK',
-                headers: {},
-                config: error.config || {}
-            } as AxiosResponse<any>;
-        }
-        
-        // For other errors, throw them so they can be properly handled
         throw error;
     }
 }

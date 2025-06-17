@@ -10,7 +10,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { CaseSchema, CaseStatsSchema } from "@/types/case.types";
-import { getCasesByOrganizationID, getCaseStats } from "@/repository/organization.repository";
+import { getCasesByOrganizationID } from "@/repository/organization.repository";
 import { usePathname, useRouter } from "next/navigation";
 import {
     FaFileAlt,
@@ -101,10 +101,8 @@ const CaseList = (): ReactNode => {
         count: number;
         data: CaseSchema[];
     } | null>(null);
-    const [stats, setStats] = useState<CaseStatsSchema | null>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filters, setFilters] = useState<CaseFilters>(initialFilters);
@@ -209,7 +207,7 @@ const CaseList = (): ReactNode => {
             );
 
             // Apply client-side filtering
-            const allCases = response.data.data || [];
+            let allCases = response.data.data || [];
             const filteredCases = applyFilters(allCases);
 
             // Apply pagination to filtered results
@@ -235,34 +233,6 @@ const CaseList = (): ReactNode => {
             setIsLoading(false);
         }
     }, [pathname, searchTerm, filters, offset]);
-
-    const getCasesStats = useCallback(async () => {
-        try {
-            setIsLoadingStats(true);
-            const pathParts = pathname.split("/");
-            const organizationId = pathParts[3];
-            if (!organizationId) {
-                throw new Error("Organization ID not found");
-            }
-
-            const response = await getCaseStats(organizationId);
-            setStats(response.data);
-        } catch (error: any) {
-            console.error("❌ Error fetching case stats:", {
-                error,
-                message: error?.message,
-                response: error?.response?.data,
-                status: error?.response?.status,
-                organizationId: pathname.split("/")[3]
-            });
-        } finally {
-            setIsLoadingStats(false);
-        }
-    }, [pathname]);
-
-    useEffect(() => {
-        getCasesStats();
-    }, [getCasesStats]);
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -449,35 +419,124 @@ const CaseList = (): ReactNode => {
     const currentPage = offset / LIMIT + 1;
     const activeFiltersCount = getActiveFiltersCount();
 
+    let casesData = cases?.data || [];
+    // DEV MOCK: Always inject mock cases in development mode if error or no data
+    if (process.env.NODE_ENV === 'development' && (error || casesData.length === 0)) {
+        casesData = [
+            {
+                id: 'mock-1',
+                case_number: 'CASE-2025-0001',
+                title: 'Mock Case 1',
+                description: 'This is a mock case for testing.',
+                status: 'IN_PROGRESS',
+                priority: 'HIGH',
+                urgency_level: 'IMMEDIATE',
+                case_type: 'LEGAL',
+                beneficiary_id: 'mock-beneficiary-1',
+                beneficiary: {
+                    id: 'mock-beneficiary-1',
+                    first_name: 'John',
+                    last_name: 'Doe',
+                    full_name: 'John Doe',
+                },
+                assigned_to_id: 'mock-user-1',
+                assigned_to: {
+                    id: 'mock-user-1',
+                    first_name: 'Jane',
+                    last_name: 'Smith',
+                    email: 'jane@example.com',
+                },
+                due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                estimated_duration: '1 Month',
+                budget_allocated: '1000',
+                tags: ['mock', 'test'],
+                notes_count: 2,
+                documents_count: 1,
+                last_activity: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 'mock-2',
+                case_number: 'CASE-2025-0002',
+                title: 'Mock Case 2',
+                description: 'Another mock case for testing.',
+                status: 'CLOSED',
+                priority: 'LOW',
+                urgency_level: 'FLEXIBLE',
+                case_type: 'HOUSING',
+                beneficiary_id: 'mock-beneficiary-2',
+                beneficiary: {
+                    id: 'mock-beneficiary-2',
+                    first_name: 'Alice',
+                    last_name: 'Brown',
+                    full_name: 'Alice Brown',
+                },
+                assigned_to_id: 'mock-user-2',
+                assigned_to: {
+                    id: 'mock-user-2',
+                    first_name: 'Bob',
+                    last_name: 'Jones',
+                    email: 'bob@example.com',
+                },
+                due_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                estimated_duration: '2 Weeks',
+                budget_allocated: '500',
+                tags: ['mock', 'closed'],
+                notes_count: 1,
+                documents_count: 0,
+                last_activity: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+        ];
+    }
+
+    // Calculate stats from the final casesData
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const totalCases = casesData.length;
+    const openCases = casesData.filter(c => c.status !== 'CLOSED' && c.status !== 'CANCELLED').length;
+    const overdueCases = casesData.filter(c => {
+        if (!c.due_date) return false;
+        const dueDate = new Date(c.due_date);
+        return dueDate < now && c.status !== 'CLOSED' && c.status !== 'CANCELLED';
+    }).length;
+    const closedThisMonth = casesData.filter(c => {
+        if (c.status !== 'CLOSED') return false;
+        const updatedDate = new Date(c.updated_at);
+        return updatedDate >= startOfMonth;
+    }).length;
+
     // Statistics cards data
     const statisticsCards = [
         {
             title: "Total Cases",
-            value: stats?.total_cases || 0,
+            value: isLoading ? "..." : totalCases,
             icon: <FaFileAlt />,
             color: "blue" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Open Cases",
-            value: stats?.open_cases || 0,
+            value: isLoading ? "..." : openCases,
             icon: <FaClock />,
             color: "orange" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Overdue",
-            value: stats?.overdue_cases || 0,
+            value: isLoading ? "..." : overdueCases,
             icon: <FaExclamationTriangle />,
             color: "red" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Closed This Month",
-            value: stats?.closed_this_month || 0,
+            value: isLoading ? "..." : closedThisMonth,
             icon: <FaCheckCircle />,
             color: "green" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
     ];
 
@@ -545,12 +604,22 @@ const CaseList = (): ReactNode => {
         router.push(`/${pathname.split("/")[1]}/app/${organizationId}/cases/create`);
     };
 
+    // If error and in development, skip error return to show mock data
+    if (error && process.env.NODE_ENV !== 'development') {
+        return (
+            <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
+                <MdError />
+                Error loading cases. Please try again.
+            </span>
+        );
+    }
+
     return (
         <>
             {/* Debug Info - Only shows in development */}
             <DebugInfo 
                 title="Cases List"
-                data={{ cases, stats, searchTerm, filters, offset, currentPage, totalPages }}
+                data={{ cases, searchTerm, filters, offset, currentPage, totalPages }}
                 error={error}
                 isLoading={isLoading}
             />
@@ -581,23 +650,16 @@ const CaseList = (): ReactNode => {
                     <h2 className="p-4 text-relif-orange-400 font-medium text-sm">Loading cases...</h2>
                 )}
 
-                {!isLoading && error && (
-                    <span className="text-sm text-red-600 font-medium flex items-center gap-1 p-4">
-                        <MdError />
-                        Error loading cases. Please try again.
-                    </span>
-                )}
-
-                {!isLoading && !error && cases && cases.data.length <= 0 && (
+                {!isLoading && casesData.length <= 0 && (
                     <span className="text-sm text-slate-900 font-medium p-4">
                         No cases found matching your criteria.
                     </span>
                 )}
 
-                {!isLoading && !error && cases && cases.data.length > 0 && (
+                {!isLoading && casesData.length > 0 && (
                     <>
                         <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                            {cases.data.map(caseItem => (
+                            {casesData.map(caseItem => (
                                 <CaseCard key={caseItem.id} data={caseItem} refreshList={getCasesList} />
                             ))}
                         </ul>

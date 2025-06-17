@@ -216,35 +216,104 @@ const ProductList = (): ReactNode => {
         return () => clearTimeout(delayDebounceFn);
     }, [searchTerm, getProductList]);
 
-    // Statistics cards data
+    // DEV MOCK: Always inject mock products in development mode if error or no data
+    let productsData = products?.data || [];
+    if (process.env.NODE_ENV === 'development' && (error || productsData.length === 0)) {
+        const mockOrg = {
+            id: 'mock-org-1',
+            name: 'Mock Org',
+            description: '',
+            address: {
+                address_line_1: '1 Org St',
+                address_line_2: '',
+                city: 'Testville',
+                zip_code: '12345',
+                district: 'Central',
+                country: 'Testland',
+            },
+            type: 'NGO',
+            creator_id: 'mock-user-1',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+        productsData = [
+            {
+                id: 'mock-product-1',
+                name: 'Mock Rice',
+                brand: 'MockBrand',
+                category: 'foodAndBeverages',
+                description: 'A bag of rice',
+                total_in_storage: 20,
+                organization_id: 'mock-org-1',
+                organization: mockOrg,
+                unit_type: 'kg',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 'mock-product-2',
+                name: 'Mock Soap',
+                brand: 'CleanBrand',
+                category: 'personalCareAndBeauty',
+                description: 'Bar of soap',
+                total_in_storage: 5,
+                organization_id: 'mock-org-1',
+                organization: mockOrg,
+                unit_type: 'pcs',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 'mock-product-3',
+                name: 'Mock Medicine',
+                brand: 'HealthBrand',
+                category: 'pharmacyAndMedications',
+                description: 'Pain relief tablets',
+                total_in_storage: 0,
+                organization_id: 'mock-org-1',
+                organization: mockOrg,
+                unit_type: 'box',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+        ];
+    }
+
+    // Calculate stats from the final productsData
+    const total = productsData.length;
+    const inStock = productsData.filter(p => p.total_in_storage > 10).length;
+    const lowStock = productsData.filter(p => p.total_in_storage > 0 && p.total_in_storage <= 10).length;
+    const outOfStock = productsData.filter(p => p.total_in_storage === 0).length;
+
+    // Use productsData for both the stats and the list rendering
     const statisticsCards = [
         {
             title: "Total Products",
-            value: stats?.total_products || 0,
+            value: isLoading ? "..." : total,
             icon: <FaBoxes />,
             color: "blue" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "In Stock",
-            value: stats?.in_stock_products || 0,
+            value: isLoading ? "..." : inStock,
             icon: <FaCheckCircle />,
             color: "green" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Low Stock",
-            value: stats?.low_stock_products || 0,
+            value: isLoading ? "..." : lowStock,
             icon: <FaExclamationTriangle />,
             color: "orange" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Out of Stock",
-            value: stats?.out_of_stock_products || 0,
+            value: isLoading ? "..." : outOfStock,
             icon: <FaClock />,
             color: "red" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
     ];
 

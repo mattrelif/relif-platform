@@ -514,29 +514,136 @@ const BeneficiaryList = (): ReactNode => {
 
     const activeFiltersCount = getActiveFiltersCount();
 
-    // Statistics cards data is now derived from the state
+    // DEV MOCK: Always inject mock beneficiaries in development mode if error or no data
+    let beneficiariesData = allBeneficiaries;
+    if (process.env.NODE_ENV === 'development' && (error || beneficiariesData.length === 0)) {
+        const mockAddress = {
+            address_line_1: '123 Main St',
+            address_line_2: '',
+            city: 'Testville',
+            zip_code: '12345',
+            district: 'Central',
+            country: 'Testland',
+        };
+        const mockMedical = {
+            allergies: [],
+            current_medications: [],
+            recurrent_medical_conditions: [],
+            health_insurance_plans: [],
+            blood_type: 'O+',
+            taken_vaccines: [],
+            mental_health_history: [],
+            height: 170,
+            weight: 70,
+            addictions: [],
+            disabilities: [],
+            prothesis_or_medical_devices: [],
+        };
+        const mockHousing = {
+            id: 'mock-housing-1',
+            organization_id: 'mock-org-1',
+            name: 'Mock Housing',
+            status: 'ACTIVE',
+            address: mockAddress,
+            occupied_vacancies: 1,
+            total_vacancies: 10,
+            total_rooms: 5,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+        const mockRoom = {
+            id: 'mock-room-1',
+            housing_id: 'mock-housing-1',
+            name: 'Room 1',
+            status: 'AVAILABLE',
+            total_vacancies: 2,
+            occupied_vacancies: 1,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+        beneficiariesData = [
+            {
+                id: 'mock-beneficiary-1',
+                image_url: '',
+                full_name: 'John Doe',
+                email: 'john@example.com',
+                documents: [],
+                birthdate: '1990-01-01',
+                gender: 'MALE',
+                occupation: 'Engineer',
+                phones: ['+1234567890'],
+                civil_status: 'SINGLE',
+                spoken_languages: ['English'],
+                education: 'UNIVERSITY',
+                address: mockAddress,
+                status: 'ACTIVE',
+                current_housing: mockHousing,
+                current_housing_id: 'mock-housing-1',
+                current_room: mockRoom,
+                current_room_id: 'mock-room-1',
+                medical_information: mockMedical,
+                emergency_contacts: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                notes: '',
+            },
+            {
+                id: 'mock-beneficiary-2',
+                image_url: '',
+                full_name: 'Alice Brown',
+                email: 'alice@example.com',
+                documents: [],
+                birthdate: '1985-05-10',
+                gender: 'FEMALE',
+                occupation: 'Teacher',
+                phones: ['+1987654321'],
+                civil_status: 'MARRIED',
+                spoken_languages: ['English', 'Spanish'],
+                education: 'HIGH_SCHOOL',
+                address: mockAddress,
+                status: 'PENDING',
+                current_housing: mockHousing,
+                current_housing_id: '',
+                current_room: mockRoom,
+                current_room_id: '',
+                medical_information: mockMedical,
+                emergency_contacts: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                notes: '',
+            },
+        ];
+    }
+
+    // Calculate stats from the final beneficiariesData
+    const total = beneficiariesData.length;
+    const active = beneficiariesData.filter(b => b.status === 'ACTIVE').length;
+    const pending = beneficiariesData.filter(b => b.status === 'PENDING').length;
+    const inactive = beneficiariesData.filter(b => b.status === 'INACTIVE').length;
+
+    // Use beneficiariesData for both the stats and the list rendering
     const statisticsCards = [
         {
             title: "Total Beneficiaries",
-            value: isLoading ? "..." : stats.total,
+            value: isLoading ? "..." : total,
             icon: <FaUsers />,
             color: "blue" as const,
         },
         {
             title: "Active",
-            value: isLoading ? "..." : stats.active,
+            value: isLoading ? "..." : active,
             icon: <FaUserCheck />,
             color: "green" as const,
         },
         {
             title: "Pending",
-            value: isLoading ? "..." : stats.pending,
+            value: isLoading ? "..." : pending,
             icon: <FaUserClock />,
             color: "orange" as const,
         },
         {
             title: "Inactive",
-            value: isLoading ? "..." : stats.inactive,
+            value: isLoading ? "..." : inactive,
             icon: <FaUserTimes />,
             color: "red" as const,
         },

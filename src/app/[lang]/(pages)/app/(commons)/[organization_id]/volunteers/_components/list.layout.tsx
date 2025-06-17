@@ -231,39 +231,126 @@ const VolunteersList = (): ReactNode => {
         setOffset((newPage - 1) * LIMIT);
     };
 
-    // Statistics cards data
+    // DEV MOCK: Always inject mock volunteers in development mode if error or no data
+    let volunteersData = volunteers?.data || [];
+    if (process.env.NODE_ENV === 'development' && (error || volunteersData.length === 0)) {
+        volunteersData = [
+            {
+                id: 'mock-volunteer-1',
+                organization_id: 'mock-org-1',
+                full_name: 'Jane Volunteer',
+                email: 'jane@volunteer.com',
+                gender: 'FEMALE',
+                documents: [],
+                birthdate: '1992-03-15',
+                phones: ['+1234567890'],
+                address: {
+                    address_line_1: '456 Volunteer Ave',
+                    address_line_2: '',
+                    city: 'Testville',
+                    zip_code: '12345',
+                    district: 'Central',
+                    country: 'Testland',
+                },
+                status: 'active',
+                segments: ['counseling', 'education'],
+                medical_information: {
+                    allergies: [],
+                    current_medications: [],
+                    recurrent_medical_conditions: [],
+                    health_insurance_plans: [],
+                    blood_type: 'A+',
+                    taken_vaccines: [],
+                    mental_health_history: [],
+                    height: 165,
+                    weight: 60,
+                    addictions: [],
+                    disabilities: [],
+                    prothesis_or_medical_devices: [],
+                },
+                emergency_contacts: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                notes: '',
+            },
+            {
+                id: 'mock-volunteer-2',
+                organization_id: 'mock-org-1',
+                full_name: 'Bob Helper',
+                email: 'bob@volunteer.com',
+                gender: 'MALE',
+                documents: [],
+                birthdate: '1988-07-22',
+                phones: ['+1987654321'],
+                address: {
+                    address_line_1: '789 Helper Rd',
+                    address_line_2: '',
+                    city: 'Testville',
+                    zip_code: '12345',
+                    district: 'Central',
+                    country: 'Testland',
+                },
+                status: 'pending',
+                segments: ['translation'],
+                medical_information: {
+                    allergies: [],
+                    current_medications: [],
+                    recurrent_medical_conditions: [],
+                    health_insurance_plans: [],
+                    blood_type: 'B-',
+                    taken_vaccines: [],
+                    mental_health_history: [],
+                    height: 180,
+                    weight: 80,
+                    addictions: [],
+                    disabilities: [],
+                    prothesis_or_medical_devices: [],
+                },
+                emergency_contacts: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                notes: '',
+            },
+        ];
+    }
+
+    // Calculate stats from the final volunteersData
+    const total = volunteersData.length;
+    const active = volunteersData.filter(v => v.status === 'active').length;
+    const pending = volunteersData.filter(v => v.status === 'pending').length;
+    const inactive = volunteersData.filter(v => v.status === 'inactive').length;
+
+    // Use volunteersData for both the stats and the list rendering
     const statisticsCards = [
         {
             title: "Total Volunteers",
-            value: stats?.total_volunteers || 0,
+            value: isLoading ? "..." : total,
             icon: <FaUsers />,
             color: "blue" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Active",
-            value: stats?.active_volunteers || 0,
+            value: isLoading ? "..." : active,
             icon: <FaUserCheck />,
             color: "green" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Pending",
-            value: stats?.pending_volunteers || 0,
+            value: isLoading ? "..." : pending,
             icon: <FaUserClock />,
             color: "orange" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
         {
             title: "Inactive",
-            value: stats?.inactive_volunteers || 0,
+            value: isLoading ? "..." : inactive,
             icon: <FaUserTimes />,
             color: "red" as const,
-            isLoading: isLoadingStats,
+            isLoading,
         },
     ];
-
-
 
     return (
         <>
