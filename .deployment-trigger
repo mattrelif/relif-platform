@@ -1,1 +1,2 @@
-# Trigger deployment rebuild Tue Jun 17 19:53:57 -03 2025
+# Trigger deployment rebuild - ChunkLoadError fix $(date)
+# Force complete rebuild to resolve chunk 1857 -> 2117 issue
