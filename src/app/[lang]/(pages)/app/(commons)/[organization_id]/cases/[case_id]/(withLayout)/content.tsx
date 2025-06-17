@@ -40,6 +40,8 @@ import {
     FaFlag,
     FaTrash,
     FaTags,
+    FaDownload,
+    FaEye,
 } from "react-icons/fa";
 import {
     getCaseById,
@@ -99,111 +101,90 @@ const CaseOverview = (): ReactNode => {
     };
 
     const confirmDeleteDocument = async () => {
-        if (documentToDelete && Array.isArray(documents)) {
-            try {
-                console.log("🗑️ Deleting document:", documentToDelete.id);
-                
-                // Call API to delete document
-                await deleteCaseDocument(caseId, documentToDelete.id);
-                console.log("✅ Document deleted from backend");
-                
-                // Remove document from the list
-                setDocuments(documents.filter(doc => doc.id !== documentToDelete.id));
-                setDeleteDialogOpen(false);
-                setDocumentToDelete(null);
-                
-                toast({
-                    title: "Success",
-                    description: "Document deleted successfully",
-                });
-            } catch (error: any) {
-                console.error("❌ Error deleting document:", {
-                    error,
-                    message: error?.message,
-                    response: error?.response?.data,
-                    status: error?.response?.status,
-                    documentId: documentToDelete.id
-                });
-                
-                let errorMessage = "Failed to delete document. Please try again.";
-                if (error?.response?.status === 403) {
-                    errorMessage = "You don't have permission to delete this document.";
-                } else if (error?.response?.status === 404) {
-                    errorMessage = "Document not found. It may have already been deleted.";
-                } else if (error?.response?.status >= 500) {
-                    errorMessage = "Server error. Please try again later.";
-                }
-                
-                toast({
-                    title: "Delete Failed",
-                    description: errorMessage,
-                    variant: "destructive",
-                });
+        if (!documentToDelete) return;
+
+        try {
+            await deleteCaseDocument(caseId, documentToDelete.id);
+            
+            // Remove from local state
+            setDocuments(prev => prev.filter(doc => doc.id !== documentToDelete.id));
+            
+            toast({
+                title: "Document Deleted",
+                description: "The document has been deleted successfully.",
+            });
+        } catch (error: any) {
+            console.error("Error deleting document:", error);
+            
+            // More specific error messages
+            let errorMessage = "Error deleting document. Please try again.";
+            if (error?.response?.status === 404) {
+                errorMessage = "Document not found.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to delete this document.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
             }
+
+            toast({
+                title: "Delete Failed",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setDeleteDialogOpen(false);
+            setDocumentToDelete(null);
         }
     };
 
     const handleEditDocument = (doc: any) => {
         setDocumentToEdit(doc);
         setEditFormData({
-            document_name: doc.document_name,
-            description: doc.description,
-            document_type: doc.document_type,
+            document_name: doc.document_name || "",
+            description: doc.description || "",
+            document_type: doc.document_type || "",
             tags: doc.tags || [],
-            is_finalized: doc.is_finalized,
+            is_finalized: doc.is_finalized || false,
         });
         setEditDialogOpen(true);
     };
 
     const confirmEditDocument = async () => {
-        if (documentToEdit && Array.isArray(documents)) {
-            try {
-                console.log("✏️ Updating document:", documentToEdit.id, editFormData);
-                
-                // Call API to update document
-                await updateCaseDocument(caseId, documentToEdit.id, editFormData);
-                console.log("✅ Document updated in backend");
-                
-                // Update document in the list
-                setDocuments(
-                    documents.map(doc =>
-                        doc.id === documentToEdit.id ? { ...doc, ...editFormData } : doc
-                    )
-                );
-                setEditDialogOpen(false);
-                setDocumentToEdit(null);
-                
-                toast({
-                    title: "Success",
-                    description: "Document updated successfully",
-                });
-            } catch (error: any) {
-                console.error("❌ Error updating document:", {
-                    error,
-                    message: error?.message,
-                    response: error?.response?.data,
-                    status: error?.response?.status,
-                    documentId: documentToEdit.id,
-                    updateData: editFormData
-                });
-                
-                let errorMessage = "Failed to update document. Please try again.";
-                if (error?.response?.status === 400) {
-                    errorMessage = "Invalid document data. Please check your inputs.";
-                } else if (error?.response?.status === 403) {
-                    errorMessage = "You don't have permission to update this document.";
-                } else if (error?.response?.status === 404) {
-                    errorMessage = "Document not found. It may have been deleted.";
-                } else if (error?.response?.status >= 500) {
-                    errorMessage = "Server error. Please try again later.";
-                }
-                
-                toast({
-                    title: "Update Failed",
-                    description: errorMessage,
-                    variant: "destructive",
-                });
-            }
+        if (!documentToEdit) return;
+
+        try {
+            const updateData = {
+                document_name: editFormData.document_name,
+                description: editFormData.description,
+                document_type: editFormData.document_type,
+                tags: editFormData.tags,
+                is_finalized: editFormData.is_finalized,
+            };
+
+            await updateCaseDocument(caseId, documentToEdit.id, updateData);
+            
+            // Update local state
+            setDocuments(prev => prev.map(doc => 
+                doc.id === documentToEdit.id 
+                    ? { ...doc, ...updateData }
+                    : doc
+            ));
+
+            toast({
+                title: "Document Updated",
+                description: "The document has been updated successfully.",
+            });
+
+            setEditDialogOpen(false);
+            setDocumentToEdit(null);
+        } catch (error: any) {
+            console.error("Error updating document:", error);
+            
+            toast({
+                title: "Update Failed",
+                description: "Error updating document. Please try again.",
+                variant: "destructive",
+            });
         }
     };
 
@@ -221,6 +202,98 @@ const CaseOverview = (): ReactNode => {
             ...prev,
             tags: prev.tags.filter(tag => tag !== tagToRemove),
         }));
+    };
+
+    const handleViewDocument = (doc: any) => {
+        if (doc.download_url) {
+            // Open document in new tab for viewing
+            window.open(doc.download_url, '_blank');
+        } else {
+            toast({
+                title: "View Failed",
+                description: "Document URL not available.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleDownloadDocument = async (doc: any) => {
+        try {
+            if (doc.download_url) {
+                // Create a temporary link element to trigger download
+                const link = document.createElement('a');
+                link.href = doc.download_url;
+                link.download = doc.file_name || doc.document_name || 'document';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                toast({
+                    title: "Download Started",
+                    description: `Downloading ${doc.document_name}...`,
+                });
+            } else {
+                toast({
+                    title: "Download Failed",
+                    description: "Document URL not available.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error: any) {
+            console.error("Error downloading document:", error);
+            toast({
+                title: "Download Failed",
+                description: "Error downloading document. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleDownloadAllDocuments = async () => {
+        try {
+            if (!documents || documents.length === 0) {
+                toast({
+                    title: "No Documents",
+                    description: "There are no documents to download.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            let downloadCount = 0;
+            for (const doc of documents) {
+                if (doc.download_url) {
+                    try {
+                        const link = document.createElement('a');
+                        link.href = doc.download_url;
+                        link.download = doc.file_name || doc.document_name || `document-${doc.id}`;
+                        link.target = '_blank';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        downloadCount++;
+                        
+                        // Add small delay between downloads to avoid overwhelming the browser
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    } catch (docError) {
+                        console.warn(`Failed to download document ${doc.document_name}:`, docError);
+                    }
+                }
+            }
+
+            toast({
+                title: "Downloads Started",
+                description: `Starting download of ${downloadCount} document(s)...`,
+            });
+        } catch (error: any) {
+            console.error("Error downloading all documents:", error);
+            toast({
+                title: "Download Failed",
+                description: "Error downloading documents. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     const handleUploadDocument = () => {
@@ -381,253 +454,216 @@ const CaseOverview = (): ReactNode => {
         }));
     };
 
+    const formatFileSize = (bytes: number): string => {
+        if (!bytes) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    };
+
+    const getMimeTypeLabel = (mimeType: string): string => {
+        if (!mimeType) return 'File';
+        
+        if (mimeType.includes('pdf')) return 'PDF';
+        if (mimeType.includes('word') || mimeType.includes('document')) return 'DOC';
+        if (mimeType.includes('image')) return 'Image';
+        if (mimeType.includes('text')) return 'Text';
+        if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return 'Excel';
+        
+        return mimeType.split('/')[1]?.toUpperCase() || 'File';
+    };
+
     useEffect(() => {
         const fetchCaseData = async () => {
             try {
-                if (caseId) {
-                    console.log("📋 Fetching case data for caseId:", caseId);
-                    
-                    const [caseResult, documentsResult] = await Promise.all([
-                        getCaseById(caseId),
-                        getCaseDocuments(caseId),
-                    ]);
-                    
-                    console.log("✅ Case data fetched:", caseResult.data);
-                    
-                    // Update case data with actual document counts
-                    const fetchedCaseData = { ...caseResult.data };
-                    
-                    // Enhanced documents debugging
-                    console.log("📄 Documents API response:", {
-                        status: documentsResult?.status,
-                        data: documentsResult?.data,
-                        dataType: typeof documentsResult?.data,
-                        isArray: Array.isArray(documentsResult?.data),
-                        length: Array.isArray(documentsResult?.data) ? documentsResult.data.length : 'N/A'
-                    });
+                setIsLoading(true);
+                
+                // Fetch case data
+                console.log("🔍 Fetching case data for ID:", caseId);
+                const caseResult = await getCaseById(caseId);
+                setCaseData(caseResult.data);
+                console.log("✅ Case data loaded:", caseResult.data);
 
-                    // Ensure documents is always an array and update counts
-                    const documentsData = documentsResult?.data;
-                    let documentsArray: any[] = [];
-                    
-                    if (Array.isArray(documentsData)) {
-                        console.log("✅ Setting documents array with", documentsData.length, "items");
-                        documentsArray = documentsData;
-                    } else if (documentsData && typeof documentsData === 'object' && documentsData.data && Array.isArray(documentsData.data)) {
-                        // Handle case where documents are nested in a data property
-                        console.log("✅ Setting documents from nested data property with", documentsData.data.length, "items");
-                        documentsArray = documentsData.data;
-                    } else {
-                        console.warn("⚠️ Documents data is not an array:", documentsData);
-                        documentsArray = [];
-                    }
-                    
-                    setDocuments(documentsArray);
-                    
-                    // Update case data with actual document count
-                    fetchedCaseData.documents_count = documentsArray.length;
-                    
-                    // If notes_count is 0 or undefined, we could also fetch notes to get accurate count
-                    // For now, just ensure it's at least 0
-                    if (typeof fetchedCaseData.notes_count !== 'number') {
-                        fetchedCaseData.notes_count = 0;
-                    }
-                    
-                    setCaseData(fetchedCaseData);
+                // Fetch documents
+                console.log("📄 Fetching documents for case:", caseId);
+                const documentsResult = await getCaseDocuments(caseId);
+                const documentsData = documentsResult?.data;
+                
+                console.log("📄 Raw documents response:", documentsData);
+                
+                if (Array.isArray(documentsData)) {
+                    setDocuments(documentsData);
+                    console.log("✅ Documents loaded directly as array with", documentsData.length, "items");
+                } else if (documentsData && typeof documentsData === 'object' && documentsData.data && Array.isArray(documentsData.data)) {
+                    setDocuments(documentsData.data);
+                    console.log("✅ Documents loaded from nested data with", documentsData.data.length, "items");
+                } else {
+                    console.warn("⚠️ Documents result is not an array:", documentsData);
+                    setDocuments([]);
                 }
             } catch (err: any) {
                 console.error("❌ Error fetching case data:", {
-                    error: err,
-                    message: err?.message,
-                    response: err?.response?.data,
+                    error: err.message,
                     status: err?.response?.status,
+                    data: err?.response?.data,
                     caseId
                 });
                 setError(true);
-                setDocuments([]); // Ensure documents is empty array on error
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchCaseData();
+        if (caseId) {
+            fetchCaseData();
+        }
     }, [caseId]);
 
     if (isLoading) {
         return (
-            <div className="p-4 text-relif-orange-400 font-medium text-sm">
-                Loading case details...
+            <div className="flex items-center justify-center py-8">
+                <div className="text-relif-orange-400">Loading case information...</div>
             </div>
         );
     }
 
     if (error || !caseData) {
         return (
-            <div className="p-4 text-red-600 font-medium text-sm">Error loading case details</div>
+            <div className="flex items-center justify-center py-8">
+                <div className="text-red-600">Error loading case information</div>
+            </div>
         );
     }
 
-    const PRIORITY_COLORS = {
-        LOW: "bg-green-100 text-green-800 hover:bg-green-200",
-        MEDIUM: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        HIGH: "bg-orange-100 text-orange-800 hover:bg-orange-200",
-        URGENT: "bg-red-100 text-red-800 hover:bg-red-200",
-    };
-
-    const STATUS_COLORS = {
-        IN_PROGRESS: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-        PENDING: "bg-orange-100 text-orange-800 hover:bg-orange-200",
-        ON_HOLD: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-        CLOSED: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-        CANCELLED: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-    };
-
-    const URGENCY_COLORS = {
-        IMMEDIATE: "bg-red-100 text-red-800 hover:bg-red-200",
-        WITHIN_WEEK: "bg-orange-100 text-orange-800 hover:bg-orange-200",
-        WITHIN_MONTH: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        FLEXIBLE: "bg-green-100 text-green-800 hover:bg-green-200",
-    };
-
-    const isOverdue = caseData.due_date && new Date(caseData.due_date) < new Date();
-
     return (
-        <div className="w-full h-max flex flex-col gap-2">
-            {/* Debug Info - Only shows in development */}
-            <DebugInfo 
-                title="Case Overview"
-                data={{ caseData, documents, caseId, uploadFormData }}
-                error={error}
-                isLoading={isLoading}
-            />
-            
+        <div className="w-full h-max flex flex-col gap-6">
             {/* Case Header */}
-            <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-4 flex flex-col items-center gap-4">
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex-1">
-                        <h2 className="text-xl font-semibold text-slate-900">
-                            {convertToTitleCase(caseData.title)}
-                        </h2>
-                        <span className="text-sm text-slate-500">
-                            {caseData.case_number} •{" "}
-                            {convertToTitleCase(caseData.case_type?.replace("_", " ") || "Unknown")}
-                        </span>
-                    </div>
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`${pathname}/edit`}>
+            <div className="w-full flex items-center justify-between">
+                <h1 className="text-xl font-bold text-slate-900">
+                    Case #{caseData.case_number}
+                </h1>
+                <div className="flex items-center gap-2">
+                    <Badge 
+                        className={`${
+                            caseData.priority === "HIGH" 
+                                ? "bg-red-100 text-red-800" 
+                                : caseData.priority === "MEDIUM"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-green-100 text-green-800"
+                        }`}
+                    >
+                        {convertToTitleCase(caseData.priority)} Priority
+                    </Badge>
+                    <Badge 
+                        className={`${
+                            caseData.status === "ACTIVE" 
+                                ? "bg-green-100 text-green-800" 
+                                : caseData.status === "CLOSED"
+                                ? "bg-gray-100 text-gray-800"
+                                : "bg-blue-100 text-blue-800"
+                        }`}
+                    >
+                        {convertToTitleCase(caseData.status)}
+                    </Badge>
+                    <Link href={`${pathname}/edit`}>
+                        <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300">
                             <FaEdit className="w-4 h-4 mr-2" />
                             Edit Case
-                        </Link>
-                    </Button>
-                </div>
-                <div className="flex gap-2 flex-wrap w-full">
-                    <Badge className={STATUS_COLORS[caseData.status as keyof typeof STATUS_COLORS]}>
-                        {caseData.status?.replace("_", " ") || "Unknown"}
-                    </Badge>
-                    <Badge
-                        className={
-                            PRIORITY_COLORS[caseData.priority as keyof typeof PRIORITY_COLORS]
-                        }
-                    >
-                        {caseData.priority}
-                    </Badge>
-                    {caseData.urgency_level && (
-                        <Badge
-                            className={
-                                URGENCY_COLORS[
-                                    caseData.urgency_level as keyof typeof URGENCY_COLORS
-                                ]
-                            }
-                        >
-                            {caseData.urgency_level?.replace("_", " ") || "Unknown"}
-                        </Badge>
-                    )}
-                    {isOverdue && (
-                        <Badge className="bg-red-200 text-red-900 hover:bg-red-300">OVERDUE</Badge>
-                    )}
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
-            {/* Case Details Grid */}
-            <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col">
-                {/* Case Information */}
-                <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                        <FaFileAlt />
+            {/* Case Overview */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Basic Information */}
+                <div className="lg:col-span-2 border-[1px] border-slate-200 rounded-lg p-4">
+                    <h3 className="text-relif-orange-200 font-bold text-base mb-4 flex items-center gap-2">
+                        <FaUser />
                         Case Information
                     </h3>
-                    <ul>
-                        <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Description:</strong> {caseData.description}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Due Date:</strong>{" "}
-                            {caseData.due_date
-                                ? formatDate(caseData.due_date, locale)
-                                : "No due date set"}
-                        </li>
-                        {caseData.estimated_duration && (
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Estimated Duration:</strong>{" "}
-                                {convertToTitleCase(caseData.estimated_duration?.replace("_", " ") || "Unknown")}
-                            </li>
-                        )}
-                        {caseData.budget_allocated && (
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Budget Allocated:</strong> {caseData.budget_allocated}
-                            </li>
-                        )}
-                        {caseData.urgency_level && (
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Urgency Level:</strong>{" "}
-                                {convertToTitleCase(caseData.urgency_level?.replace("_", " ") || "Unknown")}
-                            </li>
-                        )}
-                        {caseData.tags && caseData.tags.length > 0 && (
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2 flex-wrap">
-                                <strong>Tags:</strong>
-                                {caseData.tags.map((tag, index) => (
-                                    <Badge key={`case-tag-${index}`} className="bg-relif-orange-500 text-xs">
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-sm font-medium text-slate-700 mb-1">Title</p>
+                            <p className="text-sm text-slate-900">{caseData.title}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-700 mb-1">Beneficiary</p>
+                            <p className="text-sm text-slate-900">{caseData.beneficiary_name}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-700 mb-1">Service Types</p>
+                            <div className="flex flex-wrap gap-1">
+                                {caseData.service_types && caseData.service_types.length > 0 ? (
+                                    caseData.service_types.map((serviceType: string, index: number) => (
+                                        <Badge key={index} variant="outline" className="text-xs">
+                                            {serviceType}
+                                        </Badge>
+                                    ))
+                                ) : (
+                                    <span className="text-sm text-slate-500">No service types assigned</span>
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-700 mb-1">Case Worker</p>
+                            <p className="text-sm text-slate-900">{caseData.case_worker_name || 'Unassigned'}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-700 mb-1">Created Date</p>
+                            <p className="text-sm text-slate-900 flex items-center gap-1">
+                                <FaCalendarAlt className="w-3 h-3" />
+                                {formatDate(caseData.created_at, locale)}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-700 mb-1">Last Updated</p>
+                            <p className="text-sm text-slate-900 flex items-center gap-1">
+                                <FaClock className="w-3 h-3" />
+                                {formatDate(caseData.updated_at, locale)}
+                            </p>
+                        </div>
+                    </div>
+
+                    {caseData.description && (
+                        <div className="mt-4">
+                            <p className="text-sm font-medium text-slate-700 mb-2">Description</p>
+                            <p className="text-sm text-slate-900 bg-slate-50 p-3 rounded-lg">
+                                {caseData.description}
+                            </p>
+                        </div>
+                    )}
+
+                    {caseData.tags && caseData.tags.length > 0 && (
+                        <div className="mt-4">
+                            <p className="text-sm font-medium text-slate-700 mb-2">Tags</p>
+                            <div className="flex flex-wrap gap-1">
+                                {caseData.tags.map((tag: string, index: number) => (
+                                    <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 text-xs">
                                         #{tag}
                                     </Badge>
                                 ))}
-                            </li>
-                        )}
-                    </ul>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Assignment & Timeline */}
-                <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                        <FaUser />
-                        Assignment & Timeline
+                {/* Case Stats */}
+                <div className="border-[1px] border-slate-200 rounded-lg p-4">
+                    <h3 className="text-relif-orange-200 font-bold text-base mb-4 flex items-center gap-2">
+                        <FaStickyNote />
+                        Case Activity
                     </h3>
-                    <ul>
-                        <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Beneficiary:</strong> {caseData.beneficiary?.full_name || "Not assigned"}
+                    <ul className="space-y-2">
+                        <li className="flex items-center justify-between text-sm">
+                            <span className="text-slate-700">Updates:</span>
+                            <span className="font-medium text-slate-900">{caseData.notes_count || 0}</span>
                         </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Assigned To:</strong> {caseData.assigned_to?.first_name || "Not assigned"}{" "}
-                            {caseData.assigned_to?.last_name || ""}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Created:</strong> {formatDate(caseData.created_at, locale)}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Last Updated:</strong> {formatDate(caseData.updated_at, locale)}
-                        </li>
-                    </ul>
-
-                    <h3 className="text-relif-orange-200 font-bold text-base py-4 border-t-[1px] border-slate-200 mt-4 flex flex-wrap items-center gap-2">
-                        <FaFileAlt />
-                        Activity Summary
-                    </h3>
-                    <ul>
-                        <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Updates:</strong> {caseData.notes_count}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Documents:</strong> {caseData.documents_count}
+                        <li className="flex items-center justify-between text-sm">
+                            <span className="text-slate-700">Documents:</span>
+                            <span className="font-medium text-slate-900">{caseData.documents_count || 0}</span>
                         </li>
                     </ul>
                 </div>
@@ -643,26 +679,29 @@ const CaseOverview = (): ReactNode => {
                     <div className="flex gap-2">
                         <Button
                             size="sm"
-                            className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                            variant={Array.isArray(documents) && documents.length > 0 ? "default" : "outline"}
                             onClick={handleUploadDocument}
                         >
                             <FaFileAlt className="w-4 h-4 mr-2" />
-                            Upload Document
+                            {Array.isArray(documents) && documents.length > 0 ? "Add Document" : "Upload Document"}
                         </Button>
-                        <Button
-                            size="sm"
-                            className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
-                        >
-                            <FaEdit className="w-4 h-4 mr-2" />
-                            Manage All
-                        </Button>
+                        {Array.isArray(documents) && documents.length > 0 && (
+                            <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={handleDownloadAllDocuments}
+                            >
+                                <FaDownload className="w-4 h-4 mr-2" />
+                                Download All
+                            </Button>
+                        )}
                     </div>
                 </div>
 
                 {!Array.isArray(documents) || documents.length === 0 ? (
                     <div className="text-center py-8 text-slate-500">
                         <FaFileAlt className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-                        <p>No documents uploaded yet</p>
+                        <p className="text-base text-slate-600">No documents uploaded yet</p>
                         <p className="text-sm text-slate-400 mt-1">
                             Upload your first document to get started.
                         </p>
@@ -674,38 +713,40 @@ const CaseOverview = (): ReactNode => {
                             {documents.map(doc => (
                                 <div
                                     key={doc.id}
-                                    className="border border-gray-200 bg-white rounded-lg p-3"
+                                    className="border border-gray-200 bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors"
                                 >
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <h4 className="font-medium text-sm text-slate-900">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <h4 className="font-semibold text-base text-slate-900">
                                                     {doc.document_name}
                                                 </h4>
-                                                <Badge variant="outline" className="text-xs">
-                                                    {doc.document_type}
+                                                <Badge variant="outline" className="text-xs font-medium">
+                                                    {doc.document_type || 'OTHER'}
                                                 </Badge>
                                                 {doc.is_finalized ? (
-                                                    <Badge className="text-xs bg-green-100 text-green-800">
-                                                        Finalized
+                                                    <Badge className="text-xs bg-green-100 text-green-800 font-medium">
+                                                        Final
                                                     </Badge>
                                                 ) : (
-                                                    <Badge className="text-xs bg-yellow-100 text-yellow-800">
+                                                    <Badge className="text-xs bg-yellow-100 text-yellow-800 font-medium">
                                                         Draft
                                                     </Badge>
                                                 )}
                                             </div>
 
-                                            <p className="text-xs text-slate-600 mb-2">
-                                                {doc.description}
-                                            </p>
+                                            {doc.description && (
+                                                <p className="text-sm text-slate-600 mb-3">
+                                                    {doc.description}
+                                                </p>
+                                            )}
 
                                             {doc.tags && doc.tags.length > 0 && (
-                                                <div className="flex gap-1 mb-2 flex-wrap">
+                                                <div className="flex gap-1 mb-3 flex-wrap">
                                                     {doc.tags.map((tag: string, index: number) => (
                                                         <Badge
                                                             key={`doc-${doc.id}-tag-${index}`}
-                                                            className="bg-relif-orange-500 text-xs"
+                                                            className="bg-relif-orange-100 text-relif-orange-800 text-xs"
                                                         >
                                                             #{tag}
                                                         </Badge>
@@ -713,32 +754,36 @@ const CaseOverview = (): ReactNode => {
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center gap-3 text-xs text-slate-500">
-                                                <span>
-                                                    {doc.file_type} • {doc.file_size}
+                                            <div className="flex items-center gap-4 text-xs text-slate-500">
+                                                <span className="font-medium">
+                                                    {getMimeTypeLabel(doc.mime_type)} • {formatFileSize(doc.file_size)}
                                                 </span>
                                                 <span>By {doc.uploaded_by?.name || 'Unknown User'}</span>
-                                                <span>{formatDate(doc.uploaded_at, locale)}</span>
+                                                <span>{formatDate(doc.created_at, locale)}</span>
                                             </div>
                                         </div>
 
-                                        <div className="flex gap-1 ml-3">
+                                        <div className="flex gap-2 ml-4">
                                             <Button
                                                 size="sm"
-                                                className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                                className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white"
+                                                onClick={() => handleViewDocument(doc)}
                                             >
+                                                <FaEye className="w-3 h-3 mr-1" />
                                                 View
                                             </Button>
                                             <Button
                                                 size="sm"
-                                                className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                                className="text-xs px-3 py-1 bg-green-500 hover:bg-green-600 text-white"
+                                                onClick={() => handleDownloadDocument(doc)}
                                             >
+                                                <FaDownload className="w-3 h-3 mr-1" />
                                                 Download
                                             </Button>
                                             {!doc.is_finalized && (
                                                 <Button
                                                     size="sm"
-                                                    className="text-xs px-2 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                                    className="text-xs px-3 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
                                                     onClick={() => handleEditDocument(doc)}
                                                 >
                                                     <FaEdit className="w-3 h-3 mr-1" />
@@ -747,7 +792,7 @@ const CaseOverview = (): ReactNode => {
                                             )}
                                             <Button
                                                 size="sm"
-                                                className="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white"
+                                                className="text-xs px-3 py-1 bg-red-500 hover:bg-red-600 text-white"
                                                 onClick={() => handleDeleteDocument(doc)}
                                             >
                                                 <FaTrash className="w-3 h-3 mr-1" />

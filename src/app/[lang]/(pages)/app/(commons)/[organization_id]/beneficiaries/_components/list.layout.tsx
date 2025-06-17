@@ -253,6 +253,7 @@ const BeneficiaryList = (): ReactNode => {
         setError(false);
         try {
             const organizationId = pathname.split("/")[3];
+            
             if (!organizationId) {
                 throw new Error("Organization ID not found in URL");
             }
@@ -260,6 +261,7 @@ const BeneficiaryList = (): ReactNode => {
             // Fetch ALL beneficiaries - high limit to get all data
             const response = await getBeneficiariesByOrganizationID(organizationId, 0, 99999, "");
             const beneficiariesData = response.data.data || [];
+            
             setAllBeneficiaries(beneficiariesData);
 
         } catch (e) {
@@ -285,6 +287,7 @@ const BeneficiaryList = (): ReactNode => {
             pending: allBeneficiaries.filter(b => b.status === 'PENDING').length,
             inactive: allBeneficiaries.filter(b => b.status === 'INACTIVE').length,
         };
+        
         setStats(calculatedStats);
 
         // 2. Apply search filter
@@ -615,35 +618,29 @@ const BeneficiaryList = (): ReactNode => {
         ];
     }
 
-    // Calculate stats from the final beneficiariesData
-    const total = beneficiariesData.length;
-    const active = beneficiariesData.filter(b => b.status === 'ACTIVE').length;
-    const pending = beneficiariesData.filter(b => b.status === 'PENDING').length;
-    const inactive = beneficiariesData.filter(b => b.status === 'INACTIVE').length;
-
-    // Use beneficiariesData for both the stats and the list rendering
+    // Use the stats state that's already calculated correctly from allBeneficiaries
     const statisticsCards = [
         {
             title: "Total Beneficiaries",
-            value: isLoading ? "..." : total,
+            value: isLoading ? "..." : stats.total,
             icon: <FaUsers />,
             color: "blue" as const,
         },
         {
             title: "Active",
-            value: isLoading ? "..." : active,
+            value: isLoading ? "..." : stats.active,
             icon: <FaUserCheck />,
             color: "green" as const,
         },
         {
             title: "Pending",
-            value: isLoading ? "..." : pending,
+            value: isLoading ? "..." : stats.pending,
             icon: <FaUserClock />,
             color: "orange" as const,
         },
         {
             title: "Inactive",
-            value: isLoading ? "..." : inactive,
+            value: isLoading ? "..." : stats.inactive,
             icon: <FaUserTimes />,
             color: "red" as const,
         },

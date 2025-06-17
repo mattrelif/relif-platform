@@ -81,14 +81,15 @@ export type Donation = {
 export type CreateBeneficiaryRequest = Omit<
     BeneficiarySchema,
     | "id"
-    | "status"
     | "current_housing_id"
     | "current_housing"
     | "current_room_id"
     | "current_room"
     | "created_at"
     | "updated_at"
->;
+> & {
+    status?: "ACTIVE" | "PENDING" | "INACTIVE" | "ARCHIVED";
+};
 
 export type UpdateBeneficiaryRequest = Omit<
     BeneficiarySchema,

@@ -17,12 +17,13 @@ import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaBirthdayCake, FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
+import { FaBirthdayCake, FaEdit, FaMapMarkerAlt, FaTrash, FaUserCheck } from "react-icons/fa";
 import { IoMdMove } from "react-icons/io";
 import { SlOptions } from "react-icons/sl";
 
 import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
+import { StatusModal } from "./status.modal";
 
 type Props = BeneficiarySchema & {
     refreshList: () => void;
@@ -50,6 +51,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
 
     const [removeDialogOpenState, setRemoveDialogOpenState] = useState(false);
     const [moveDialogOpenState, setMoveDialogOpenState] = useState(false);
+    const [statusDialogOpenState, setStatusDialogOpenState] = useState(false);
 
     const beneficiaryPath = pathname.split("/").slice(0, 5).join("/");
     const housingPath = pathname.split("/").slice(0, 4).join("/");
@@ -168,6 +170,17 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                                     <DropdownMenuItem
                                         onClick={e => {
                                             e.stopPropagation();
+                                            setStatusDialogOpenState(true);
+                                        }}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <FaUserCheck className="text-xs" />
+                                            Change Status
+                                        </span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={e => {
+                                            e.stopPropagation();
                                             setRemoveDialogOpenState(true);
                                         }}
                                     >
@@ -203,7 +216,21 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             {formatDate(data?.created_at, locale || "en")}
                         </span>
                         <span>
-                            <Badge>{dict.commons.beneficiaries.card.active}</Badge>
+                            <Badge 
+                                className={
+                                    data.status === 'ACTIVE' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
+                                    data.status === 'INACTIVE' ? 'bg-red-100 text-red-800 hover:bg-red-200' :
+                                    data.status === 'PENDING' ? 'bg-orange-100 text-orange-800 hover:bg-orange-200' :
+                                    data.status === 'ARCHIVED' ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' :
+                                    'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                }
+                            >
+                                {data.status === 'ACTIVE' ? 'Active' :
+                                 data.status === 'INACTIVE' ? 'Inactive' :
+                                 data.status === 'PENDING' ? 'Pending' :
+                                 data.status === 'ARCHIVED' ? 'Archived' :
+                                 data.status}
+                            </Badge>
                         </span>
                     </div>
                 </div>
@@ -221,6 +248,13 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                 refreshList={refreshList}
                 moveDialogOpenState={moveDialogOpenState}
                 setMoveDialogOpenState={setMoveDialogOpenState}
+            />
+
+            <StatusModal
+                beneficiary={data}
+                refreshList={refreshList}
+                statusDialogOpenState={statusDialogOpenState}
+                setStatusDialogOpenState={setStatusDialogOpenState}
             />
         </>
     );

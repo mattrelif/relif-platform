@@ -45,20 +45,11 @@ const NotesContent = (): ReactNode => {
     const [notes, setNotes] = useState<CaseNoteSchema[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [showAddForm, setShowAddForm] = useState(false);
+    const [showAddDialog, setShowAddDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [selectedNote, setSelectedNote] = useState<CaseNoteSchema | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Form state
-    const [formData, setFormData] = useState({
-        title: "",
-        content: "",
-        tags: "",
-        note_type: "UPDATE" as const,
-        is_important: false,
-    });
 
     const [editFormData, setEditFormData] = useState({
         title: "",
@@ -120,91 +111,7 @@ const NotesContent = (): ReactNode => {
         fetchNotes();
     }, [caseId]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
 
-        try {
-            // Prepare the payload
-            const payload: CreateCaseNotePayload = {
-                title: formData.title,
-                content: formData.content,
-                tags: formData.tags
-                    .split(",")
-                    .map(tag => tag.trim())
-                    .filter(tag => tag),
-                note_type: formData.note_type,
-                is_important: formData.is_important,
-            };
-
-            // Call the API to create the note
-            console.log("📝 Creating case note:", payload);
-            const response = await createCaseNote(caseId, payload);
-            console.log("✅ Case note created:", response);
-
-            // Add the new note to the local state
-            if (response.data) {
-                setNotes(prev => [response.data, ...prev]);
-                console.log("✅ Note added to local state");
-            } else if (response.status >= 200 && response.status < 300) {
-                // Even if no data returned, but status is successful, consider it a success
-                console.log("✅ Note creation successful (no data returned but status OK)");
-                // Refresh notes list to get updated data
-                try {
-                    const notesResponse = await getCaseNotes(caseId);
-                    const notesData = notesResponse?.data;
-                    if (Array.isArray(notesData)) {
-                        setNotes(notesData);
-                    } else if (notesData && typeof notesData === 'object' && notesData.data && Array.isArray(notesData.data)) {
-                        setNotes(notesData.data);
-                    }
-                } catch (refreshError) {
-                    console.warn("⚠️ Could not refresh notes after creation:", refreshError);
-                }
-            } else {
-                console.warn("⚠️ No data returned from createCaseNote:", response);
-            }
-
-            setShowAddForm(false);
-            setFormData({
-                title: "",
-                content: "",
-                tags: "",
-                note_type: "UPDATE",
-                is_important: false,
-            });
-
-            toast({
-                title: "Update added successfully",
-                description: "The case update has been added.",
-                variant: "success",
-            });
-        } catch (error: any) {
-            console.error("❌ Error creating case note:", {
-                error,
-                message: error?.message,
-                response: error?.response?.data,
-                status: error?.response?.status
-            });
-            
-            let errorMessage = "Something went wrong. Please try again.";
-            if (error?.response?.status === 400) {
-                errorMessage = "Invalid note data. Please check your inputs.";
-            } else if (error?.response?.status === 403) {
-                errorMessage = "You don't have permission to add notes to this case.";
-            } else if (error?.response?.status >= 500) {
-                errorMessage = "Server error. Please try again later.";
-            }
-            
-            toast({
-                title: "Error adding update",
-                description: errorMessage,
-                variant: "destructive",
-            });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     const handleEdit = (note: CaseNoteSchema) => {
         setSelectedNote(note);
@@ -376,7 +283,7 @@ const NotesContent = (): ReactNode => {
             {/* Debug Info - Only shows in development */}
             <DebugInfo 
                 title="Case Notes"
-                data={{ notes, caseId, formData, editFormData }}
+                data={{ notes, caseId, editFormData }}
                 error={error}
                 isLoading={isLoading}
             />
@@ -388,129 +295,23 @@ const NotesContent = (): ReactNode => {
                         <FaStickyNote />
                         Case Updates
                     </h3>
-                    <Button onClick={() => setShowAddForm(!showAddForm)}>
+                    <Button onClick={() => setShowAddDialog(true)}>
                         <FaPlus className="w-4 h-4 mr-2" />
                         Add Update
                     </Button>
                 </div>
             </div>
 
-            {/* Add Update Form */}
-            {showAddForm && (
-                <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                        <FaPlus />
-                        Add New Update
-                    </h3>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <Label htmlFor="title">Title *</Label>
-                            <Input
-                                id="title"
-                                value={formData.title}
-                                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                placeholder="Enter update title"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <Label htmlFor="content">Content *</Label>
-                            <Textarea
-                                id="content"
-                                value={formData.content}
-                                onChange={e =>
-                                    setFormData({ ...formData, content: e.target.value })
-                                }
-                                placeholder="Enter update content"
-                                rows={4}
-                                required
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="note_type">Update Type</Label>
-                                <Select
-                                    value={formData.note_type}
-                                    onValueChange={(value: any) =>
-                                        setFormData({ ...formData, note_type: value })
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="CALL">📞 Call</SelectItem>
-                                        <SelectItem value="MEETING">🤝 Meeting</SelectItem>
-                                        <SelectItem value="UPDATE">📝 Update</SelectItem>
-                                        <SelectItem value="APPOINTMENT">📅 Appointment</SelectItem>
-                                        <SelectItem value="OTHER">📋 Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div>
-                                <Label htmlFor="tags">Tags (comma separated)</Label>
-                                <Input
-                                    id="tags"
-                                    value={formData.tags}
-                                    onChange={e =>
-                                        setFormData({ ...formData, tags: e.target.value })
-                                    }
-                                    placeholder="follow-up, phone-call, housing"
-                                />
-                                {/* Tag Preview */}
-                                {formData.tags && (
-                                    <div className="flex flex-wrap gap-1 mt-2">
-                                        {formData.tags.split(",").map((tag, index) => {
-                                            const trimmedTag = tag.trim();
-                                            return trimmedTag ? (
-                                                <Badge
-                                                    key={index}
-                                                    variant="secondary"
-                                                    className="text-xs bg-slate-100 text-slate-700"
-                                                >
-                                                    #{trimmedTag}
-                                                </Badge>
-                                            ) : null;
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                id="is_important"
-                                checked={formData.is_important}
-                                onChange={e =>
-                                    setFormData({ ...formData, is_important: e.target.checked })
-                                }
-                                className="rounded border-gray-300"
-                            />
-                            <Label htmlFor="is_important" className="flex items-center gap-1">
-                                <FaFlag className="w-3 h-3 text-red-500" />
-                                Mark as important
-                            </Label>
-                        </div>
-
-                        <div className="flex gap-2">
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? "Saving..." : "Save Update"}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setShowAddForm(false)}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-            )}
+            {/* Add Update Dialog */}
+            <AddNoteDialog
+                isOpen={showAddDialog}
+                onClose={() => setShowAddDialog(false)}
+                onSave={(newNote: CaseNoteSchema) => {
+                    setNotes(prev => [newNote, ...prev]);
+                    setShowAddDialog(false);
+                }}
+                caseId={caseId}
+            />
 
             {/* Updates List */}
             {!Array.isArray(notes) || notes.length === 0 ? (
@@ -612,6 +413,259 @@ const NotesContent = (): ReactNode => {
                 locale={locale}
             />
         </div>
+    );
+};
+
+// Add Note Dialog Component
+const AddNoteDialog = ({
+    isOpen,
+    onClose,
+    onSave,
+    caseId,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (newNote: CaseNoteSchema) => void;
+    caseId: string;
+}) => {
+    const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        title: "",
+        content: "",
+        tags: "",
+        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER",
+        is_important: false,
+    });
+    
+    const [tagPreviews, setTagPreviews] = useState<string[]>([]);
+
+    const handleTagsChange = (value: string) => {
+        setFormData(prev => ({ ...prev, tags: value }));
+        const tags = value
+            .split(",")
+            .map(tag => tag.trim())
+            .filter(tag => tag);
+        setTagPreviews(tags);
+    };
+
+    const handleSave = async () => {
+        if (!formData.title || !formData.content) {
+            toast({
+                title: "Missing required fields",
+                description: "Please provide both title and content.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+
+            // Prepare the payload
+            const payload: CreateCaseNotePayload = {
+                title: formData.title,
+                content: formData.content,
+                tags: tagPreviews,
+                note_type: formData.note_type,
+                is_important: formData.is_important,
+            };
+
+            // Call the API to create the note
+            console.log("📝 Creating case note:", payload);
+            const response = await createCaseNote(caseId, payload);
+            console.log("✅ Case note created:", response);
+
+            // Handle successful response
+            let newNote: CaseNoteSchema;
+            if (response.data) {
+                newNote = response.data;
+            } else {
+                // Create a temporary note if no data returned but status is successful
+                newNote = {
+                    id: Date.now().toString(), // Temporary ID
+                    title: formData.title,
+                    content: formData.content,
+                    note_type: formData.note_type,
+                    tags: tagPreviews,
+                    is_important: formData.is_important,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    created_by: { name: "Current User" }, // Placeholder
+                } as CaseNoteSchema;
+            }
+
+            onSave(newNote);
+            
+            // Reset form
+            setFormData({
+                title: "",
+                content: "",
+                tags: "",
+                note_type: "UPDATE",
+                is_important: false,
+            });
+            setTagPreviews([]);
+
+            toast({
+                title: "Update added successfully",
+                description: "The case update has been added.",
+                variant: "success",
+            });
+        } catch (error: any) {
+            console.error("❌ Error creating case note:", error);
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error?.response?.status === 400) {
+                errorMessage = "Invalid note data. Please check your inputs.";
+            } else if (error?.response?.status === 403) {
+                errorMessage = "You don't have permission to add notes to this case.";
+            } else if (error?.response?.status >= 500) {
+                errorMessage = "Server error. Please try again later.";
+            }
+            
+            toast({
+                title: "Error adding update",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleClose = () => {
+        // Reset form when closing
+        setFormData({
+            title: "",
+            content: "",
+            tags: "",
+            note_type: "UPDATE",
+            is_important: false,
+        });
+        setTagPreviews([]);
+        onClose();
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <FaPlus className="w-4 h-4" />
+                        Add New Update
+                    </DialogTitle>
+                    <DialogDescription>
+                        Add a new update to track case progress and important information.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                            <Label htmlFor="add-title">Title *</Label>
+                            <Input
+                                id="add-title"
+                                value={formData.title}
+                                onChange={e =>
+                                    setFormData(prev => ({ ...prev, title: e.target.value }))
+                                }
+                                placeholder="Enter update title"
+                                className="mt-1"
+                            />
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <Label htmlFor="add-content">Content *</Label>
+                            <Textarea
+                                id="add-content"
+                                value={formData.content}
+                                onChange={e =>
+                                    setFormData(prev => ({ ...prev, content: e.target.value }))
+                                }
+                                placeholder="Enter update content"
+                                rows={4}
+                                className="mt-1"
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="add-type">Update Type</Label>
+                            <Select
+                                value={formData.note_type}
+                                onValueChange={(
+                                    value: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER"
+                                ) => setFormData(prev => ({ ...prev, note_type: value }))}
+                            >
+                                <SelectTrigger className="mt-1">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="CALL">📞 Call</SelectItem>
+                                    <SelectItem value="MEETING">🤝 Meeting</SelectItem>
+                                    <SelectItem value="UPDATE">📝 Update</SelectItem>
+                                    <SelectItem value="APPOINTMENT">📅 Appointment</SelectItem>
+                                    <SelectItem value="OTHER">📋 Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div>
+                            <Label htmlFor="add-tags">Tags (comma separated)</Label>
+                            <Input
+                                id="add-tags"
+                                value={formData.tags}
+                                onChange={e => handleTagsChange(e.target.value)}
+                                placeholder="follow-up, phone-call, housing"
+                                className="mt-1"
+                            />
+                            {/* Tag Preview */}
+                            {tagPreviews.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                    {tagPreviews.map((tag, index) => (
+                                        <Badge
+                                            key={index}
+                                            variant="secondary"
+                                            className="text-xs bg-slate-100 text-slate-700"
+                                        >
+                                            #{tag}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="add-important"
+                                    checked={formData.is_important}
+                                    onCheckedChange={(checked) =>
+                                        setFormData(prev => ({ ...prev, is_important: !!checked }))
+                                    }
+                                />
+                                <Label htmlFor="add-important" className="flex items-center gap-1">
+                                    <FaFlag className="w-3 h-3 text-red-500" />
+                                    Mark as important
+                                </Label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                    <Button variant="outline" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        disabled={!formData.title || !formData.content || isLoading}
+                    >
+                        {isLoading ? "Saving..." : "Save Update"}
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

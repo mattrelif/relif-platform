@@ -116,3 +116,17 @@ export async function getAllocationByBeneficiaryId(
         method: "GET",
     });
 }
+
+export async function updateBeneficiaryStatus(
+    beneficiaryId: string,
+    status: "ACTIVE" | "INACTIVE" | "PENDING" | "ARCHIVED"
+): Promise<AxiosResponse> {
+    return client.request({
+        url: `${PREFIX}/${beneficiaryId}/status`,
+        method: "PUT",
+        data: { status },
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}

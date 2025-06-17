@@ -26,7 +26,7 @@ import { UserSchema } from "@/types/user.types";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState, useEffect } from "react";
-import { FaUsers, FaMapMarkerAlt, FaUpload, FaUser } from "react-icons/fa";
+import { FaUsers, FaMapMarkerAlt, FaUpload, FaUser, FaUserCheck } from "react-icons/fa";
 import { MdContacts } from "react-icons/md";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
@@ -61,6 +61,7 @@ const Form = (): ReactNode => {
     const [skipMedicalInfo, setSkipMedicalInfo] = useState<boolean>(false);
     const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
     const [notes, setNotes] = useState<string>("");
+    const [requiresReview, setRequiresReview] = useState<boolean>(false);
 
     useEffect(() => {
         try {
@@ -292,7 +293,8 @@ const Form = (): ReactNode => {
                     country: data.country || "",
                 },
                 medical_information: medicalData,
-                notes: "",
+                notes: notes,
+                status: requiresReview ? "PENDING" : "ACTIVE",
                 documents: [
                     {
                         type: data.documentType,
@@ -719,7 +721,37 @@ const Form = (): ReactNode => {
                         </div>
                     </div>
 
-                    {/* Action Buttons - After Medical Information */}
+                    {/* Review Status Section */}
+                    <div className="w-full h-max flex flex-col gap-4 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <FaUserCheck /> Registration Status
+                        </h2>
+                        
+                        <div className="flex items-start space-x-3">
+                            <Checkbox 
+                                id="requiresReview" 
+                                checked={requiresReview}
+                                onCheckedChange={(checked) => setRequiresReview(checked as boolean)}
+                                className="mt-1"
+                            />
+                            <div className="space-y-1">
+                                <Label htmlFor="requiresReview" className="text-sm font-medium cursor-pointer">
+                                    This beneficiary requires review before activation
+                                </Label>
+                                <p className="text-xs text-gray-600">
+                                    Check this if the beneficiary's information needs verification, document review, 
+                                    or administrative approval before they can receive services. 
+                                    {requiresReview ? (
+                                        <span className="text-orange-600 font-medium"> Status will be set to PENDING.</span>
+                                    ) : (
+                                        <span className="text-green-600 font-medium"> Status will be set to ACTIVE.</span>
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons - After Review Status */}
                     <div className="flex justify-end gap-4">
                         <Button variant="outline" type="button" onClick={() => router.push(urlPath)}>
                             Cancel
