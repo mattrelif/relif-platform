@@ -383,34 +383,16 @@ export const CreateCaseForm = (): ReactNode => {
                 tags: formData.tags.length > 0 ? formData.tags : undefined,
             };
 
-            // Add initial note if provided
-            if (formData.initial_note.title || formData.initial_note.content) {
-                console.log("📝 Adding initial note to case:", formData.initial_note);
-                casePayload.initial_note = {
-                    title: formData.initial_note.title,
-                    content: formData.initial_note.content,
-                    note_type: formData.initial_note.note_type as
-                        | "CALL"
-                        | "MEETING"
-                        | "UPDATE"
-                        | "APPOINTMENT"
-                        | "OTHER",
-                    is_important: formData.initial_note.is_important,
-                    tags: formData.initial_note.tags,
-                };
-            }
-
             // Create the case
             console.log("🏗️ Creating case with payload:", casePayload);
             const response = await createCase(casePayload);
             const newCaseId = response.data.id;
             console.log("✅ Case created with ID:", newCaseId);
 
-            // Create initial note separately if backend doesn't handle it in case creation
-            // This is a fallback in case the initial_note in casePayload doesn't work
+            // Create initial note only if provided and backend doesn't handle it automatically
             if (formData.initial_note.title || formData.initial_note.content) {
                 try {
-                    console.log("📝 Creating initial note separately...");
+                    console.log("📝 Creating initial note...");
                     const notePayload = {
                         title: formData.initial_note.title,
                         content: formData.initial_note.content,
@@ -427,7 +409,7 @@ export const CreateCaseForm = (): ReactNode => {
                     const noteResponse = await createCaseNote(newCaseId, notePayload);
                     console.log("✅ Initial note created:", noteResponse);
                 } catch (noteError: any) {
-                    console.warn("⚠️ Failed to create initial note separately:", noteError);
+                    console.warn("⚠️ Failed to create initial note:", noteError);
                     // Don't fail the entire case creation if note creation fails
                 }
             }
@@ -952,7 +934,7 @@ export const CreateCaseForm = (): ReactNode => {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <Label htmlFor="assigned_to_id">Assign to User</Label>
+                        <Label htmlFor="assigned_to_id">Assign to User *</Label>
                         <Select
                             value={formData.assigned_to_id}
                             onValueChange={value => handleInputChange("assigned_to_id", value)}

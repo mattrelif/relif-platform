@@ -73,7 +73,6 @@ const CaseOverview = (): ReactNode => {
         description: "",
         document_type: "",
         tags: [] as string[],
-        is_finalized: false,
     });
 
     // Upload dialog state
@@ -144,7 +143,6 @@ const CaseOverview = (): ReactNode => {
             description: doc.description || "",
             document_type: doc.document_type || "",
             tags: doc.tags || [],
-            is_finalized: doc.is_finalized || false,
         });
         setEditDialogOpen(true);
     };
@@ -158,7 +156,6 @@ const CaseOverview = (): ReactNode => {
                 description: editFormData.description,
                 document_type: editFormData.document_type,
                 tags: editFormData.tags,
-                is_finalized: editFormData.is_finalized,
             };
 
             await updateCaseDocument(caseId, documentToEdit.id, updateData);
@@ -205,13 +202,17 @@ const CaseOverview = (): ReactNode => {
     };
 
     const handleViewDocument = (doc: any) => {
-        if (doc.download_url) {
+        console.log("📄 Attempting to view document:", doc);
+        
+        if (doc.download_url && doc.download_url.trim() !== '') {
             // Open document in new tab for viewing
+            console.log("🔗 Opening document URL:", doc.download_url);
             window.open(doc.download_url, '_blank');
         } else {
+            console.error("❌ Document URL not available:", doc);
             toast({
                 title: "View Failed",
-                description: "Document URL not available.",
+                description: "Document URL not available. The document may still be processing.",
                 variant: "destructive",
             });
         }
@@ -219,7 +220,11 @@ const CaseOverview = (): ReactNode => {
 
     const handleDownloadDocument = async (doc: any) => {
         try {
-            if (doc.download_url) {
+            console.log("📥 Attempting to download document:", doc);
+            
+            if (doc.download_url && doc.download_url.trim() !== '') {
+                console.log("🔗 Using download URL:", doc.download_url);
+                
                 // Create a temporary link element to trigger download
                 const link = document.createElement('a');
                 link.href = doc.download_url;
@@ -231,17 +236,18 @@ const CaseOverview = (): ReactNode => {
 
                 toast({
                     title: "Download Started",
-                    description: `Downloading ${doc.document_name}...`,
+                    description: `Downloading ${doc.document_name || doc.file_name}...`,
                 });
             } else {
+                console.error("❌ Document URL not available:", doc);
                 toast({
                     title: "Download Failed",
-                    description: "Document URL not available.",
+                    description: "Document URL not available. The document may still be processing.",
                     variant: "destructive",
                 });
             }
         } catch (error: any) {
-            console.error("Error downloading document:", error);
+            console.error("❌ Error downloading document:", error);
             toast({
                 title: "Download Failed",
                 description: "Error downloading document. Please try again.",
@@ -474,6 +480,94 @@ const CaseOverview = (): ReactNode => {
         return mimeType.split('/')[1]?.toUpperCase() || 'File';
     };
 
+    const getServiceTypeLabel = (serviceType: string): string => {
+        const serviceTypeMap: { [key: string]: string } = {
+            'CHILD_PROTECTION_CASE_MANAGEMENT': 'Child Protection Case Management',
+            'GBV_CASE_MANAGEMENT': 'Gender-Based Violence (GBV) Case Management',
+            'GENERAL_PROTECTION_SERVICES': 'General Protection Services',
+            'SEXUAL_VIOLENCE_RESPONSE': 'Sexual Violence Response',
+            'INTIMATE_PARTNER_VIOLENCE_SUPPORT': 'Intimate Partner Violence Support',
+            'HUMAN_TRAFFICKING_RESPONSE': 'Human Trafficking Response',
+            'FAMILY_SEPARATION_REUNIFICATION': 'Family Separation and Reunification',
+            'UASC_SERVICES': 'Unaccompanied and Separated Children (UASC) Services',
+            'MHPSS': 'Mental Health and Psychosocial Support (MHPSS)',
+            'LEGAL_AID_ASSISTANCE': 'Legal Aid and Assistance',
+            'CIVIL_DOCUMENTATION_SUPPORT': 'Civil Documentation Support',
+            'EMERGENCY_SHELTER_HOUSING': 'Emergency Shelter and Housing',
+            'NFI_DISTRIBUTION': 'Non-Food Items (NFI) Distribution',
+            'FOOD_SECURITY_NUTRITION': 'Food Security and Nutrition',
+            'CVA': 'Cash and Voucher Assistance (CVA)',
+            'WASH': 'Water, Sanitation and Hygiene (WASH)',
+            'HEALTHCARE_SERVICES': 'Healthcare Services',
+            'EMERGENCY_MEDICAL_CARE': 'Emergency Medical Care',
+            'SEXUAL_REPRODUCTIVE_HEALTH': 'Sexual and Reproductive Health Services',
+            'DISABILITY_SUPPORT_SERVICES': 'Disability Support Services',
+            'EMERGENCY_EVACUATION': 'Emergency Evacuation',
+            'SEARCH_RESCUE_COORDINATION': 'Search and Rescue Coordination',
+            'RAPID_ASSESSMENT_NEEDS_ANALYSIS': 'Rapid Assessment and Needs Analysis',
+            'EMERGENCY_REGISTRATION': 'Emergency Registration',
+            'EMERGENCY_TRANSPORTATION': 'Emergency Transportation',
+            'EMERGENCY_COMMUNICATION_SERVICES': 'Emergency Communication Services',
+            'EMERGENCY_EDUCATION_SERVICES': 'Emergency Education Services',
+            'CHILD_FRIENDLY_SPACES': 'Child-Friendly Spaces',
+            'SKILLS_TRAINING_VOCATIONAL_EDUCATION': 'Skills Training and Vocational Education',
+            'LITERACY_PROGRAMS': 'Literacy Programs',
+            'AWARENESS_PREVENTION_CAMPAIGNS': 'Awareness and Prevention Campaigns',
+            'LIVELIHOOD_SUPPORT_PROGRAMS': 'Livelihood Support Programs',
+            'MICROFINANCE_CREDIT_SERVICES': 'Microfinance and Credit Services',
+            'JOB_PLACEMENT_EMPLOYMENT_SERVICES': 'Job Placement and Employment Services',
+            'AGRICULTURAL_SUPPORT': 'Agricultural Support',
+            'BUSINESS_DEVELOPMENT_SUPPORT': 'Business Development Support',
+            'REFUGEE_SERVICES': 'Refugee Services',
+            'IDP_SERVICES': 'Internally Displaced Person (IDP) Services',
+            'RETURNEE_REINTEGRATION_SERVICES': 'Returnee and Reintegration Services',
+            'HOST_COMMUNITY_SUPPORT': 'Host Community Support',
+            'ELDERLY_CARE_SERVICES': 'Elderly Care Services',
+            'SERVICES_FOR_PERSONS_WITH_DISABILITIES': 'Services for Persons with Disabilities',
+            'CASE_REFERRAL_TRANSFER': 'Case Referral and Transfer',
+            'INTER_AGENCY_COORDINATION': 'Inter-agency Coordination',
+            'SERVICE_MAPPING_INFORMATION': 'Service Mapping and Information',
+            'FOLLOW_UP_MONITORING': 'Follow-up and Monitoring',
+            'CASE_CLOSURE_TRANSITION': 'Case Closure and Transition',
+            'BIRTH_REGISTRATION': 'Birth Registration',
+            'IDENTITY_DOCUMENTATION': 'Identity Documentation',
+            'LEGAL_COUNSELING': 'Legal Counseling',
+            'COURT_SUPPORT_ACCOMPANIMENT': 'Court Support and Accompaniment',
+            'DETENTION_MONITORING': 'Detention Monitoring',
+            'ADVOCACY_SERVICES': 'Advocacy Services',
+            'PRIMARY_HEALTHCARE': 'Primary Healthcare',
+            'CLINICAL_MANAGEMENT_RAPE': 'Clinical Management of Rape (CMR)',
+            'HIV_AIDS_PREVENTION_TREATMENT': 'HIV/AIDS Prevention and Treatment',
+            'TUBERCULOSIS_TREATMENT': 'Tuberculosis Treatment',
+            'MALNUTRITION_TREATMENT': 'Malnutrition Treatment',
+            'VACCINATION_PROGRAMS': 'Vaccination Programs',
+            'EMERGENCY_SURGERY': 'Emergency Surgery',
+            'CAMP_COORDINATION_MANAGEMENT': 'Camp Coordination and Camp Management',
+            'MINE_ACTION_SERVICES': 'Mine Action Services',
+            'PEACEKEEPING_PEACEBUILDING': 'Peacekeeping and Peacebuilding',
+            'LOGISTICS_TELECOMMUNICATIONS': 'Logistics and Telecommunications',
+            'INFORMATION_MANAGEMENT': 'Information Management',
+            'COMMUNITY_MOBILIZATION': 'Community Mobilization',
+            'WINTERIZATION_SUPPORT': 'Winterization Support'
+        };
+        return serviceTypeMap[serviceType] || serviceType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    };
+
+    const getDocumentTypeLabel = (documentType: string): string => {
+        const documentTypeMap: { [key: string]: string } = {
+            'FORM': 'Form',
+            'REPORT': 'Report',
+            'EVIDENCE': 'Evidence',
+            'CORRESPONDENCE': 'Correspondence',
+            'IDENTIFICATION': 'Identification',
+            'LEGAL': 'Legal Document',
+            'MEDICAL': 'Medical Document',
+            'OTHER': 'Other'
+        };
+        
+        return documentTypeMap[documentType] || convertToTitleCase(documentType);
+    };
+
     useEffect(() => {
         const fetchCaseData = async () => {
             try {
@@ -537,183 +631,231 @@ const CaseOverview = (): ReactNode => {
     }
 
     return (
-        <div className="w-full h-max flex flex-col gap-6">
-            {/* Case Header */}
-            <div className="w-full flex items-center justify-between">
-                <h1 className="text-xl font-bold text-slate-900">
-                    Case #{caseData.case_number}
-                </h1>
-                <div className="flex items-center gap-2">
-                    <Badge 
-                        className={`${
-                            caseData.priority === "HIGH" 
-                                ? "bg-red-100 text-red-800" 
-                                : caseData.priority === "MEDIUM"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-green-100 text-green-800"
-                        }`}
-                    >
-                        {convertToTitleCase(caseData.priority)} Priority
-                    </Badge>
-                    <Badge 
-                        className={`${
-                            caseData.status === "ACTIVE" 
-                                ? "bg-green-100 text-green-800" 
-                                : caseData.status === "CLOSED"
-                                ? "bg-gray-100 text-gray-800"
-                                : "bg-blue-100 text-blue-800"
-                        }`}
-                    >
-                        {convertToTitleCase(caseData.status)}
-                    </Badge>
-                    <Link href={`${pathname}/edit`}>
-                        <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300">
-                            <FaEdit className="w-4 h-4 mr-2" />
-                            Edit Case
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-
-            {/* Case Overview */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Basic Information */}
-                <div className="lg:col-span-2 border-[1px] border-slate-200 rounded-lg p-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base mb-4 flex items-center gap-2">
-                        <FaUser />
-                        Case Information
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-sm font-medium text-slate-700 mb-1">Title</p>
-                            <p className="text-sm text-slate-900">{caseData.title}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-700 mb-1">Beneficiary</p>
-                            <p className="text-sm text-slate-900">{caseData.beneficiary_name}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-700 mb-1">Service Types</p>
-                            <div className="flex flex-wrap gap-1">
-                                {caseData.service_types && caseData.service_types.length > 0 ? (
-                                    caseData.service_types.map((serviceType: string, index: number) => (
-                                        <Badge key={index} variant="outline" className="text-xs">
-                                            {serviceType}
-                                        </Badge>
-                                    ))
-                                ) : (
-                                    <span className="text-sm text-slate-500">No service types assigned</span>
-                                )}
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-700 mb-1">Case Worker</p>
-                            <p className="text-sm text-slate-900">{caseData.case_worker_name || 'Unassigned'}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-700 mb-1">Created Date</p>
-                            <p className="text-sm text-slate-900 flex items-center gap-1">
-                                <FaCalendarAlt className="w-3 h-3" />
-                                {formatDate(caseData.created_at, locale)}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-slate-700 mb-1">Last Updated</p>
-                            <p className="text-sm text-slate-900 flex items-center gap-1">
-                                <FaClock className="w-3 h-3" />
-                                {formatDate(caseData.updated_at, locale)}
-                            </p>
-                        </div>
+        <div className="w-full h-max flex flex-col gap-4">
+            {/* Case Header Card */}
+            <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-6 bg-white">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-2xl font-bold text-slate-900">
+                            Case #{caseData.case_number}
+                        </h1>
+                        <p className="text-slate-600 text-sm">{caseData.title}</p>
                     </div>
-
-                    {caseData.description && (
-                        <div className="mt-4">
-                            <p className="text-sm font-medium text-slate-700 mb-2">Description</p>
-                            <p className="text-sm text-slate-900 bg-slate-50 p-3 rounded-lg">
-                                {caseData.description}
-                            </p>
-                        </div>
-                    )}
-
-                    {caseData.tags && caseData.tags.length > 0 && (
-                        <div className="mt-4">
-                            <p className="text-sm font-medium text-slate-700 mb-2">Tags</p>
-                            <div className="flex flex-wrap gap-1">
-                                {caseData.tags.map((tag: string, index: number) => (
-                                    <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 text-xs">
-                                        #{tag}
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Case Stats */}
-                <div className="border-[1px] border-slate-200 rounded-lg p-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base mb-4 flex items-center gap-2">
-                        <FaStickyNote />
-                        Case Activity
-                    </h3>
-                    <ul className="space-y-2">
-                        <li className="flex items-center justify-between text-sm">
-                            <span className="text-slate-700">Updates:</span>
-                            <span className="font-medium text-slate-900">{caseData.notes_count || 0}</span>
-                        </li>
-                        <li className="flex items-center justify-between text-sm">
-                            <span className="text-slate-700">Documents:</span>
-                            <span className="font-medium text-slate-900">{caseData.documents_count || 0}</span>
-                        </li>
-                    </ul>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Badge 
+                            className={`${
+                                caseData.priority === "HIGH" 
+                                    ? "bg-red-100 text-red-800 hover:bg-red-200" 
+                                    : caseData.priority === "MEDIUM"
+                                    ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                    : "bg-green-100 text-green-800 hover:bg-green-200"
+                            } px-3 py-1 font-medium`}
+                        >
+                            {convertToTitleCase(caseData.priority)} Priority
+                        </Badge>
+                        <Badge 
+                            className={`${
+                                caseData.status === "IN_PROGRESS" 
+                                    ? "bg-blue-100 text-blue-800 hover:bg-blue-200" 
+                                    : caseData.status === "CLOSED"
+                                    ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                    : caseData.status === "PENDING"
+                                    ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                    : caseData.status === "ON_HOLD"
+                                    ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                                    : "bg-red-100 text-red-800 hover:bg-red-200"
+                            } px-3 py-1 font-medium`}
+                        >
+                            {convertToTitleCase(caseData.status.replace('_', ' '))}
+                        </Badge>
+                        <Link href={`${pathname}/edit`}>
+                            <Button size="sm" className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white font-medium">
+                                <FaEdit className="w-4 h-4 mr-2" />
+                                Edit Case
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Documents Section */}
-            <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base flex items-center gap-2">
-                        <FaFileAlt />
-                        Case Documents ({Array.isArray(documents) ? documents.length : 0})
-                    </h3>
-                    <div className="flex gap-2">
-                        <Button
-                            size="sm"
-                            variant={Array.isArray(documents) && documents.length > 0 ? "default" : "outline"}
-                            onClick={handleUploadDocument}
-                        >
-                            <FaFileAlt className="w-4 h-4 mr-2" />
-                            {Array.isArray(documents) && documents.length > 0 ? "Add Document" : "Upload Document"}
-                        </Button>
-                        {Array.isArray(documents) && documents.length > 0 && (
-                            <Button
-                                size="sm"
-                                variant="secondary"
-                                onClick={handleDownloadAllDocuments}
-                            >
-                                <FaDownload className="w-4 h-4 mr-2" />
-                                Download All
-                            </Button>
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Case Information Card */}
+                <div className="lg:col-span-2 w-full h-max border-[1px] border-slate-200 rounded-lg p-6 bg-white">
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold text-lg flex items-center gap-2">
+                            <FaUser className="text-lg" />
+                            Case Information
+                        </h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Title</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border">
+                                    <p className="text-sm text-slate-900">{caseData.title}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Beneficiary</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border">
+                                    <p className="text-sm text-slate-900 font-medium">{caseData.beneficiary.full_name}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Service Types</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border min-h-[44px] flex items-center">
+                                    {caseData.service_types && caseData.service_types.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {caseData.service_types.map((serviceType: string, index: number) => (
+                                                <Badge key={index} variant="outline" className="text-xs font-medium">
+                                                    {getServiceTypeLabel(serviceType)}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span className="text-sm text-slate-500">No service types assigned</span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Case Worker</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border">
+                                    <p className="text-sm text-slate-900">{caseData.assigned_to ? `${caseData.assigned_to.first_name} ${caseData.assigned_to.last_name}` : 'Unassigned'}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Created Date</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border">
+                                    <p className="text-sm text-slate-900 flex items-center gap-2">
+                                        <FaCalendarAlt className="w-4 h-4 text-relif-orange-200" />
+                                        {formatDate(caseData.created_at, locale)}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Last Updated</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border">
+                                    <p className="text-sm text-slate-900 flex items-center gap-2">
+                                        <FaClock className="w-4 h-4 text-relif-orange-200" />
+                                        {formatDate(caseData.updated_at, locale)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {caseData.description && (
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Description</label>
+                                <div className="p-4 bg-slate-50 rounded-lg border">
+                                    <p className="text-sm text-slate-900 leading-relaxed">{caseData.description}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {caseData.tags && caseData.tags.length > 0 && (
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-slate-700">Tags</label>
+                                <div className="p-3 bg-slate-50 rounded-lg border">
+                                    <div className="flex flex-wrap gap-2">
+                                        {caseData.tags.map((tag: string, index: number) => (
+                                            <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 hover:bg-relif-orange-200 text-xs font-medium">
+                                                #{tag}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {!Array.isArray(documents) || documents.length === 0 ? (
-                    <div className="text-center py-8 text-slate-500">
-                        <FaFileAlt className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-                        <p className="text-base text-slate-600">No documents uploaded yet</p>
-                        <p className="text-sm text-slate-400 mt-1">
-                            Upload your first document to get started.
-                        </p>
+                {/* Case Activity Card */}
+                <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-6 bg-white">
+                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold text-lg flex items-center gap-2">
+                            <FaStickyNote className="text-lg" />
+                            Case Activity
+                        </h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border">
+                                <div className="flex items-center gap-2">
+                                    <FaStickyNote className="w-4 h-4 text-blue-500" />
+                                    <span className="text-sm font-medium text-slate-700">Updates</span>
+                                </div>
+                                <Badge className="bg-blue-100 text-blue-800 font-bold">
+                                    {caseData.notes_count || 0}
+                                </Badge>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border">
+                                <div className="flex items-center gap-2">
+                                    <FaFileAlt className="w-4 h-4 text-green-500" />
+                                    <span className="text-sm font-medium text-slate-700">Documents</span>
+                                </div>
+                                <Badge className="bg-green-100 text-green-800 font-bold">
+                                    {caseData.documents_count || 0}
+                                </Badge>
+                            </div>
+                        </div>
                     </div>
-                ) : (
-                    <>
-                        {/* Documents List */}
-                        <div className="space-y-3">
+                </div>
+            </div>
+
+            {/* Documents Section Card */}
+            <div className="w-full h-max border-[1px] border-slate-200 rounded-lg p-6 bg-white">
+                <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <h2 className="text-relif-orange-200 font-bold text-lg flex items-center gap-2">
+                            <FaFileAlt className="text-lg" />
+                            Case Documents ({Array.isArray(documents) ? documents.length : 0})
+                        </h2>
+                        {Array.isArray(documents) && documents.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                <Button
+                                    size="sm"
+                                    className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white font-medium"
+                                    onClick={handleUploadDocument}
+                                >
+                                    <FaFileAlt className="w-4 h-4 mr-2" />
+                                    Add More Documents
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-green-200 text-green-700 hover:bg-green-50 font-medium"
+                                    onClick={handleDownloadAllDocuments}
+                                >
+                                    <FaDownload className="w-4 h-4 mr-2" />
+                                    Download All
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
+                    {!Array.isArray(documents) || documents.length === 0 ? (
+                        <div className="text-center py-12 px-4">
+                            <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
+                                <FaFileAlt className="w-8 h-8 text-slate-400" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-slate-600 mb-2">No documents uploaded yet</h3>
+                            <p className="text-sm text-slate-500 mb-4">
+                                Upload your first document to get started with case documentation.
+                            </p>
+                            <Button
+                                size="default"
+                                variant="outline"
+                                className="border-slate-300 text-slate-600 hover:bg-slate-50 font-medium px-6 py-2"
+                                onClick={handleUploadDocument}
+                            >
+                                <FaFileAlt className="w-4 h-4 mr-2" />
+                                Add First Document
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
                             {documents.map(doc => (
                                 <div
                                     key={doc.id}
-                                    className="border border-gray-200 bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                                    className="border border-slate-200 bg-white rounded-lg p-4 hover:border-relif-orange-200 hover:shadow-sm transition-all duration-200"
                                 >
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
@@ -722,17 +864,9 @@ const CaseOverview = (): ReactNode => {
                                                     {doc.document_name}
                                                 </h4>
                                                 <Badge variant="outline" className="text-xs font-medium">
-                                                    {doc.document_type || 'OTHER'}
+                                                    {getDocumentTypeLabel(doc.document_type || 'OTHER')}
                                                 </Badge>
-                                                {doc.is_finalized ? (
-                                                    <Badge className="text-xs bg-green-100 text-green-800 font-medium">
-                                                        Final
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge className="text-xs bg-yellow-100 text-yellow-800 font-medium">
-                                                        Draft
-                                                    </Badge>
-                                                )}
+
                                             </div>
 
                                             {doc.description && (
@@ -780,16 +914,14 @@ const CaseOverview = (): ReactNode => {
                                                 <FaDownload className="w-3 h-3 mr-1" />
                                                 Download
                                             </Button>
-                                            {!doc.is_finalized && (
-                                                <Button
-                                                    size="sm"
-                                                    className="text-xs px-3 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
-                                                    onClick={() => handleEditDocument(doc)}
-                                                >
-                                                    <FaEdit className="w-3 h-3 mr-1" />
-                                                    Edit
-                                                </Button>
-                                            )}
+                                            <Button
+                                                size="sm"
+                                                className="text-xs px-3 py-1 bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                                onClick={() => handleEditDocument(doc)}
+                                            >
+                                                <FaEdit className="w-3 h-3 mr-1" />
+                                                Edit
+                                            </Button>
                                             <Button
                                                 size="sm"
                                                 className="text-xs px-3 py-1 bg-red-500 hover:bg-red-600 text-white"
@@ -803,17 +935,8 @@ const CaseOverview = (): ReactNode => {
                                 </div>
                             ))}
                         </div>
-
-                        {/* Show More Button if many documents */}
-                        {Array.isArray(documents) && documents.length > 5 && (
-                            <div className="text-center mt-4">
-                                <Button variant="outline" size="sm">
-                                    View All Documents ({documents.length})
-                                </Button>
-                            </div>
-                        )}
-                    </>
-                )}
+                    )}
+                </div>
             </div>
 
             {/* Delete Confirmation Dialog */}
@@ -937,7 +1060,7 @@ const CaseOverview = (): ReactNode => {
                         <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
                             <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
                                 <FaTags />
-                                Tags & Status
+                                Tags
                             </h2>
 
                             {/* Tags */}
@@ -973,20 +1096,7 @@ const CaseOverview = (): ReactNode => {
                                 />
                             </div>
 
-                            {/* Finalized Status */}
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_finalized"
-                                    checked={editFormData.is_finalized}
-                                    onCheckedChange={checked =>
-                                        setEditFormData(prev => ({
-                                            ...prev,
-                                            is_finalized: checked as boolean,
-                                        }))
-                                    }
-                                />
-                                <Label htmlFor="is_finalized">Mark as finalized</Label>
-                            </div>
+
                         </div>
                     </div>
 
