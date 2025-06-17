@@ -456,9 +456,9 @@ export async function getBeneficiaryStats(orgId: string): Promise<AxiosResponse<
             
             const stats = {
                 total_beneficiaries: beneficiaries.length,
-                active_beneficiaries: beneficiaries.filter(b => b.status === 'ACTIVE').length,
-                pending_beneficiaries: beneficiaries.filter(b => b.status === 'PENDING').length,
-                inactive_beneficiaries: beneficiaries.filter(b => b.status === 'INACTIVE').length,
+                active_beneficiaries: beneficiaries.filter((b: any) => b.status === 'ACTIVE').length,
+                pending_beneficiaries: beneficiaries.filter((b: any) => b.status === 'PENDING').length,
+                inactive_beneficiaries: beneficiaries.filter((b: any) => b.status === 'INACTIVE').length,
             };
             
             console.log("✅ Calculated beneficiary stats from data:", stats);
@@ -513,9 +513,9 @@ export async function getVolunteerStats(orgId: string): Promise<AxiosResponse<an
             
             const stats = {
                 total_volunteers: volunteers.length,
-                active_volunteers: volunteers.filter(v => v.status === 'active').length,
-                pending_volunteers: volunteers.filter(v => v.status === 'pending').length,
-                inactive_volunteers: volunteers.filter(v => v.status === 'inactive').length,
+                active_volunteers: volunteers.filter((v: any) => v.status === 'active').length,
+                pending_volunteers: volunteers.filter((v: any) => v.status === 'pending').length,
+                inactive_volunteers: volunteers.filter((v: any) => v.status === 'inactive').length,
             };
             
             console.log("✅ Calculated volunteer stats from data:", stats);
@@ -570,9 +570,9 @@ export async function getHousingStats(orgId: string): Promise<AxiosResponse<any>
             
             const stats = {
                 total_housing: housings.length,
-                available_housing: housings.filter(h => h.status === 'available').length,
-                occupied_housing: housings.filter(h => h.status === 'occupied').length,
-                maintenance_housing: housings.filter(h => h.status === 'maintenance').length,
+                available_housing: housings.filter((h: any) => h.status === 'available').length,
+                occupied_housing: housings.filter((h: any) => h.status === 'occupied').length,
+                maintenance_housing: housings.filter((h: any) => h.status === 'maintenance').length,
             };
             
             console.log("✅ Calculated housing stats from data:", stats);

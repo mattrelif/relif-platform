@@ -510,7 +510,7 @@ const CaseOverview = (): ReactNode => {
                         </h2>
                         <span className="text-sm text-slate-500">
                             {caseData.case_number} •{" "}
-                            {convertToTitleCase(caseData.case_type.replace("_", " "))}
+                            {convertToTitleCase(caseData.case_type?.replace("_", " ") || "Unknown")}
                         </span>
                     </div>
                     <Button variant="outline" size="sm" asChild>
@@ -522,7 +522,7 @@ const CaseOverview = (): ReactNode => {
                 </div>
                 <div className="flex gap-2 flex-wrap w-full">
                     <Badge className={STATUS_COLORS[caseData.status as keyof typeof STATUS_COLORS]}>
-                        {caseData.status.replace("_", " ")}
+                        {caseData.status?.replace("_", " ") || "Unknown"}
                     </Badge>
                     <Badge
                         className={
@@ -539,7 +539,7 @@ const CaseOverview = (): ReactNode => {
                                 ]
                             }
                         >
-                            {caseData.urgency_level.replace("_", " ")}
+                            {caseData.urgency_level?.replace("_", " ") || "Unknown"}
                         </Badge>
                     )}
                     {isOverdue && (
@@ -569,7 +569,7 @@ const CaseOverview = (): ReactNode => {
                         {caseData.estimated_duration && (
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>Estimated Duration:</strong>{" "}
-                                {convertToTitleCase(caseData.estimated_duration.replace("_", " "))}
+                                {convertToTitleCase(caseData.estimated_duration?.replace("_", " ") || "Unknown")}
                             </li>
                         )}
                         {caseData.budget_allocated && (
@@ -580,7 +580,7 @@ const CaseOverview = (): ReactNode => {
                         {caseData.urgency_level && (
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>Urgency Level:</strong>{" "}
-                                {convertToTitleCase(caseData.urgency_level.replace("_", " "))}
+                                {convertToTitleCase(caseData.urgency_level?.replace("_", " ") || "Unknown")}
                             </li>
                         )}
                         {caseData.tags && caseData.tags.length > 0 && (
@@ -604,11 +604,11 @@ const CaseOverview = (): ReactNode => {
                     </h3>
                     <ul>
                         <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Beneficiary:</strong> {caseData.beneficiary.full_name}
+                            <strong>Beneficiary:</strong> {caseData.beneficiary?.full_name || "Not assigned"}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Assigned To:</strong> {caseData.assigned_to.first_name}{" "}
-                            {caseData.assigned_to.last_name}
+                            <strong>Assigned To:</strong> {caseData.assigned_to?.first_name || "Not assigned"}{" "}
+                            {caseData.assigned_to?.last_name || ""}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Created:</strong> {formatDate(caseData.created_at, locale)}

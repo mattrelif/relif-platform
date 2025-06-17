@@ -207,7 +207,7 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                             <div className="flex items-center gap-1">
                                 <FaClock className="text-xs" />
                                 <span>
-                                    {convertToTitleCase(data.estimated_duration.replace("_", " "))}
+                                    {convertToTitleCase(data.estimated_duration?.replace("_", " ") || "Unknown")}
                                 </span>
                             </div>
                         )}
