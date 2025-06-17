@@ -22,7 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { CaseSchema } from "@/types/case.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
@@ -52,9 +52,9 @@ import {
     deleteCaseDocument,
     extractFileKeyFromS3Url,
 } from "@/repository/organization.repository";
-import { CreateCaseDocumentPayload } from "@/types/case.types";
+
 import { useToast } from "@/components/ui/use-toast";
-import { DebugInfo } from "@/components/debug-info";
+
 
 const CaseOverview = (): ReactNode => {
     const pathname = usePathname();

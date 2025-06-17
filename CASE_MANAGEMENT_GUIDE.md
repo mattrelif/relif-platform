@@ -20,7 +20,7 @@ src/app/[lang]/(pages)/app/(commons)/[organization_id]/cases/
 ├── [case_id]/                        ✅ Dynamic case routes
 │   ├── (withLayout)/                 ✅ Tabbed interface
 │   │   ├── layout.tsx                ✅ Case detail layout with sidebar
-│   │   ├── tabs.layout.tsx           ✅ Navigation tabs (Overview/Notes/Documents)
+│   │   ├── tabs.layout.tsx           ✅ Navigation tabs (Overview/Notes)
 │   │   ├── content.tsx               ✅ Case overview with stats
 │   │   ├── overview/                 ✅ Case details & beneficiary info
 │   │   │   └── page.tsx
@@ -119,7 +119,7 @@ interface CaseSchema {
 
 ### **✅ Layout Implemented:**
 - **📌 Case Header:** Number, title, status, priority, actions
-- **🗂️ Tab Navigation:** Overview, Notes, Documents
+- **🗂️ Tab Navigation:** Overview (includes documents), Notes
 - **👤 Beneficiary Sidebar:** Photo, contact info, quick actions
 - **📊 Statistics Cards:** Notes count, documents count, days open
 - **🔄 Quick Actions:** Edit, Close, Reassign, Delete
