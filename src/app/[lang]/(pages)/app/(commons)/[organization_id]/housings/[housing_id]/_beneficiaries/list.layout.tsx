@@ -2,7 +2,7 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { PDFDocument } from "@/components/reports/beneficiaries";
+
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { getBeneficiariesByHousingId } from "@/repository/housing.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { flattenObject } from "@/utils/flattenObject";
-import { pdf } from "@react-pdf/renderer";
+
 import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -80,8 +80,13 @@ const BeneficiaryList = ({ housingId }: Props): ReactNode => {
     const handleDownloadPDF = async () => {
         try {
             const response = await getBeneficiariesByHousingId(housingId, 0, 99999, "");
+            // Dynamically import PDF functionality to avoid chunk loading issues
+            const { pdf } = await import("@react-pdf/renderer");
+            const { createElement } = await import("react");
+            const { PDFDocument } = await import("@/components/reports/beneficiaries");
+            
             const blob = await pdf(
-                <PDFDocument title="Housing beneficiaries" beneficiaries={response.data.data} />
+                createElement(PDFDocument, { title: "Housing beneficiaries", beneficiaries: response.data.data })
             ).toBlob();
             saveAs(blob, `beneficiaries_${housingId}.pdf`);
         } catch {

@@ -2,7 +2,7 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { PDFDocument } from "@/components/reports/spaces";
+
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -13,7 +13,7 @@ import {
 import { getSpacesByHousingId } from "@/repository/housing.repository";
 import { SpaceSchema } from "@/types/space.types";
 import { flattenObject } from "@/utils/flattenObject";
-import { pdf } from "@react-pdf/renderer";
+
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { ReactNode, useEffect, useState } from "react";
@@ -52,8 +52,13 @@ const SpaceList = ({ housingId }: { housingId: string }): ReactNode => {
     const handleDownloadPDF = async (): Promise<void> => {
         try {
             const response = await getSpacesByHousingId(housingId, 0, 99999);
+            // Dynamically import PDF functionality to avoid chunk loading issues
+            const { pdf } = await import("@react-pdf/renderer");
+            const { createElement } = await import("react");
+            const { PDFDocument } = await import("@/components/reports/spaces");
+            
             const blob = await pdf(
-                <PDFDocument title="Spaces" spaces={response.data.data} />
+                createElement(PDFDocument, { title: "Spaces", spaces: response.data.data })
             ).toBlob();
             saveAs(blob, `spaces_${housingId}.pdf`);
         } catch {

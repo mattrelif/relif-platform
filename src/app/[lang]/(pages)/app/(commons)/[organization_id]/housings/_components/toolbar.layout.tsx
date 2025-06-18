@@ -2,7 +2,7 @@
 
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { PDFDocument } from "@/components/reports/housings";
+
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { findHousingsByOrganizationId } from "@/repository/organization.repository";
 import { flattenObject } from "@/utils/flattenObject";
-import { pdf } from "@react-pdf/renderer";
+
 import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,8 +30,13 @@ const Toolbar = ({ organizationId }: { organizationId: string }): ReactNode => {
     const handleDownloadPDF = async () => {
         try {
             const response = await findHousingsByOrganizationId(organizationId, 0, 99999, "");
+            // Dynamically import PDF functionality to avoid chunk loading issues
+            const { pdf } = await import("@react-pdf/renderer");
+            const { createElement } = await import("react");
+            const { PDFDocument } = await import("@/components/reports/housings");
+            
             const blob = await pdf(
-                <PDFDocument title="Housings" housings={response.data.data} />
+                createElement(PDFDocument, { title: "Housings", housings: response.data.data })
             ).toBlob();
             saveAs(blob, "housings.pdf");
         } catch {

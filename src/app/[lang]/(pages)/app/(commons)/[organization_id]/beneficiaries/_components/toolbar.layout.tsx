@@ -1,6 +1,6 @@
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { PDFDocument } from "@/components/reports/beneficiaries";
+
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { getBeneficiariesByOrganizationID } from "@/repository/organization.repository";
 import { flattenObject } from "@/utils/flattenObject";
 import { getFromLocalStorage } from "@/utils/localStorage";
-import { pdf } from "@react-pdf/renderer";
+
 import { saveAs } from "file-saver";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -60,8 +60,13 @@ const Toolbar = ({ filteredBeneficiaries, searchTerm }: ToolbarProps): ReactNode
             const titleSuffix = exportType === "filtered" ? " (Filtered)" : 
                               exportType === "searched" ? " (Search Results)" : "";
             
+            // Dynamically import PDF functionality to avoid chunk loading issues
+            const { pdf } = await import("@react-pdf/renderer");
+            const { createElement } = await import("react");
+            const { PDFDocument } = await import("@/components/reports/beneficiaries");
+            
             const blob = await pdf(
-                <PDFDocument title={`Beneficiaries Report${titleSuffix}`} beneficiaries={beneficiaries} />
+                createElement(PDFDocument, { title: `Beneficiaries Report${titleSuffix}`, beneficiaries })
             ).toBlob();
             
             saveAs(blob, `beneficiaries-report-${exportType}-${new Date().toISOString().split('T')[0]}.pdf`);

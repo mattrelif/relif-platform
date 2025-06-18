@@ -1,6 +1,6 @@
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
-import { CasesPDFDocument } from "@/components/reports/cases";
+
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -63,6 +63,7 @@ const Toolbar = ({ filteredCases, searchTerm }: ToolbarProps): ReactNode => {
             // Dynamically import PDF functionality to avoid chunk loading issues
             const { pdf } = await import("@react-pdf/renderer");
             const { createElement } = await import("react");
+            const { CasesPDFDocument } = await import("@/components/reports/cases");
             
             const blob = await pdf(
                 createElement(CasesPDFDocument, { title: `Cases Report${titleSuffix}`, cases })
