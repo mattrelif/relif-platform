@@ -454,7 +454,6 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                                             <SelectItem value="passport">Passport</SelectItem>
                                             <SelectItem value="national_id">National ID</SelectItem>
                                             <SelectItem value="drivers_license">Driver's License</SelectItem>
-                                            <SelectItem value="cpf">CPF</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <Input
@@ -462,7 +461,7 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                                         name="documentValue"
                                         type="text"
                                         className="w-[50%]"
-                                        placeholder={dict.commons.beneficiaries.edit.documentValuePlaceholder}
+                                        placeholder="12345678910"
                                         required
                                         defaultValue={data.documents[0]?.value}
                                     />

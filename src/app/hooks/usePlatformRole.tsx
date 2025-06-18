@@ -8,9 +8,15 @@ const usePlatformRole = (): "ORG_MEMBER" | "ORG_ADMIN" | "RELIF_MEMBER" => {
     );
 
     useEffect(() => {
-        const data: UserSchema = getFromLocalStorage("r_ud");
-        if (data) {
-            setPlatformRole(data.platform_role as "ORG_MEMBER" | "ORG_ADMIN" | "RELIF_MEMBER");
+        try {
+            const data: UserSchema = getFromLocalStorage("r_ud");
+            if (data) {
+                setPlatformRole(data.platform_role as "ORG_MEMBER" | "ORG_ADMIN" | "RELIF_MEMBER");
+            }
+        } catch (error) {
+            console.error("Error reading platform role from localStorage:", error);
+            // Default to ORG_ADMIN for mock data to show all toolbar buttons
+            setPlatformRole("ORG_ADMIN");
         }
     }, []);
 

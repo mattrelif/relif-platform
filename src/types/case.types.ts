@@ -110,7 +110,7 @@ export interface CaseNoteSchema {
     title: string;
     content: string;
     tags: string[];
-    note_type: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER";
+    note_type: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER";
     is_important: boolean;
     created_by: {
         id: string;
@@ -238,7 +238,7 @@ export interface CreateCasePayload {
     initial_note?: {
         title: string;
         content: string;
-        note_type: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER";
+        note_type: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER";
         is_important: boolean;
         tags: string[];
     };
@@ -345,7 +345,7 @@ export interface CreateCaseNotePayload {
     title: string;
     content: string;
     tags: string[];
-    note_type: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER";
+    note_type: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER";
     is_important: boolean;
 }
 

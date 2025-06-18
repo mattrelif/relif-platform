@@ -84,7 +84,7 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
             >
                 <div className="flex gap-4">
                     <Avatar className="w-14 h-14">
-                        <AvatarImage src={data.image_url} />
+                        <AvatarImage src={data.image_url} className="object-cover" />
                         <AvatarFallback className="bg-relif-orange-200 text-white">
                             {data?.full_name.charAt(0).toUpperCase()}
                         </AvatarFallback>

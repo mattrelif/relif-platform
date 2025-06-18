@@ -20,7 +20,8 @@ interface FilterSection {
     options?: FilterOption[];
     placeholder: string;
     note?: string;
-    type?: "select" | "date" | "number";
+    type?: "select" | "date" | "number" | "searchable-select";
+    searchable?: boolean;
     min?: number;
     max?: number;
 }
@@ -81,6 +82,10 @@ export const SearchFilterBar = ({
 
     // State for date pickers
     const [dateStates, setDateStates] = useState<Record<string, Date | undefined>>({});
+    
+    // State for searchable selects
+    const [searchableStates, setSearchableStates] = useState<Record<string, string>>({});
+    const [openSearchables, setOpenSearchables] = useState<Record<string, boolean>>({});
 
     const handleDateSelect = (sectionKey: string, date: Date | undefined) => {
         setDateStates(prev => ({ ...prev, [sectionKey]: date }));
@@ -216,6 +221,78 @@ export const SearchFilterBar = ({
                                                     }
                                                 }}
                                             />
+                                        ) : section.type === "searchable-select" || section.searchable ? (
+                                            <div className="relative">
+                                                <Input
+                                                    type="text"
+                                                    placeholder={section.placeholder}
+                                                    value={searchableStates[section.key] || ""}
+                                                    onChange={(e) => {
+                                                        setSearchableStates(prev => ({
+                                                            ...prev,
+                                                            [section.key]: e.target.value
+                                                        }));
+                                                    }}
+                                                    onFocus={() => {
+                                                        setOpenSearchables(prev => ({
+                                                            ...prev,
+                                                            [section.key]: true
+                                                        }));
+                                                    }}
+                                                    onBlur={() => {
+                                                        // Delay closing to allow clicking on options
+                                                        setTimeout(() => {
+                                                            setOpenSearchables(prev => ({
+                                                                ...prev,
+                                                                [section.key]: false
+                                                            }));
+                                                        }, 150);
+                                                    }}
+                                                    className="w-full h-8 text-xs border-relif-orange-200 focus:border-relif-orange-300"
+                                                />
+                                                {openSearchables[section.key] && (
+                                                    <div className="absolute top-full left-0 right-0 z-50 max-h-32 overflow-y-auto border border-slate-200 rounded-md bg-white shadow-lg">
+                                                        {section.options
+                                                            ?.filter(option => 
+                                                                option.label.toLowerCase().includes(
+                                                                    (searchableStates[section.key] || "").toLowerCase()
+                                                                )
+                                                            )
+                                                            ?.slice(0, 10)
+                                                            ?.map((option) => (
+                                                                <button
+                                                                    key={option.value}
+                                                                    onClick={() => {
+                                                                        if (onFilterAdd) {
+                                                                            onFilterAdd(section.key, option.value);
+                                                                        }
+                                                                        setSearchableStates(prev => ({
+                                                                            ...prev,
+                                                                            [section.key]: ""
+                                                                        }));
+                                                                        setOpenSearchables(prev => ({
+                                                                            ...prev,
+                                                                            [section.key]: false
+                                                                        }));
+                                                                    }}
+                                                                    className="w-full text-left px-3 py-2 text-xs hover:bg-slate-100 border-b border-slate-100 last:border-b-0"
+                                                                >
+                                                                    {option.label}
+                                                                </button>
+                                                            ))}
+                                                        {section.options
+                                                            ?.filter(option => 
+                                                                option.label.toLowerCase().includes(
+                                                                    (searchableStates[section.key] || "").toLowerCase()
+                                                                )
+                                                            )?.length === 0 && searchableStates[section.key] && (
+                                                            <div className="px-3 py-2 text-xs text-slate-500">
+                                                                No results found
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         ) : (
                                             <Select
                                                 onValueChange={(value) => {

@@ -97,7 +97,63 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
 
         (async () => {
             try {
-                if (beneficiaryId) {
+                setError(false); // Reset error state
+                if (beneficiaryId === 'mock-beneficiary-1') {
+                    // Mock data for demonstration
+                    const mockBeneficiaryData = {
+                        id: "mock-beneficiary-1",
+                        full_name: "Matheus Souza",
+                        birthdate: "1995-03-15T00:00:00Z",
+                        email: "matheus.souza@example.com",
+                        gender: "male",
+                        phones: ["+55_11_98765-4321", "+55_11_99999-8888"],
+                        civil_status: "single",
+                        spoken_languages: ["Português", "English", "Español"],
+                        education: "complete-higher-education",
+                        occupation: "Software Developer",
+                        current_housing_id: "mock-housing-1",
+                        current_housing: { name: "Mock Housing Center" },
+                        current_room_id: "mock-room-1",
+                        current_room: { name: "Mock Room A" },
+                        created_at: "2024-12-01T10:30:00Z",
+                        document: {
+                            type: "CPF",
+                            value: "123.456.789-00"
+                        },
+                        address: {
+                            address_line_1: "Rua das Flores, 123",
+                            address_line_2: "Apartamento 45",
+                            city: "São Paulo",
+                            zip_code: "01234-567",
+                            district: "SP",
+                            country: "Brasil"
+                        },
+                        emergency_contacts: [
+                            {
+                                full_name: "Maria Souza",
+                                relationship: "parent",
+                                phones: ["+55_11_98888-7777", "+55_11_97777-6666"],
+                                emails: ["maria.souza@example.com", "maria.alt@example.com"]
+                            }
+                        ],
+                        medical_information: {
+                            allergies: ["Pólen", "Frutos do mar"],
+                            current_medications: ["Vitamina D"],
+                            recurrent_medical_conditions: ["Asma leve"],
+                            health_insurance_plans: ["SUS", "Unimed"],
+                            blood_type: "O+",
+                            taken_vaccines: ["COVID-19", "Influenza 2024"],
+                            mental_health_history: ["Estável"],
+                            height: 175,
+                            weight: 70,
+                            addictions: [],
+                            disabilities: [],
+                            prothesis_or_medical_devices: []
+                        },
+                        notes: "Mock beneficiary data for demonstration purposes. This person is actively engaged in case management and receives regular support."
+                    };
+                    setData(mockBeneficiaryData as any);
+                } else if (beneficiaryId) {
                     const response = await getBeneficiaryById(beneficiaryId);
                     setData(response.data);
                 } else {
@@ -109,7 +165,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                 setIsLoading(false);
             }
         })();
-    }, []);
+    }, [beneficiaryId]);
 
     if (isLoading)
         return (
@@ -369,7 +425,7 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                     <HoverCardTrigger>
                                         <span className="text-sm text-slate-900 flex items-center gap-2">
                                             {data.emergency_contacts[0].phones[0] &&
-                                                data.phones[0].split("_").join(" ")}
+                                                data.emergency_contacts[0].phones[0].split("_").join(" ")}
                                             {data.emergency_contacts[0].phones.length >= 2 && (
                                                 <Badge variant="outline">
                                                     +{data.emergency_contacts[0].phones.length - 1}
@@ -499,9 +555,8 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                             <textarea
                                 className="flex h-full resize-none w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 ring-offset-white focus:outline-none"
                                 readOnly
-                            >
-                                {data.notes}
-                            </textarea>
+                                defaultValue={data.notes}
+                            />
                         </div>
 
                         {/*  <ul className="h-[480px] overflow-y-scroll overflow-x-hidden pt-2 pb-4 pl-4 pr-4 flex flex-col gap-2"> */}

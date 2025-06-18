@@ -40,16 +40,31 @@ import { Education } from "./education.layout";
 import { Gender } from "./gender.layout";
 import { Medical } from "./medical.layout";
 import { RelationshipDegree } from "./relationship.layout";
+import { AddressAutocomplete, AddressData } from "@/components/ui/address-autocomplete";
+import { useGooglePlaces } from "@/hooks/useGooglePlaces";
 
 interface LanguageOption {
     value: string;
     label: string;
 }
 
+interface EmergencyContact {
+    id: string;
+    fullName: string;
+    relationship: string;
+    otherRelationship?: string;
+    phone: string;
+    email: string;
+}
+
 const Form = (): ReactNode => {
     const router = useRouter();
     const { toast } = useToast();
     const dict = useDictionary();
+    
+    // Debug: Log dictionary to see what's available
+    console.log("Dictionary:", dict);
+    console.log("Beneficiaries create title:", dict?.commons?.beneficiaries?.create?.title);
 
     const [currentUser, setCurrentUser] = useState<UserSchema | null>(null);
     const [languages, setLanguages] = useState<LanguageOption[]>([]);
@@ -57,11 +72,27 @@ const Form = (): ReactNode => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [phone, setPhone] = useState<string>("");
-    const [emergencyPhone, setEmergencyPhone] = useState<string>("");
     const [skipMedicalInfo, setSkipMedicalInfo] = useState<boolean>(false);
+    const [skipEmergencyContact, setSkipEmergencyContact] = useState<boolean>(false);
+    const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([
+        {
+            id: crypto.randomUUID(),
+            fullName: "",
+            relationship: "",
+            otherRelationship: "",
+            phone: "",
+            email: ""
+        }
+    ]);
     const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
+    const [birthdateInput, setBirthdateInput] = useState<string>("");
+    const [birthdateError, setBirthdateError] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [requiresReview, setRequiresReview] = useState<boolean>(false);
+    
+    // Google Places integration
+    const { apiKey, isReady } = useGooglePlaces();
+    const [addressData, setAddressData] = useState<AddressData | null>(null);
 
     useEffect(() => {
         try {
@@ -124,6 +155,27 @@ const Form = (): ReactNode => {
         actionMeta: ActionMeta<LanguageOption>
     ) => {
         setLanguages([...(newValue || [])]);
+    };
+
+    const addEmergencyContact = () => {
+        setEmergencyContacts(prev => [...prev, {
+            id: crypto.randomUUID(),
+            fullName: "",
+            relationship: "",
+            otherRelationship: "",
+            phone: "",
+            email: ""
+        }]);
+    };
+
+    const removeEmergencyContact = (id: string) => {
+        setEmergencyContacts(prev => prev.filter(contact => contact.id !== id));
+    };
+
+    const updateEmergencyContact = (id: string, field: keyof EmergencyContact, value: string) => {
+        setEmergencyContacts(prev => prev.map(contact => 
+            contact.id === id ? { ...contact, [field]: value } : contact
+        ));
     };
 
     const pathname = usePathname();
@@ -198,22 +250,36 @@ const Form = (): ReactNode => {
                 throw new Error("At least one language is required");
             }
 
-            // Validate address fields
-            if (!data.addressLine1 || !data.city || !data.postalCode || !data.state || !data.country) {
+            // Validate address fields (from autocomplete or manual input)
+            const addressToUse = addressData || {
+                address_line_1: data.addressLine1 || "",
+                address_line_2: data.addressLine2 || "",
+                city: data.city || "",
+                district: data.state || "",
+                zip_code: data.postalCode || "",
+                country: data.country || "",
+            };
+            
+            if (!addressToUse.address_line_1 || !addressToUse.city || !addressToUse.zip_code || !addressToUse.district || !addressToUse.country) {
                 throw new Error("Address fields (address line 1, city, postal code, state, country) are required");
             }
 
-            // Validate emergency contact fields
-            if (!data.emergencyName) {
-                throw new Error("Emergency contact name is required");
-            }
-
-            if (!emergencyPhone || emergencyPhone.trim() === "") {
-                throw new Error("Emergency contact phone is required");
-            }
-
-            if (!data.emergencyEmail) {
-                throw new Error("Emergency contact email is required");
+            // Validate emergency contact fields (only if not skipped)
+            if (!skipEmergencyContact && emergencyContacts.length > 0) {
+                emergencyContacts.forEach((contact, index) => {
+                    if (!contact.fullName || contact.fullName.trim() === "") {
+                        throw new Error(`Emergency contact ${index + 1}: Name is required`);
+                    }
+                    if (!contact.relationship || contact.relationship.trim() === "") {
+                        throw new Error(`Emergency contact ${index + 1}: Relationship is required`);
+                    }
+                    if (!contact.phone || contact.phone.trim() === "") {
+                        throw new Error(`Emergency contact ${index + 1}: Phone is required`);
+                    }
+                    if (!contact.email || contact.email.trim() === "") {
+                        throw new Error(`Emergency contact ${index + 1}: Email is required`);
+                    }
+                });
             }
 
             // Validate "other" options
@@ -229,10 +295,13 @@ const Form = (): ReactNode => {
                 throw new Error("Please specify the education when 'Other' is selected");
             }
 
-            // Validate emergency contact relationship
-            const relationship = data.emergencyRelationship === "other" ? data.otherEmergencyRelationship : data.emergencyRelationship;
-            if (!relationship || relationship.trim() === "") {
-                throw new Error("Emergency contact relationship is required");
+            // Validate emergency contact relationship (only if not skipped)
+            let relationship = "";
+            if (!skipEmergencyContact) {
+                relationship = data.emergencyRelationship === "other" ? data.otherEmergencyRelationship : data.emergencyRelationship;
+                if (!relationship || relationship.trim() === "") {
+                    throw new Error("Emergency contact relationship is required");
+                }
             }
 
             const today = new Date();
@@ -285,12 +354,12 @@ const Form = (): ReactNode => {
                 spoken_languages: languages.map(lang => lang.value),
                 phones: phone ? [phone] : [],
                 address: {
-                    address_line_1: data.addressLine1 || "",
-                    address_line_2: data.addressLine2 || "",
-                    city: data.city || "",
-                    district: data.state || "",
-                    zip_code: data.postalCode || "",
-                    country: data.country || "",
+                    address_line_1: addressToUse.address_line_1,
+                    address_line_2: addressToUse.address_line_2,
+                    city: addressToUse.city,
+                    district: addressToUse.district,
+                    zip_code: addressToUse.zip_code,
+                    country: addressToUse.country,
                 },
                 medical_information: medicalData,
                 notes: notes,
@@ -301,14 +370,14 @@ const Form = (): ReactNode => {
                         value: data.documentValue,
                     },
                 ],
-                emergency_contacts: [
-                    {
-                        full_name: data.emergencyName,
-                        relationship: relationship,
-                        phones: emergencyPhone ? [emergencyPhone] : [],
-                        emails: [data.emergencyEmail],
-                    },
-                ],
+                emergency_contacts: skipEmergencyContact ? [] : emergencyContacts
+                    .filter(contact => contact.fullName.trim() !== "")
+                    .map(contact => ({
+                        full_name: contact.fullName,
+                        relationship: contact.relationship === "other" ? (contact.otherRelationship || "") : contact.relationship,
+                        phones: contact.phone ? [contact.phone] : [],
+                        emails: [contact.email],
+                    })),
             });
 
             toast({
@@ -338,7 +407,7 @@ const Form = (): ReactNode => {
         <div className="w-full h-max p-4">
             <h1 className="text-2xl text-slate-900 font-bold flex items-center gap-3 mb-6">
                 <FaUsers />
-                {dict.commons.beneficiaries.create.title}
+                {dict?.commons?.beneficiaries?.create?.title || "Create Beneficiary"}
             </h1>
 
             <form
@@ -408,26 +477,50 @@ const Form = (): ReactNode => {
                                     name="birthdate"
                                     type="text"
                                     placeholder="DD/MM/YYYY or click calendar"
-                                    value={birthdate ? format(birthdate, "dd/MM/yyyy") : ""}
+                                    value={birthdate ? format(birthdate, "dd/MM/yyyy") : birthdateInput}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        // Try to parse different date formats
-                                        if (value) {
-                                            // Handle DD/MM/YYYY format
+                                        setBirthdateInput(value);
+                                        setBirthdateError(""); // Clear error while typing
+                                        
+                                        // Clear the date if input is empty
+                                        if (!value) {
+                                            setBirthdate(undefined);
+                                            return;
+                                        }
+                                        
+                                        // Only try to parse when we have a complete date (10 characters: DD/MM/YYYY)
+                                        if (value.length === 10) {
                                             const parts = value.split('/');
                                             if (parts.length === 3) {
                                                 const day = parseInt(parts[0]);
                                                 const month = parseInt(parts[1]) - 1; // Month is 0-indexed
                                                 const year = parseInt(parts[2]);
+                                                
                                                 if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
                                                     const date = new Date(year, month, day);
                                                     if (date.getFullYear() === year && date.getMonth() === month && date.getDate() === day) {
-                                                        setBirthdate(date);
+                                                        // Check if date is within valid range
+                                                        const today = new Date();
+                                                        const minDate = new Date(1900, 0, 1);
+                                                        
+                                                        if (date > today) {
+                                                            setBirthdateError("Birthdate cannot be in the future");
+                                                        } else if (date < minDate) {
+                                                            setBirthdateError("Birthdate cannot be before year 1900");
+                                                        } else {
+                                                            setBirthdate(date);
+                                                            setBirthdateError("");
+                                                        }
+                                                        return;
                                                     }
                                                 }
                                             }
-                                        } else {
-                                            setBirthdate(undefined);
+                                            // Show error for invalid format when 10 characters are entered
+                                            setBirthdateError("Invalid date format. Use DD/MM/YYYY");
+                                        } else if (value.length > 10) {
+                                            // Prevent typing more than 10 characters
+                                            setBirthdateInput(value.slice(0, 10));
                                         }
                                     }}
                                     className="pr-10"
@@ -448,13 +541,38 @@ const Form = (): ReactNode => {
                                         <Calendar
                                             mode="single"
                                             selected={birthdate}
-                                            onSelect={setBirthdate}
+                                            onSelect={(date) => {
+                                                setBirthdate(date);
+                                                setBirthdateInput(""); // Clear input when date is selected from calendar
+                                                setBirthdateError(""); // Clear any errors
+                                            }}
                                             disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                            captionLayout="dropdown"
+                                            fromYear={1900}
+                                            toYear={new Date().getFullYear()}
+                                            defaultMonth={birthdate || new Date(1990, 0)} // Default to year 1990 for better UX
+                                            classNames={{
+                                                caption: "flex justify-center pt-1 relative items-center",
+                                                caption_label: "hidden", // Hide the duplicate title
+                                                caption_dropdowns: "flex justify-center gap-2",
+                                                dropdown_month: "text-sm font-medium border border-slate-200 rounded-md px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-relif-orange-200",
+                                                dropdown_year: "text-sm font-medium border border-slate-200 rounded-md px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-relif-orange-200",
+                                                head_cell: "text-slate-500 rounded-md w-9 font-normal text-sm",
+                                                cell: "text-sm",
+                                                day: "h-9 w-9 p-0 font-normal text-sm hover:bg-slate-100 focus:bg-slate-100",
+                                                day_selected: "bg-relif-orange-500 text-white hover:bg-relif-orange-600 focus:bg-relif-orange-600",
+                                                day_today: "bg-slate-100 text-slate-900 font-semibold",
+                                                day_outside: "text-slate-400 opacity-50",
+                                                day_disabled: "text-slate-400 opacity-50",
+                                            }}
                                             initialFocus
                                         />
                                     </PopoverContent>
                                 </Popover>
                             </div>
+                            {birthdateError && (
+                                <p className="text-sm text-red-500 mt-1">{birthdateError}</p>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -468,7 +586,6 @@ const Form = (): ReactNode => {
                                         <SelectItem value="passport">Passport</SelectItem>
                                         <SelectItem value="national_id">National ID</SelectItem>
                                         <SelectItem value="drivers_license">Driver's License</SelectItem>
-                                        <SelectItem value="cpf">CPF</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <Input
@@ -476,7 +593,7 @@ const Form = (): ReactNode => {
                                     name="documentValue"
                                     type="text"
                                     className="w-[50%]"
-                                    placeholder={dict.commons.beneficiaries.create.documentValuePlaceholder}
+                                    placeholder="12345678910"
                                     required
                                 />
                             </div>
@@ -572,104 +689,230 @@ const Form = (): ReactNode => {
                         </div>
                     </div>
 
-                    {/* Last Address Section */}
-                    <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                            <FaMapMarkerAlt /> {dict.commons.beneficiaries.create.lastAddress}
-                        </h2>
-
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="addressLine1">
-                                {dict.commons.beneficiaries.create.addressLine} 1 *
-                            </Label>
-                            <Input id="addressLine1" name="addressLine1" type="text" required />
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="addressLine2">
-                                {dict.commons.beneficiaries.create.addressLine} 2
-                            </Label>
-                            <Input id="addressLine2" name="addressLine2" type="text" />
-                        </div>
-
-                        <div className="w-full flex items-center gap-2">
-                            <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="city">{dict.commons.beneficiaries.create.city} *</Label>
-                                <Input id="city" name="city" type="text" required />
+                    {/* Last Address Section with Google Places Autocomplete */}
+                    {isReady ? (
+                        <AddressAutocomplete
+                            googleApiKey={apiKey}
+                            onAddressSelect={setAddressData}
+                            labels={{
+                                sectionTitle: dict.commons.beneficiaries.create.lastAddress,
+                                addressLine1: dict.commons.beneficiaries.create.addressLine + " 1",
+                                addressLine2: dict.commons.beneficiaries.create.addressLine + " 2",
+                                city: dict.commons.beneficiaries.create.city,
+                                state: dict.commons.beneficiaries.create.state,
+                                zipCode: dict.commons.beneficiaries.create.postalCode,
+                                country: dict.commons.beneficiaries.create.country
+                            }}
+                            required={true}
+                        />
+                    ) : (
+                        <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                            <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                                <FaMapMarkerAlt /> {dict.commons.beneficiaries.create.lastAddress}
+                            </h2>
+                            <div className="p-4 text-gray-500 text-sm">
+                                Google Places API not configured. Using manual entry.
                             </div>
 
-                            <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="postalCode">
-                                    {dict.commons.beneficiaries.create.postalCode} *
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="addressLine1">
+                                    {dict.commons.beneficiaries.create.addressLine} 1 *
                                 </Label>
-                                <Input id="postalCode" name="postalCode" type="text" required />
-                            </div>
-                        </div>
-
-                        <div className="w-full flex items-center gap-2">
-                            <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="state">
-                                    {dict.commons.beneficiaries.create.state} *
-                                </Label>
-                                <Input id="state" name="state" type="text" required />
+                                <Input id="addressLine1" name="addressLine1" type="text" required />
                             </div>
 
-                            <div className="flex flex-col gap-3 w-full">
-                                <Label htmlFor="country">
-                                    {dict.commons.beneficiaries.create.country} *
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="addressLine2">
+                                    {dict.commons.beneficiaries.create.addressLine} 2
                                 </Label>
-                                <Input id="country" name="country" type="text" required />
+                                <Input id="addressLine2" name="addressLine2" type="text" />
+                            </div>
+
+                            <div className="w-full flex items-center gap-2">
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Label htmlFor="city">{dict.commons.beneficiaries.create.city} *</Label>
+                                    <Input id="city" name="city" type="text" required />
+                                </div>
+
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Label htmlFor="postalCode">
+                                        {dict.commons.beneficiaries.create.postalCode} *
+                                    </Label>
+                                    <Input id="postalCode" name="postalCode" type="text" required />
+                                </div>
+                            </div>
+
+                            <div className="w-full flex items-center gap-2">
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Label htmlFor="state">
+                                        {dict.commons.beneficiaries.create.state} *
+                                    </Label>
+                                    <Input id="state" name="state" type="text" required />
+                                </div>
+
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Label htmlFor="country">
+                                        {dict.commons.beneficiaries.create.country} *
+                                    </Label>
+                                    <Input id="country" name="country" type="text" required />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Emergency Contact Section */}
                     <div className="w-full h-max flex flex-col gap-6 p-4 border border-dashed border-relif-orange-200 rounded-lg">
-                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
-                            <MdContacts /> {dict.commons.beneficiaries.create.emergencyContact}
-                        </h2>
-
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="emergencyName">
-                                {dict.commons.beneficiaries.create.emergencyName} *
-                            </Label>
-                            <Input id="emergencyName" name="emergencyName" type="text" required />
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                                <MdContacts /> {dict.commons.beneficiaries.create.emergencyContact}
+                            </h2>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox 
+                                    id="skipEmergencyContact" 
+                                    checked={skipEmergencyContact}
+                                    onCheckedChange={(checked) => setSkipEmergencyContact(checked as boolean)}
+                                />
+                                <Label htmlFor="skipEmergencyContact" className="text-sm font-normal">
+                                    Skip emergency contact
+                                </Label>
+                            </div>
                         </div>
 
-                        <RelationshipDegree />
+                        <div className={skipEmergencyContact ? "opacity-50 pointer-events-none" : ""}>
+                            <div className="flex flex-col gap-4">
+                                {emergencyContacts.map((contact, index) => (
+                                    <div key={contact.id} className="border border-gray-200 rounded-lg p-4 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-sm font-medium text-gray-700">
+                                                Emergency Contact {index + 1}
+                                            </h3>
+                                            {emergencyContacts.length > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => removeEmergencyContact(contact.id)}
+                                                    className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
+                                                    disabled={skipEmergencyContact}
+                                                >
+                                                    ×
+                                                </Button>
+                                            )}
+                                        </div>
 
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="emergencyPhone">
-                                {dict.commons.beneficiaries.create.emergencyPhone} *
-                            </Label>
-                            <PhoneInput
-                                country={"us"}
-                                value={emergencyPhone}
-                                onChange={(value: string) => setEmergencyPhone(value)}
-                                containerClass="w-full"
-                                inputStyle={{
-                                    height: "40px",
-                                    width: "100%",
-                                    borderColor: "#e2e8f0",
-                                    borderRadius: "0.375rem",
-                                    fontSize: "0.875rem",
-                                }}
-                                buttonStyle={{
-                                    borderColor: "#e2e8f0",
-                                    borderRadius: "0.375rem 0 0 0.375rem",
-                                }}
-                                inputProps={{
-                                    name: "emergencyPhone",
-                                    required: true,
-                                }}
-                            />
-                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="flex flex-col gap-3">
+                                                <Label htmlFor={`emergencyName-${contact.id}`}>
+                                                    {dict.commons.beneficiaries.create.emergencyName} *
+                                                </Label>
+                                                <Input
+                                                    id={`emergencyName-${contact.id}`}
+                                                    type="text"
+                                                    value={contact.fullName}
+                                                    onChange={(e) => updateEmergencyContact(contact.id, 'fullName', e.target.value)}
+                                                    required={!skipEmergencyContact}
+                                                    disabled={skipEmergencyContact}
+                                                />
+                                            </div>
 
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="emergencyEmail">
-                                {dict.commons.beneficiaries.create.emergencyEmail} *
-                            </Label>
-                            <Input id="emergencyEmail" name="emergencyEmail" type="email" required />
+                                            <div className="flex flex-col gap-3">
+                                                <Label htmlFor={`emergencyEmail-${contact.id}`}>
+                                                    {dict.commons.beneficiaries.create.emergencyEmail} *
+                                                </Label>
+                                                <Input
+                                                    id={`emergencyEmail-${contact.id}`}
+                                                    type="email"
+                                                    value={contact.email}
+                                                    onChange={(e) => updateEmergencyContact(contact.id, 'email', e.target.value)}
+                                                    required={!skipEmergencyContact}
+                                                    disabled={skipEmergencyContact}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="flex flex-col gap-3">
+                                                <Label htmlFor={`emergencyPhone-${contact.id}`}>
+                                                    {dict.commons.beneficiaries.create.emergencyPhone} *
+                                                </Label>
+                                                <PhoneInput
+                                                    country={"us"}
+                                                    value={contact.phone}
+                                                    onChange={(value: string) => updateEmergencyContact(contact.id, 'phone', value)}
+                                                    containerClass="w-full"
+                                                    inputStyle={{
+                                                        height: "40px",
+                                                        width: "100%",
+                                                        borderColor: "#e2e8f0",
+                                                        borderRadius: "0.375rem",
+                                                        fontSize: "0.875rem",
+                                                    }}
+                                                    buttonStyle={{
+                                                        borderColor: "#e2e8f0",
+                                                        borderRadius: "0.375rem 0 0 0.375rem",
+                                                    }}
+                                                    inputProps={{
+                                                        required: !skipEmergencyContact,
+                                                        disabled: skipEmergencyContact,
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="flex flex-col gap-3">
+                                                <Label htmlFor={`emergencyRelationship-${contact.id}`}>
+                                                    Relationship *
+                                                </Label>
+                                                <Select
+                                                    value={contact.relationship}
+                                                    onValueChange={(value) => updateEmergencyContact(contact.id, 'relationship', value)}
+                                                    disabled={skipEmergencyContact}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select relationship" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="parent">Parent</SelectItem>
+                                                        <SelectItem value="spouse">Spouse</SelectItem>
+                                                        <SelectItem value="sibling">Sibling</SelectItem>
+                                                        <SelectItem value="child">Child</SelectItem>
+                                                        <SelectItem value="friend">Friend</SelectItem>
+                                                        <SelectItem value="guardian">Guardian</SelectItem>
+                                                        <SelectItem value="other">Other</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+
+                                        {contact.relationship === "other" && (
+                                            <div className="flex flex-col gap-3">
+                                                <Label htmlFor={`otherRelationship-${contact.id}`}>
+                                                    Please specify relationship *
+                                                </Label>
+                                                <Input
+                                                    id={`otherRelationship-${contact.id}`}
+                                                    type="text"
+                                                    value={contact.otherRelationship || ""}
+                                                    onChange={(e) => updateEmergencyContact(contact.id, 'otherRelationship', e.target.value)}
+                                                    placeholder="e.g., Cousin, Neighbor, etc."
+                                                    required={!skipEmergencyContact}
+                                                    disabled={skipEmergencyContact}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {!skipEmergencyContact && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={addEmergencyContact}
+                                        className="w-full border-dashed border-relif-orange-200 text-relif-orange-500 hover:bg-relif-orange-50"
+                                    >
+                                        + Add Another Emergency Contact
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
 

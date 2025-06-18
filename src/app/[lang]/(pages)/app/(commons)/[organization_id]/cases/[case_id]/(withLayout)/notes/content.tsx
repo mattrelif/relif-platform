@@ -55,7 +55,7 @@ const NotesContent = (): ReactNode => {
         title: "",
         content: "",
         tags: "",
-        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER",
+        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER",
         is_important: false,
     });
 
@@ -65,7 +65,64 @@ const NotesContent = (): ReactNode => {
     useEffect(() => {
         const fetchNotes = async () => {
             try {
-                if (caseId) {
+                setIsLoading(true);
+                
+                // Check if we're in demo mode (mock case ID)
+                if (caseId && caseId.startsWith('mock-')) {
+                    console.log("📝 Demo mode detected, using mock notes for caseId:", caseId);
+                    
+                    // Use mock data for demo
+                    const mockNotes = [
+                        {
+                            id: "note-1",
+                            case_id: caseId,
+                            title: "Initial consultation completed",
+                            content: "Conducted initial consultation with beneficiary. Discussed housing needs and available options. Beneficiary expressed preference for family accommodation near children's school.",
+                            note_type: "MEETING" as const,
+                            tags: ["consultation", "housing", "family"],
+                            is_important: true,
+                            created_at: "2025-01-15T14:30:00Z",
+                            updated_at: "2025-01-15T14:30:00Z",
+                            created_by: {
+                                id: "user-1",
+                                name: "Sarah Johnson"
+                            }
+                        },
+                        {
+                            id: "note-2",
+                            case_id: caseId,
+                            title: "Follow-up call scheduled",
+                            content: "Scheduled follow-up call for next week to discuss available housing options. Will coordinate with housing coordinator to review current availability.",
+                            note_type: "CALL" as const,
+                            tags: ["follow-up", "coordination"],
+                            is_important: false,
+                            created_at: "2025-01-16T10:15:00Z",
+                            updated_at: "2025-01-16T10:15:00Z",
+                            created_by: {
+                                id: "user-2",
+                                name: "Ana Silva"
+                            }
+                        },
+                        {
+                            id: "note-3",
+                            case_id: caseId,
+                            title: "Documentation review",
+                            content: "Reviewed submitted documentation. All required documents are present and valid. Case can proceed to next stage.",
+                            note_type: "UPDATE" as const,
+                            tags: ["documentation", "review", "approved"],
+                            is_important: false,
+                            created_at: "2025-01-17T16:45:00Z",
+                            updated_at: "2025-01-17T16:45:00Z",
+                            created_by: {
+                                id: "user-1",
+                                name: "Sarah Johnson"
+                            }
+                        }
+                    ];
+                    
+                    setNotes(mockNotes);
+                    setError(false);
+                } else if (caseId) {
                     console.log("📝 Fetching case notes for caseId:", caseId);
                     const response = await getCaseNotes(caseId);
                     
@@ -306,8 +363,28 @@ const NotesContent = (): ReactNode => {
             <AddNoteDialog
                 isOpen={showAddDialog}
                 onClose={() => setShowAddDialog(false)}
-                onSave={(newNote: CaseNoteSchema) => {
-                    setNotes(prev => [newNote, ...prev]);
+                onSave={async (newNote: CaseNoteSchema | null) => {
+                    if (newNote) {
+                        // Add the new note normally
+                        setNotes(prev => [newNote, ...prev]);
+                    } else {
+                        // Refresh the entire notes list from the API
+                        try {
+                            console.log("🔄 Refreshing notes list after creation");
+                            const response = await getCaseNotes(caseId);
+                            const notesData = response?.data;
+                            
+                            if (Array.isArray(notesData)) {
+                                setNotes(notesData);
+                            } else if (notesData && typeof notesData === 'object' && notesData.data && Array.isArray(notesData.data)) {
+                                setNotes(notesData.data);
+                            } else {
+                                console.warn("⚠️ Could not refresh notes list");
+                            }
+                        } catch (err) {
+                            console.error("❌ Error refreshing notes list:", err);
+                        }
+                    }
                     setShowAddDialog(false);
                 }}
                 caseId={caseId}
@@ -405,12 +482,29 @@ const NotesContent = (): ReactNode => {
                 note={selectedNote}
                 isOpen={showDeleteDialog}
                 onClose={() => setShowDeleteDialog(false)}
-                onDelete={noteId => {
+                onDelete={async (noteId: string) => {
+                    // Remove the note from local state
                     setNotes(prev => prev.filter(note => note.id !== noteId));
                     setShowDeleteDialog(false);
                     setSelectedNote(null);
+                    
+                    // Also refresh the notes list to ensure synchronization
+                    try {
+                        console.log("🔄 Refreshing notes list after deletion");
+                        const response = await getCaseNotes(caseId);
+                        const notesData = response?.data;
+                        
+                        if (Array.isArray(notesData)) {
+                            setNotes(notesData);
+                        } else if (notesData && typeof notesData === 'object' && notesData.data && Array.isArray(notesData.data)) {
+                            setNotes(notesData.data);
+                        }
+                    } catch (err) {
+                        console.warn("⚠️ Could not refresh notes list after deletion:", err);
+                    }
                 }}
                 locale={locale}
+                caseId={caseId}
             />
         </div>
     );
@@ -425,7 +519,7 @@ const AddNoteDialog = ({
 }: {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (newNote: CaseNoteSchema) => void;
+    onSave: (newNote: CaseNoteSchema | null) => void;
     caseId: string;
 }) => {
     const { toast } = useToast();
@@ -434,7 +528,7 @@ const AddNoteDialog = ({
         title: "",
         content: "",
         tags: "",
-        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER",
+        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER",
         is_important: false,
     });
     
@@ -478,21 +572,34 @@ const AddNoteDialog = ({
 
             // Handle successful response
             let newNote: CaseNoteSchema;
-            if (response.data) {
+            if (response.data && response.data.id) {
+                // Use the actual note returned by the API
                 newNote = response.data;
+                console.log("✅ Using actual note from API:", newNote.id);
             } else {
-                // Create a temporary note if no data returned but status is successful
-                newNote = {
-                    id: Date.now().toString(), // Temporary ID
-                    title: formData.title,
-                    content: formData.content,
-                    note_type: formData.note_type,
-                    tags: tagPreviews,
-                    is_important: formData.is_important,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    created_by: { name: "Current User" }, // Placeholder
-                } as CaseNoteSchema;
+                // If no proper data returned, refresh the entire notes list instead of using temporary data
+                console.warn("⚠️ No proper note data returned, refreshing notes list");
+                
+                // Call onSave with null to trigger a refresh in the parent component
+                onSave(null as any);
+                
+                // We'll need to refresh the notes list in the parent component
+                toast({
+                    title: "Update added successfully",
+                    description: "The case update has been added. Refreshing the list...",
+                    variant: "success",
+                });
+                
+                // Reset form and close dialog
+                setFormData({
+                    title: "",
+                    content: "",
+                    tags: "",
+                    note_type: "UPDATE",
+                    is_important: false,
+                });
+                setTagPreviews([]);
+                return; // Exit early
             }
 
             onSave(newNote);
@@ -832,7 +939,7 @@ const EditNoteDialog = ({
                         <Select
                             value={formData.note_type}
                             onValueChange={(
-                                value: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER"
+                                value: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER"
                             ) => setFormData(prev => ({ ...prev, note_type: value }))}
                         >
                             <SelectTrigger>
@@ -843,6 +950,7 @@ const EditNoteDialog = ({
                                 <SelectItem value="MEETING">🤝 Meeting</SelectItem>
                                 <SelectItem value="UPDATE">📝 Update</SelectItem>
                                 <SelectItem value="APPOINTMENT">📅 Appointment</SelectItem>
+                                <SelectItem value="REFERRAL">🔗 Referral</SelectItem>
                                 <SelectItem value="OTHER">📋 Other</SelectItem>
                             </SelectContent>
                         </Select>
@@ -898,7 +1006,7 @@ const EditNoteDialog = ({
 };
 
 // Helper function to get note type icon
-const getNoteTypeIcon = (noteType: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER") => {
+const getNoteTypeIcon = (noteType: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER") => {
     switch (noteType) {
         case "CALL":
             return "📞";
@@ -908,6 +1016,8 @@ const getNoteTypeIcon = (noteType: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT"
             return "📝";
         case "APPOINTMENT":
             return "📅";
+        case "REFERRAL":
+            return "🔗";
         case "OTHER":
             return "📋";
         default:
@@ -922,12 +1032,14 @@ const DeleteNoteDialog = ({
     onClose,
     onDelete,
     locale,
+    caseId,
 }: {
     note: CaseNoteSchema | null;
     isOpen: boolean;
     onClose: () => void;
     onDelete: (noteId: string) => void;
     locale: "en" | "pt" | "es";
+    caseId: string;
 }) => {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
@@ -937,13 +1049,14 @@ const DeleteNoteDialog = ({
 
         try {
             setIsLoading(true);
-
-            // Get case ID from the current pathname
-            const pathname = window.location.pathname;
-            const caseId = pathname.split("/")[5];
             
             // Call the API to delete the note
-            console.log("🗑️ Deleting case note:", note.id);
+            console.log("🗑️ Deleting case note:", {
+                noteId: note.id,
+                caseId: caseId,
+                noteTitle: note.title,
+                noteCreatedAt: note.created_at
+            });
             await deleteCaseNote(caseId, note.id);
             console.log("✅ Case note deleted from backend");
 

@@ -29,7 +29,7 @@ import { DebugInfo } from "@/components/debug-info";
 interface CaseFilters {
     status: string[];
     priority: string[];
-    case_type: string[];
+    service_types: string[];
     assigned_to: string[];
     urgency_level: string[];
     date_from: Date | null;
@@ -41,7 +41,7 @@ interface CaseFilters {
 const initialFilters: CaseFilters = {
     status: [],
     priority: [],
-    case_type: [],
+    service_types: [],
     assigned_to: [],
     urgency_level: [],
     date_from: null,
@@ -65,12 +65,74 @@ const filterOptions = {
         { value: "HIGH", label: "High" },
         { value: "URGENT", label: "Urgent" },
     ],
-    case_type: [
-        { value: "HOUSING", label: "Housing" },
-        { value: "LEGAL", label: "Legal" },
-        { value: "MEDICAL", label: "Medical" },
-        { value: "SUPPORT", label: "Support" },
-        { value: "OTHER", label: "Other" },
+    service_types: [
+        { value: "CHILD_PROTECTION_CASE_MANAGEMENT", label: "Child Protection Case Management" },
+        { value: "GBV_CASE_MANAGEMENT", label: "GBV Case Management" },
+        { value: "GENERAL_PROTECTION_SERVICES", label: "General Protection Services" },
+        { value: "SEXUAL_VIOLENCE_RESPONSE", label: "Sexual Violence Response" },
+        { value: "INTIMATE_PARTNER_VIOLENCE_SUPPORT", label: "Intimate Partner Violence Support" },
+        { value: "HUMAN_TRAFFICKING_RESPONSE", label: "Human Trafficking Response" },
+        { value: "FAMILY_SEPARATION_REUNIFICATION", label: "Family Separation & Reunification" },
+        { value: "UASC_SERVICES", label: "Unaccompanied & Separated Children Services" },
+        { value: "MHPSS", label: "Mental Health & Psychosocial Support" },
+        { value: "LEGAL_AID_ASSISTANCE", label: "Legal Aid & Assistance" },
+        { value: "CIVIL_DOCUMENTATION_SUPPORT", label: "Civil Documentation Support" },
+        { value: "EMERGENCY_SHELTER_HOUSING", label: "Emergency Shelter & Housing" },
+        { value: "NFI_DISTRIBUTION", label: "Non-Food Items Distribution" },
+        { value: "FOOD_SECURITY_NUTRITION", label: "Food Security & Nutrition" },
+        { value: "CVA", label: "Cash & Voucher Assistance" },
+        { value: "WASH", label: "Water, Sanitation & Hygiene" },
+        { value: "HEALTHCARE_SERVICES", label: "Healthcare Services" },
+        { value: "EMERGENCY_MEDICAL_CARE", label: "Emergency Medical Care" },
+        { value: "SEXUAL_REPRODUCTIVE_HEALTH", label: "Sexual & Reproductive Health" },
+        { value: "DISABILITY_SUPPORT_SERVICES", label: "Disability Support Services" },
+        { value: "EMERGENCY_EVACUATION", label: "Emergency Evacuation" },
+        { value: "SEARCH_RESCUE_COORDINATION", label: "Search & Rescue Coordination" },
+        { value: "RAPID_ASSESSMENT_NEEDS_ANALYSIS", label: "Rapid Assessment & Needs Analysis" },
+        { value: "EMERGENCY_REGISTRATION", label: "Emergency Registration" },
+        { value: "EMERGENCY_TRANSPORTATION", label: "Emergency Transportation" },
+        { value: "EMERGENCY_COMMUNICATION_SERVICES", label: "Emergency Communication Services" },
+        { value: "EMERGENCY_EDUCATION_SERVICES", label: "Emergency Education Services" },
+        { value: "CHILD_FRIENDLY_SPACES", label: "Child-Friendly Spaces" },
+        { value: "SKILLS_TRAINING_VOCATIONAL_EDUCATION", label: "Skills Training & Vocational Education" },
+        { value: "LITERACY_PROGRAMS", label: "Literacy Programs" },
+        { value: "AWARENESS_PREVENTION_CAMPAIGNS", label: "Awareness & Prevention Campaigns" },
+        { value: "LIVELIHOOD_SUPPORT_PROGRAMS", label: "Livelihood Support Programs" },
+        { value: "MICROFINANCE_CREDIT_SERVICES", label: "Microfinance & Credit Services" },
+        { value: "JOB_PLACEMENT_EMPLOYMENT_SERVICES", label: "Job Placement & Employment Services" },
+        { value: "AGRICULTURAL_SUPPORT", label: "Agricultural Support" },
+        { value: "BUSINESS_DEVELOPMENT_SUPPORT", label: "Business Development Support" },
+        { value: "REFUGEE_SERVICES", label: "Refugee Services" },
+        { value: "IDP_SERVICES", label: "Internally Displaced Persons Services" },
+        { value: "RETURNEE_REINTEGRATION_SERVICES", label: "Returnee & Reintegration Services" },
+        { value: "HOST_COMMUNITY_SUPPORT", label: "Host Community Support" },
+        { value: "ELDERLY_CARE_SERVICES", label: "Elderly Care Services" },
+        { value: "SERVICES_FOR_PERSONS_WITH_DISABILITIES", label: "Services for Persons with Disabilities" },
+        { value: "CASE_REFERRAL_TRANSFER", label: "Case Referral & Transfer" },
+        { value: "INTER_AGENCY_COORDINATION", label: "Inter-Agency Coordination" },
+        { value: "SERVICE_MAPPING_INFORMATION", label: "Service Mapping & Information" },
+        { value: "FOLLOW_UP_MONITORING", label: "Follow-up & Monitoring" },
+        { value: "CASE_CLOSURE_TRANSITION", label: "Case Closure & Transition" },
+        { value: "BIRTH_REGISTRATION", label: "Birth Registration" },
+        { value: "IDENTITY_DOCUMENTATION", label: "Identity Documentation" },
+        { value: "LEGAL_COUNSELING", label: "Legal Counseling" },
+        { value: "COURT_SUPPORT_ACCOMPANIMENT", label: "Court Support & Accompaniment" },
+        { value: "DETENTION_MONITORING", label: "Detention Monitoring" },
+        { value: "ADVOCACY_SERVICES", label: "Advocacy Services" },
+        { value: "PRIMARY_HEALTHCARE", label: "Primary Healthcare" },
+        { value: "CLINICAL_MANAGEMENT_RAPE", label: "Clinical Management of Rape" },
+        { value: "HIV_AIDS_PREVENTION_TREATMENT", label: "HIV/AIDS Prevention & Treatment" },
+        { value: "TUBERCULOSIS_TREATMENT", label: "Tuberculosis Treatment" },
+        { value: "MALNUTRITION_TREATMENT", label: "Malnutrition Treatment" },
+        { value: "VACCINATION_PROGRAMS", label: "Vaccination Programs" },
+        { value: "EMERGENCY_SURGERY", label: "Emergency Surgery" },
+        { value: "CAMP_COORDINATION_MANAGEMENT", label: "Camp Coordination & Management" },
+        { value: "MINE_ACTION_SERVICES", label: "Mine Action Services" },
+        { value: "PEACEKEEPING_PEACEBUILDING", label: "Peacekeeping & Peacebuilding" },
+        { value: "LOGISTICS_TELECOMMUNICATIONS", label: "Logistics & Telecommunications" },
+        { value: "INFORMATION_MANAGEMENT", label: "Information Management" },
+        { value: "COMMUNITY_MOBILIZATION", label: "Community Mobilization" },
+        { value: "WINTERIZATION_SUPPORT", label: "Winterization Support" },
     ],
     urgency_level: [
         { value: "IMMEDIATE", label: "Immediate" },
@@ -113,7 +175,25 @@ const CaseList = (): ReactNode => {
 
     // Helper function to apply client-side filtering
     const applyFilters = (casesData: CaseSchema[]): CaseSchema[] => {
-        return casesData.filter(caseItem => {
+            console.log('🚀 Starting filter process with:', {
+        totalCases: casesData.length,
+        activeFilters: filters,
+        activeFiltersCount: getActiveFiltersCount()
+    });
+
+    // Simple test: If we're filtering by service types, show what we're looking for
+    if (filters.service_types.length > 0) {
+        console.log('🎯 FILTER TEST:');
+        console.log('Looking for service types:', filters.service_types);
+        console.log('Available cases and their service types:');
+        casesData.forEach(caseItem => {
+            console.log(`  Case ${caseItem.id}: [${caseItem.service_types.join(', ')}]`);
+            const hasMatch = caseItem.service_types.some(st => filters.service_types.includes(st));
+            console.log(`    → Should match: ${hasMatch}`);
+        });
+    }
+
+        const filteredCases = casesData.filter(caseItem => {
             // Status filter
             if (filters.status.length > 0 && !filters.status.includes(caseItem.status)) {
                 return false;
@@ -124,9 +204,21 @@ const CaseList = (): ReactNode => {
                 return false;
             }
 
-            // Case type filter
-            if (filters.case_type.length > 0 && !filters.case_type.includes(caseItem.case_type)) {
-                return false;
+            // Service types filter - THIS IS THE KEY PART
+            if (filters.service_types.length > 0) {
+                const hasMatchingServiceType = caseItem.service_types.some(serviceType => 
+                    filters.service_types.includes(serviceType)
+                );
+                console.log(`🎯 Case ${caseItem.id} service type check:`, {
+                    caseServiceTypes: caseItem.service_types,
+                    filterServiceTypes: filters.service_types,
+                    hasMatch: hasMatchingServiceType
+                });
+                if (!hasMatchingServiceType) {
+                    console.log(`❌ Case ${caseItem.id} FILTERED OUT - no matching service types`);
+                    return false;
+                }
+                console.log(`✅ Case ${caseItem.id} PASSES service type filter`);
             }
 
             // Urgency level filter
@@ -186,6 +278,9 @@ const CaseList = (): ReactNode => {
 
             return true;
         });
+
+        console.log(`🎯 FINAL RESULT: ${filteredCases.length} cases out of ${casesData.length} passed all filters`);
+        return filteredCases;
     };
 
     const getCasesList = useCallback(async () => {
@@ -209,6 +304,80 @@ const CaseList = (): ReactNode => {
 
             // Apply client-side filtering
             let allCases = response.data.data || [];
+            
+            // DEV MOCK: Always inject mock cases in development mode if error or no data
+            if (process.env.NODE_ENV === 'development' && allCases.length === 0) {
+                allCases = [
+                    {
+                        id: 'mock-1',
+                        case_number: 'CASE-2025-0001',
+                        title: 'Mock Case 1',
+                        description: 'This is a mock case for testing.',
+                        status: 'IN_PROGRESS' as const,
+                        priority: 'HIGH' as const,
+                        urgency_level: 'IMMEDIATE' as const,
+                        service_types: ['LEGAL_AID_ASSISTANCE', 'CIVIL_DOCUMENTATION_SUPPORT'],
+                        beneficiary_id: 'mock-beneficiary-1',
+                        beneficiary: {
+                            id: 'mock-beneficiary-1',
+                            first_name: 'John',
+                            last_name: 'Doe',
+                            full_name: 'John Doe',
+                        },
+                        assigned_to_id: 'mock-user-1',
+                        assigned_to: {
+                            id: 'mock-user-1',
+                            first_name: 'Jane',
+                            last_name: 'Smith',
+                            email: 'jane@example.com',
+                        },
+                        due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        estimated_duration: '1 Month',
+                        budget_allocated: '1000',
+                        tags: ['mock', 'test'],
+                        notes_count: 2,
+                        documents_count: 1,
+                        last_activity: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    },
+                    {
+                        id: 'mock-2',
+                        case_number: 'CASE-2025-0002',
+                        title: 'Mock Case 2',
+                        description: 'Another mock case for testing.',
+                        status: 'CLOSED' as const,
+                        priority: 'LOW' as const,
+                        urgency_level: 'FLEXIBLE' as const,
+                        service_types: ['EMERGENCY_SHELTER_HOUSING', 'FOOD_SECURITY_NUTRITION'],
+                        beneficiary_id: 'mock-beneficiary-2',
+                        beneficiary: {
+                            id: 'mock-beneficiary-2',
+                            first_name: 'Alice',
+                            last_name: 'Brown',
+                            full_name: 'Alice Brown',
+                        },
+                        assigned_to_id: 'mock-user-2',
+                        assigned_to: {
+                            id: 'mock-user-2',
+                            first_name: 'Bob',
+                            last_name: 'Jones',
+                            email: 'bob@example.com',
+                        },
+                        due_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                        estimated_duration: '2 Weeks',
+                        budget_allocated: '500',
+                        tags: ['mock', 'closed'],
+                        notes_count: 1,
+                        documents_count: 0,
+                        last_activity: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    },
+                ] as CaseSchema[];
+                console.log('🎭 Using mock data for development:', allCases);
+            }
+            
             const filteredCases = applyFilters(allCases);
 
             // Store all filtered cases for export
@@ -232,8 +401,91 @@ const CaseList = (): ReactNode => {
                 filters
             });
             setError(true);
-            setCases({ count: 0, data: [] }); // Ensure cases is set to empty state
-            setAllFilteredCases([]); // Reset filtered cases on error
+            
+            // In development, still apply filtering to mock data even on error
+            if (process.env.NODE_ENV === 'development') {
+                const mockData: CaseSchema[] = [
+                    {
+                        id: 'mock-1',
+                        case_number: 'CASE-2025-0001',
+                        title: 'Mock Case 1',
+                        description: 'This is a mock case for testing.',
+                        status: 'IN_PROGRESS' as const,
+                        priority: 'HIGH' as const,
+                        urgency_level: 'IMMEDIATE' as const,
+                        service_types: ['LEGAL_AID_ASSISTANCE', 'CIVIL_DOCUMENTATION_SUPPORT'],
+                        beneficiary_id: 'mock-beneficiary-1',
+                        beneficiary: {
+                            id: 'mock-beneficiary-1',
+                            first_name: 'John',
+                            last_name: 'Doe',
+                            full_name: 'John Doe',
+                        },
+                        assigned_to_id: 'mock-user-1',
+                        assigned_to: {
+                            id: 'mock-user-1',
+                            first_name: 'Jane',
+                            last_name: 'Smith',
+                            email: 'jane@example.com',
+                        },
+                        due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        estimated_duration: '1 Month',
+                        budget_allocated: '1000',
+                        tags: ['mock', 'test'],
+                        notes_count: 2,
+                        documents_count: 1,
+                        last_activity: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    },
+                    {
+                        id: 'mock-2',
+                        case_number: 'CASE-2025-0002',
+                        title: 'Mock Case 2',
+                        description: 'Another mock case for testing.',
+                        status: 'CLOSED' as const,
+                        priority: 'LOW' as const,
+                        urgency_level: 'FLEXIBLE' as const,
+                        service_types: ['EMERGENCY_SHELTER_HOUSING', 'FOOD_SECURITY_NUTRITION'],
+                        beneficiary_id: 'mock-beneficiary-2',
+                        beneficiary: {
+                            id: 'mock-beneficiary-2',
+                            first_name: 'Alice',
+                            last_name: 'Brown',
+                            full_name: 'Alice Brown',
+                        },
+                        assigned_to_id: 'mock-user-2',
+                        assigned_to: {
+                            id: 'mock-user-2',
+                            first_name: 'Bob',
+                            last_name: 'Jones',
+                            email: 'bob@example.com',
+                        },
+                        due_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                        estimated_duration: '2 Weeks',
+                        budget_allocated: '500',
+                        tags: ['mock', 'closed'],
+                        notes_count: 1,
+                        documents_count: 0,
+                        last_activity: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    },
+                ];
+                console.log('🎭 Using mock data due to API error:', mockData);
+                
+                const filteredCases = applyFilters(mockData);
+                setAllFilteredCases(filteredCases);
+                
+                const paginatedCases = filteredCases.slice(offset, offset + LIMIT);
+                setCases({
+                    count: filteredCases.length,
+                    data: paginatedCases,
+                });
+            } else {
+                setCases({ count: 0, data: [] }); // Ensure cases is set to empty state
+                setAllFilteredCases([]); // Reset filtered cases on error
+            }
         } finally {
             setIsLoading(false);
         }
@@ -257,11 +509,17 @@ const CaseList = (): ReactNode => {
                 [typedFilterType]: new Date(value),
             }));
         } else {
-            // Handle array filters
-            setFilters(prev => ({
-                ...prev,
-                [typedFilterType]: [...(prev[typedFilterType] as string[]), value],
-            }));
+            // Handle array filters - prevent duplicates
+            setFilters(prev => {
+                const currentValues = prev[typedFilterType] as string[];
+                if (currentValues.includes(value)) {
+                    return prev; // Don't add if already exists
+                }
+                return {
+                    ...prev,
+                    [typedFilterType]: [...currentValues, value],
+                };
+            });
         }
         setOffset(0); // Reset to first page when filtering
     };
@@ -292,7 +550,7 @@ const CaseList = (): ReactNode => {
         return (
             filters.status.length +
             filters.priority.length +
-            filters.case_type.length +
+            filters.service_types.length +
             filters.assigned_to.length +
             filters.urgency_level.length +
             (filters.date_from ? 1 : 0) +
@@ -303,22 +561,17 @@ const CaseList = (): ReactNode => {
     };
 
     const getActiveFilters = () => {
-        const activeFilters: Array<{
-            type: string;
-            value: string;
-            label: string;
-            displayLabel: string;
-        }> = [];
+        const activeFilters: Array<{ type: string; value: string; label: string; displayLabel: string }> = [];
 
         // Status filters
         filters.status.forEach(status => {
             const option = filterOptions.status.find(opt => opt.value === status);
             if (option) {
                 activeFilters.push({
-                    type: 'status',
+                    type: "status",
                     value: status,
                     label: option.label,
-                    displayLabel: `Status: ${option.label}`
+                    displayLabel: option.label,
                 });
             }
         });
@@ -328,88 +581,92 @@ const CaseList = (): ReactNode => {
             const option = filterOptions.priority.find(opt => opt.value === priority);
             if (option) {
                 activeFilters.push({
-                    type: 'priority',
+                    type: "priority",
                     value: priority,
                     label: option.label,
-                    displayLabel: `Priority: ${option.label}`
+                    displayLabel: option.label,
                 });
             }
         });
 
-        // Case type filters
-        filters.case_type.forEach(caseType => {
-            const option = filterOptions.case_type.find(opt => opt.value === caseType);
+        // Service types filters
+        filters.service_types.forEach(serviceType => {
+            const option = filterOptions.service_types.find(opt => opt.value === serviceType);
             if (option) {
                 activeFilters.push({
-                    type: 'case_type',
-                    value: caseType,
+                    type: "service_types",
+                    value: serviceType,
                     label: option.label,
-                    displayLabel: `Type: ${option.label}`
+                    displayLabel: option.label,
                 });
             }
         });
 
         // Urgency level filters
-        filters.urgency_level.forEach(urgency => {
-            const option = filterOptions.urgency_level.find(opt => opt.value === urgency);
+        filters.urgency_level.forEach(urgencyLevel => {
+            const option = filterOptions.urgency_level.find(opt => opt.value === urgencyLevel);
             if (option) {
                 activeFilters.push({
-                    type: 'urgency_level',
-                    value: urgency,
+                    type: "urgency_level",
+                    value: urgencyLevel,
                     label: option.label,
-                    displayLabel: `Urgency: ${option.label}`
+                    displayLabel: option.label,
                 });
             }
         });
 
         // Assigned to filters
         const userOptions = getUniqueUsers(cases?.data || null);
-        filters.assigned_to.forEach(userId => {
-            const option = userOptions.find(opt => opt.value === userId);
+        filters.assigned_to.forEach(assignedTo => {
+            const option = userOptions.find(opt => opt.value === assignedTo);
             if (option) {
                 activeFilters.push({
-                    type: 'assigned_to',
-                    value: userId,
+                    type: "assigned_to",
+                    value: assignedTo,
                     label: option.label,
-                    displayLabel: `Assigned: ${option.label}`
+                    displayLabel: option.label,
                 });
             }
         });
 
         // Date filters
         if (filters.date_from) {
+            const displayLabel = `From: ${filters.date_from.toLocaleDateString()}`;
             activeFilters.push({
-                type: 'date_from',
+                type: "date_from",
                 value: filters.date_from.toISOString(),
-                label: filters.date_from.toLocaleDateString(),
-                displayLabel: `Created From: ${filters.date_from.toLocaleDateString()}`
+                label: displayLabel,
+                displayLabel,
             });
         }
 
         if (filters.date_to) {
+            const displayLabel = `To: ${filters.date_to.toLocaleDateString()}`;
             activeFilters.push({
-                type: 'date_to',
+                type: "date_to",
                 value: filters.date_to.toISOString(),
-                label: filters.date_to.toLocaleDateString(),
-                displayLabel: `Created To: ${filters.date_to.toLocaleDateString()}`
+                label: displayLabel,
+                displayLabel,
             });
         }
 
         if (filters.due_date_from) {
+            const displayLabel = `Due From: ${filters.due_date_from.toLocaleDateString()}`;
             activeFilters.push({
-                type: 'due_date_from',
+                type: "due_date_from",
                 value: filters.due_date_from.toISOString(),
-                label: filters.due_date_from.toLocaleDateString(),
-                displayLabel: `Due From: ${filters.due_date_from.toLocaleDateString()}`
+                label: displayLabel,
+                displayLabel,
             });
         }
 
         if (filters.due_date_to) {
+            const displayLabel = `Due To: ${filters.due_date_to.toLocaleDateString()}`;
             activeFilters.push({
-                type: 'due_date_to',
+                type: "due_date_to",
                 value: filters.due_date_to.toISOString(),
-                label: filters.due_date_to.toLocaleDateString(),
-                displayLabel: `Due To: ${filters.due_date_to.toLocaleDateString()}`
+                label: displayLabel,
+                displayLabel,
             });
         }
 
@@ -425,77 +682,6 @@ const CaseList = (): ReactNode => {
     const activeFiltersCount = getActiveFiltersCount();
 
     let casesData = cases?.data || [];
-    // DEV MOCK: Always inject mock cases in development mode if error or no data
-    if (process.env.NODE_ENV === 'development' && (error || casesData.length === 0)) {
-        casesData = [
-            {
-                id: 'mock-1',
-                case_number: 'CASE-2025-0001',
-                title: 'Mock Case 1',
-                description: 'This is a mock case for testing.',
-                status: 'IN_PROGRESS',
-                priority: 'HIGH',
-                urgency_level: 'IMMEDIATE',
-                case_type: 'LEGAL',
-                beneficiary_id: 'mock-beneficiary-1',
-                beneficiary: {
-                    id: 'mock-beneficiary-1',
-                    first_name: 'John',
-                    last_name: 'Doe',
-                    full_name: 'John Doe',
-                },
-                assigned_to_id: 'mock-user-1',
-                assigned_to: {
-                    id: 'mock-user-1',
-                    first_name: 'Jane',
-                    last_name: 'Smith',
-                    email: 'jane@example.com',
-                },
-                due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                estimated_duration: '1 Month',
-                budget_allocated: '1000',
-                tags: ['mock', 'test'],
-                notes_count: 2,
-                documents_count: 1,
-                last_activity: new Date().toISOString(),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            },
-            {
-                id: 'mock-2',
-                case_number: 'CASE-2025-0002',
-                title: 'Mock Case 2',
-                description: 'Another mock case for testing.',
-                status: 'CLOSED',
-                priority: 'LOW',
-                urgency_level: 'FLEXIBLE',
-                case_type: 'HOUSING',
-                beneficiary_id: 'mock-beneficiary-2',
-                beneficiary: {
-                    id: 'mock-beneficiary-2',
-                    first_name: 'Alice',
-                    last_name: 'Brown',
-                    full_name: 'Alice Brown',
-                },
-                assigned_to_id: 'mock-user-2',
-                assigned_to: {
-                    id: 'mock-user-2',
-                    first_name: 'Bob',
-                    last_name: 'Jones',
-                    email: 'bob@example.com',
-                },
-                due_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                estimated_duration: '2 Weeks',
-                budget_allocated: '500',
-                tags: ['mock', 'closed'],
-                notes_count: 1,
-                documents_count: 0,
-                last_activity: new Date().toISOString(),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            },
-        ];
-    }
 
     // Calculate stats from the final casesData
     const now = new Date();
@@ -561,10 +747,11 @@ const CaseList = (): ReactNode => {
             placeholder: "Select priority...",
         },
         {
-            key: "case_type",
-            label: "Case Type",
-            options: filterOptions.case_type,
-            placeholder: "Select type...",
+            key: "service_types",
+            label: "Service Types",
+            options: filterOptions.service_types,
+            placeholder: "Search service types...",
+            type: "searchable-select" as const,
         },
         {
             key: "urgency_level",
