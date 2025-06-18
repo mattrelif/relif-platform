@@ -1,6 +1,7 @@
 import { getDictionary } from "@/app/dictionaries";
 import { Locale } from "@/app/i18n-config";
 import { ReactNode } from "react";
+import { BetaWarning } from "./beta-warning";
 
 export default async function Layout({
     children,
@@ -13,6 +14,8 @@ export default async function Layout({
 
     return (
         <div className="w-full grid grid-cols-5 gap-4 p-4 xl:flex xl:items-center xl:justify-center">
+            <BetaWarning dict={dict} />
+
             <section className="w-full h-full flex flex-col justify-center items-center col-span-2">
                 {children}
             </section>

@@ -141,9 +141,9 @@ const HousingList = (): ReactNode => {
     };
 
     // DEV MOCK: Always inject mock housings in development mode if error or no data
-    let housingsData = housings?.data || [];
-    if (process.env.NODE_ENV === 'development' && (error || housingsData.length === 0)) {
-        housingsData = [
+    let allHousingsData = housings?.data || [];
+    if (process.env.NODE_ENV === 'development' && (error || allHousingsData.length === 0)) {
+        allHousingsData = [
             {
                 id: 'mock-housing-1',
                 organization_id: 'mock-org-1',
@@ -204,11 +204,14 @@ const HousingList = (): ReactNode => {
         ];
     }
 
-    // Calculate stats from the final housingsData
-    const total = housingsData.length;
-    const available = housingsData.filter(h => h.status === 'available').length;
-    const occupied = housingsData.filter(h => h.status === 'occupied').length;
-    const maintenance = housingsData.filter(h => h.status === 'maintenance').length;
+    // Apply filters to get filtered data
+    const filteredHousingsData = applyHousingFilters(allHousingsData);
+
+    // Calculate stats from the filtered housingsData
+    const total = filteredHousingsData.length;
+    const available = filteredHousingsData.filter(h => h.status === 'available').length;
+    const occupied = filteredHousingsData.filter(h => h.status === 'occupied').length;
+    const maintenance = filteredHousingsData.filter(h => h.status === 'maintenance').length;
 
     // Use housingsData for both the stats and the list rendering
     const statisticsCards = [
@@ -371,16 +374,16 @@ const HousingList = (): ReactNode => {
                     </span>
                 )}
 
-                {!isLoading && !error && housings && housings.data.length <= 0 && (
+                {!isLoading && !error && filteredHousingsData.length <= 0 && (
                     <span className="text-sm text-slate-900 font-medium p-4">
                         {dict.housingList.notFound}
                     </span>
                 )}
 
-                {!isLoading && !error && housings && housings.data.length > 0 && (
+                {!isLoading && !error && filteredHousingsData.length > 0 && (
                     <>
                         <ul className="w-full h-full flex flex-col gap-[1px] overflow-y-scroll overflow-x-hidden">
-                            {housings?.data.map(housing => (
+                            {filteredHousingsData.map(housing => (
                                 <Card key={housing.id} {...housing} refreshList={getHousingList} />
                             ))}
                         </ul>

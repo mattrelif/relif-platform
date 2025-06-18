@@ -970,29 +970,10 @@ export const CreateCaseForm = (): ReactNode => {
                                         formData.tags.length === 0 && "text-muted-foreground"
                                     )}
                                 >
-                                    {formData.tags.length === 0 ? "Select one or more tags..." : ""}
-                                    {formData.tags.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 items-start min-h-[40px] mt-2">
-                                            {formData.tags.map(code => {
-                                                const tag = CASE_TAG_OPTIONS.find(opt => opt.code === code);
-                                                return tag ? (
-                                                    <Badge key={code} variant="secondary" className="text-xs bg-slate-100 text-slate-700">
-                                                        {tag.code} - {tag.label}
-                                                        <X
-                                                            className="ml-1 h-3 w-3 cursor-pointer"
-                                                            onClick={e => {
-                                                                e.stopPropagation();
-                                                                setFormData(prev => ({
-                                                                    ...prev,
-                                                                    tags: prev.tags.filter(t => t !== code),
-                                                                }));
-                                                            }}
-                                                        />
-                                                    </Badge>
-                                                ) : null;
-                                            })}
-                                        </div>
-                                    )}
+                                    {formData.tags.length === 0 
+                                        ? "Select one or more tags..." 
+                                        : `${formData.tags.length} tag(s) selected`}
+                                    <div className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-[400px] p-2">
@@ -1030,6 +1011,27 @@ export const CreateCaseForm = (): ReactNode => {
                                 </div>
                             </PopoverContent>
                         </Popover>
+                        {formData.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 items-start p-3 bg-gray-50 border border-gray-200 rounded-md max-w-full">
+                                {formData.tags.map(code => {
+                                    const tag = CASE_TAG_OPTIONS.find(opt => opt.code === code);
+                                    return tag ? (
+                                        <Badge key={code} variant="secondary" className="text-xs bg-slate-100 text-slate-700 break-words">
+                                            {tag.code} - {tag.label}
+                                            <X
+                                                className="ml-1 h-3 w-3 cursor-pointer hover:text-red-500"
+                                                onClick={() => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        tags: prev.tags.filter(t => t !== code),
+                                                    }));
+                                                }}
+                                            />
+                                        </Badge>
+                                    ) : null;
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

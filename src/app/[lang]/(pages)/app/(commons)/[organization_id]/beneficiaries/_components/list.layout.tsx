@@ -280,24 +280,24 @@ const BeneficiaryList = (): ReactNode => {
     
     // This master effect runs whenever the source of truth or filters change
     useEffect(() => {
-        // 1. Calculate and set statistics from the full, unfiltered list
-        const calculatedStats = {
-            total: allBeneficiaries.length,
-            active: allBeneficiaries.filter(b => b.status === 'ACTIVE').length,
-            pending: allBeneficiaries.filter(b => b.status === 'PENDING').length,
-            inactive: allBeneficiaries.filter(b => b.status === 'INACTIVE').length,
-        };
-        
-        setStats(calculatedStats);
-
-        // 2. Apply search filter
+        // 1. Apply search filter
         const searched = allBeneficiaries.filter(b => 
             b.full_name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         
-        // 3. Apply advanced filters
+        // 2. Apply advanced filters
         const fullyFiltered = applyBeneficiaryFilters(searched);
         setFilteredBeneficiaries(fullyFiltered);
+
+        // 3. Calculate and set statistics from the filtered results
+        const calculatedStats = {
+            total: fullyFiltered.length,
+            active: fullyFiltered.filter(b => b.status === 'ACTIVE').length,
+            pending: fullyFiltered.filter(b => b.status === 'PENDING').length,
+            inactive: fullyFiltered.filter(b => b.status === 'INACTIVE').length,
+        };
+        
+        setStats(calculatedStats);
 
         // 4. Apply pagination
         const paginated = fullyFiltered.slice(offset, offset + LIMIT);

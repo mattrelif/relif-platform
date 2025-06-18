@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
@@ -42,13 +42,168 @@ import { UserSchema } from "@/types/user.types";
 import { UpdateCasePayload } from "@/types/case.types";
 import { useToast } from "@/components/ui/use-toast";
 
+const SERVICE_TYPE_OPTIONS = [
+    { value: "CHILD_PROTECTION_CASE_MANAGEMENT", label: "Child Protection Case Management" },
+    { value: "GBV_CASE_MANAGEMENT", label: "Gender-Based Violence (GBV) Case Management" },
+    { value: "GENERAL_PROTECTION_SERVICES", label: "General Protection Services" },
+    { value: "SEXUAL_VIOLENCE_RESPONSE", label: "Sexual Violence Response" },
+    { value: "INTIMATE_PARTNER_VIOLENCE_SUPPORT", label: "Intimate Partner Violence Support" },
+    { value: "HUMAN_TRAFFICKING_RESPONSE", label: "Human Trafficking Response" },
+    { value: "FAMILY_SEPARATION_REUNIFICATION", label: "Family Separation and Reunification" },
+    { value: "UASC_SERVICES", label: "Unaccompanied and Separated Children (UASC) Services" },
+    { value: "MHPSS", label: "Mental Health and Psychosocial Support (MHPSS)" },
+    { value: "LEGAL_AID_ASSISTANCE", label: "Legal Aid and Assistance" },
+    { value: "CIVIL_DOCUMENTATION_SUPPORT", label: "Civil Documentation Support" },
+    { value: "EMERGENCY_SHELTER_HOUSING", label: "Emergency Shelter and Housing" },
+    { value: "NFI_DISTRIBUTION", label: "Non-Food Items (NFI) Distribution" },
+    { value: "FOOD_SECURITY_NUTRITION", label: "Food Security and Nutrition" },
+    { value: "CVA", label: "Cash and Voucher Assistance (CVA)" },
+    { value: "WASH", label: "Water, Sanitation and Hygiene (WASH)" },
+    { value: "HEALTHCARE_SERVICES", label: "Healthcare Services" },
+    { value: "EMERGENCY_MEDICAL_CARE", label: "Emergency Medical Care" },
+    { value: "SEXUAL_REPRODUCTIVE_HEALTH", label: "Sexual and Reproductive Health Services" },
+    { value: "DISABILITY_SUPPORT_SERVICES", label: "Disability Support Services" },
+    { value: "EMERGENCY_EVACUATION", label: "Emergency Evacuation" },
+    { value: "SEARCH_RESCUE_COORDINATION", label: "Search and Rescue Coordination" },
+    { value: "RAPID_ASSESSMENT_NEEDS_ANALYSIS", label: "Rapid Assessment and Needs Analysis" },
+    { value: "EMERGENCY_REGISTRATION", label: "Emergency Registration" },
+    { value: "EMERGENCY_TRANSPORTATION", label: "Emergency Transportation" },
+    { value: "EMERGENCY_COMMUNICATION_SERVICES", label: "Emergency Communication Services" },
+    { value: "EMERGENCY_EDUCATION_SERVICES", label: "Emergency Education Services" },
+    { value: "CHILD_FRIENDLY_SPACES", label: "Child-Friendly Spaces" },
+    { value: "SKILLS_TRAINING_VOCATIONAL_EDUCATION", label: "Skills Training and Vocational Education" },
+    { value: "LITERACY_PROGRAMS", label: "Literacy Programs" },
+    { value: "AWARENESS_PREVENTION_CAMPAIGNS", label: "Awareness and Prevention Campaigns" },
+    { value: "LIVELIHOOD_SUPPORT_PROGRAMS", label: "Livelihood Support Programs" },
+    { value: "MICROFINANCE_CREDIT_SERVICES", label: "Microfinance and Credit Services" },
+    { value: "JOB_PLACEMENT_EMPLOYMENT_SERVICES", label: "Job Placement and Employment Services" },
+    { value: "AGRICULTURAL_SUPPORT", label: "Agricultural Support" },
+    { value: "BUSINESS_DEVELOPMENT_SUPPORT", label: "Business Development Support" },
+    { value: "REFUGEE_SERVICES", label: "Refugee Services" },
+    { value: "IDP_SERVICES", label: "Internally Displaced Person (IDP) Services" },
+    { value: "RETURNEE_REINTEGRATION_SERVICES", label: "Returnee and Reintegration Services" },
+    { value: "HOST_COMMUNITY_SUPPORT", label: "Host Community Support" },
+    { value: "ELDERLY_CARE_SERVICES", label: "Elderly Care Services" },
+    { value: "SERVICES_FOR_PERSONS_WITH_DISABILITIES", label: "Services for Persons with Disabilities" },
+    { value: "CASE_REFERRAL_TRANSFER", label: "Case Referral and Transfer" },
+    { value: "INTER_AGENCY_COORDINATION", label: "Inter-agency Coordination" },
+    { value: "SERVICE_MAPPING_INFORMATION", label: "Service Mapping and Information" },
+    { value: "FOLLOW_UP_MONITORING", label: "Follow-up and Monitoring" },
+    { value: "CASE_CLOSURE_TRANSITION", label: "Case Closure and Transition" },
+    { value: "BIRTH_REGISTRATION", label: "Birth Registration" },
+    { value: "IDENTITY_DOCUMENTATION", label: "Identity Documentation" },
+    { value: "LEGAL_COUNSELING", label: "Legal Counseling" },
+    { value: "COURT_SUPPORT_ACCOMPANIMENT", label: "Court Support and Accompaniment" },
+    { value: "DETENTION_MONITORING", label: "Detention Monitoring" },
+    { value: "ADVOCACY_SERVICES", label: "Advocacy Services" },
+    { value: "PRIMARY_HEALTHCARE", label: "Primary Healthcare" },
+    { value: "CLINICAL_MANAGEMENT_RAPE", label: "Clinical Management of Rape (CMR)" },
+    { value: "HIV_AIDS_PREVENTION_TREATMENT", label: "HIV/AIDS Prevention and Treatment" },
+    { value: "TUBERCULOSIS_TREATMENT", label: "Tuberculosis Treatment" },
+    { value: "MALNUTRITION_TREATMENT", label: "Malnutrition Treatment" },
+    { value: "VACCINATION_PROGRAMS", label: "Vaccination Programs" },
+    { value: "EMERGENCY_SURGERY", label: "Emergency Surgery" },
+    { value: "CAMP_COORDINATION_MANAGEMENT", label: "Camp Coordination and Camp Management" },
+    { value: "MINE_ACTION_SERVICES", label: "Mine Action Services" },
+    { value: "PEACEKEEPING_PEACEBUILDING", label: "Peacekeeping and Peacebuilding" },
+    { value: "LOGISTICS_TELECOMMUNICATIONS", label: "Logistics and Telecommunications" },
+    { value: "INFORMATION_MANAGEMENT", label: "Information Management" },
+    { value: "COMMUNITY_MOBILIZATION", label: "Community Mobilization" },
+    { value: "WINTERIZATION_SUPPORT", label: "Winterization Support" },
+];
+
+const CASE_TAG_OPTIONS = [
+    { code: 'CR', label: 'Child at risk' },
+    { code: 'CR-CP', label: 'Child parent' },
+    { code: 'CR-CS', label: 'Child spouse' },
+    { code: 'CR-CC', label: 'Child carer' },
+    { code: 'CR-TP', label: 'Teenage pregnancy' },
+    { code: 'CR-LW', label: 'Child engaged in worst forms of child labour' },
+    { code: 'CR-LO', label: 'Child engaged in other forms of child labour' },
+    { code: 'CR-NE', label: 'Child at risk of not attending school' },
+    { code: 'CR-SE', label: 'Child with special education needs' },
+    { code: 'CR-AF', label: 'Child associated with armed forces or groups' },
+    { code: 'CR-CL', label: 'Child in conflict with the law' },
+    { code: 'SC', label: 'Unaccompanied or separated child' },
+    { code: 'SC-SC', label: 'Separated child' },
+    { code: 'SC-UC', label: 'Unaccompanied child' },
+    { code: 'SC-CH', label: 'Child-headed household' },
+    { code: 'SC-IC', label: 'Child in institutional care' },
+    { code: 'SC-FC', label: 'Child in foster care' },
+    { code: 'WR', label: 'Woman at risk' },
+    { code: 'WR-WR', label: 'Woman at risk' },
+    { code: 'WR-SF', label: 'Single woman at risk' },
+    { code: 'WR-LC', label: 'Lactation' },
+    { code: 'ER', label: 'Older person at risk' },
+    { code: 'ER-NF', label: 'Single older person' },
+    { code: 'ER-MC', label: 'Older person with children' },
+    { code: 'ER-FR', label: 'Older person unable to care for self' },
+    { code: 'SP', label: 'Single parent or caregiver' },
+    { code: 'SP-PT', label: 'Single HR – parent' },
+    { code: 'SP-GP', label: 'Single HR – grandparent' },
+    { code: 'SP-CG', label: 'Single HR – caregiver' },
+    { code: 'DS', label: 'Disability' },
+    { code: 'DS-BD', label: 'Visual impairment (including blindness)' },
+    { code: 'DS-DF', label: 'Hearing impairment (including deafness)' },
+    { code: 'DS-PM', label: 'Physical disability – moderate' },
+    { code: 'DS-PS', label: 'Physical disability – severe' },
+    { code: 'DS-MM', label: 'Mental disability – moderate' },
+    { code: 'DS-MS', label: 'Mental disability – severe' },
+    { code: 'DS-SD', label: 'Speech impairment/disability' },
+    { code: 'SM', label: 'Serious medical condition' },
+    { code: 'SM-MI', label: 'Mental illness' },
+    { code: 'SM-MN', label: 'Malnutrition' },
+    { code: 'SM-DP', label: 'Difficult pregnancy' },
+    { code: 'SM-CI', label: 'Chronic illness' },
+    { code: 'SM-CC', label: 'Critical medical condition' },
+    { code: 'SM-OT', label: 'Other medical condition' },
+    { code: 'SM-AD', label: 'Addiction' },
+    { code: 'FU', label: 'Family unity' },
+    { code: 'FU-TR', label: 'Tracing required' },
+    { code: 'FU-FR', label: 'Family reunification required' },
+    { code: 'LP', label: 'Specific legal and physical protection needs' },
+    { code: 'LP-ND', label: 'No legal documentation' },
+    { code: 'LP-BN', label: 'Unmet basic needs' },
+    { code: 'LP-NA', label: 'No access to services' },
+    { code: 'LP-MM', label: 'Mixed marriage' },
+    { code: 'LP-MD', label: 'Multiple displacements' },
+    { code: 'LP-RR', label: 'At risk of refoulement' },
+    { code: 'LP-RD', label: 'At risk of removal' },
+    { code: 'LP-DA', label: 'Detained in country of asylum' },
+    { code: 'LP-DO', label: 'Detained in country of origin' },
+    { code: 'LP-DT', label: 'Detained elsewhere' },
+    { code: 'LP-IH', label: 'In hiding' },
+    { code: 'LP-WP', label: 'Absence of witness protection' },
+    { code: 'LP-AN', label: 'Violence, abuse or neglect' },
+    { code: 'LP-RP', label: 'At risk due to profile' },
+    { code: 'LP-MS', label: 'Marginalized from society/community' },
+    { code: 'LP-LS', label: 'Lack of durable solutions prospects' },
+    { code: 'LP-AP', label: 'Alleged perpetrator' },
+    { code: 'LP-CR', label: 'Criminal record' },
+    { code: 'LP-ST', label: 'Security threat to UNHCR/partner staff' },
+    { code: 'LP-AF', label: 'Formerly associated with armed forces/groups' },
+    { code: 'TR', label: 'Torture' },
+    { code: 'TR-PI', label: 'Psychological/physical impairment due to torture' },
+    { code: 'TR-HO', label: 'Forced to egregious acts' },
+    { code: 'TR-WV', label: 'Witness of violence to other' },
+    { code: 'SV', label: 'SGBV' },
+    { code: 'SV-VA', label: 'Victim/survivor of SGBV in country of asylum' },
+    { code: 'SV-VF', label: 'Victim/survivor of SGBV during flight' },
+    { code: 'SV-VO', label: 'Victim/survivor of SGBV in country of origin' },
+    { code: 'SV-GM', label: 'Female genital mutilation' },
+    { code: 'SV-HP', label: 'Harmful traditional practices' },
+    { code: 'SV-HK', label: 'Threat of honour killing/violence' },
+    { code: 'SV-FM', label: 'Forced/early marriage' },
+    { code: 'SV-SS', label: 'Survival sex' },
+];
+
 const EditCasePage = (): ReactNode => {
     const router = useRouter();
     const pathname = usePathname();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [tags, setTags] = useState<string[]>([]);
+    const [tagSearch, setTagSearch] = useState("");
     const [beneficiaries, setBeneficiaries] = useState<BeneficiarySchema[]>([]);
     const [users, setUsers] = useState<UserSchema[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
@@ -56,7 +211,7 @@ const EditCasePage = (): ReactNode => {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        case_type: "",
+        service_types: [] as string[],
         status: "",
         priority: "",
         urgency_level: "",
@@ -83,7 +238,7 @@ const EditCasePage = (): ReactNode => {
                     setFormData({
                         title: caseData.title,
                         description: caseData.description,
-                        case_type: caseData.case_type,
+                        service_types: caseData.service_types || [],
                         status: caseData.status,
                         priority: caseData.priority,
                         urgency_level: caseData.urgency_level || "",
@@ -95,7 +250,6 @@ const EditCasePage = (): ReactNode => {
                         beneficiary_id: caseData.beneficiary_id,
                         assigned_to_id: caseData.assigned_to_id,
                     });
-                    setTags(caseData.tags || []);
                 }
             } catch (error) {
                 console.error("Error fetching case data:", error);
@@ -137,22 +291,26 @@ const EditCasePage = (): ReactNode => {
         loadData();
     }, [pathname]);
 
-    const handleInputChange = (field: string, value: string | boolean | Date | undefined) => {
+    const handleInputChange = (field: string, value: string | boolean | Date | undefined | string[]) => {
         setFormData(prev => ({
             ...prev,
             [field]: value,
         }));
     };
 
-    const handleTagsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const values = event.target.value
-            .split(",")
-            .map(value => value.trim())
-            .filter(value => value);
-        setTags(values);
+    const addTag = (tagCode: string) => {
+        if (!formData.tags.includes(tagCode)) {
+            setFormData(prev => ({
+                ...prev,
+                tags: [...prev.tags, tagCode],
+            }));
+        }
+    };
+
+    const removeTag = (tagCode: string) => {
         setFormData(prev => ({
             ...prev,
-            tags: values,
+            tags: prev.tags.filter(tag => tag !== tagCode),
         }));
     };
 
@@ -190,7 +348,7 @@ const EditCasePage = (): ReactNode => {
             const updatePayload: UpdateCasePayload = {
                 title: formData.title,
                 description: formData.description,
-                case_type: formData.case_type as UpdateCasePayload["case_type"],
+                service_types: formData.service_types as UpdateCasePayload["service_types"],
                 status: formData.status as UpdateCasePayload["status"],
                 priority: formData.priority as UpdateCasePayload["priority"],
                 urgency_level: formData.urgency_level
@@ -258,7 +416,7 @@ const EditCasePage = (): ReactNode => {
         );
     }
 
-    const isFormValid = formData.title && formData.case_type && formData.priority;
+    const isFormValid = formData.title && formData.service_types.length > 0 && formData.priority;
 
     return (
         <div className="w-full h-max p-4 flex flex-col gap-4 lg:p-2">
@@ -298,30 +456,68 @@ const EditCasePage = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="case_type">Case Type *</Label>
-                            <Select
-                                value={formData.case_type}
-                                onValueChange={value => handleInputChange("case_type", value)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select case type..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="HOUSING">Housing</SelectItem>
-                                    <SelectItem value="LEGAL">Legal</SelectItem>
-                                    <SelectItem value="MEDICAL">Medical</SelectItem>
-                                    <SelectItem value="SUPPORT">Support</SelectItem>
-                                    <SelectItem value="EDUCATION">Education</SelectItem>
-                                    <SelectItem value="EMPLOYMENT">Employment</SelectItem>
-                                    <SelectItem value="FINANCIAL">Financial</SelectItem>
-                                    <SelectItem value="FAMILY_REUNIFICATION">
-                                        Family Reunification
-                                    </SelectItem>
-                                    <SelectItem value="DOCUMENTATION">Documentation</SelectItem>
-                                    <SelectItem value="MENTAL_HEALTH">Mental Health</SelectItem>
-                                    <SelectItem value="OTHER">Other</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Label htmlFor="service_types">Service Types *</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className={cn(
+                                            "w-full justify-between",
+                                            formData.service_types.length === 0 && "text-muted-foreground"
+                                        )}
+                                    >
+                                        {formData.service_types.length === 0 
+                                            ? "Select service types..." 
+                                            : `${formData.service_types.length} service type(s) selected`}
+                                        <div className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                    <div className="p-2 space-y-2 max-h-60 overflow-y-auto">
+                                        {SERVICE_TYPE_OPTIONS.map((serviceType) => (
+                                            <div key={serviceType.value} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={serviceType.value}
+                                                    checked={formData.service_types.includes(serviceType.value)}
+                                                    onCheckedChange={(checked) => {
+                                                        const newServiceTypes = checked
+                                                            ? [...formData.service_types, serviceType.value]
+                                                            : formData.service_types.filter(type => type !== serviceType.value);
+                                                        handleInputChange("service_types", newServiceTypes);
+                                                    }}
+                                                />
+                                                <Label htmlFor={serviceType.value} className="text-sm font-normal">
+                                                    {serviceType.label}
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            {formData.service_types.length > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                    {formData.service_types.map((type) => {
+                                        const serviceTypeLabel = SERVICE_TYPE_OPTIONS.find(option => option.value === type)?.label || type;
+                                        
+                                        return (
+                                            <Badge key={type} variant="secondary" className="text-xs">
+                                                {serviceTypeLabel}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newServiceTypes = formData.service_types.filter(t => t !== type);
+                                                        handleInputChange("service_types", newServiceTypes);
+                                                    }}
+                                                    className="ml-1 text-xs hover:text-red-500"
+                                                >
+                                                    ×
+                                                </button>
+                                            </Badge>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         <div className="w-full flex items-center gap-2">
@@ -541,20 +737,74 @@ const EditCasePage = (): ReactNode => {
                         </h2>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="tags">Tags</Label>
-                            <Input
-                                id="tags"
-                                placeholder="Write tags separated by commas, e.g. urgent, family, medical"
-                                value={tags.join(", ")}
-                                onChange={handleTagsChange}
-                            />
-                            <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
-                                {tags?.map((tag, index) => (
-                                    <Badge variant="outline" key={index}>
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
+                            <Label htmlFor="case-tags">Case Tags</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className={cn(
+                                            "w-full justify-between",
+                                            formData.tags.length === 0 && "text-muted-foreground"
+                                        )}
+                                    >
+                                        {formData.tags.length === 0 
+                                            ? "Select one or more tags..." 
+                                            : `${formData.tags.length} tag(s) selected`}
+                                        <div className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[400px] p-2">
+                                    <Input
+                                        placeholder="Search tags..."
+                                        className="mb-2"
+                                        value={tagSearch}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTagSearch(e.target.value)}
+                                    />
+                                    <div className="max-h-60 overflow-y-auto flex flex-col gap-1">
+                                        {CASE_TAG_OPTIONS.filter(opt =>
+                                            !formData.tags.includes(opt.code) &&
+                                            (tagSearch === "" ||
+                                                opt.code.toLowerCase().includes(tagSearch.toLowerCase()) ||
+                                                opt.label.toLowerCase().includes(tagSearch.toLowerCase()))
+                                        ).map(option => (
+                                            <Button
+                                                key={option.code}
+                                                variant="ghost"
+                                                className="w-full justify-start text-left"
+                                                onClick={() => addTag(option.code)}
+                                            >
+                                                <span className="font-mono text-xs mr-2">{option.code}</span>
+                                                {option.label}
+                                            </Button>
+                                        ))}
+                                        {CASE_TAG_OPTIONS.filter(opt =>
+                                            !formData.tags.includes(opt.code) &&
+                                            (tagSearch === "" ||
+                                                opt.code.toLowerCase().includes(tagSearch.toLowerCase()) ||
+                                                opt.label.toLowerCase().includes(tagSearch.toLowerCase()))
+                                        ).length === 0 && (
+                                            <span className="text-xs text-muted-foreground">No tags found</span>
+                                        )}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            {formData.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-2 items-start p-3 bg-gray-50 border border-gray-200 rounded-md max-w-full">
+                                    {formData.tags.map(code => {
+                                        const tag = CASE_TAG_OPTIONS.find(opt => opt.code === code);
+                                        return tag ? (
+                                            <Badge key={code} variant="secondary" className="text-xs bg-slate-100 text-slate-700 break-words">
+                                                {tag.code} - {tag.label}
+                                                <X
+                                                    className="ml-1 h-3 w-3 cursor-pointer hover:text-red-500"
+                                                    onClick={() => removeTag(code)}
+                                                />
+                                            </Badge>
+                                        ) : null;
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
 

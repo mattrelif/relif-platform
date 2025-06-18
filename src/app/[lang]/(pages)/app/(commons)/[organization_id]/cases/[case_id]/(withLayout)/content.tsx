@@ -29,10 +29,15 @@ import {
     FaLock,
     FaUnlock,
     FaCheck,
+    FaTrash,
 } from "react-icons/fa";
 import {
     getCaseById,
     getCaseDocuments,
+    updateCaseDocument,
+    deleteCaseDocument,
+    generateCaseDocumentUploadLink,
+    createCaseDocument,
 } from "@/repository/organization.repository";
 
 const CaseOverview = (): ReactNode => {
@@ -42,6 +47,15 @@ const CaseOverview = (): ReactNode => {
     const [documents, setDocuments] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [isOperationLoading, setIsOperationLoading] = useState(false);
+    const [editingDocument, setEditingDocument] = useState<any | null>(null);
+    const [viewingDocument, setViewingDocument] = useState<any | null>(null);
+    const [editFormData, setEditFormData] = useState({
+        document_name: '',
+        document_type: '',
+        description: '',
+        tags: ''
+    });
 
     const caseId = pathname.split("/")[5];
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
@@ -79,6 +93,152 @@ const CaseOverview = (): ReactNode => {
         return documentTypeMap[documentType] || convertToTitleCase(documentType);
     };
 
+    const refreshDocuments = async () => {
+        try {
+            const documentsResponse = await getCaseDocuments(caseId);
+            const documentsData = Array.isArray(documentsResponse.data) ? documentsResponse.data : [];
+            setDocuments(documentsData);
+            console.log("✅ Documents refreshed:", documentsData);
+        } catch (error) {
+            console.error("❌ Error refreshing documents:", error);
+        }
+    };
+
+    const handleViewDocument = (doc: any) => {
+        setViewingDocument(doc);
+    };
+
+    const handleDownloadDocument = (doc: any) => {
+        // For now, we'll try to download the document URL if available
+        if (doc.file_url || doc.url) {
+            const link = document.createElement('a');
+            link.href = doc.file_url || doc.url;
+            link.download = doc.document_name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            // If no direct URL, show info about the limitation
+            alert(`Cannot download "${doc.document_name}"\n\nReason: Document URL not available in the API response.\nThis may require additional backend configuration for S3 presigned URLs.`);
+        }
+    };
+
+    const handleEditDocument = (doc: any) => {
+        setEditingDocument(doc);
+        setEditFormData({
+            document_name: doc.document_name || '',
+            document_type: doc.document_type || 'OTHER',
+            description: doc.description || '',
+            tags: Array.isArray(doc.tags) ? doc.tags.join(', ') : ''
+        });
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingDocument) return;
+        
+        try {
+            setIsOperationLoading(true);
+            const dataToSave = {
+                document_name: editFormData.document_name,
+                document_type: editFormData.document_type,
+                description: editFormData.description,
+                tags: editFormData.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag),
+            };
+            await updateCaseDocument(caseId, editingDocument.id, dataToSave);
+            setEditingDocument(null);
+            setEditFormData({ document_name: '', document_type: '', description: '', tags: '' });
+            await refreshDocuments();
+            alert('Document updated successfully!');
+        } catch (error) {
+            console.error('Error updating document:', error);
+            alert('Error updating document. Please try again.');
+        } finally {
+            setIsOperationLoading(false);
+        }
+    };
+
+    const handleDeleteDocument = async (doc: any) => {
+        const confirmed = confirm(`Are you sure you want to delete "${doc.document_name}"?\n\nThis action cannot be undone.`);
+        if (!confirmed) return;
+
+        try {
+            setIsOperationLoading(true);
+            await deleteCaseDocument(caseId, doc.id);
+            await refreshDocuments();
+            alert('Document deleted successfully!');
+        } catch (error) {
+            console.error('Error deleting document:', error);
+            alert('Error deleting document. Please try again.');
+        } finally {
+            setIsOperationLoading(false);
+        }
+    };
+
+    const handleAddDocuments = () => {
+        // Create a file input element
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.multiple = true;
+        fileInput.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt';
+        
+        fileInput.onchange = async (e: any) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            try {
+                setIsOperationLoading(true);
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    console.log(`📤 Uploading file ${i + 1}/${files.length}:`, file.name);
+                    
+                    // Generate upload link
+                    const uploadResponse = await generateCaseDocumentUploadLink(caseId, file.type);
+                    const uploadUrl = uploadResponse.data.link;
+                    
+                    // Upload file to S3
+                    const uploadResult = await fetch(uploadUrl, {
+                        method: 'PUT',
+                        body: file,
+                        headers: {
+                            'Content-Type': file.type,
+                        },
+                    });
+                    
+                    if (!uploadResult.ok) {
+                        throw new Error(`Failed to upload ${file.name}`);
+                    }
+                    
+                    // Extract file key from the upload URL
+                    const fileKey = new URL(uploadUrl).pathname.substring(1);
+                    
+                    // Save document metadata
+                    await createCaseDocument(caseId, {
+                        document_name: file.name,
+                        document_type: 'OTHER', // Default type
+                        description: `Uploaded file: ${file.name}`,
+                        tags: [],
+                        file_name: file.name,
+                        file_size: file.size,
+                        mime_type: file.type,
+                        file_key: fileKey,
+                    });
+                }
+                
+                await refreshDocuments();
+                alert(`Successfully uploaded ${files.length} document(s)!`);
+                
+            } catch (error) {
+                console.error('Error uploading documents:', error);
+                alert('Error uploading documents. Please try again.');
+            } finally {
+                setIsOperationLoading(false);
+            }
+        };
+        
+        fileInput.click();
+    };
+
     useEffect(() => {
         const fetchCaseData = async () => {
             try {
@@ -94,14 +254,21 @@ const CaseOverview = (): ReactNode => {
                 let documentsData = [];
                 try {
                     const documentsResponse = await getCaseDocuments(caseId);
-                    documentsData = documentsResponse.data || [];
+                    documentsData = Array.isArray(documentsResponse.data) ? documentsResponse.data : [];
                     console.log("✅ Case documents fetched:", documentsData);
                 } catch (docError: any) {
                     console.warn("⚠️ Error fetching documents (non-critical):", docError);
                     documentsData = [];
                 }
                 
-                setCaseData(caseResponse.data);
+                // Ensure case data has proper array fields
+                const processedCaseData = {
+                    ...caseResponse.data,
+                    service_types: Array.isArray(caseResponse.data.service_types) ? caseResponse.data.service_types : [],
+                    tags: Array.isArray(caseResponse.data.tags) ? caseResponse.data.tags : []
+                };
+                
+                setCaseData(processedCaseData);
                 setDocuments(documentsData);
                 setError(false);
                 
@@ -174,8 +341,15 @@ const CaseOverview = (): ReactNode => {
                         }
                     ];
 
-                    setCaseData(mockCaseData as unknown as CaseSchema);
-                    setDocuments(mockDocuments);
+                    // Ensure mock data has proper array fields
+                    const processedMockData = {
+                        ...mockCaseData,
+                        service_types: Array.isArray(mockCaseData.service_types) ? mockCaseData.service_types : [],
+                        tags: Array.isArray(mockCaseData.tags) ? mockCaseData.tags : []
+                    };
+                    
+                    setCaseData(processedMockData as unknown as CaseSchema);
+                    setDocuments(Array.isArray(mockDocuments) ? mockDocuments : []);
                     setError(false);
                 } else {
                     // In production, show error instead of mock data
@@ -238,14 +412,22 @@ const CaseOverview = (): ReactNode => {
                                 className="bg-red-100 text-red-800 hover:bg-red-200 px-3 py-1 font-medium"
                             >
                                 <FaFlag className="w-3 h-3 mr-1" />
-                                High Priority
+                                {convertToTitleCase(caseData.priority)} Priority
                             </Badge>
                             <Badge 
                                 className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1 font-medium"
                             >
                                 <FaClock className="w-3 h-3 mr-1" />
-                                In Progress
+                                {convertToTitleCase(caseData.status.replace('_', ' '))}
                             </Badge>
+                            {caseData.urgency_level && (
+                                <Badge 
+                                    className="bg-orange-100 text-orange-800 hover:bg-orange-200 px-3 py-1 font-medium"
+                                >
+                                    <FaExclamationTriangle className="w-3 h-3 mr-1" />
+                                    {convertToTitleCase(caseData.urgency_level.replace('_', ' '))} Urgency
+                                </Badge>
+                            )}
                         </div>
                         <span className="text-sm text-slate-500 flex items-center gap-2">
                             <FaCalendarAlt className="w-4 h-4 text-relif-orange-200" />
@@ -306,16 +488,36 @@ const CaseOverview = (): ReactNode => {
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Priority:</strong> {convertToTitleCase(caseData.priority)}
                         </li>
+                        {caseData.urgency_level && (
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Urgency Level:</strong> {convertToTitleCase(caseData.urgency_level.replace('_', ' '))}
+                            </li>
+                        )}
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Created Date:</strong> {formatDate(caseData.created_at, locale)}
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Last Updated:</strong> {formatDate(caseData.updated_at, locale)}
                         </li>
+                        {caseData.due_date && (
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Due Date:</strong> {formatDate(caseData.due_date, locale)}
+                            </li>
+                        )}
+                        {caseData.estimated_duration && (
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Estimated Duration:</strong> {caseData.estimated_duration}
+                            </li>
+                        )}
+                        {caseData.budget_allocated && (
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Budget Allocated:</strong> ${caseData.budget_allocated}
+                            </li>
+                        )}
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Service Types:</strong>
                             <div className="flex flex-wrap gap-1 mt-2">
-                                {caseData.service_types.map((serviceType: string, index: number) => (
+                                {(Array.isArray(caseData.service_types) ? caseData.service_types : []).map((serviceType: string, index: number) => (
                                     <Badge key={index} variant="outline" className="text-xs font-medium">
                                         {getServiceTypeLabel(serviceType)}
                                     </Badge>
@@ -323,14 +525,18 @@ const CaseOverview = (): ReactNode => {
                             </div>
                         </li>
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Tags:</strong>
-                            <div className="flex flex-wrap gap-1 mt-2">
-                                {(caseData.tags || []).map((tag: string, index: number) => (
-                                    <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 hover:bg-relif-orange-200 text-xs font-medium">
-                                        #{tag}
-                                    </Badge>
-                                ))}
-                            </div>
+                            <strong>Case Tags:</strong>
+                            {(caseData.tags && caseData.tags.length > 0) ? (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                    {caseData.tags.map((tag: string, index: number) => (
+                                        <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 hover:bg-relif-orange-200 text-xs font-medium">
+                                            #{tag}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="text-slate-500 text-xs ml-2">No tags assigned</span>
+                            )}
                         </li>
                     </ul>
 
@@ -517,26 +723,18 @@ const CaseOverview = (): ReactNode => {
                             <Button
                                 size="sm"
                                 className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white font-medium"
-                                onClick={() => alert('Demo: Add Documents')}
+                                onClick={handleAddDocuments}
+                                disabled={isOperationLoading}
                             >
                                 <FaFileAlt className="w-4 h-4 mr-2" />
-                                Add Documents
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-green-200 text-green-700 hover:bg-green-50 font-medium"
-                                onClick={() => alert('Demo: Download All')}
-                            >
-                                <FaDownload className="w-4 h-4 mr-2" />
-                                Download All
+                                {isOperationLoading ? 'Uploading...' : 'Add Documents'}
                             </Button>
                         </div>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    {documents.map(doc => (
+                    {(Array.isArray(documents) ? documents : []).map(doc => (
                         <div
                             key={doc.id}
                             className="border border-slate-200 bg-white rounded-lg p-4 hover:border-relif-orange-200 hover:shadow-sm transition-all duration-200"
@@ -557,7 +755,7 @@ const CaseOverview = (): ReactNode => {
                                     </p>
 
                                     <div className="flex gap-1 mb-3 flex-wrap">
-                                        {doc.tags.map((tag: string, index: number) => (
+                                        {(Array.isArray(doc.tags) ? doc.tags : []).map((tag: string, index: number) => (
                                             <Badge
                                                 key={`doc-${doc.id}-tag-${index}`}
                                                 className="bg-relif-orange-100 text-relif-orange-800 text-xs"
@@ -576,29 +774,245 @@ const CaseOverview = (): ReactNode => {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2 ml-4">
-                                    <Button
-                                        size="sm"
-                                        className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white"
-                                        onClick={() => alert('Demo: View Document')}
-                                    >
-                                        <FaEye className="w-3 h-3 mr-1" />
-                                        View
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        className="text-xs px-3 py-1 bg-green-500 hover:bg-green-600 text-white"
-                                        onClick={() => alert('Demo: Download Document')}
-                                    >
-                                        <FaDownload className="w-3 h-3 mr-1" />
-                                        Download
-                                    </Button>
+                                <div className="flex gap-1 ml-4">
+                                    <div className="relative group">
+                                        <button
+                                            type="button"
+                                            className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={() => handleViewDocument(doc)}
+                                            disabled={isOperationLoading}
+                                        >
+                                            <FaEye className="w-3 h-3" />
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            View
+                                        </div>
+                                    </div>
+                                    <div className="relative group">
+                                        <button
+                                            type="button"
+                                            className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={() => handleDownloadDocument(doc)}
+                                            disabled={isOperationLoading}
+                                        >
+                                            <FaDownload className="w-3 h-3" />
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            Download
+                                        </div>
+                                    </div>
+                                    <div className="relative group">
+                                        <button
+                                            type="button"
+                                            className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={() => handleEditDocument(doc)}
+                                            disabled={isOperationLoading}
+                                        >
+                                            <FaEdit className="w-3 h-3" />
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            Edit
+                                        </div>
+                                    </div>
+                                    <div className="relative group">
+                                        <button
+                                            type="button"
+                                            className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={() => handleDeleteDocument(doc)}
+                                            disabled={isOperationLoading}
+                                        >
+                                            <FaTrash className="w-3 h-3" />
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            Delete
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {/* Edit Document Modal */}
+            {editingDocument && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                        <h3 className="text-lg font-semibold mb-4">Edit Document</h3>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSaveEdit();
+                            }}
+                        >
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Document Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editFormData.document_name}
+                                        onChange={(e) => setEditFormData({...editFormData, document_name: e.target.value})}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Document Type
+                                    </label>
+                                    <select
+                                        value={editFormData.document_type}
+                                        onChange={(e) => setEditFormData({...editFormData, document_type: e.target.value})}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="FORM">Form</option>
+                                        <option value="REPORT">Report</option>
+                                        <option value="EVIDENCE">Evidence</option>
+                                        <option value="CORRESPONDENCE">Correspondence</option>
+                                        <option value="IDENTIFICATION">Identification</option>
+                                        <option value="LEGAL">Legal Document</option>
+                                        <option value="MEDICAL">Medical Document</option>
+                                        <option value="OTHER">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Description
+                                    </label>
+                                    <textarea
+                                        value={editFormData.description}
+                                        onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                                        rows={3}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Tags (comma separated)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editFormData.tags}
+                                        onChange={(e) => setEditFormData({...editFormData, tags: e.target.value})}
+                                        placeholder="tag1, tag2, tag3"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <Button
+                                    type="submit"
+                                    className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                    disabled={isOperationLoading}
+                                >
+                                    {isOperationLoading ? 'Saving...' : 'Save Changes'}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => {
+                                        setEditingDocument(null);
+                                        setEditFormData({ document_name: '', document_type: '', description: '', tags: '' });
+                                    }}
+                                    disabled={isOperationLoading}
+                                >
+                                    Cancel
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Document Viewer Modal */}
+            {viewingDocument && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] mx-4 overflow-hidden">
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 className="text-lg font-semibold">{viewingDocument.document_name}</h3>
+                                <p className="text-sm text-gray-500">
+                                    {formatFileSize(viewingDocument.file_size)} • {getMimeTypeLabel(viewingDocument.mime_type)}
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                {(viewingDocument.file_url || viewingDocument.url) && (
+                                    <button
+                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                                        onClick={() => {
+                                            const link = document.createElement('a');
+                                            link.href = viewingDocument.file_url || viewingDocument.url;
+                                            link.download = viewingDocument.document_name;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }}
+                                    >
+                                        Download
+                                    </button>
+                                )}
+                                <button
+                                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                                    onClick={() => setViewingDocument(null)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="h-[500px] border border-gray-200 rounded">
+                            {(viewingDocument.file_url || viewingDocument.url) ? (
+                                <>
+                                    {viewingDocument.mime_type.startsWith('image/') ? (
+                                        <img 
+                                            src={viewingDocument.file_url || viewingDocument.url}
+                                            alt={viewingDocument.document_name}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    ) : viewingDocument.mime_type === 'application/pdf' ? (
+                                        <iframe
+                                            src={`${viewingDocument.file_url || viewingDocument.url}#toolbar=1`}
+                                            className="w-full h-full"
+                                            title={viewingDocument.document_name}
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                            <div className="text-4xl mb-4">📄</div>
+                                            <h3 className="text-lg font-semibold mb-2">Preview Not Available</h3>
+                                            <p className="text-sm text-center mb-4">
+                                                This file type cannot be previewed in the browser.
+                                            </p>
+                                            <button
+                                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                onClick={() => {
+                                                    const link = document.createElement('a');
+                                                    link.href = viewingDocument.file_url || viewingDocument.url;
+                                                    link.download = viewingDocument.document_name;
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }}
+                                            >
+                                                Download to View
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                    <div className="text-4xl mb-4">⚠️</div>
+                                    <h3 className="text-lg font-semibold mb-2">Document URL Not Available</h3>
+                                    <p className="text-sm text-center">
+                                        This document cannot be previewed because the file URL is not available.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

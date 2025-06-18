@@ -2,6 +2,11 @@
     "bannerLine1": "Transforming the way we",
     "bannerLine2": "respond to",
     "bannerTag": "emergencies",
+    "testWarning": {
+        "title": "🚀 Welcome to Relif Beta!",
+        "message": "Hey there! You're experiencing our platform in beta testing. We're working hard to make it amazing for you. Found something that could be better? We'd love to hear from you at matt@relifaid.org",
+        "closeButton": "Got it!"
+    },
     "root": {
         "title": "Get Started Now",
         "subtitle": "Enter your credentials to access our account",

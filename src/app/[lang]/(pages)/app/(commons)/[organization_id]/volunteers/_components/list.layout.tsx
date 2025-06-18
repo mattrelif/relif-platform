@@ -41,6 +41,7 @@ const VolunteersList = (): ReactNode => {
         count: number;
         data: VoluntarySchema[];
     } | null>(null);
+    const [allFilteredVolunteers, setAllFilteredVolunteers] = useState<VoluntarySchema[]>([]);
     const [stats, setStats] = useState<any>(null);
     const [offset, setOffset] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -92,6 +93,9 @@ const VolunteersList = (): ReactNode => {
                     // Apply client-side filtering
                     const allVolunteers = response.data.data || [];
                     const filteredVolunteers = applyVolunteerFilters(allVolunteers);
+
+                    // Store all filtered volunteers for stats calculation
+                    setAllFilteredVolunteers(filteredVolunteers);
 
                     // Apply pagination to filtered results
                     const startIndex = offset;
@@ -232,9 +236,9 @@ const VolunteersList = (): ReactNode => {
     };
 
     // DEV MOCK: Always inject mock volunteers in development mode if error or no data
-    let volunteersData = volunteers?.data || [];
-    if (process.env.NODE_ENV === 'development' && (error || volunteersData.length === 0)) {
-        volunteersData = [
+    let allVolunteersForStats = allFilteredVolunteers;
+    if (process.env.NODE_ENV === 'development' && (error || allVolunteersForStats.length === 0)) {
+        const mockVolunteersData = [
             {
                 id: 'mock-volunteer-1',
                 organization_id: 'mock-org-1',
@@ -312,13 +316,16 @@ const VolunteersList = (): ReactNode => {
                 notes: '',
             },
         ];
+        
+        // Apply filters to mock data for consistent behavior
+        allVolunteersForStats = applyVolunteerFilters(mockVolunteersData);
     }
 
-    // Calculate stats from the final volunteersData
-    const total = volunteersData.length;
-    const active = volunteersData.filter(v => v.status === 'active').length;
-    const pending = volunteersData.filter(v => v.status === 'pending').length;
-    const inactive = volunteersData.filter(v => v.status === 'inactive').length;
+    // Calculate stats from the filtered volunteers data
+    const total = allVolunteersForStats.length;
+    const active = allVolunteersForStats.filter((v: VoluntarySchema) => v.status === 'active').length;
+    const pending = allVolunteersForStats.filter((v: VoluntarySchema) => v.status === 'pending').length;
+    const inactive = allVolunteersForStats.filter((v: VoluntarySchema) => v.status === 'inactive').length;
 
     // Use volunteersData for both the stats and the list rendering
     const statisticsCards = [

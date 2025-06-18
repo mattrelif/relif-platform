@@ -236,7 +236,7 @@ const ProductList = (): ReactNode => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         };
-        productsData = [
+        const mockProductsData = [
             {
                 id: 'mock-product-1',
                 name: 'Mock Rice',
@@ -277,6 +277,9 @@ const ProductList = (): ReactNode => {
                 updated_at: new Date().toISOString(),
             },
         ];
+        
+        // Apply filters to mock data for consistent behavior
+        productsData = applyInventoryFilters(mockProductsData);
     }
 
     // Calculate stats from the final productsData

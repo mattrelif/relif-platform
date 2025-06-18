@@ -137,7 +137,7 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                         </span>
                         <span className="text-sm text-slate-500">•</span>
                         <span className="text-sm text-slate-500">
-                            {convertToTitleCase(data?.case_type?.replace("_", " "))}
+                            {data?.service_types?.[0] ? convertToTitleCase(data.service_types[0].replace(/_/g, " ")) : "General Case"}
                         </span>
                     </div>
 
@@ -146,20 +146,20 @@ const Card = ({ data, refreshList }: { data: CaseSchema; refreshList: () => void
                             variant="outline"
                             className={`text-xs ${STATUS_COLORS[data?.status as keyof typeof STATUS_COLORS] || "text-slate-600"}`}
                         >
-                            {convertToTitleCase(data?.status?.replace("_", " "))}
+                            Status: {convertToTitleCase(data?.status?.replace("_", " "))}
                         </Badge>
                         <Badge
                             variant="outline"
                             className={`text-xs ${PRIORITY_COLORS[data?.priority as keyof typeof PRIORITY_COLORS] || "text-slate-600"}`}
                         >
-                            {convertToTitleCase(data?.priority)}
+                            Priority: {convertToTitleCase(data?.priority)}
                         </Badge>
                         {data?.urgency_level && (
                             <Badge
                                 variant="outline"
                                 className={`text-xs ${URGENCY_COLORS[data?.urgency_level as keyof typeof URGENCY_COLORS] || "text-slate-600"}`}
                             >
-                                {convertToTitleCase(data?.urgency_level?.replace("_", " "))}
+                                Urgency: {convertToTitleCase(data?.urgency_level?.replace("_", " "))}
                             </Badge>
                         )}
                         {isOverdue && (
