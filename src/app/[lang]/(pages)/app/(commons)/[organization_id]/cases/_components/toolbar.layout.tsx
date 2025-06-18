@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { getFromLocalStorage } from "@/utils/localStorage";
 import { getCasesByOrganizationID } from "@/repository/organization.repository";
 import { flattenObject } from "@/utils/flattenObject";
-import { pdf } from "@react-pdf/renderer";
+
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import Link from "next/link";
@@ -60,8 +60,12 @@ const Toolbar = ({ filteredCases, searchTerm }: ToolbarProps): ReactNode => {
             const titleSuffix = exportType === "filtered" ? " (Filtered)" : 
                               exportType === "searched" ? " (Search Results)" : "";
             
+            // Dynamically import PDF functionality to avoid chunk loading issues
+            const { pdf } = await import("@react-pdf/renderer");
+            const { createElement } = await import("react");
+            
             const blob = await pdf(
-                <CasesPDFDocument title={`Cases Report${titleSuffix}`} cases={cases} />
+                createElement(CasesPDFDocument, { title: `Cases Report${titleSuffix}`, cases })
             ).toBlob();
             
             saveAs(blob, `cases-report-${exportType}-${new Date().toISOString().split('T')[0]}.pdf`);

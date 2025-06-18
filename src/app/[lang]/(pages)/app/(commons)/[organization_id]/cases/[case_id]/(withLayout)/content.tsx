@@ -10,7 +10,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -26,6 +25,7 @@ import {
 import { CaseSchema } from "@/types/case.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
+import { getServiceTypeLabel } from "@/utils/serviceTypeLabels";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -36,7 +36,6 @@ import {
     FaStickyNote,
     FaUser,
     FaClock,
-    FaDollarSign,
     FaFlag,
     FaTrash,
     FaTags,
@@ -480,78 +479,7 @@ const CaseOverview = (): ReactNode => {
         return mimeType.split('/')[1]?.toUpperCase() || 'File';
     };
 
-    const getServiceTypeLabel = (serviceType: string): string => {
-        const serviceTypeMap: { [key: string]: string } = {
-            'CHILD_PROTECTION_CASE_MANAGEMENT': 'Child Protection Case Management',
-            'GBV_CASE_MANAGEMENT': 'Gender-Based Violence (GBV) Case Management',
-            'GENERAL_PROTECTION_SERVICES': 'General Protection Services',
-            'SEXUAL_VIOLENCE_RESPONSE': 'Sexual Violence Response',
-            'INTIMATE_PARTNER_VIOLENCE_SUPPORT': 'Intimate Partner Violence Support',
-            'HUMAN_TRAFFICKING_RESPONSE': 'Human Trafficking Response',
-            'FAMILY_SEPARATION_REUNIFICATION': 'Family Separation and Reunification',
-            'UASC_SERVICES': 'Unaccompanied and Separated Children (UASC) Services',
-            'MHPSS': 'Mental Health and Psychosocial Support (MHPSS)',
-            'LEGAL_AID_ASSISTANCE': 'Legal Aid and Assistance',
-            'CIVIL_DOCUMENTATION_SUPPORT': 'Civil Documentation Support',
-            'EMERGENCY_SHELTER_HOUSING': 'Emergency Shelter and Housing',
-            'NFI_DISTRIBUTION': 'Non-Food Items (NFI) Distribution',
-            'FOOD_SECURITY_NUTRITION': 'Food Security and Nutrition',
-            'CVA': 'Cash and Voucher Assistance (CVA)',
-            'WASH': 'Water, Sanitation and Hygiene (WASH)',
-            'HEALTHCARE_SERVICES': 'Healthcare Services',
-            'EMERGENCY_MEDICAL_CARE': 'Emergency Medical Care',
-            'SEXUAL_REPRODUCTIVE_HEALTH': 'Sexual and Reproductive Health Services',
-            'DISABILITY_SUPPORT_SERVICES': 'Disability Support Services',
-            'EMERGENCY_EVACUATION': 'Emergency Evacuation',
-            'SEARCH_RESCUE_COORDINATION': 'Search and Rescue Coordination',
-            'RAPID_ASSESSMENT_NEEDS_ANALYSIS': 'Rapid Assessment and Needs Analysis',
-            'EMERGENCY_REGISTRATION': 'Emergency Registration',
-            'EMERGENCY_TRANSPORTATION': 'Emergency Transportation',
-            'EMERGENCY_COMMUNICATION_SERVICES': 'Emergency Communication Services',
-            'EMERGENCY_EDUCATION_SERVICES': 'Emergency Education Services',
-            'CHILD_FRIENDLY_SPACES': 'Child-Friendly Spaces',
-            'SKILLS_TRAINING_VOCATIONAL_EDUCATION': 'Skills Training and Vocational Education',
-            'LITERACY_PROGRAMS': 'Literacy Programs',
-            'AWARENESS_PREVENTION_CAMPAIGNS': 'Awareness and Prevention Campaigns',
-            'LIVELIHOOD_SUPPORT_PROGRAMS': 'Livelihood Support Programs',
-            'MICROFINANCE_CREDIT_SERVICES': 'Microfinance and Credit Services',
-            'JOB_PLACEMENT_EMPLOYMENT_SERVICES': 'Job Placement and Employment Services',
-            'AGRICULTURAL_SUPPORT': 'Agricultural Support',
-            'BUSINESS_DEVELOPMENT_SUPPORT': 'Business Development Support',
-            'REFUGEE_SERVICES': 'Refugee Services',
-            'IDP_SERVICES': 'Internally Displaced Person (IDP) Services',
-            'RETURNEE_REINTEGRATION_SERVICES': 'Returnee and Reintegration Services',
-            'HOST_COMMUNITY_SUPPORT': 'Host Community Support',
-            'ELDERLY_CARE_SERVICES': 'Elderly Care Services',
-            'SERVICES_FOR_PERSONS_WITH_DISABILITIES': 'Services for Persons with Disabilities',
-            'CASE_REFERRAL_TRANSFER': 'Case Referral and Transfer',
-            'INTER_AGENCY_COORDINATION': 'Inter-agency Coordination',
-            'SERVICE_MAPPING_INFORMATION': 'Service Mapping and Information',
-            'FOLLOW_UP_MONITORING': 'Follow-up and Monitoring',
-            'CASE_CLOSURE_TRANSITION': 'Case Closure and Transition',
-            'BIRTH_REGISTRATION': 'Birth Registration',
-            'IDENTITY_DOCUMENTATION': 'Identity Documentation',
-            'LEGAL_COUNSELING': 'Legal Counseling',
-            'COURT_SUPPORT_ACCOMPANIMENT': 'Court Support and Accompaniment',
-            'DETENTION_MONITORING': 'Detention Monitoring',
-            'ADVOCACY_SERVICES': 'Advocacy Services',
-            'PRIMARY_HEALTHCARE': 'Primary Healthcare',
-            'CLINICAL_MANAGEMENT_RAPE': 'Clinical Management of Rape (CMR)',
-            'HIV_AIDS_PREVENTION_TREATMENT': 'HIV/AIDS Prevention and Treatment',
-            'TUBERCULOSIS_TREATMENT': 'Tuberculosis Treatment',
-            'MALNUTRITION_TREATMENT': 'Malnutrition Treatment',
-            'VACCINATION_PROGRAMS': 'Vaccination Programs',
-            'EMERGENCY_SURGERY': 'Emergency Surgery',
-            'CAMP_COORDINATION_MANAGEMENT': 'Camp Coordination and Camp Management',
-            'MINE_ACTION_SERVICES': 'Mine Action Services',
-            'PEACEKEEPING_PEACEBUILDING': 'Peacekeeping and Peacebuilding',
-            'LOGISTICS_TELECOMMUNICATIONS': 'Logistics and Telecommunications',
-            'INFORMATION_MANAGEMENT': 'Information Management',
-            'COMMUNITY_MOBILIZATION': 'Community Mobilization',
-            'WINTERIZATION_SUPPORT': 'Winterization Support'
-        };
-        return serviceTypeMap[serviceType] || serviceType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    };
+
 
     const getDocumentTypeLabel = (documentType: string): string => {
         const documentTypeMap: { [key: string]: string } = {
