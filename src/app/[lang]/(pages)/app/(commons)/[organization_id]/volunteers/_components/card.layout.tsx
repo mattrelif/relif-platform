@@ -4,20 +4,13 @@ import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { VoluntarySchema } from "@/types/voluntary.types";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
-import { SlOptions } from "react-icons/sl";
 
 import { RemoveModal } from "./remove.modal";
 
@@ -35,9 +28,19 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
     const urlPath = pathname.split("/").slice(0, 5).join("/");
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
 
-    const handleDropdownItemClick = (e: any, url: string) => {
+    const handleViewProfileClick = (e: any) => {
         e.stopPropagation();
-        router.push(url);
+        router.push(`${urlPath}/${voluntary?.id}`);
+    };
+
+    const handleEditClick = (e: any) => {
+        e.stopPropagation();
+        router.push(`${urlPath}/${voluntary?.id}/edit`);
+    };
+
+    const handleRemoveClick = (e: any) => {
+        e.stopPropagation();
+        setRemoveDialogOpenState(true);
     };
 
     return (
@@ -60,51 +63,59 @@ const Card = ({ refreshList, ...voluntary }: Props): ReactNode => {
                 </div>
 
                 <div className="flex flex-col items-end justify-between">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <Button variant="icon" className="w-7 h-7 p-0">
-                                <SlOptions className="text-sm" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem
-                                onClick={e =>
-                                    handleDropdownItemClick(e, `${urlPath}/${voluntary?.id}`)
-                                }
-                            >
-                                {dict.commons.volunteers.list.card.profile}
-                            </DropdownMenuItem>
-                            {platformRole === "ORG_ADMIN" && (
-                                <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                        onClick={e =>
-                                            handleDropdownItemClick(
-                                                e,
-                                                `${urlPath}/${voluntary?.id}/edit`
-                                            )
-                                        }
+                    <div className="flex items-center gap-2">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-8 h-8 p-0 flex items-center justify-center"
+                                        onClick={handleViewProfileClick}
                                     >
-                                        <span className="flex items-center gap-2">
-                                            <FaEdit className="text-xs" />
-                                            {dict.commons.volunteers.list.card.editVoluntary}
-                                        </span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setRemoveDialogOpenState(true);
-                                        }}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <FaTrash className="text-xs" />
-                                            {dict.commons.volunteers.list.card.removeVoluntary}
-                                        </span>
-                                    </DropdownMenuItem>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                        <FaEye />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>{dict.commons.volunteers.list.card.profile}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-8 h-8 p-0 flex items-center justify-center"
+                                                onClick={handleEditClick}
+                                            >
+                                                <FaEdit />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.commons.volunteers.list.card.editVoluntary}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-8 h-8 p-0 flex items-center justify-center"
+                                                onClick={handleRemoveClick}
+                                            >
+                                                <FaTrash />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.commons.volunteers.list.card.removeVoluntary}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </>
+                        )}
+                    </div>
                     <div className="flex flex-col items-end lg:hidden">
                         <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                             {dict.commons.volunteers.list.card.createdAt}{" "}

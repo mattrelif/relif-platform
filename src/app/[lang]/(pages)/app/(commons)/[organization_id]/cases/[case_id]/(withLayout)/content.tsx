@@ -84,59 +84,104 @@ const CaseOverview = (): ReactNode => {
             try {
                 setIsLoading(true);
                 
-                // For demo purposes, show mock data
-                const mockCaseData = {
-                    id: "mock-case-id",
-                    case_number: "CASE-2025-8241", 
-                    title: "Emergency Housing Assistance",
-                    status: "IN_PROGRESS",
-                    priority: "HIGH",
-                    description: "Legal assistance case for domestic violence situation. Beneficiary requires immediate support for legal proceedings and documentation assistance. Case involves coordination with local authorities and shelter accommodation.",
-                    created_at: "2025-01-15T10:30:00Z",
-                    updated_at: "2025-01-18T14:45:00Z",
-                    service_types: ["LEGAL_AID_ASSISTANCE", "MHPSS", "EMERGENCY_SHELTER_HOUSING"],
-                    tags: ["urgent", "documentation", "legal", "domestic-violence", "priority"],
-                    beneficiary: {
-                        id: "mock-beneficiary-1",
-                        full_name: "Matheus Souza"
-                    },
-                    assigned_to: {
-                        id: "mock-user-id", 
-                        first_name: "Ana",
-                        last_name: "Silva"
-                    }
-                };
-
-                const mockDocuments = [
-                    {
-                        id: "mock-doc-1",
-                        document_name: "Identity Document Copy",
-                        document_type: "IDENTIFICATION",
-                        description: "Copy of beneficiary's identity document for verification purposes",
-                        file_size: 2048576,
-                        mime_type: "application/pdf",
-                        tags: ["identity", "verification"],
-                        created_at: "2025-01-15T11:00:00Z",
-                        uploaded_by: { name: "Case Worker" }
-                    },
-                    {
-                        id: "mock-doc-2", 
-                        document_name: "Legal Consultation Notes",
-                        document_type: "LEGAL",
-                        description: "Notes from the initial legal consultation session",
-                        file_size: 1024000,
-                        mime_type: "application/pdf", 
-                        tags: ["consultation", "legal", "notes"],
-                        created_at: "2025-01-16T09:30:00Z",
-                        uploaded_by: { name: "Legal Advisor" }
-                    }
-                ];
-
-                setCaseData(mockCaseData);
-                setDocuments(mockDocuments);
+                console.log("📋 Fetching case details for caseId:", caseId);
+                
+                // Try to fetch real case data from API
+                const caseResponse = await getCaseById(caseId);
+                console.log("✅ Case data fetched successfully:", caseResponse.data);
+                
+                // Try to fetch case documents
+                let documentsData = [];
+                try {
+                    const documentsResponse = await getCaseDocuments(caseId);
+                    documentsData = documentsResponse.data || [];
+                    console.log("✅ Case documents fetched:", documentsData);
+                } catch (docError: any) {
+                    console.warn("⚠️ Error fetching documents (non-critical):", docError);
+                    documentsData = [];
+                }
+                
+                setCaseData(caseResponse.data);
+                setDocuments(documentsData);
+                setError(false);
+                
             } catch (err: any) {
-                console.error("Error fetching case data:", err);
-                setError(true);
+                console.error("❌ Error fetching case data:", {
+                    error: err.message,
+                    status: err?.response?.status,
+                    statusText: err?.response?.statusText,
+                    responseData: err?.response?.data,
+                    caseId
+                });
+                
+                // Only use mock data in development mode for testing
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("🎭 Development mode: Using mock data for case detail due to API failure");
+                    
+                    const mockCaseData = {
+                        id: caseId,
+                        case_number: "CASE-2025-8241", 
+                        title: "Emergency Housing Assistance",
+                        status: "IN_PROGRESS" as const,
+                        priority: "HIGH" as const,
+                        description: "Legal assistance case for domestic violence situation. Beneficiary requires immediate support for legal proceedings and documentation assistance. Case involves coordination with local authorities and shelter accommodation.",
+                        created_at: "2025-01-15T10:30:00Z",
+                        updated_at: "2025-01-18T14:45:00Z",
+                        service_types: ["LEGAL_AID_ASSISTANCE", "MHPSS", "EMERGENCY_SHELTER_HOUSING"],
+                        tags: ["urgent", "documentation", "legal", "domestic-violence", "priority"],
+                        beneficiary: {
+                            id: "mock-beneficiary-1",
+                            full_name: "Matheus Souza"
+                        },
+                        assigned_to: {
+                            id: "mock-user-id", 
+                            first_name: "Ana",
+                            last_name: "Silva"
+                        },
+                        beneficiary_id: "mock-beneficiary-1",
+                        assigned_to_id: "mock-user-id",
+                        urgency_level: "IMMEDIATE" as const,
+                        due_date: "2025-02-15T00:00:00Z",
+                        estimated_duration: "2 Weeks",
+                        budget_allocated: "1000",
+                        notes_count: 3,
+                        documents_count: 2,
+                        last_activity: "2025-01-18T14:45:00Z"
+                    };
+
+                    const mockDocuments = [
+                        {
+                            id: "mock-doc-1",
+                            document_name: "Identity Document Copy",
+                            document_type: "IDENTIFICATION",
+                            description: "Copy of beneficiary's identity document for verification purposes",
+                            file_size: 2048576,
+                            mime_type: "application/pdf",
+                            tags: ["identity", "verification"],
+                            created_at: "2025-01-15T11:00:00Z",
+                            uploaded_by: { name: "Case Worker" }
+                        },
+                        {
+                            id: "mock-doc-2", 
+                            document_name: "Legal Consultation Notes",
+                            document_type: "LEGAL",
+                            description: "Notes from the initial legal consultation session",
+                            file_size: 1024000,
+                            mime_type: "application/pdf", 
+                            tags: ["consultation", "legal", "notes"],
+                            created_at: "2025-01-16T09:30:00Z",
+                            uploaded_by: { name: "Legal Advisor" }
+                        }
+                    ];
+
+                    setCaseData(mockCaseData as unknown as CaseSchema);
+                    setDocuments(mockDocuments);
+                    setError(false);
+                } else {
+                    // In production, show error instead of mock data
+                    console.error("🚨 Production: Case data fetch failed, showing error");
+                    setError(true);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -280,7 +325,7 @@ const CaseOverview = (): ReactNode => {
                         <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                             <strong>Tags:</strong>
                             <div className="flex flex-wrap gap-1 mt-2">
-                                {caseData.tags.map((tag: string, index: number) => (
+                                {(caseData.tags || []).map((tag: string, index: number) => (
                                     <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 hover:bg-relif-orange-200 text-xs font-medium">
                                         #{tag}
                                     </Badge>

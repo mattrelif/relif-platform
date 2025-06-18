@@ -4,19 +4,12 @@ import { useDictionary } from "@/app/context/dictionaryContext";
 import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HousingSchema } from "@/types/housing.types";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaEdit, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
-import { SlOptions } from "react-icons/sl";
+import { FaEdit, FaEye, FaMapMarkerAlt, FaTrash } from "react-icons/fa";
 
 import { RemoveModal } from "./remove.modal";
 
@@ -48,9 +41,19 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
 
     const status = getStatus();
 
-    const handleDropdownItemClick = (e: any, url: string) => {
+    const handleViewClick = (e: any) => {
         e.stopPropagation();
-        router.push(url);
+        router.push(`${urlPath}/${data?.id}`);
+    };
+
+    const handleEditClick = (e: any) => {
+        e.stopPropagation();
+        router.push(`${urlPath}/${data?.id}/edit`);
+    };
+
+    const handleRemoveClick = (e: any) => {
+        e.stopPropagation();
+        setRemoveDialogOpenState(true);
     };
 
     const percentageOccupiedVacancies = (
@@ -120,49 +123,59 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-between">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <Button variant="icon" className="w-7 h-7 p-0">
-                                <SlOptions className="text-sm" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem
-                                onClick={e => handleDropdownItemClick(e, `${urlPath}/${data?.id}`)}
-                            >
-                                {dict.housingList.dropdownViewHousing}
-                            </DropdownMenuItem>
-                            {platformRole === "ORG_ADMIN" && (
-                                <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                        onClick={e =>
-                                            handleDropdownItemClick(
-                                                e,
-                                                `${urlPath}/${data?.id}/edit`
-                                            )
-                                        }
+                    <div className="flex items-center gap-2">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-8 h-8 p-0 flex items-center justify-center"
+                                        onClick={handleViewClick}
                                     >
-                                        <span className="flex items-center gap-2">
-                                            <FaEdit className="text-xs" />
-                                            {dict.housingList.dropdownEditHousing}
-                                        </span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setRemoveDialogOpenState(true);
-                                        }}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <FaTrash className="text-xs" />
-                                            {dict.housingList.dropdownRemoveHousing}
-                                        </span>
-                                    </DropdownMenuItem>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                        <FaEye />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>{dict.housingList.dropdownViewHousing}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-8 h-8 p-0 flex items-center justify-center"
+                                                onClick={handleEditClick}
+                                            >
+                                                <FaEdit />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.housingOverview.tooltipEdit}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-8 h-8 p-0 flex items-center justify-center"
+                                                onClick={handleRemoveClick}
+                                            >
+                                                <FaTrash />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.housingOverview.tooltipRemove}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </>
+                        )}
+                    </div>
                     <div className="flex flex-col items-end lg:hidden">
                         <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                             {dict.housingList.createdAt}{" "}

@@ -5,21 +5,14 @@ import { usePlatformRole } from "@/app/hooks/usePlatformRole";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { FaBirthdayCake, FaEdit, FaMapMarkerAlt, FaTrash, FaUserCheck } from "react-icons/fa";
+import { FaBirthdayCake, FaEdit, FaEye, FaHome, FaMapMarkerAlt, FaTrash, FaUserCheck } from "react-icons/fa";
 import { IoMdMove } from "react-icons/io";
-import { SlOptions } from "react-icons/sl";
 
 import { MoveModal } from "./move.modal";
 import { RemoveModal } from "./remove.modal";
@@ -29,19 +22,18 @@ type Props = BeneficiarySchema & {
     refreshList: () => void;
 };
 
-const calculateAge = (birthdate: string): number => {
-    const birthDate = new Date(birthdate);
+function calculateAge(dateString: string): number {
     const today = new Date();
+    const birthDate = new Date(dateString);
     let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
 
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        // eslint-disable-next-line no-plusplus
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
     }
 
-    return age > 0 ? age : 0;
-};
+    return age;
+}
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const pathname = usePathname();
@@ -71,9 +63,34 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
         other: dict.commons.beneficiaries.card.gender.other,
     };
 
-    const handleDropdownItemClick = (e: any, url: string) => {
+    const handleViewProfileClick = (e: any) => {
         e.stopPropagation();
-        router.push(url);
+        router.push(`${beneficiaryPath}/${data?.id}`);
+    };
+
+    const handleViewHousingClick = (e: any) => {
+        e.stopPropagation();
+        router.push(`${housingPath}/housings/${data?.current_housing_id}`);
+    };
+
+    const handleEditClick = (e: any) => {
+        e.stopPropagation();
+        router.push(`${beneficiaryPath}/${data?.id}/edit`);
+    };
+
+    const handleStatusClick = (e: any) => {
+        e.stopPropagation();
+        setStatusDialogOpenState(true);
+    };
+
+    const handleRemoveClick = (e: any) => {
+        e.stopPropagation();
+        setRemoveDialogOpenState(true);
+    };
+
+    const handleMoveClick = (e: any) => {
+        e.stopPropagation();
+        setMoveDialogOpenState(true);
     };
 
     return (
@@ -103,113 +120,119 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                             <FaBirthdayCake /> {formatDate(data?.birthdate, locale || "en")} ({age}{" "}
                             {dict.commons.beneficiaries.card.yearsOld})
                         </span>
-                        <div className="flex flex-wrap mt-2 gap-2">
-                            {data.gender && (
-                                <Badge>
-                                    {GENDER_MAPPING[data?.gender as keyof typeof GENDER_MAPPING]}
-                                </Badge>
-                            )}
+                        <span className="text-xs text-slate-500 mt-1 flex items-center gap-2">
+                            {convertToTitleCase(GENDER_MAPPING[data?.gender as keyof typeof GENDER_MAPPING])}
                             {isUnderage && (
-                                <Badge className="bg-yellow-300 text-slate-900 hover:bg-yellow-500">
+                                <Badge className="bg-blue-500 text-white hover:bg-blue-600">
                                     {dict.commons.beneficiaries.card.underage}
                                 </Badge>
                             )}
-                            {!data?.current_room_id && (
-                                <Badge className="bg-slate-200 text-slate-900 hover:bg-slate-400">
-                                    {dict.commons.beneficiaries.card.unallocated}
-                                </Badge>
-                            )}
-                        </div>
+                        </span>
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-between">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <Button variant="icon" className="w-7 h-7 p-0">
-                                <SlOptions className="text-sm" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem
-                                onClick={e =>
-                                    handleDropdownItemClick(e, `${beneficiaryPath}/${data?.id}`)
-                                }
-                            >
-                                {dict.commons.beneficiaries.card.dropdownMenu.profile}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={e =>
-                                    handleDropdownItemClick(
-                                        e,
-                                        `${housingPath}/housings/${data?.current_housing_id}`
-                                    )
-                                }
-                                disabled={!data?.current_housing_id}
-                            >
-                                {dict.commons.beneficiaries.card.dropdownMenu.viewHousing}
-                            </DropdownMenuItem>
-                            {platformRole === "ORG_ADMIN" && (
-                                <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                        onClick={e =>
-                                            handleDropdownItemClick(
-                                                e,
-                                                `${beneficiaryPath}/${data?.id}/edit`
-                                            )
-                                        }
+                    <div className="flex items-center gap-1">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-7 h-7 p-0 flex items-center justify-center"
+                                        onClick={handleViewProfileClick}
                                     >
-                                        <span className="flex items-center gap-2">
-                                            <FaEdit className="text-xs" />
-                                            {
-                                                dict.commons.beneficiaries.card.dropdownMenu
-                                                    .editBeneficiary
-                                            }
-                                        </span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setStatusDialogOpenState(true);
-                                        }}
+                                        <FaEye />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>{dict.commons.beneficiaries.card.dropdownMenu.profile}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Button
+                                        size="sm"
+                                        variant="icon"
+                                        className="w-7 h-7 p-0 flex items-center justify-center"
+                                        onClick={handleViewHousingClick}
+                                        disabled={!data?.current_housing_id}
                                     >
-                                        <span className="flex items-center gap-2">
-                                            <FaUserCheck className="text-xs" />
-                                            Change Status
-                                        </span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setRemoveDialogOpenState(true);
-                                        }}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <FaTrash className="text-xs" />
-                                            {
-                                                dict.commons.beneficiaries.card.dropdownMenu
-                                                    .removeBeneficiary
-                                            }
-                                        </span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            setMoveDialogOpenState(true);
-                                        }}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <IoMdMove className="text-xs" />
-                                            {
-                                                dict.commons.beneficiaries.card.dropdownMenu
-                                                    .moveToOtherHousing
-                                            }
-                                        </span>
-                                    </DropdownMenuItem>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                        <FaHome />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>{dict.commons.beneficiaries.card.dropdownMenu.viewHousing}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {platformRole === "ORG_ADMIN" && (
+                            <>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-7 h-7 p-0 flex items-center justify-center"
+                                                onClick={handleEditClick}
+                                            >
+                                                <FaEdit />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.commons.beneficiaries.card.dropdownMenu.editBeneficiary}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-7 h-7 p-0 flex items-center justify-center"
+                                                onClick={handleStatusClick}
+                                            >
+                                                <FaUserCheck />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Change Status</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-7 h-7 p-0 flex items-center justify-center"
+                                                onClick={handleMoveClick}
+                                            >
+                                                <IoMdMove />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.commons.beneficiaries.card.dropdownMenu.moveToOtherHousing}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button
+                                                size="sm"
+                                                variant="icon"
+                                                className="w-7 h-7 p-0 flex items-center justify-center"
+                                                onClick={handleRemoveClick}
+                                            >
+                                                <FaTrash />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{dict.commons.beneficiaries.card.dropdownMenu.removeBeneficiary}</TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </>
+                        )}
+                    </div>
                     <div className="flex flex-col items-end lg:items-start lg:hidden">
                         <span className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                             {dict.commons.beneficiaries.card.createdAt}{" "}
