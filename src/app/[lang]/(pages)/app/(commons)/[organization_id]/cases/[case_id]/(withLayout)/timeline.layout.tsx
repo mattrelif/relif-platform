@@ -68,17 +68,24 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                     getCaseNotes(caseId)
                 ]);
                 
+                console.log("📅 API Responses:", {
+                    case: caseResponse.status,
+                    documents: documentsResponse.status,
+                    notes: notesResponse.status
+                });
+                
                 const events: TimelineEvent[] = [];
                 
                 // Add case creation event
                 if (caseResponse.status === 'fulfilled') {
                     const caseData = caseResponse.value.data;
+                    console.log("📄 Case data:", caseData);
                     events.push({
                         id: `case-created-${caseData.id}`,
                         type: "created",
                         title: "Case Created",
                         description: `Case "${caseData.title}" was created in the system`,
-                        user: { name: "System", role: "System" },
+                        user: { name: caseData.assigned_to ? `${caseData.assigned_to.first_name} ${caseData.assigned_to.last_name}` : "System", role: "Case Worker" },
                         timestamp: caseData.created_at,
                     });
                     
@@ -96,6 +103,8 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                             },
                         });
                     }
+                } else {
+                    console.error("❌ Failed to fetch case data:", caseResponse.reason);
                 }
                 
                 // Add document events
@@ -104,6 +113,7 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                         ? documentsResponse.value.data 
                         : [];
                     
+                    console.log("📄 Documents data:", documents);
                     documents.forEach((doc: any) => {
                         events.push({
                             id: `doc-${doc.id}`,
@@ -120,6 +130,8 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                             },
                         });
                     });
+                } else {
+                    console.error("❌ Failed to fetch documents:", documentsResponse.reason);
                 }
                 
                 // Add note/update events
@@ -129,6 +141,7 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                         ? notesData 
                         : (notesData?.data && Array.isArray(notesData.data) ? notesData.data : []);
                     
+                    console.log("📄 Notes data:", notes);
                     notes.forEach((note: any) => {
                         events.push({
                             id: `note-${note.id}`,
@@ -145,19 +158,111 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                             },
                         });
                     });
+                } else {
+                    console.error("❌ Failed to fetch notes:", notesResponse.reason);
                 }
                 
-                // Sort events by timestamp (newest first)
-                events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                // Sort events by timestamp (oldest first - chronological order)
+                events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
                 
-                console.log("📅 Timeline events built:", events.length, "events");
+                console.log("📅 Timeline events built:", events.length, "events", events);
                 setTimelineEvents(events);
                 onTimelineEventsLoad?.(events.length);
+                
+                // If no events were built and we're in development mode, use mock data
+                if (events.length === 0 && process.env.NODE_ENV === 'development') {
+                    console.log("🎭 Development mode: Using mock timeline data due to API failures");
+                    
+                    const mockTimelineEvents: TimelineEvent[] = [
+                        {
+                            id: "mock-case-created",
+                            type: "created",
+                            title: "Case Created",
+                            description: 'Case "Emergency Housing Assistance" was created in the system',
+                            user: { name: "Ana Silva", role: "Case Worker" },
+                            timestamp: "2025-01-15T10:30:00Z",
+                        },
+                        {
+                            id: "mock-case-assigned",
+                            type: "assigned",
+                            title: "Case Assigned",
+                            description: "Case was assigned to a case worker",
+                            user: { name: "Ana Silva", role: "Case Worker" },
+                            timestamp: "2025-01-15T10:35:00Z",
+                            metadata: {
+                                new_value: "Ana Silva",
+                            },
+                        },
+                        {
+                            id: "mock-doc-1",
+                            type: "document_added",
+                            title: "Document Added",
+                            description: "New document was uploaded to the case",
+                            user: { 
+                                name: "Ana Silva", 
+                                role: "Case Worker" 
+                            },
+                            timestamp: "2025-01-15T11:00:00Z",
+                            metadata: {
+                                document_name: "Identity Document Copy",
+                            },
+                        },
+                        {
+                            id: "mock-doc-2",
+                            type: "document_added",
+                            title: "Document Added",
+                            description: "New document was uploaded to the case",
+                            user: { 
+                                name: "Legal Advisor", 
+                                role: "Legal Specialist" 
+                            },
+                            timestamp: "2025-01-16T09:30:00Z",
+                            metadata: {
+                                document_name: "Legal Consultation Notes",
+                            },
+                        },
+                        {
+                            id: "mock-note-1",
+                            type: "comment_added",
+                            title: "Case Update",
+                            description: "Case update was added",
+                            user: { 
+                                name: "Ana Silva", 
+                                role: "Case Worker" 
+                            },
+                            timestamp: "2025-01-17T14:15:00Z",
+                            metadata: {
+                                comment: "Initial assessment completed. Beneficiary requires immediate legal documentation support.",
+                            },
+                        },
+                        {
+                            id: "mock-note-2",
+                            type: "comment_added",
+                            title: "Legal Consultation",
+                            description: "Case update was added",
+                            user: { 
+                                name: "Legal Advisor", 
+                                role: "Legal Specialist" 
+                            },
+                            timestamp: "2025-01-18T10:45:00Z",
+                            metadata: {
+                                comment: "Legal consultation session conducted. Documentation process initiated with local authorities.",
+                            },
+                        }
+                    ];
+                    
+                    // Sort mock events by timestamp (oldest first - chronological order)
+                    mockTimelineEvents.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+                    
+                    console.log("🎭 Mock timeline events:", mockTimelineEvents.length, "events");
+                    setTimelineEvents(mockTimelineEvents);
+                    onTimelineEventsLoad?.(mockTimelineEvents.length);
+                }
                 
             } catch (error) {
                 console.error("❌ Error building timeline:", error);
                 
-                // Fallback to minimal timeline
+                // Fallback to minimal timeline only if we have no events at all
                 const fallbackEvents: TimelineEvent[] = [
                     {
                         id: "1",
@@ -328,16 +433,6 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                             </div>
                         </div>
                     ))}
-
-                    {/* Timeline end indicator */}
-                    <div className="relative flex items-center gap-4 mt-6">
-                        <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-slate-300 bg-slate-100">
-                            <FaCheck className="w-4 h-4 text-slate-500" />
-                        </div>
-                        <div className="text-sm text-slate-500 italic">
-                            Timeline complete
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
