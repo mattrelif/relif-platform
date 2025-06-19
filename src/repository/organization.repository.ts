@@ -16,7 +16,7 @@ import {
 } from "@/types/requests.types";
 import { UserSchema } from "@/types/user.types";
 import { CreateVoluntaryRequest, VoluntarySchema } from "@/types/voluntary.types";
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 import { CaseSchema, CreateCasePayload, UpdateCasePayload, CaseNoteSchema } from "@/types/case.types";
 
 const PREFIX = "organizations";

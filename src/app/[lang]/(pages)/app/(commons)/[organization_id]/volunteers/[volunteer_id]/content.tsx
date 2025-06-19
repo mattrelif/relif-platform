@@ -217,77 +217,87 @@ const Content = ({ volunteerId }: { volunteerId: string }): ReactNode => {
                         <ul>
                             <li className="w-full p-2 text-sm text-slate-900">
                                 <strong>{dict.commons.volunteers.volunteerId.content.name}:</strong>{" "}
-                                {convertToTitleCase(data.emergency_contacts[0].full_name)}
+                                {data.emergency_contacts?.[0]?.full_name ? 
+                                    convertToTitleCase(data.emergency_contacts[0].full_name) : 
+                                    "No emergency contact"
+                                }
                             </li>
                             <li className="w-full p-2 text-sm text-slate-900">
                                 <strong>
                                     {dict.commons.volunteers.volunteerId.content.relationshipDegree}
                                     :
                                 </strong>{" "}
-                                {RELATIONSHIPS_MAPPING[
-                                    data.emergency_contacts[0]
-                                        .relationship as keyof typeof RELATIONSHIPS_MAPPING
-                                ] || data.emergency_contacts[0].relationship}
+                                {data.emergency_contacts?.[0]?.relationship ? (
+                                    RELATIONSHIPS_MAPPING[
+                                        data.emergency_contacts[0].relationship as keyof typeof RELATIONSHIPS_MAPPING
+                                    ] || data.emergency_contacts[0].relationship
+                                ) : "No relationship specified"}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
                                 <strong>
                                     {dict.commons.volunteers.volunteerId.content.emails}:
                                 </strong>
-                                <HoverCard>
-                                    <HoverCardTrigger>
-                                        <span className="text-sm text-slate-900 flex items-center gap-2">
-                                            {data.emergency_contacts[0].emails[0] &&
-                                                data.emergency_contacts[0].emails[0]}
-                                            {data.emergency_contacts[0].emails.length >= 2 && (
-                                                <Badge variant="outline">
-                                                    +{data.emergency_contacts[0].emails.length - 1}
-                                                </Badge>
-                                            )}
-                                        </span>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                        <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            {dict.commons.volunteers.volunteerId.content.emails}
-                                        </h3>
-                                        <ul>
-                                            {data.emergency_contacts[0].emails.map((email, index) => (
-                                                <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
-                                                    <MdMail /> {email}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                {data.emergency_contacts?.[0]?.emails?.length > 0 ? (
+                                    <HoverCard>
+                                        <HoverCardTrigger>
+                                            <span className="text-sm text-slate-900 flex items-center gap-2">
+                                                {data.emergency_contacts[0].emails[0]}
+                                                {data.emergency_contacts[0].emails.length >= 2 && (
+                                                    <Badge variant="outline">
+                                                        +{data.emergency_contacts[0].emails.length - 1}
+                                                    </Badge>
+                                                )}
+                                            </span>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent>
+                                            <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                                {dict.commons.volunteers.volunteerId.content.emails}
+                                            </h3>
+                                            <ul>
+                                                {data.emergency_contacts[0].emails.map((email, index) => (
+                                                    <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                        <MdMail /> {email}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                ) : (
+                                    <span className="text-sm text-slate-500">No email provided</span>
+                                )}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex items-center gap-2">
                                 <strong>
                                     {dict.commons.volunteers.volunteerId.content.phones}:
                                 </strong>
-                                <HoverCard>
-                                    <HoverCardTrigger>
-                                        <span className="text-sm text-slate-900 flex items-center gap-2">
-                                            {data.emergency_contacts[0].phones[0] &&
-                                                data.phones[0].split("_").join(" ")}
-                                            {data.emergency_contacts[0].phones.length >= 2 && (
-                                                <Badge variant="outline">
-                                                    +{data.emergency_contacts[0].phones.length - 1}
-                                                </Badge>
-                                            )}
-                                        </span>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                        <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            {dict.commons.volunteers.volunteerId.content.phones}
-                                        </h3>
-                                        <ul>
-                                            {data.emergency_contacts[0].phones.map((phone, index) => (
-                                                <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
-                                                    <MdPhone /> {phone.split("_").join(" ")}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                {data.emergency_contacts?.[0]?.phones?.length > 0 ? (
+                                    <HoverCard>
+                                        <HoverCardTrigger>
+                                            <span className="text-sm text-slate-900 flex items-center gap-2">
+                                                {data.emergency_contacts[0].phones[0].split("_").join(" ")}
+                                                {data.emergency_contacts[0].phones.length >= 2 && (
+                                                    <Badge variant="outline">
+                                                        +{data.emergency_contacts[0].phones.length - 1}
+                                                    </Badge>
+                                                )}
+                                            </span>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent>
+                                            <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                                {dict.commons.volunteers.volunteerId.content.phones}
+                                            </h3>
+                                            <ul>
+                                                {data.emergency_contacts[0].phones.map((phone, index) => (
+                                                    <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                        <MdPhone /> {phone.split("_").join(" ")}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                ) : (
+                                    <span className="text-sm text-slate-500">No phone provided</span>
+                                )}
                             </li>
                         </ul>
                     </div>

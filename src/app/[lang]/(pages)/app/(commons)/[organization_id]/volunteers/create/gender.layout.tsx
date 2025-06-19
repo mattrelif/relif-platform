@@ -12,15 +12,19 @@ import {
 } from "@/components/ui/select";
 import { ReactNode, useState } from "react";
 
-const Gender = (): ReactNode => {
-    const [option, setOption] = useState("");
+interface GenderProps {
+    defaultValue?: string;
+}
+
+const Gender = ({ defaultValue }: GenderProps): ReactNode => {
+    const [option, setOption] = useState(defaultValue || "");
     const dict = useDictionary();
 
     return (
         <div className="flex flex-col gap-3">
             <Label htmlFor="gender">{dict.commons.volunteers.create.gender.label}</Label>
-            <Select name="gender" onValueChange={opt => setOption(opt)}>
-                <SelectTrigger className="w-full" id="gender" defaultValue="male">
+            <Select name="gender" onValueChange={opt => setOption(opt)} defaultValue={defaultValue}>
+                <SelectTrigger className="w-full" id="gender">
                     <SelectValue placeholder={dict.commons.volunteers.create.gender.placeholder} />
                 </SelectTrigger>
                 <SelectContent>

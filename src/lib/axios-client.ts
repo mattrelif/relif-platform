@@ -1,5 +1,6 @@
 import { BFFConfig } from "@/config/bff";
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import axios from "axios";
+import type { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 
 const client: AxiosInstance = axios.create({
     baseURL: BFFConfig.host,

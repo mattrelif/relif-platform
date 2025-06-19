@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCartPlus, FaMapMarkerAlt } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa6";
-import { LuHelpingHand } from "react-icons/lu";
+import { LuHeart } from "react-icons/lu";
 import { MdError } from "react-icons/md";
 
 type Props = {
@@ -104,7 +104,7 @@ const Content = ({ beneficiaryId }: Props): ReactNode => {
                 </div>
                 <div className="w-full grow border-[1px] border-slate-200 rounded-lg p-4 mt-2">
                     <h1 className="text-relif-orange-200 text-xl font-bold flex items-center gap-2 mb-4">
-                        <LuHelpingHand size={28} />
+                        <LuHeart size={28} />
                         {dict.commons.beneficiaries.beneficiaryId.assistance.assistanceReceived}
                     </h1>
                     {assistances?.count !== 0 ? (

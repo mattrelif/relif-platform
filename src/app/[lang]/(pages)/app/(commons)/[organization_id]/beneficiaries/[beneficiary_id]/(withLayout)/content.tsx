@@ -251,7 +251,14 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>{dict.commons.beneficiaries.beneficiaryId.email}:</strong>{" "}
-                                {data.email}
+                                {data.email ? (
+                                    data.email
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" checked disabled className="text-relif-orange-200" />
+                                        <span className="text-sm text-slate-500">Beneficiary has no email</span>
+                                    </div>
+                                )}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>{dict.commons.beneficiaries.beneficiaryId.gender}:</strong>{" "}
@@ -260,25 +267,32 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap gap-2">
                                 <strong>{dict.commons.beneficiaries.beneficiaryId.phones}:</strong>
-                                <HoverCard>
-                                    <HoverCardTrigger>
-                                        <span className="text-sm text-slate-900 flex items-center gap-2">
-                                            {data.phones[0] && data.phones[0].split("_").join(" ")}
-                                        </span>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                        <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            {dict.commons.beneficiaries.beneficiaryId.phones}
-                                        </h3>
-                                        <ul>
-                                            {data.phones.map((phone, index) => (
-                                                <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
-                                                    <MdPhone /> {phone.split("_").join(" ")}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                {data.phones?.length > 0 ? (
+                                    <HoverCard>
+                                        <HoverCardTrigger>
+                                            <span className="text-sm text-slate-900 flex items-center gap-2">
+                                                {data.phones[0].split("_").join(" ")}
+                                            </span>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent>
+                                            <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                                {dict.commons.beneficiaries.beneficiaryId.phones}
+                                            </h3>
+                                            <ul>
+                                                {data.phones.map((phone, index) => (
+                                                    <li key={index} className="text-slate-500 w-full text-xs flex items-center gap-2">
+                                                        <MdPhone /> {phone.split("_").join(" ")}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" checked disabled className="text-relif-orange-200" />
+                                        <span className="text-sm text-slate-500">Beneficiary has no phone</span>
+                                    </div>
+                                )}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
                                 <strong>
@@ -373,68 +387,81 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                     {dict.commons.beneficiaries.beneficiaryId.emergencyRelationship}
                                     :
                                 </strong>{" "}
-                                {RELATIONSHIPS_MAPPING[
-                                    data.emergency_contacts[0]
-                                        .relationship as keyof typeof RELATIONSHIPS_MAPPING
-                                ] || data.emergency_contacts[0].relationship}
+                                {data.emergency_contacts?.[0]?.relationship ? (
+                                    RELATIONSHIPS_MAPPING[
+                                        data.emergency_contacts[0].relationship as keyof typeof RELATIONSHIPS_MAPPING
+                                    ] || data.emergency_contacts[0].relationship
+                                ) : "No relationship specified"}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap items-center gap-2">
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.emergencyEmail}:
                                 </strong>
-                                <HoverCard>
-                                    <HoverCardTrigger>
-                                        <span className="text-sm text-slate-900 flex items-center gap-2">
-                                            {data.emergency_contacts[0].emails[0] &&
-                                                data.emergency_contacts[0].emails[0]}
-                                            {data.emergency_contacts[0].emails.length >= 2 && (
-                                                <Badge variant="outline">
-                                                    +{data.emergency_contacts[0].emails.length - 1}
-                                                </Badge>
-                                            )}
-                                        </span>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                        <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            E-mails
-                                        </h3>
-                                        <ul>
-                                            {data.emergency_contacts[0].emails.map((email, index) => (
-                                                <li key={index} className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
-                                                    <MdMail /> {email}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                {data.emergency_contacts?.[0]?.emails?.length > 0 ? (
+                                    <HoverCard>
+                                        <HoverCardTrigger>
+                                            <span className="text-sm text-slate-900 flex items-center gap-2">
+                                                {data.emergency_contacts[0].emails[0]}
+                                                {data.emergency_contacts[0].emails.length >= 2 && (
+                                                    <Badge variant="outline">
+                                                        +{data.emergency_contacts[0].emails.length - 1}
+                                                    </Badge>
+                                                )}
+                                            </span>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent>
+                                            <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                                E-mails
+                                            </h3>
+                                            <ul>
+                                                {data.emergency_contacts[0].emails.map((email, index) => (
+                                                    <li key={index} className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
+                                                        <MdMail /> {email}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" checked disabled className="text-relif-orange-200" />
+                                        <span className="text-sm text-slate-500">Beneficiary has no email</span>
+                                    </div>
+                                )}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap items-center gap-2">
                                 <strong>{dict.commons.beneficiaries.beneficiaryId.phone}:</strong>
-                                <HoverCard>
-                                    <HoverCardTrigger>
-                                        <span className="text-sm text-slate-900 flex items-center gap-2">
-                                            {data.emergency_contacts[0].phones[0] &&
-                                                data.emergency_contacts[0].phones[0].split("_").join(" ")}
-                                            {data.emergency_contacts[0].phones.length >= 2 && (
-                                                <Badge variant="outline">
-                                                    +{data.emergency_contacts[0].phones.length - 1}
-                                                </Badge>
-                                            )}
-                                        </span>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent>
-                                        <h3 className="text-slate-900 font-bold text-sm mb-2">
-                                            {dict.commons.beneficiaries.beneficiaryId.phones}
-                                        </h3>
-                                        <ul>
-                                            {data.emergency_contacts[0].phones.map((phone, index) => (
-                                                <li key={index} className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
-                                                    <MdPhone /> {phone.split("_").join(" ")}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                {data.emergency_contacts?.[0]?.phones?.length > 0 ? (
+                                    <HoverCard>
+                                        <HoverCardTrigger>
+                                            <span className="text-sm text-slate-900 flex items-center gap-2">
+                                                {data.emergency_contacts[0].phones[0].split("_").join(" ")}
+                                                {data.emergency_contacts[0].phones.length >= 2 && (
+                                                    <Badge variant="outline">
+                                                        +{data.emergency_contacts[0].phones.length - 1}
+                                                    </Badge>
+                                                )}
+                                            </span>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent>
+                                            <h3 className="text-slate-900 font-bold text-sm mb-2">
+                                                {dict.commons.beneficiaries.beneficiaryId.phones}
+                                            </h3>
+                                            <ul>
+                                                {data.emergency_contacts[0].phones.map((phone, index) => (
+                                                    <li key={index} className="text-slate-500 w-full text-xs flex flex-wrap items-center gap-2">
+                                                        <MdPhone /> {phone.split("_").join(" ")}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" checked disabled className="text-relif-orange-200" />
+                                        <span className="text-sm text-slate-500">Beneficiary has no phone</span>
+                                    </div>
+                                )}
                             </li>
                         </ul>
                     </div>

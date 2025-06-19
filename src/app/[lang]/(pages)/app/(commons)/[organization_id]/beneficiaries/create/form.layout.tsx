@@ -91,6 +91,8 @@ const Form = (): ReactNode => {
     const [notes, setNotes] = useState<string>("");
     const [requiresReview, setRequiresReview] = useState<boolean>(false);
     const [wantToAllocate, setWantToAllocate] = useState<boolean>(false);
+    const [hasNoEmail, setHasNoEmail] = useState<boolean>(false);
+    const [hasNoPhone, setHasNoPhone] = useState<boolean>(false);
     
     // Google Places integration
     const { apiKey, isReady } = useGooglePlaces();
@@ -348,13 +350,13 @@ const Form = (): ReactNode => {
                 full_name: data.fullName,
                 image_url: imageUrl || "",
                 birthdate: data.birthdate,
-                email: data.email,
+                email: hasNoEmail ? "" : data.email,
                 gender: data.gender === "other" ? data.otherGender : data.gender,
                 civil_status: data.civilStatus === "other" ? data.otherCivilStatus : data.civilStatus,
                 education: data.education === "other" ? data.otherEducation : data.education,
                 occupation: data.occupation,
                 spoken_languages: languages.map(lang => lang.value),
-                phones: phone ? [phone] : [],
+                phones: hasNoPhone ? [] : (phone ? [phone] : []),
                 address: {
                     address_line_1: addressToUse.address_line_1,
                     address_line_2: addressToUse.address_line_2,
@@ -607,8 +609,26 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="email">{dict.commons.beneficiaries.create.email} *</Label>
-                            <Input id="email" name="email" type="email" required />
+                            <Label htmlFor="email">
+                                {dict.commons.beneficiaries.create.email} {!hasNoEmail && "*"}
+                            </Label>
+                            <Input 
+                                id="email" 
+                                name="email" 
+                                type="email" 
+                                required={!hasNoEmail}
+                                className={hasNoEmail ? "opacity-50 pointer-events-none" : ""}
+                            />
+                            <div className="flex items-center space-x-2 mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                                <Checkbox 
+                                    id="hasNoEmail" 
+                                    checked={hasNoEmail}
+                                    onCheckedChange={(checked) => setHasNoEmail(checked as boolean)}
+                                />
+                                <Label htmlFor="hasNoEmail" className="text-sm font-normal text-gray-700 cursor-pointer">
+                                    ✓ Beneficiary has no email
+                                </Label>
+                            </div>
                         </div>
 
                         <Gender />
@@ -625,28 +645,45 @@ const Form = (): ReactNode => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="phone">{dict.commons.beneficiaries.create.phone} *</Label>
-                            <PhoneInput
-                                country={"us"}
-                                value={phone}
-                                onChange={(value: string) => setPhone(value)}
-                                containerClass="w-full"
-                                inputStyle={{
-                                    height: "40px",
-                                    width: "100%",
-                                    borderColor: "#e2e8f0",
-                                    borderRadius: "0.375rem",
-                                    fontSize: "0.875rem",
-                                }}
-                                buttonStyle={{
-                                    borderColor: "#e2e8f0",
-                                    borderRadius: "0.375rem 0 0 0.375rem",
-                                }}
-                                inputProps={{
-                                    name: "phone",
-                                    required: true,
-                                }}
-                            />
+                            <Label htmlFor="phone">
+                                {dict.commons.beneficiaries.create.phone} {!hasNoPhone && "*"}
+                            </Label>
+                            <div className={hasNoPhone ? "opacity-50 pointer-events-none" : ""}>
+                                <PhoneInput
+                                    country={"us"}
+                                    value={phone}
+                                    onChange={(value: string) => setPhone(value)}
+                                    containerClass="w-full"
+                                    inputStyle={{
+                                        height: "40px",
+                                        width: "100%",
+                                        borderColor: "#e2e8f0",
+                                        borderRadius: "0.375rem",
+                                        fontSize: "0.875rem",
+                                    }}
+                                    buttonStyle={{
+                                        borderColor: "#e2e8f0",
+                                        borderRadius: "0.375rem 0 0 0.375rem",
+                                    }}
+                                    inputProps={{
+                                        name: "phone",
+                                        required: !hasNoPhone,
+                                    }}
+                                />
+                            </div>
+                            <div className="flex items-center space-x-2 mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                                <Checkbox 
+                                    id="hasNoPhone" 
+                                    checked={hasNoPhone}
+                                    onCheckedChange={(checked) => {
+                                        setHasNoPhone(checked as boolean);
+                                        if (checked) setPhone("");
+                                    }}
+                                />
+                                <Label htmlFor="hasNoPhone" className="text-sm font-normal text-gray-700 cursor-pointer">
+                                    ✓ Beneficiary has no phone
+                                </Label>
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-3">

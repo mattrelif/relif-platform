@@ -54,10 +54,10 @@ const UserDropdown = ({ children, isEntry }: Props): ReactNode => {
             if (currentUser) {
                 setUser(currentUser);
             } else {
-                throw new Error();
+                console.warn("No user data found in localStorage");
             }
         } catch (err) {
-            console.error(err);
+            console.warn("Failed to load user data:", err);
         }
     }, []);
 

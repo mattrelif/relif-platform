@@ -12,8 +12,12 @@ import {
 } from "@/components/ui/select";
 import { ReactNode, useState } from "react";
 
-const RelationshipDegree = (): ReactNode => {
-    const [option, setOption] = useState("");
+interface RelationshipDegreeProps {
+    defaultValue?: string;
+}
+
+const RelationshipDegree = ({ defaultValue }: RelationshipDegreeProps): ReactNode => {
+    const [option, setOption] = useState(defaultValue || "");
     const dict = useDictionary();
 
     return (
@@ -21,7 +25,7 @@ const RelationshipDegree = (): ReactNode => {
             <Label htmlFor="emergencyRelationship">
                 {dict.commons.volunteers.create.relationshipDegree.label} *
             </Label>
-            <Select name="emergencyRelationship" onValueChange={setOption}>
+            <Select name="emergencyRelationship" onValueChange={setOption} defaultValue={defaultValue}>
                 <SelectTrigger className="w-full" id="emergencyRelationship">
                     <SelectValue
                         placeholder={dict.commons.volunteers.create.relationshipDegree.placeholder}

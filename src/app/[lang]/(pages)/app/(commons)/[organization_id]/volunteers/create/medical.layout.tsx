@@ -14,18 +14,35 @@ import {
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { MdHealthAndSafety } from "react-icons/md";
 
-const Medical = (): ReactNode => {
+interface MedicalProps {
+    defaultValue?: {
+        allergies?: string[];
+        current_medications?: string[];
+        recurrent_medical_conditions?: string[];
+        health_insurance_plans?: string[];
+        blood_type?: string;
+        taken_vaccines?: string[];
+        mental_health_history?: string[];
+        height?: number;
+        weight?: number;
+        addictions?: string[];
+        disabilities?: string[];
+        prothesis_or_medical_devices?: string[];
+    };
+}
+
+const Medical = ({ defaultValue }: MedicalProps): ReactNode => {
     const dict = useDictionary();
 
-    const [allergies, setAllergies] = useState<string[]>([]);
-    const [currentMedications, setCurrentMedications] = useState<string[]>([]);
-    const [chronicMedicalConditions, setChronicMedicalConditions] = useState<string[]>([]);
-    const [healthInsurance, setHealthInsurance] = useState<string[]>([]);
-    const [vaccinations, setVaccinations] = useState<string[]>([]);
-    const [mentalHealth, setMentalHealth] = useState<string[]>([]);
-    const [addictions, setAddictions] = useState<string[]>([]);
-    const [disabilities, setDisabilities] = useState<string[]>([]);
-    const [prosthesisOrMedicalDevices, setProsthesisOrMedicalDevices] = useState<string[]>([]);
+    const [allergies, setAllergies] = useState<string[]>(defaultValue?.allergies || []);
+    const [currentMedications, setCurrentMedications] = useState<string[]>(defaultValue?.current_medications || []);
+    const [chronicMedicalConditions, setChronicMedicalConditions] = useState<string[]>(defaultValue?.recurrent_medical_conditions || []);
+    const [healthInsurance, setHealthInsurance] = useState<string[]>(defaultValue?.health_insurance_plans || []);
+    const [vaccinations, setVaccinations] = useState<string[]>(defaultValue?.taken_vaccines || []);
+    const [mentalHealth, setMentalHealth] = useState<string[]>(defaultValue?.mental_health_history || []);
+    const [addictions, setAddictions] = useState<string[]>(defaultValue?.addictions || []);
+    const [disabilities, setDisabilities] = useState<string[]>(defaultValue?.disabilities || []);
+    const [prosthesisOrMedicalDevices, setProsthesisOrMedicalDevices] = useState<string[]>(defaultValue?.prothesis_or_medical_devices || []);
 
     const handleInputChange =
         (setter: Dispatch<SetStateAction<string[]>>) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +66,7 @@ const Medical = (): ReactNode => {
                         name="allergies"
                         type="text"
                         placeholder={dict.commons.volunteers.create.medical.writeAsMuch}
+                        defaultValue={defaultValue?.allergies?.join(", ") || ""}
                         onChange={handleInputChange(setAllergies)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -69,6 +87,7 @@ const Medical = (): ReactNode => {
                         name="currentMedications"
                         type="text"
                         placeholder={dict.commons.volunteers.create.medical.writeAsMuch}
+                        defaultValue={defaultValue?.current_medications?.join(", ") || ""}
                         onChange={handleInputChange(setCurrentMedications)}
                     />
                     <div className="flex flex-wrap items-center gap-1 mt-[-6px]">
@@ -124,7 +143,7 @@ const Medical = (): ReactNode => {
                     <Label htmlFor="bloodType">
                         {dict.commons.volunteers.create.medical.bloodType}
                     </Label>
-                    <Select name="bloodType">
+                    <Select name="bloodType" defaultValue={defaultValue?.blood_type || ""}>
                         <SelectTrigger className="w-full">
                             <SelectValue
                                 placeholder={
@@ -187,12 +206,12 @@ const Medical = (): ReactNode => {
 
                 <div className="flex flex-col gap-3 w-full">
                     <Label htmlFor="height">{dict.commons.volunteers.create.medical.height}</Label>
-                    <Input id="height" name="height" type="number" placeholder="e.g. 170cm" />
+                    <Input id="height" name="height" type="number" placeholder="e.g. 170cm" defaultValue={defaultValue?.height || ""} />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">
                     <Label htmlFor="weight">{dict.commons.volunteers.create.medical.weight}</Label>
-                    <Input id="weight" name="weight" type="number" placeholder="e.g. 80kg" />
+                    <Input id="weight" name="weight" type="number" placeholder="e.g. 80kg" defaultValue={defaultValue?.weight || ""} />
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">

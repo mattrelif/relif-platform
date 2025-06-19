@@ -70,6 +70,10 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
     const [skipMedicalInfo, setSkipMedicalInfo] = useState<boolean>(false);
     const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
     const [notes, setNotes] = useState<string>("");
+    const [hasNoEmergencyPhone, setHasNoEmergencyPhone] = useState<boolean>(false);
+    const [hasNoEmergencyEmail, setHasNoEmergencyEmail] = useState<boolean>(false);
+    const [hasNoPhone, setHasNoPhone] = useState<boolean>(false);
+    const [hasNoEmail, setHasNoEmail] = useState<boolean>(false);
 
     useEffect(() => {
         setIsLoading(true);
@@ -89,13 +93,28 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                     
                     if (beneficiary.phones && beneficiary.phones.length > 0) {
                         setPhone(beneficiary.phones[0]);
+                    } else {
+                        setHasNoPhone(true);
+                    }
+                    
+                    if (!beneficiary.email) {
+                        setHasNoEmail(true);
                     }
                     
                     if (beneficiary.emergency_contacts && beneficiary.emergency_contacts.length > 0) {
                         const emergencyContact = beneficiary.emergency_contacts[0];
                         if (emergencyContact.phones && emergencyContact.phones.length > 0) {
                             setEmergencyPhone(emergencyContact.phones[0]);
+                        } else {
+                            setHasNoEmergencyPhone(true);
                         }
+                        
+                        if (!emergencyContact.emails || emergencyContact.emails.length === 0) {
+                            setHasNoEmergencyEmail(true);
+                        }
+                    } else {
+                        setHasNoEmergencyPhone(true);
+                        setHasNoEmergencyEmail(true);
                     }
                     
                     if (beneficiary.spoken_languages) {
@@ -248,14 +267,14 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                 full_name: fData.fullName,
                 image_url: imageUrl || "",
                 birthdate: birthdate ? format(birthdate, "yyyy-MM-dd") : fData.birthdate,
-                email: fData.email,
+                email: hasNoEmail ? "" : fData.email,
                 gender: fData.gender === "other" ? fData.otherGender : fData.gender,
                 civil_status:
                     fData.civilStatus === "other" ? fData.otherCivilStatus : fData.civilStatus,
                 education: fData.education === "other" ? fData.otherEducation : fData.education,
                 occupation: fData.occupation,
                 spoken_languages: languages.map(lang => lang.value),
-                phones: phone ? [phone] : [],
+                phones: hasNoPhone ? [] : (phone ? [phone] : []),
                 address: {
                     address_line_1: fData.addressLine1,
                     address_line_2: fData.addressLine2,
@@ -274,8 +293,8 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                 ],
                 emergency_contacts: [
                     {
-                        phones: emergencyPhone ? [emergencyPhone] : [],
-                        emails: [fData.emergencyEmail],
+                        phones: hasNoEmergencyPhone ? [] : (emergencyPhone ? [emergencyPhone] : []),
+                        emails: hasNoEmergencyEmail ? [] : (fData.emergencyEmail ? [fData.emergencyEmail] : []),
                         full_name: fData.emergencyName,
                         relationship: relationship,
                     },
@@ -469,14 +488,27 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="email">{dict.commons.beneficiaries.edit.email} *</Label>
+                                <Label htmlFor="email">
+                                    {dict.commons.beneficiaries.edit.email} {!hasNoEmail && "*"}
+                                </Label>
                                 <Input 
                                     id="email" 
                                     name="email" 
                                     type="email" 
-                                    required 
+                                    required={!hasNoEmail}
                                     defaultValue={data.email}
+                                    className={hasNoEmail ? "opacity-50 pointer-events-none" : ""}
                                 />
+                                <div className="flex items-center space-x-2 mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                                    <Checkbox 
+                                        id="hasNoEmail" 
+                                        checked={hasNoEmail}
+                                        onCheckedChange={(checked) => setHasNoEmail(checked as boolean)}
+                                    />
+                                    <Label htmlFor="hasNoEmail" className="text-sm font-normal text-gray-700 cursor-pointer">
+                                        ✓ Beneficiary has no email
+                                    </Label>
+                                </div>
                             </div>
 
                             <Gender defaultValue={data.gender} />
@@ -499,28 +531,45 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="phone">{dict.commons.beneficiaries.edit.phone} *</Label>
-                                <PhoneInput
-                                    country={"us"}
-                                    value={phone}
-                                    onChange={(value: string) => setPhone(value)}
-                                    containerClass="w-full"
-                                    inputStyle={{
-                                        height: "40px",
-                                        width: "100%",
-                                        borderColor: "#e2e8f0",
-                                        borderRadius: "0.375rem",
-                                        fontSize: "0.875rem",
-                                    }}
-                                    buttonStyle={{
-                                        borderColor: "#e2e8f0",
-                                        borderRadius: "0.375rem 0 0 0.375rem",
-                                    }}
-                                    inputProps={{
-                                        name: "phone",
-                                        required: true,
-                                    }}
-                                />
+                                <Label htmlFor="phone">
+                                    {dict.commons.beneficiaries.edit.phone} {!hasNoPhone && "*"}
+                                </Label>
+                                <div className={hasNoPhone ? "opacity-50 pointer-events-none" : ""}>
+                                    <PhoneInput
+                                        country={"us"}
+                                        value={phone}
+                                        onChange={(value: string) => setPhone(value)}
+                                        containerClass="w-full"
+                                        inputStyle={{
+                                            height: "40px",
+                                            width: "100%",
+                                            borderColor: "#e2e8f0",
+                                            borderRadius: "0.375rem",
+                                            fontSize: "0.875rem",
+                                        }}
+                                        buttonStyle={{
+                                            borderColor: "#e2e8f0",
+                                            borderRadius: "0.375rem 0 0 0.375rem",
+                                        }}
+                                        inputProps={{
+                                            name: "phone",
+                                            required: !hasNoPhone,
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex items-center space-x-2 mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                                    <Checkbox 
+                                        id="hasNoPhone" 
+                                        checked={hasNoPhone}
+                                        onCheckedChange={(checked) => {
+                                            setHasNoPhone(checked as boolean);
+                                            if (checked) setPhone("");
+                                        }}
+                                    />
+                                    <Label htmlFor="hasNoPhone" className="text-sm font-normal text-gray-700 cursor-pointer">
+                                        ✓ Beneficiary has no phone
+                                    </Label>
+                                </div>
                             </div>
 
                             <div className="flex flex-col gap-3">
@@ -671,52 +720,83 @@ const Form = ({ beneficiaryId }: Props): ReactNode => {
                                     name="emergencyName" 
                                     type="text" 
                                     required 
-                                    defaultValue={data.emergency_contacts[0]?.full_name}
+                                    defaultValue={data.emergency_contacts?.[0]?.full_name || ""}
                                 />
                             </div>
 
                             <RelationshipDegree
-                                defaultValue={data.emergency_contacts[0]?.relationship}
+                                defaultValue={data.emergency_contacts?.[0]?.relationship}
                             />
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="emergencyPhone">
-                                    {dict.commons.beneficiaries.edit.emergencyPhone} *
-                                </Label>
-                                <PhoneInput
-                                    country={"us"}
-                                    value={emergencyPhone}
-                                    onChange={(value: string) => setEmergencyPhone(value)}
-                                    containerClass="w-full"
-                                    inputStyle={{
-                                        height: "40px",
-                                        width: "100%",
-                                        borderColor: "#e2e8f0",
-                                        borderRadius: "0.375rem",
-                                        fontSize: "0.875rem",
-                                    }}
-                                    buttonStyle={{
-                                        borderColor: "#e2e8f0",
-                                        borderRadius: "0.375rem 0 0 0.375rem",
-                                    }}
-                                    inputProps={{
-                                        name: "emergencyPhone",
-                                        required: true,
-                                    }}
-                                />
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="emergencyPhone">
+                                        {dict.commons.beneficiaries.edit.emergencyPhone} {!hasNoEmergencyPhone && "*"}
+                                    </Label>
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox 
+                                            id="hasNoEmergencyPhone" 
+                                            checked={hasNoEmergencyPhone}
+                                            onCheckedChange={(checked) => {
+                                                setHasNoEmergencyPhone(checked as boolean);
+                                                if (checked) setEmergencyPhone("");
+                                            }}
+                                        />
+                                        <Label htmlFor="hasNoEmergencyPhone" className="text-sm font-normal">
+                                            Beneficiary has no phone
+                                        </Label>
+                                    </div>
+                                </div>
+                                <div className={hasNoEmergencyPhone ? "opacity-50 pointer-events-none" : ""}>
+                                    <PhoneInput
+                                        country={"us"}
+                                        value={emergencyPhone}
+                                        onChange={(value: string) => setEmergencyPhone(value)}
+                                        containerClass="w-full"
+                                        inputStyle={{
+                                            height: "40px",
+                                            width: "100%",
+                                            borderColor: "#e2e8f0",
+                                            borderRadius: "0.375rem",
+                                            fontSize: "0.875rem",
+                                        }}
+                                        buttonStyle={{
+                                            borderColor: "#e2e8f0",
+                                            borderRadius: "0.375rem 0 0 0.375rem",
+                                        }}
+                                        inputProps={{
+                                            name: "emergencyPhone",
+                                            required: !hasNoEmergencyPhone,
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="emergencyEmail">
-                                    {dict.commons.beneficiaries.edit.emergencyEmail} *
-                                </Label>
-                                <Input 
-                                    id="emergencyEmail" 
-                                    name="emergencyEmail" 
-                                    type="email" 
-                                    required 
-                                    defaultValue={data.emergency_contacts[0]?.emails[0]}
-                                />
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="emergencyEmail">
+                                        {dict.commons.beneficiaries.edit.emergencyEmail} {!hasNoEmergencyEmail && "*"}
+                                    </Label>
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox 
+                                            id="hasNoEmergencyEmail" 
+                                            checked={hasNoEmergencyEmail}
+                                            onCheckedChange={(checked) => setHasNoEmergencyEmail(checked as boolean)}
+                                        />
+                                        <Label htmlFor="hasNoEmergencyEmail" className="text-sm font-normal">
+                                            Beneficiary has no email
+                                        </Label>
+                                    </div>
+                                </div>
+                                <div className={hasNoEmergencyEmail ? "opacity-50 pointer-events-none" : ""}>
+                                    <Input 
+                                        id="emergencyEmail" 
+                                        name="emergencyEmail" 
+                                        type="email" 
+                                        required={!hasNoEmergencyEmail}
+                                        defaultValue={data.emergency_contacts?.[0]?.emails?.[0] || ""}
+                                    />
+                                </div>
                             </div>
                         </div>
 
