@@ -27,6 +27,7 @@ import { getFromLocalStorage } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction, useState, useEffect } from "react";
 import { FaUsers, FaMapMarkerAlt, FaUpload, FaUser, FaUserCheck } from "react-icons/fa";
+import { FaHouseChimneyUser } from "react-icons/fa6";
 import { MdContacts } from "react-icons/md";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
@@ -89,6 +90,7 @@ const Form = (): ReactNode => {
     const [birthdateError, setBirthdateError] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [requiresReview, setRequiresReview] = useState<boolean>(false);
+    const [wantToAllocate, setWantToAllocate] = useState<boolean>(false);
     
     // Google Places integration
     const { apiKey, isReady } = useGooglePlaces();
@@ -342,7 +344,7 @@ const Form = (): ReactNode => {
                 prothesis_or_medical_devices: data.prothesisOrMedicalDevices ? data.prothesisOrMedicalDevices.split(",").filter(item => item.trim()) : [],
             };
 
-            await createBeneficiary(currentUser.organization_id, {
+            const response = await createBeneficiary(currentUser.organization_id, {
                 full_name: data.fullName,
                 image_url: imageUrl || "",
                 birthdate: data.birthdate,
@@ -385,7 +387,12 @@ const Form = (): ReactNode => {
                 description: dict.commons.beneficiaries.create.toastSuccessDescription,
             });
 
-            router.push(urlPath);
+            // Check if user wants to allocate and redirect accordingly
+            if (wantToAllocate && response.data && response.data.id) {
+                router.push(`${urlPath}/create/${response.data.id}/allocate`);
+            } else {
+                router.push(urlPath);
+            }
         } catch (err: any) {
             console.error("Beneficiary creation error:", err);
             console.error("Error details:", {
@@ -994,13 +1001,41 @@ const Form = (): ReactNode => {
                         </div>
                     </div>
 
+                    {/* Allocation Option Section */}
+                    <div className="w-full h-max flex flex-col gap-4 p-4 border border-dashed border-relif-orange-200 rounded-lg">
+                        <h2 className="text-relif-orange-200 font-bold flex items-center gap-2">
+                            <FaHouseChimneyUser /> Housing Allocation
+                        </h2>
+                        
+                        <div className="flex items-start space-x-3">
+                            <Checkbox 
+                                id="wantToAllocate" 
+                                checked={wantToAllocate}
+                                onCheckedChange={(checked) => setWantToAllocate(checked as boolean)}
+                                className="mt-1"
+                            />
+                            <div className="space-y-1">
+                                <Label htmlFor="wantToAllocate" className="text-sm font-medium cursor-pointer">
+                                    Allocate to housing after creation
+                                </Label>
+                                <p className="text-xs text-gray-600">
+                                    Check this to immediately proceed to housing allocation after creating the beneficiary. 
+                                    You can also allocate them to housing later from the beneficiary list.
+                                    {wantToAllocate && (
+                                        <span className="text-blue-600 font-medium"> You will be redirected to the allocation page.</span>
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Action Buttons - After Review Status */}
                     <div className="flex justify-end gap-4">
                         <Button variant="outline" type="button" onClick={() => router.push(urlPath)}>
                             Cancel
                         </Button>
                         <Button type="submit">
-                            Create Beneficiary
+                            {wantToAllocate ? "Create & Allocate" : "Create Beneficiary"}
                         </Button>
                     </div>
                 </div>

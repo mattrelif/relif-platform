@@ -60,7 +60,7 @@ const CreateOrganization = (): ReactNode => {
                 name: data.name,
                 description: data.description,
                 areas_of_work: selectedAreas,
-                logo: logoPreview,
+                logo: logoPreview || undefined,
                 address: {
                     address_line_1: data.addressLine1,
                     address_line_2: data.addressLine2,
@@ -162,7 +162,7 @@ const CreateOrganization = (): ReactNode => {
                     <div className="flex flex-col gap-3">
                         <Label className="mb-1">{dict.createOrganization.areasOfOperation} *</Label>
                         <div className="flex flex-wrap gap-2">
-                            {dict.createOrganization.areasOfOperationList.map(area => (
+                            {dict.createOrganization.areasOfOperationList.map((area: string) => (
                                 <button
                                     key={area}
                                     type="button"

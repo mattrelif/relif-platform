@@ -7,7 +7,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { getBeneficiaryById } from "@/repository/beneficiary.repository";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
-import { formatDate } from "@/utils/formatDate";
+import { formatDate, calculateAge } from "@/utils/formatDate";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -17,20 +17,6 @@ import { IoPerson } from "react-icons/io5";
 import { MdContactEmergency, MdError, MdMail, MdPhone, MdNoteAlt } from "react-icons/md";
 
 import { Toolbar } from "./toolbar.layout";
-
-const calculateAge = (birthdate: string): number => {
-    const birthDate = new Date(birthdate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        // eslint-disable-next-line no-plusplus
-        age--;
-    }
-
-    return age > 0 ? age : 0;
-};
 
 const RELATIONSHIPS_MAPPING = {
     parent: "Parent",
@@ -247,15 +233,15 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.fullName}:
                                 </strong>{" "}
-                                {convertToTitleCase(data.full_name)}
+                                {data.full_name ? convertToTitleCase(data.full_name) : "Unknown Name"}
                             </li>
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900 flex flex-wrap items-center gap-2">
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.birthdate}:
                                 </strong>{" "}
-                                {formatDate(data.birthdate, locale || "en")} (
-                                {calculateAge(data.birthdate)} years old)
-                                {calculateAge(data.birthdate) < 18 && (
+                                {data.birthdate ? formatDate(data.birthdate, locale || "en") : "No birthdate"} (
+                                {data.birthdate && calculateAge(data.birthdate) > 0 ? `${calculateAge(data.birthdate)} years old` : "Unknown age"})
+                                {data.birthdate && calculateAge(data.birthdate) < 18 && calculateAge(data.birthdate) > 0 && (
                                     <span>
                                         <Badge className="bg-yellow-300 text-slate-900">
                                             {dict.commons.beneficiaries.beneficiaryId.underage}
@@ -377,7 +363,10 @@ const Content = ({ beneficiaryId }: { beneficiaryId: string }): ReactNode => {
                                 <strong>
                                     {dict.commons.beneficiaries.beneficiaryId.emergencyName}:
                                 </strong>{" "}
-                                {convertToTitleCase(data.emergency_contacts[0].full_name)}
+                                {data.emergency_contacts?.[0]?.full_name ? 
+                                    convertToTitleCase(data.emergency_contacts[0].full_name) : 
+                                    "No emergency contact"
+                                }
                             </li>
                             <li className="w-full p-2 text-sm text-slate-900">
                                 <strong>

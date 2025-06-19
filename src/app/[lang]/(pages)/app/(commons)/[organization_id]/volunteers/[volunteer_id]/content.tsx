@@ -6,7 +6,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { getVolunteerById } from "@/repository/volunteer.repository";
 import { VoluntarySchema } from "@/types/voluntary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
-import { formatDate } from "@/utils/formatDate";
+import { formatDate, calculateAge } from "@/utils/formatDate";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { FaCity } from "react-icons/fa";
@@ -15,20 +15,6 @@ import { IoPerson } from "react-icons/io5";
 import { MdContactEmergency, MdError, MdMail, MdPhone } from "react-icons/md";
 
 import { Toolbar } from "./toolbar.layout";
-
-const calculateAge = (birthdate: string): number => {
-    const birthDate = new Date(birthdate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        // eslint-disable-next-line no-plusplus
-        age--;
-    }
-
-    return age > 0 ? age : 0;
-};
 
 const RELATIONSHIPS_MAPPING = {
     parent: "Parent",

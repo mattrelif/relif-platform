@@ -324,6 +324,7 @@ const NotesContent = (): ReactNode => {
         MEETING: "bg-green-100 text-green-800",
         UPDATE: "bg-purple-100 text-purple-800",
         APPOINTMENT: "bg-orange-100 text-orange-800",
+        REFERRAL: "bg-yellow-100 text-yellow-800",
         OTHER: "bg-gray-100 text-gray-800",
     };
 
@@ -701,7 +702,7 @@ const AddNoteDialog = ({
                             <Select
                                 value={formData.note_type}
                                 onValueChange={(
-                                    value: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER"
+                                    value: "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER"
                                 ) => setFormData(prev => ({ ...prev, note_type: value }))}
                             >
                                 <SelectTrigger className="mt-1">
@@ -712,6 +713,7 @@ const AddNoteDialog = ({
                                     <SelectItem value="MEETING">🤝 Meeting</SelectItem>
                                     <SelectItem value="UPDATE">📝 Update</SelectItem>
                                     <SelectItem value="APPOINTMENT">📅 Appointment</SelectItem>
+                                    <SelectItem value="REFERRAL">🔗 Referral</SelectItem>
                                     <SelectItem value="OTHER">📋 Other</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -794,7 +796,7 @@ const EditNoteDialog = ({
     const [formData, setFormData] = useState({
         title: "",
         content: "",
-        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "OTHER",
+        note_type: "UPDATE" as "CALL" | "MEETING" | "UPDATE" | "APPOINTMENT" | "REFERRAL" | "OTHER",
         tags: "",
         is_important: false,
     });

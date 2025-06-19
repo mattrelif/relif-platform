@@ -195,4 +195,70 @@ The frontend implementation for beneficiary status management is **100% complete
 **Build Status**: ✅ Passing
 **Ready for Backend Integration**: ✅ Yes
 
-Once the backend API is implemented according to the specification, this feature will be fully functional and ready for user testing. 
+Once the backend API is implemented according to the specification, this feature will be fully functional and ready for user testing.
+
+## Date Format Handling Improvements
+
+### Issue Fixed
+- **Problem**: Birthdates were showing "Invalid date (NaN years old)" and causing JavaScript errors when `full_name` was undefined
+- **Root Cause**: 
+  - Poor date format parsing that couldn't handle various backend date formats
+  - Missing null checks for beneficiary data properties
+
+### Solution Implemented
+
+#### 1. Enhanced Date Parsing (`src/utils/formatDate.ts`)
+Created a robust date parser that handles multiple formats:
+- **ISO formats**: `2025-01-14T10:30:00.000Z`, `2025-01-14`
+- **DD/MM/YYYY**: `14/01/2025`, `14/1/2025`
+- **MM/DD/YYYY**: `01/14/2025`, `1/14/2025` 
+- **YYYY/MM/DD**: `2025/01/14`, `2025/1/14`
+
+#### 2. Centralized Age Calculation
+- Moved all age calculation logic to a single utility function
+- Added validation for unrealistic dates (before 1900, future dates)
+- Returns 0 for invalid dates instead of NaN
+
+#### 3. Safe Property Access
+- Added null checks for `full_name`, `birthdate`, and other properties
+- Graceful fallbacks for missing data
+
+### Testing Your Date Formats
+
+If you want to test specific date formats in development, you can use the `testDateFormats` utility:
+
+```javascript
+import { testDateFormats } from '@/utils/formatDate';
+
+// Test in browser console or component
+testDateFormats("2025-01-14T10:30:00.000Z"); // ISO format
+testDateFormats("14/01/2025");               // DD/MM/YYYY
+testDateFormats("01/14/2025");               // MM/DD/YYYY
+testDateFormats("invalid-date");             // See error handling
+```
+
+### Components Updated
+1. `src/app/[lang]/(pages)/app/(commons)/[organization_id]/beneficiaries/_components/card.layout.tsx`
+2. `src/app/[lang]/(pages)/app/(commons)/[organization_id]/beneficiaries/[beneficiary_id]/(withLayout)/content.tsx`
+3. `src/app/[lang]/(pages)/app/(commons)/[organization_id]/volunteers/[volunteer_id]/content.tsx`
+4. `src/app/[lang]/(pages)/app/(commons)/[organization_id]/beneficiaries/_components/list.layout.tsx`
+5. `src/utils/formatDate.ts`
+
+### Development Debugging
+- Added console logging in development mode to track date parsing
+- Warnings for invalid/unrealistic dates
+- Test utility for validating date formats
+
+### Expected Behavior Now
+- ✅ Valid dates: Show formatted date and correct age
+- ✅ Invalid dates: Show "Invalid date" and "Unknown age" instead of errors
+- ✅ Missing data: Show fallback messages instead of crashing
+- ✅ Future dates: Return 0 age with warning
+- ✅ Multiple date formats: Automatically detected and parsed
+
+## Benefits
+1. **Reliability**: No more JavaScript errors from undefined properties
+2. **Flexibility**: Supports multiple date formats from different backends
+3. **User Experience**: Graceful degradation with meaningful fallback messages
+4. **Debugging**: Easy to troubleshoot date format issues in development
+5. **Consistency**: Single source of truth for date/age calculations 

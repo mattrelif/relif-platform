@@ -148,9 +148,12 @@ const CasesPDFDocument = ({ title, cases }: CasesPDFDocumentProps): ReactNode =>
                             </View>
                             
                             <View style={styles.itemRow}>
-                                <Text style={styles.itemLabel}>Type:</Text>
+                                <Text style={styles.itemLabel}>Service Types:</Text>
                                 <Text style={styles.itemValue}>
-                                    {CASE_TYPE_LABELS[case_.case_type as keyof typeof CASE_TYPE_LABELS] || case_.case_type}
+                                    {case_.service_types?.length > 0 
+                                        ? case_.service_types.slice(0, 2).join(", ") + (case_.service_types.length > 2 ? "..." : "")
+                                        : "None"
+                                    }
                                 </Text>
                             </View>
                             

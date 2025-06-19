@@ -68,6 +68,7 @@ const Form = ({ productId }: Props): ReactNode => {
                     brand: string;
                     unitType: string;
                     category: string;
+                    totalInStorage?: string;
                 } = Object.fromEntries(formData);
 
                 await updateProduct(productId, {
@@ -76,6 +77,7 @@ const Form = ({ productId }: Props): ReactNode => {
                     brand: data.brand,
                     category: data.category,
                     unit_type: data.unitType,
+                    total_in_storage: data.totalInStorage ? parseInt(data.totalInStorage) : 0,
                 });
 
                 toast({
@@ -228,6 +230,17 @@ const Form = ({ productId }: Props): ReactNode => {
                                 </SelectItem>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <Label htmlFor="totalInStorage">Total in Storage</Label>
+                        <Input
+                            id="totalInStorage"
+                            name="totalInStorage"
+                            type="number"
+                            min="0"
+                            defaultValue={product?.total_in_storage?.toString() || "0"}
+                        />
                     </div>
 
                     <Button className="flex items-center gap-2" type="submit">

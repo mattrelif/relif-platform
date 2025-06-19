@@ -17,6 +17,7 @@ import { MdError, MdAdd } from "react-icons/md";
 import { FaUsers, FaUserCheck, FaUserClock, FaUserTimes } from "react-icons/fa";
 import { StatisticsCards } from "@/components/ui/statistics-cards";
 import { SearchFilterBar } from "@/components/ui/search-filter-bar";
+import { calculateAge } from "@/utils/formatDate";
 
 import { Card } from "./card.layout";
 
@@ -121,18 +122,6 @@ const BeneficiaryList = (): ReactNode => {
     const [filters, setFilters] = useState<BeneficiaryFilters>(initialFilters);
     const [showFilters, setShowFilters] = useState<boolean>(false);
     const LIMIT = 20;
-
-    // Helper function to calculate age from date of birth
-    const calculateAge = (dateOfBirth: string): number => {
-        const today = new Date();
-        const birthDate = new Date(dateOfBirth);
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age;
-    };
 
     // Helper function to check if age falls within range
     const isAgeInRange = (dateOfBirth: string, ageRange: string): boolean => {
@@ -282,7 +271,7 @@ const BeneficiaryList = (): ReactNode => {
     useEffect(() => {
         // 1. Apply search filter
         const searched = allBeneficiaries.filter(b => 
-            b.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+            b.full_name ? b.full_name.toLowerCase().includes(searchTerm.toLowerCase()) : false
         );
         
         // 2. Apply advanced filters

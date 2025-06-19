@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BeneficiarySchema } from "@/types/beneficiary.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
-import { formatDate } from "@/utils/formatDate";
+import { formatDate, calculateAge } from "@/utils/formatDate";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { FaBirthdayCake, FaEdit, FaEye, FaHome, FaMapMarkerAlt, FaTrash, FaUserCheck } from "react-icons/fa";
@@ -21,19 +21,6 @@ import { StatusModal } from "./status.modal";
 type Props = BeneficiarySchema & {
     refreshList: () => void;
 };
-
-function calculateAge(dateString: string): number {
-    const today = new Date();
-    const birthDate = new Date(dateString);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-
-    return age;
-}
 
 const Card = ({ refreshList, ...data }: Props): ReactNode => {
     const pathname = usePathname();
@@ -103,25 +90,25 @@ const Card = ({ refreshList, ...data }: Props): ReactNode => {
                     <Avatar className="w-14 h-14">
                         <AvatarImage src={data.image_url} className="object-cover" />
                         <AvatarFallback className="bg-relif-orange-200 text-white">
-                            {data?.full_name.charAt(0).toUpperCase()}
+                            {data?.full_name?.charAt(0)?.toUpperCase() || "U"}
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="text-sm text-slate-900 font-bold">
-                            {convertToTitleCase(data?.full_name)}
+                            {data?.full_name ? convertToTitleCase(data.full_name) : "Unknown Name"}
                         </span>
                         <span className="text-xs text-slate-900 font-medium mt-1 flex items-center gap-1">
                             <FaMapMarkerAlt />
                             {data?.current_housing_id
-                                ? `${convertToTitleCase(data?.current_housing.name)} | ${data?.current_room.name}`
+                                ? `${convertToTitleCase(data?.current_housing?.name || "Unknown Housing")} | ${data?.current_room?.name || "Unknown Room"}`
                                 : dict.commons.beneficiaries.card.unallocated}
                         </span>
                         <span className="text-xs text-slate-500 mt-3 flex items-center gap-1">
-                            <FaBirthdayCake /> {formatDate(data?.birthdate, locale || "en")} ({age}{" "}
-                            {dict.commons.beneficiaries.card.yearsOld})
+                            <FaBirthdayCake /> {data?.birthdate ? formatDate(data.birthdate, locale || "en") : "No birthdate"} ({age > 0 ? age : "Unknown"}{" "}
+                            {age > 0 ? dict.commons.beneficiaries.card.yearsOld : "age"})
                         </span>
                         <span className="text-xs text-slate-500 mt-1 flex items-center gap-2">
-                            {convertToTitleCase(GENDER_MAPPING[data?.gender as keyof typeof GENDER_MAPPING])}
+                            {data?.gender ? convertToTitleCase(GENDER_MAPPING[data.gender as keyof typeof GENDER_MAPPING] || data.gender) : "Unknown gender"}
                             {isUnderage && (
                                 <Badge className="bg-blue-500 text-white hover:bg-blue-600">
                                     {dict.commons.beneficiaries.card.underage}

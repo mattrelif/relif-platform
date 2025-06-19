@@ -52,6 +52,7 @@ const Form = (): ReactNode => {
                     brand: data.brand,
                     category: data.category,
                     unit_type: data.unitType,
+                    total_in_storage: 0,
                 });
 
                 toast({
