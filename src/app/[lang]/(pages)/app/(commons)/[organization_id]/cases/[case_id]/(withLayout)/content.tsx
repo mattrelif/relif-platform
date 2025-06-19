@@ -54,6 +54,14 @@ const Content = (): ReactNode => {
     const [viewingDocument, setViewingDocument] = useState<any | null>(null);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+    const [uploadDocuments, setUploadDocuments] = useState<{
+        file: File;
+        name: string;
+        type: string;
+        description: string;
+        tags: string[];
+        isFinalized: boolean;
+    }[]>([]);
     const [editFormData, setEditFormData] = useState({
         document_name: '',
         document_type: '',
@@ -186,34 +194,86 @@ const Content = (): ReactNode => {
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        setUploadFiles(files);
+        const newDocuments = files.map(file => ({
+            file,
+            name: file.name.replace(/\.[^/.]+$/, ""), // Remove extension for default name
+            type: "OTHER",
+            description: "",
+            tags: [],
+            isFinalized: false,
+        }));
+        setUploadDocuments(prev => [...prev, ...newDocuments]);
+    };
+
+    const updateUploadDocument = (
+        index: number,
+        field: string,
+        value: string | string[] | boolean
+    ) => {
+        setUploadDocuments(prev =>
+            prev.map((doc, i) =>
+                i === index ? { ...doc, [field]: value } : doc
+            )
+        );
+    };
+
+    const finalizeUploadDocument = (index: number) => {
+        updateUploadDocument(index, "isFinalized", true);
+    };
+
+    const editUploadDocument = (index: number) => {
+        updateUploadDocument(index, "isFinalized", false);
+    };
+
+    const removeUploadDocument = (index: number) => {
+        setUploadDocuments(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const addNewUploadDocument = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.multiple = true;
+        input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt";
+        input.onchange = e => {
+            const files = Array.from((e.target as HTMLInputElement).files || []);
+            const newDocuments = files.map(file => ({
+                file,
+                name: file.name.replace(/\.[^/.]+$/, ""),
+                type: "OTHER",
+                description: "",
+                tags: [],
+                isFinalized: false,
+            }));
+            setUploadDocuments(prev => [...prev, ...newDocuments]);
+        };
+        input.click();
     };
 
     const handleUploadDocuments = async () => {
-        if (uploadFiles.length === 0) return;
+        if (uploadDocuments.length === 0) return;
 
         try {
             setIsOperationLoading(true);
             
-            for (let i = 0; i < uploadFiles.length; i++) {
-                const file = uploadFiles[i];
-                console.log(`📤 Uploading file ${i + 1}/${uploadFiles.length}:`, file.name);
+            for (let i = 0; i < uploadDocuments.length; i++) {
+                const doc = uploadDocuments[i];
+                console.log(`📤 Uploading document ${i + 1}/${uploadDocuments.length}:`, doc.name);
                 
                 // Generate upload link
-                const uploadResponse = await generateCaseDocumentUploadLink(caseId, file.type);
+                const uploadResponse = await generateCaseDocumentUploadLink(caseId, doc.file.type);
                 const uploadUrl = uploadResponse.data.link;
                 
                 // Upload file to S3
                 const uploadResult = await fetch(uploadUrl, {
                     method: 'PUT',
-                    body: file,
+                    body: doc.file,
                     headers: {
-                        'Content-Type': file.type,
+                        'Content-Type': doc.file.type,
                     },
                 });
                 
                 if (!uploadResult.ok) {
-                    throw new Error(`Failed to upload ${file.name}`);
+                    throw new Error(`Failed to upload ${doc.name}`);
                 }
                 
                 // Extract file key from the upload URL
@@ -221,21 +281,21 @@ const Content = (): ReactNode => {
                 
                 // Save document metadata
                 await createCaseDocument(caseId, {
-                    document_name: file.name,
-                    document_type: 'OTHER', // Default type
-                    description: `Uploaded file: ${file.name}`,
-                    tags: [],
-                    file_name: file.name,
-                    file_size: file.size,
-                    mime_type: file.type,
+                    document_name: doc.name,
+                    document_type: doc.type,
+                    description: doc.description,
+                    tags: doc.tags,
+                    file_name: doc.file.name,
+                    file_size: doc.file.size,
+                    mime_type: doc.file.type,
                     file_key: fileKey,
                 });
             }
             
             await refreshDocuments();
             setShowUploadDialog(false);
-            setUploadFiles([]);
-            alert(`Successfully uploaded ${uploadFiles.length} document(s)!`);
+            setUploadDocuments([]);
+            alert(`Successfully uploaded ${uploadDocuments.length} document(s)!`);
             
         } catch (error) {
             console.error('Error uploading documents:', error);
@@ -272,11 +332,38 @@ const Content = (): ReactNode => {
                 // Try to fetch case documents
                 let documentsData = [];
                 try {
+                    console.log("📄 Fetching case documents for caseId:", caseId);
                     const documentsResponse = await getCaseDocuments(caseId);
-                    documentsData = Array.isArray(documentsResponse.data) ? documentsResponse.data : [];
-                    console.log("✅ Case documents fetched:", documentsData);
+                    
+                    console.log("📄 Documents API response:", {
+                        status: documentsResponse?.status,
+                        data: documentsResponse?.data,
+                        dataType: typeof documentsResponse?.data,
+                        isArray: Array.isArray(documentsResponse?.data)
+                    });
+                    
+                    // Handle different response formats
+                    if (Array.isArray(documentsResponse.data)) {
+                        documentsData = documentsResponse.data;
+                    } else if (documentsResponse.data && typeof documentsResponse.data === 'object' && documentsResponse.data.data && Array.isArray(documentsResponse.data.data)) {
+                        // Handle nested data structure
+                        documentsData = documentsResponse.data.data;
+                    } else if (documentsResponse.data && typeof documentsResponse.data === 'object') {
+                        // Handle object response
+                        documentsData = [documentsResponse.data];
+                    } else {
+                        documentsData = [];
+                    }
+                    
+                    console.log("✅ Case documents processed:", documentsData.length, "documents");
                 } catch (docError: any) {
-                    console.warn("⚠️ Error fetching documents (non-critical):", docError);
+                    console.warn("⚠️ Error fetching documents (non-critical):", {
+                        error: docError.message,
+                        status: docError?.response?.status,
+                        statusText: docError?.response?.statusText,
+                        responseData: docError?.response?.data,
+                        caseId
+                    });
                     documentsData = [];
                 }
                 
@@ -833,8 +920,20 @@ const Content = (): ReactNode => {
             {/* Document Upload Dialog */}
             {showUploadDialog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-                        <h3 className="text-lg font-semibold mb-4">Upload Documents</h3>
+                    <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-semibold">Upload Documents</h3>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addNewUploadDocument}
+                                className="flex items-center gap-2"
+                            >
+                                <FaPlus className="w-4 h-4" />
+                                Add Files
+                            </Button>
+                        </div>
                         
                         <div className="space-y-4">
                             <div>
@@ -846,28 +945,202 @@ const Content = (): ReactNode => {
                                     multiple
                                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
                                     onChange={handleFileSelect}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
                                 />
                                 <p className="text-xs text-gray-500 mt-1">
                                     Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
                                 </p>
                             </div>
 
-                            {uploadFiles.length > 0 && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Selected Files ({uploadFiles.length})
+                            {uploadDocuments.length > 0 && (
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Document Details
                                     </label>
-                                    <div className="max-h-32 overflow-y-auto space-y-1">
-                                        {uploadFiles.map((file, index) => (
-                                            <div key={index} className="text-sm text-gray-600 flex justify-between items-center">
-                                                <span className="truncate">{file.name}</span>
-                                                <span className="text-xs text-gray-500 ml-2">
-                                                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    {uploadDocuments.map((doc, index) => (
+                                        <div
+                                            key={index}
+                                            className={`p-4 border rounded-lg space-y-3 ${doc.isFinalized ? "border-green-200 bg-green-50/30" : "border-gray-200"}`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-medium text-gray-700">
+                                                    {doc.file.name} (
+                                                    {(doc.file.size / 1024 / 1024).toFixed(2)} MB)
                                                 </span>
+                                                <div className="flex items-center gap-2">
+                                                    {doc.isFinalized && (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="text-green-600 border-green-600"
+                                                        >
+                                                            Finalized
+                                                        </Badge>
+                                                    )}
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => removeUploadDocument(index)}
+                                                        className="text-red-600 hover:text-red-800"
+                                                    >
+                                                        <FaTrash className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
+
+                                            {!doc.isFinalized ? (
+                                                <>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                                Document Name
+                                                            </label>
+                                                            <input
+                                                                type="text"
+                                                                value={doc.name}
+                                                                onChange={e =>
+                                                                    updateUploadDocument(
+                                                                        index,
+                                                                        "name",
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                                placeholder="Enter document name"
+                                                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                                Document Type
+                                                            </label>
+                                                            <select
+                                                                value={doc.type}
+                                                                onChange={e =>
+                                                                    updateUploadDocument(index, "type", e.target.value)
+                                                                }
+                                                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                            >
+                                                                <option value="FORM">Form</option>
+                                                                <option value="REPORT">Report</option>
+                                                                <option value="EVIDENCE">Evidence</option>
+                                                                <option value="CORRESPONDENCE">Correspondence</option>
+                                                                <option value="IDENTIFICATION">Identification</option>
+                                                                <option value="LEGAL">Legal Document</option>
+                                                                <option value="MEDICAL">Medical Document</option>
+                                                                <option value="OTHER">Other</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Description
+                                                        </label>
+                                                        <textarea
+                                                            value={doc.description}
+                                                            onChange={e =>
+                                                                updateUploadDocument(
+                                                                    index,
+                                                                    "description",
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                            placeholder="Brief description of the document"
+                                                            rows={2}
+                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Tags (comma separated)
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={doc.tags.join(", ")}
+                                                            onChange={e => {
+                                                                const tags = e.target.value
+                                                                    .split(",")
+                                                                    .map(tag => tag.trim())
+                                                                    .filter(tag => tag);
+                                                                updateUploadDocument(index, "tags", tags);
+                                                            }}
+                                                            placeholder="e.g. important, legal, housing"
+                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        />
+                                                        {doc.tags.length > 0 && (
+                                                            <div className="flex flex-wrap gap-2 items-start min-h-[40px] mt-2">
+                                                                {doc.tags.map((tag, tagIndex) => (
+                                                                    <Badge
+                                                                        variant="outline"
+                                                                        key={tagIndex}
+                                                                        className="text-xs"
+                                                                    >
+                                                                        #{tag}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex gap-2 pt-2">
+                                                        <Button
+                                                            type="button"
+                                                            onClick={() => finalizeUploadDocument(index)}
+                                                            size="sm"
+                                                            className="bg-green-600 hover:bg-green-700"
+                                                        >
+                                                            Finalize Document
+                                                        </Button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                                        <div>
+                                                            <span className="font-medium">Name:</span>{" "}
+                                                            {doc.name}
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-medium">Type:</span>{" "}
+                                                            {getDocumentTypeLabel(doc.type)}
+                                                        </div>
+                                                    </div>
+                                                    {doc.description && (
+                                                        <div className="text-sm">
+                                                            <span className="font-medium">
+                                                                Description:
+                                                            </span>{" "}
+                                                            {doc.description}
+                                                        </div>
+                                                    )}
+                                                    {doc.tags.length > 0 && (
+                                                        <div className="flex flex-wrap gap-2 items-start min-h-[40px] mt-2">
+                                                            {doc.tags.map((tag, tagIndex) => (
+                                                                <Badge
+                                                                    variant="outline"
+                                                                    key={tagIndex}
+                                                                    className="text-xs"
+                                                                >
+                                                                    #{tag}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => editUploadDocument(index)}
+                                                        className="mt-2"
+                                                    >
+                                                        Edit Document
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
@@ -876,21 +1149,27 @@ const Content = (): ReactNode => {
                             <Button
                                 onClick={handleUploadDocuments}
                                 className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
-                                disabled={isOperationLoading || uploadFiles.length === 0}
+                                disabled={isOperationLoading || uploadDocuments.length === 0 || uploadDocuments.some(doc => !doc.isFinalized)}
                             >
-                                {isOperationLoading ? 'Uploading...' : 'Upload Documents'}
+                                {isOperationLoading ? 'Uploading...' : `Upload ${uploadDocuments.length} Document(s)`}
                             </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => {
                                     setShowUploadDialog(false);
-                                    setUploadFiles([]);
+                                    setUploadDocuments([]);
                                 }}
                                 disabled={isOperationLoading}
                             >
                                 Cancel
                             </Button>
                         </div>
+                        
+                        {uploadDocuments.length > 0 && uploadDocuments.some(doc => !doc.isFinalized) && (
+                            <p className="text-xs text-orange-600 mt-2">
+                                Please finalize all documents before uploading.
+                            </p>
+                        )}
                     </div>
                 </div>
             )}

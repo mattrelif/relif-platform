@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
-import CaseOverview from "./content";
+import Content from "./content";
 
 export default function Page(): ReactNode {
-    return <CaseOverview />;
+    return <Content />;
 }

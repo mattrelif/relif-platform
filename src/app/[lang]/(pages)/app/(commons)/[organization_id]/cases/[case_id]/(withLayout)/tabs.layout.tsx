@@ -9,12 +9,13 @@ import { ReactNode } from "react";
 const TabsLayout = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
-
-    const pathSegments = pathname.split("/");
-    const activeOption = pathSegments[7] ?? "overview";
     
-    // Build the base case URL (up to case_id)
-    const baseCaseUrl = pathSegments.slice(0, 7).join("/");
+    // Detect if we're on updates tab (path ends with /updates)
+    const isUpdatesTab = pathname.endsWith("/updates");
+    const activeOption = isUpdatesTab ? "updates" : "overview";
+    
+    // Build the base case URL (remove /updates if present)
+    const baseCaseUrl = isUpdatesTab ? pathname.replace("/updates", "") : pathname;
 
     return (
         <Tabs value={activeOption} className="w-full">

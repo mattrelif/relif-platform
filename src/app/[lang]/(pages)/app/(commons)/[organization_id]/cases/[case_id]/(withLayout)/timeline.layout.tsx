@@ -18,6 +18,11 @@ import {
     FaLock,
     FaUnlock,
 } from "react-icons/fa";
+import {
+    getCaseById,
+    getCaseDocuments,
+    getCaseNotes,
+} from "@/repository/organization.repository";
 
 interface TimelineEvent {
     id: string;
@@ -54,27 +59,104 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
             try {
                 setIsLoading(true);
                 
-                // TODO: Replace with actual API call when timeline endpoint is available
-                // const response = await getCaseTimeline(caseId);
-                // setTimelineEvents(response.data);
+                console.log("📅 Building timeline for case:", caseId);
                 
-                // For now, create timeline events based on case creation
-                const mockEvents: TimelineEvent[] = [
-                    {
-                        id: "1",
-                        type: "created" as const,
+                // Fetch case data, documents, and notes in parallel
+                const [caseResponse, documentsResponse, notesResponse] = await Promise.allSettled([
+                    getCaseById(caseId),
+                    getCaseDocuments(caseId),
+                    getCaseNotes(caseId)
+                ]);
+                
+                const events: TimelineEvent[] = [];
+                
+                // Add case creation event
+                if (caseResponse.status === 'fulfilled') {
+                    const caseData = caseResponse.value.data;
+                    events.push({
+                        id: `case-created-${caseData.id}`,
+                        type: "created",
                         title: "Case Created",
-                        description: "New case opened in the system",
+                        description: `Case "${caseData.title}" was created in the system`,
                         user: { name: "System", role: "System" },
-                        timestamp: new Date().toISOString(),
+                        timestamp: caseData.created_at,
+                    });
+                    
+                    // Add case assignment if exists
+                    if (caseData.assigned_to) {
+                        events.push({
+                            id: `case-assigned-${caseData.id}`,
+                            type: "assigned",
+                            title: "Case Assigned",
+                            description: "Case was assigned to a case worker",
+                            user: { name: "System", role: "System" },
+                            timestamp: caseData.created_at, // Use creation time as assignment time
+                            metadata: {
+                                new_value: `${caseData.assigned_to.first_name} ${caseData.assigned_to.last_name}`,
+                            },
+                        });
                     }
-                ];
+                }
                 
-                setTimelineEvents(mockEvents);
-                onTimelineEventsLoad?.(mockEvents.length);
+                // Add document events
+                if (documentsResponse.status === 'fulfilled') {
+                    const documents = Array.isArray(documentsResponse.value.data) 
+                        ? documentsResponse.value.data 
+                        : [];
+                    
+                    documents.forEach((doc: any) => {
+                        events.push({
+                            id: `doc-${doc.id}`,
+                            type: "document_added",
+                            title: "Document Added",
+                            description: "New document was uploaded to the case",
+                            user: { 
+                                name: doc.uploaded_by?.name || "Unknown User", 
+                                role: "Case Worker" 
+                            },
+                            timestamp: doc.created_at,
+                            metadata: {
+                                document_name: doc.document_name,
+                            },
+                        });
+                    });
+                }
+                
+                // Add note/update events
+                if (notesResponse.status === 'fulfilled') {
+                    const notesData = notesResponse.value.data;
+                    const notes = Array.isArray(notesData) 
+                        ? notesData 
+                        : (notesData?.data && Array.isArray(notesData.data) ? notesData.data : []);
+                    
+                    notes.forEach((note: any) => {
+                        events.push({
+                            id: `note-${note.id}`,
+                            type: "comment_added",
+                            title: note.title || "Case Update",
+                            description: note.content || "Case update was added",
+                            user: { 
+                                name: note.created_by?.name || "Unknown User", 
+                                role: "Case Worker" 
+                            },
+                            timestamp: note.created_at,
+                            metadata: {
+                                comment: note.content,
+                            },
+                        });
+                    });
+                }
+                
+                // Sort events by timestamp (newest first)
+                events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                
+                console.log("📅 Timeline events built:", events.length, "events");
+                setTimelineEvents(events);
+                onTimelineEventsLoad?.(events.length);
                 
             } catch (error) {
-                console.error("Error fetching timeline events:", error);
+                console.error("❌ Error building timeline:", error);
+                
                 // Fallback to minimal timeline
                 const fallbackEvents: TimelineEvent[] = [
                     {
@@ -225,7 +307,9 @@ const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNod
                                                 )}
                                                 {event.metadata.comment && (
                                                     <div className="mt-2 p-2 bg-slate-50 rounded text-xs text-slate-700 italic border-l-2 border-slate-300">
-                                                        "{event.metadata.comment}"
+                                                        "{event.metadata.comment.length > 100 
+                                                            ? event.metadata.comment.substring(0, 100) + '...' 
+                                                            : event.metadata.comment}"
                                                     </div>
                                                 )}
                                             </div>
