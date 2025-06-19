@@ -35,10 +35,11 @@ import {
 import {
     getCaseById,
     getCaseDocuments,
+    generateCaseDocumentUploadLink,
+    generateCaseDocumentDownloadLink,
+    createCaseDocument,
     updateCaseDocument,
     deleteCaseDocument,
-    generateCaseDocumentUploadLink,
-    createCaseDocument,
 } from "@/repository/organization.repository";
 import { CaseTimeline } from "./timeline.layout";
 
@@ -109,12 +110,41 @@ const Content = (): ReactNode => {
 
     const refreshDocuments = async () => {
         try {
+            console.log("🔄 Refreshing case documents for caseId:", caseId);
             const documentsResponse = await getCaseDocuments(caseId);
-            const documentsData = Array.isArray(documentsResponse.data) ? documentsResponse.data : [];
+            
+            console.log("📄 Documents refresh API response:", {
+                status: documentsResponse?.status,
+                data: documentsResponse?.data,
+                dataType: typeof documentsResponse?.data,
+                isArray: Array.isArray(documentsResponse?.data)
+            });
+            
+            // Handle different response formats (same logic as initial fetch)
+            let documentsData = [];
+            if (Array.isArray(documentsResponse.data)) {
+                documentsData = documentsResponse.data;
+            } else if (documentsResponse.data && typeof documentsResponse.data === 'object' && documentsResponse.data.data && Array.isArray(documentsResponse.data.data)) {
+                // Handle nested data structure
+                documentsData = documentsResponse.data.data;
+            } else if (documentsResponse.data && typeof documentsResponse.data === 'object') {
+                // Handle object response
+                documentsData = [documentsResponse.data];
+            } else {
+                documentsData = [];
+            }
+            
             setDocuments(documentsData);
-            console.log("✅ Documents refreshed:", documentsData);
-        } catch (error) {
-            console.error("❌ Error refreshing documents:", error);
+            console.log("✅ Documents refreshed successfully:", documentsData.length, "documents");
+        } catch (error: any) {
+            console.error("❌ Error refreshing documents:", {
+                error: error.message,
+                status: error?.response?.status,
+                statusText: error?.response?.statusText,
+                responseData: error?.response?.data,
+                caseId
+            });
+            // Don't clear documents on error - keep the current state
         }
     };
 
@@ -122,18 +152,54 @@ const Content = (): ReactNode => {
         setViewingDocument(doc);
     };
 
-    const handleDownloadDocument = (doc: any) => {
-        // For now, we'll try to download the document URL if available
-        if (doc.file_url || doc.url) {
-            const link = document.createElement('a');
-            link.href = doc.file_url || doc.url;
-            link.download = doc.document_name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+    const handleDownloadDocument = async (doc: any) => {
+        console.log("📥 Attempting to download document:", {
+            id: doc.id,
+            name: doc.document_name,
+            download_url: doc.download_url,
+            file_url: doc.file_url,
+            url: doc.url,
+            availableFields: Object.keys(doc)
+        });
+
+        // Check for download_url first (according to schema), then fallback to other possible fields
+        let downloadUrl = doc.download_url || doc.file_url || doc.url;
+        
+        // If no download URL is available, try to generate one
+        if (!downloadUrl) {
+            try {
+                console.log("🔗 No download URL found, attempting to generate one...");
+                setIsOperationLoading(true);
+                const downloadResponse = await generateCaseDocumentDownloadLink(caseId, doc.id);
+                downloadUrl = downloadResponse.data.link;
+                console.log("✅ Download link generated successfully:", downloadUrl);
+            } catch (error: any) {
+                console.error("❌ Error generating download link:", error);
+                alert(`Cannot generate download link for "${doc.document_name}"\n\nError: ${error.message}\n\nThis may indicate:\n• The backend doesn't support download link generation\n• The document file is missing or corrupted\n• Insufficient permissions\n\nPlease contact support if the issue persists.`);
+                setIsOperationLoading(false);
+                return;
+            } finally {
+                setIsOperationLoading(false);
+            }
+        }
+        
+        if (downloadUrl) {
+            try {
+                console.log("✅ Download URL available, initiating download:", downloadUrl);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = doc.document_name || doc.file_name || 'document';
+                link.target = '_blank'; // Open in new tab as fallback
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                console.error("❌ Error initiating download:", error);
+                alert(`Error downloading "${doc.document_name}"\n\nThe download link appears to be invalid or expired.`);
+            }
         } else {
-            // If no direct URL, show info about the limitation
-            alert(`Cannot download "${doc.document_name}"\n\nReason: Document URL not available in the API response.\nThis may require additional backend configuration for S3 presigned URLs.`);
+            console.warn("⚠️ No download URL available for document:", doc);
+            alert(`Cannot download "${doc.document_name}"\n\nReason: No download URL available and failed to generate one.\n\nPlease try refreshing the page or contact support if the issue persists.`);
         }
     };
 

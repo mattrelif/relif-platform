@@ -617,6 +617,62 @@ export async function generateCaseDocumentUploadLink(
     }
 }
 
+// Generate presigned download URL for documents
+export async function generateCaseDocumentDownloadLink(
+    caseId: string,
+    documentId: string
+): Promise<AxiosResponse<{ link: string }>> {
+    try {
+        console.log("🔗 Generating download link for document:", documentId, "in case:", caseId);
+        const response = await client.request({
+            url: `cases/${caseId}/documents/${documentId}/generate-download-link`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Download link generated successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error generating download link:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            documentId
+        });
+        throw error;
+    }
+}
+
+// Generate presigned download URL for documents
+export async function generateCaseDocumentDownloadLink(
+    caseId: string,
+    documentId: string
+): Promise<AxiosResponse<{ link: string }>> {
+    try {
+        console.log("🔗 Generating download link for document:", documentId, "in case:", caseId);
+        const response = await client.request({
+            url: `cases/${caseId}/documents/${documentId}/generate-download-link`,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("✅ Download link generated successfully:", response.data);
+        return response;
+    } catch (error: any) {
+        console.error("❌ Error generating download link:", {
+            error: error.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            caseId,
+            documentId
+        });
+        throw error;
+    }
+}
+
 // Step 3: Save document metadata after S3 upload
 export async function createCaseDocument(
     caseId: string,
