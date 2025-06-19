@@ -1,25 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface BetaWarningProps {
     dict: any;
 }
 
 export function BetaWarning({ dict }: BetaWarningProps) {
-    const [showWarning, setShowWarning] = useState(false);
-
-    useEffect(() => {
-        // Check if user has previously closed the warning
-        const hasClosedWarning = localStorage.getItem('relif-beta-warning-closed');
-        if (!hasClosedWarning) {
-            setShowWarning(true);
-        }
-    }, []);
+    // For external pages (login/signup), show every time to inform users about beta
+    const [showWarning, setShowWarning] = useState(true);
 
     const handleCloseWarning = () => {
         setShowWarning(false);
-        localStorage.setItem('relif-beta-warning-closed', 'true');
     };
 
     if (!showWarning) {

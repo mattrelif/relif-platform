@@ -7,6 +7,7 @@ import { getMe } from "@/repository/auth.repository";
 import { removeFromLocalStorage } from "@/utils/localStorage";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
+import { BetaWarningFloating } from "@/components/beta-warning-floating";
 
 export default function Layout({ children }: { children: ReactNode }): ReactNode {
     const router = useRouter();
@@ -58,6 +59,7 @@ export default function Layout({ children }: { children: ReactNode }): ReactNode
                 <Header />
                 <div className="col-span-1">{children}</div>
             </div>
+            <BetaWarningFloating dict={dict} />
         </div>
     );
 }
