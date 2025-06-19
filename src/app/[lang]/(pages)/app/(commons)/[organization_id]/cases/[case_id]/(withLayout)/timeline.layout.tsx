@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/formatDate";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
     FaFlag,
     FaFileAlt,
@@ -39,99 +39,64 @@ interface TimelineEvent {
 
 interface TimelineProps {
     caseId: string;
+    onTimelineEventsLoad?: (count: number) => void;
 }
 
-const CaseTimeline = ({ caseId }: TimelineProps): ReactNode => {
+const CaseTimeline = ({ caseId, onTimelineEventsLoad }: TimelineProps): ReactNode => {
     const pathname = usePathname();
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
+    
+    const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Mock timeline data - in real app, this would come from API
-    const timelineEvents: TimelineEvent[] = [
-        {
-            id: "1",
-            type: "created",
-            title: "Case Created",
-            description: "New case opened for urgent housing assistance",
-            user: { name: "Sarah Johnson", role: "Case Manager" },
-            timestamp: "2024-01-15T10:00:00Z",
-        },
-        {
-            id: "2",
-            type: "assigned",
-            title: "Case Assigned",
-            description: "Case assigned to case worker",
-            user: { name: "Admin User", role: "Administrator" },
-            timestamp: "2024-01-15T10:30:00Z",
-            metadata: {
-                new_value: "John Smith",
-            },
-        },
-        {
-            id: "3",
-            type: "priority_change",
-            title: "Priority Updated",
-            description: "Case priority changed from Medium to High",
-            user: { name: "Sarah Johnson", role: "Case Manager" },
-            timestamp: "2024-01-15T14:00:00Z",
-            metadata: {
-                previous_value: "Medium",
-                new_value: "High",
-            },
-        },
-        {
-            id: "4",
-            type: "document_added",
-            title: "Document Added",
-            description: "New document uploaded to case",
-            user: { name: "John Smith", role: "Case Worker" },
-            timestamp: "2024-01-16T09:15:00Z",
-            metadata: {
-                document_name: "Housing Application Form",
-            },
-        },
-        {
-            id: "5",
-            type: "comment_added",
-            title: "Comment Added",
-            description: "Case worker added update comment",
-            user: { name: "John Smith", role: "Case Worker" },
-            timestamp: "2024-01-16T11:30:00Z",
-            metadata: {
-                comment: "Contacted housing authority. Waiting for response on available units.",
-            },
-        },
-        {
-            id: "6",
-            type: "status_change",
-            title: "Status Changed",
-            description: "Case status updated",
-            user: { name: "John Smith", role: "Case Worker" },
-            timestamp: "2024-01-18T16:45:00Z",
-            metadata: {
-                previous_value: "Open",
-                new_value: "In Progress",
-            },
-        },
-        {
-            id: "7",
-            type: "document_added",
-            title: "Document Added",
-            description: "Progress report uploaded",
-            user: { name: "John Smith", role: "Case Worker" },
-            timestamp: "2024-01-20T13:20:00Z",
-            metadata: {
-                document_name: "Weekly Progress Report",
-            },
-        },
-        {
-            id: "8",
-            type: "closed",
-            title: "Case Closed",
-            description: "Housing secured successfully",
-            user: { name: "Sarah Johnson", role: "Case Manager" },
-            timestamp: "2024-01-25T17:00:00Z",
-        },
-    ];
+    useEffect(() => {
+        const fetchTimelineEvents = async () => {
+            try {
+                setIsLoading(true);
+                
+                // TODO: Replace with actual API call when timeline endpoint is available
+                // const response = await getCaseTimeline(caseId);
+                // setTimelineEvents(response.data);
+                
+                // For now, create timeline events based on case creation
+                const mockEvents: TimelineEvent[] = [
+                    {
+                        id: "1",
+                        type: "created" as const,
+                        title: "Case Created",
+                        description: "New case opened in the system",
+                        user: { name: "System", role: "System" },
+                        timestamp: new Date().toISOString(),
+                    }
+                ];
+                
+                setTimelineEvents(mockEvents);
+                onTimelineEventsLoad?.(mockEvents.length);
+                
+            } catch (error) {
+                console.error("Error fetching timeline events:", error);
+                // Fallback to minimal timeline
+                const fallbackEvents: TimelineEvent[] = [
+                    {
+                        id: "1",
+                        type: "created" as const,
+                        title: "Case Created",
+                        description: "Case created in the system",
+                        user: { name: "System", role: "System" },
+                        timestamp: new Date().toISOString(),
+                    }
+                ];
+                setTimelineEvents(fallbackEvents);
+                onTimelineEventsLoad?.(fallbackEvents.length);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (caseId) {
+            fetchTimelineEvents();
+        }
+    }, [caseId, onTimelineEventsLoad]);
 
     const getEventIcon = (type: string) => {
         switch (type) {
@@ -183,23 +148,43 @@ const CaseTimeline = ({ caseId }: TimelineProps): ReactNode => {
         }
     };
 
+    if (isLoading) {
+        return (
+            <div className="w-full border-[1px] border-slate-200 rounded-lg p-4 flex flex-col h-[750px]">
+                <h3 className="text-relif-orange-200 font-bold text-base pb-4 flex items-center gap-2">
+                    <FaClock className="w-4 h-4" />
+                    Case Timeline
+                </h3>
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="text-slate-500 text-sm">Loading timeline...</div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
+        <div className="w-full border-[1px] border-slate-200 rounded-lg p-4 flex flex-col h-[750px]">
             <h3 className="text-relif-orange-200 font-bold text-base pb-4 flex items-center gap-2">
                 <FaClock className="w-4 h-4" />
                 Case Timeline ({timelineEvents.length} events)
             </h3>
 
-            <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200"></div>
+            <div className="relative flex-1 overflow-y-auto">
+                <div className="space-y-6 pr-2 relative">
+                    {/* Continuous timeline line */}
+                    <div 
+                        className="absolute w-0.5 bg-slate-300 z-0" 
+                        style={{
+                            left: '24px', // Center of 48px (w-12) dot
+                            top: '24px',  // Start from center of first dot
+                            height: `calc(100% - 24px)` // Extend to the end
+                        }}
+                    ></div>
 
-                {/* Timeline events */}
-                <div className="space-y-6">
                     {timelineEvents.map((event, index) => (
                         <div key={event.id} className="relative flex items-start gap-4">
                             {/* Timeline dot */}
-                            <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${getEventColor(event.type)}`}>
+                            <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${getEventColor(event.type)} flex-shrink-0`}>
                                 {getEventIcon(event.type)}
                             </div>
 
@@ -259,15 +244,15 @@ const CaseTimeline = ({ caseId }: TimelineProps): ReactNode => {
                             </div>
                         </div>
                     ))}
-                </div>
 
-                {/* Timeline end indicator */}
-                <div className="relative flex items-center gap-4 mt-6">
-                    <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-slate-300 bg-slate-100">
-                        <FaCheck className="w-4 h-4 text-slate-500" />
-                    </div>
-                    <div className="text-sm text-slate-500 italic">
-                        Timeline complete
+                    {/* Timeline end indicator */}
+                    <div className="relative flex items-center gap-4 mt-6">
+                        <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-slate-300 bg-slate-100">
+                            <FaCheck className="w-4 h-4 text-slate-500" />
+                        </div>
+                        <div className="text-sm text-slate-500 italic">
+                            Timeline complete
+                        </div>
                     </div>
                 </div>
             </div>

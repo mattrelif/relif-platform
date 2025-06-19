@@ -10,19 +10,22 @@ const TabsLayout = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
 
-    const activeOption = pathname.split("/")[7] ?? "overview";
-    const urlPath = pathname.split("/").slice(0, 7).join("/");
+    const pathSegments = pathname.split("/");
+    const activeOption = pathSegments[7] ?? "overview";
+    
+    // Build the base case URL (up to case_id)
+    const baseCaseUrl = pathSegments.slice(0, 7).join("/");
 
     return (
-        <Tabs defaultValue={activeOption} className="w-full">
+        <Tabs value={activeOption} className="w-full">
             <TabsList>
                 <TabsTrigger value="overview" asChild>
-                    <Link href={`${urlPath}`}>
+                    <Link href={baseCaseUrl}>
                         Overview
                     </Link>
                 </TabsTrigger>
                 <TabsTrigger value="updates" asChild>
-                    <Link href={`${urlPath}/updates`}>
+                    <Link href={`${baseCaseUrl}/updates`}>
                         Updates
                     </Link>
                 </TabsTrigger>

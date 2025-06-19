@@ -3,13 +3,14 @@
 import { useDictionary } from "@/app/context/dictionaryContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DocumentViewer } from "@/components/ui/document-viewer";
 import { CaseSchema } from "@/types/case.types";
 import { convertToTitleCase } from "@/utils/convertToTitleCase";
 import { formatDate } from "@/utils/formatDate";
 import { getServiceTypeLabel } from "@/utils/serviceTypeLabels";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useRef } from "react";
 import {
     FaCalendarAlt,
     FaEdit,
@@ -39,8 +40,9 @@ import {
     generateCaseDocumentUploadLink,
     createCaseDocument,
 } from "@/repository/organization.repository";
+import { CaseTimeline } from "./timeline.layout";
 
-const CaseOverview = (): ReactNode => {
+const Content = (): ReactNode => {
     const pathname = usePathname();
     const dict = useDictionary();
     const [caseData, setCaseData] = useState<CaseSchema | null>(null);
@@ -50,12 +52,16 @@ const CaseOverview = (): ReactNode => {
     const [isOperationLoading, setIsOperationLoading] = useState(false);
     const [editingDocument, setEditingDocument] = useState<any | null>(null);
     const [viewingDocument, setViewingDocument] = useState<any | null>(null);
+    const [showUploadDialog, setShowUploadDialog] = useState(false);
+    const [uploadFiles, setUploadFiles] = useState<File[]>([]);
     const [editFormData, setEditFormData] = useState({
         document_name: '',
         document_type: '',
         description: '',
         tags: ''
     });
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const [timelineEventCount, setTimelineEventCount] = useState(1);
 
     const caseId = pathname.split("/")[5];
     const locale = pathname.split("/")[1] as "en" | "pt" | "es";
@@ -175,68 +181,81 @@ const CaseOverview = (): ReactNode => {
     };
 
     const handleAddDocuments = () => {
-        // Create a file input element
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.multiple = true;
-        fileInput.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png,.txt';
-        
-        fileInput.onchange = async (e: any) => {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
+        setShowUploadDialog(true);
+    };
 
-            try {
-                setIsOperationLoading(true);
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        setUploadFiles(files);
+    };
+
+    const handleUploadDocuments = async () => {
+        if (uploadFiles.length === 0) return;
+
+        try {
+            setIsOperationLoading(true);
+            
+            for (let i = 0; i < uploadFiles.length; i++) {
+                const file = uploadFiles[i];
+                console.log(`📤 Uploading file ${i + 1}/${uploadFiles.length}:`, file.name);
                 
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    console.log(`📤 Uploading file ${i + 1}/${files.length}:`, file.name);
-                    
-                    // Generate upload link
-                    const uploadResponse = await generateCaseDocumentUploadLink(caseId, file.type);
-                    const uploadUrl = uploadResponse.data.link;
-                    
-                    // Upload file to S3
-                    const uploadResult = await fetch(uploadUrl, {
-                        method: 'PUT',
-                        body: file,
-                        headers: {
-                            'Content-Type': file.type,
-                        },
-                    });
-                    
-                    if (!uploadResult.ok) {
-                        throw new Error(`Failed to upload ${file.name}`);
-                    }
-                    
-                    // Extract file key from the upload URL
-                    const fileKey = new URL(uploadUrl).pathname.substring(1);
-                    
-                    // Save document metadata
-                    await createCaseDocument(caseId, {
-                        document_name: file.name,
-                        document_type: 'OTHER', // Default type
-                        description: `Uploaded file: ${file.name}`,
-                        tags: [],
-                        file_name: file.name,
-                        file_size: file.size,
-                        mime_type: file.type,
-                        file_key: fileKey,
-                    });
+                // Generate upload link
+                const uploadResponse = await generateCaseDocumentUploadLink(caseId, file.type);
+                const uploadUrl = uploadResponse.data.link;
+                
+                // Upload file to S3
+                const uploadResult = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type,
+                    },
+                });
+                
+                if (!uploadResult.ok) {
+                    throw new Error(`Failed to upload ${file.name}`);
                 }
                 
-                await refreshDocuments();
-                alert(`Successfully uploaded ${files.length} document(s)!`);
+                // Extract file key from the upload URL
+                const fileKey = new URL(uploadUrl).pathname.substring(1);
                 
-            } catch (error) {
-                console.error('Error uploading documents:', error);
-                alert('Error uploading documents. Please try again.');
-            } finally {
-                setIsOperationLoading(false);
+                // Save document metadata
+                await createCaseDocument(caseId, {
+                    document_name: file.name,
+                    document_type: 'OTHER', // Default type
+                    description: `Uploaded file: ${file.name}`,
+                    tags: [],
+                    file_name: file.name,
+                    file_size: file.size,
+                    mime_type: file.type,
+                    file_key: fileKey,
+                });
             }
-        };
-        
-        fileInput.click();
+            
+            await refreshDocuments();
+            setShowUploadDialog(false);
+            setUploadFiles([]);
+            alert(`Successfully uploaded ${uploadFiles.length} document(s)!`);
+            
+        } catch (error) {
+            console.error('Error uploading documents:', error);
+            alert('Error uploading documents. Please try again.');
+        } finally {
+            setIsOperationLoading(false);
+        }
+    };
+
+    const toggleDescription = () => {
+        setIsDescriptionExpanded(!isDescriptionExpanded);
+    };
+
+    const getDescriptionText = () => {
+        if (!caseData?.description) return '';
+        const words = caseData.description.split(' ');
+        if (words.length <= 50 || isDescriptionExpanded) {
+            return caseData.description;
+        }
+        return words.slice(0, 50).join(' ') + '...';
     };
 
     useEffect(() => {
@@ -469,244 +488,129 @@ const CaseOverview = (): ReactNode => {
                 </div>
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {/* Case Information and Timeline Grid */}
+            <div className="w-full grid grid-cols-2 gap-2 lg:flex lg:flex-col">
                 {/* Case Information Card */}
-                <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
+                <div className="w-full border-[1px] border-slate-200 rounded-lg p-4 flex flex-col h-[750px]">
                     <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
                         <FaFileAlt className="w-4 h-4" />
                         Case Information
                     </h3>
                     
-                    <ul className="space-y-0">
-                        <li className="w-full p-2 text-sm text-slate-900">
-                            <strong>Title:</strong> {caseData.title}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Status:</strong> {convertToTitleCase(caseData.status.replace('_', ' '))}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Priority:</strong> {convertToTitleCase(caseData.priority)}
-                        </li>
-                        {caseData.urgency_level && (
-                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Urgency Level:</strong> {convertToTitleCase(caseData.urgency_level.replace('_', ' '))}
+                    <div className="flex-1 overflow-y-auto pr-2 flex flex-col">
+                        <ul className="space-y-0 flex-shrink-0">
+                            <li className="w-full p-2 text-sm text-slate-900">
+                                <strong>Title:</strong> {caseData.title}
                             </li>
-                        )}
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Created Date:</strong> {formatDate(caseData.created_at, locale)}
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Last Updated:</strong> {formatDate(caseData.updated_at, locale)}
-                        </li>
-                        {caseData.due_date && (
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Due Date:</strong> {formatDate(caseData.due_date, locale)}
+                                <strong>Status:</strong> {convertToTitleCase(caseData.status.replace('_', ' '))}
                             </li>
-                        )}
-                        {caseData.estimated_duration && (
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Estimated Duration:</strong> {caseData.estimated_duration}
+                                <strong>Priority:</strong> {convertToTitleCase(caseData.priority)}
                             </li>
-                        )}
-                        {caseData.budget_allocated && (
+                            {caseData.urgency_level && (
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Urgency Level:</strong> {convertToTitleCase(caseData.urgency_level.replace('_', ' '))}
+                                </li>
+                            )}
                             <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                                <strong>Budget Allocated:</strong> ${caseData.budget_allocated}
+                                <strong>Created Date:</strong> {formatDate(caseData.created_at, locale)}
                             </li>
-                        )}
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Service Types:</strong>
-                            <div className="flex flex-wrap gap-1 mt-2">
-                                {(Array.isArray(caseData.service_types) ? caseData.service_types : []).map((serviceType: string, index: number) => (
-                                    <Badge key={index} variant="outline" className="text-xs font-medium">
-                                        {getServiceTypeLabel(serviceType)}
-                                    </Badge>
-                                ))}
-                            </div>
-                        </li>
-                        <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
-                            <strong>Case Tags:</strong>
-                            {(caseData.tags && caseData.tags.length > 0) ? (
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Last Updated:</strong> {formatDate(caseData.updated_at, locale)}
+                            </li>
+                            {caseData.due_date && (
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Due Date:</strong> {formatDate(caseData.due_date, locale)}
+                                </li>
+                            )}
+                            {caseData.estimated_duration && (
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Estimated Duration:</strong> {caseData.estimated_duration}
+                                </li>
+                            )}
+                            {caseData.budget_allocated && (
+                                <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                    <strong>Budget Allocated:</strong> ${caseData.budget_allocated}
+                                </li>
+                            )}
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Service Types:</strong>
                                 <div className="flex flex-wrap gap-1 mt-2">
-                                    {caseData.tags.map((tag: string, index: number) => (
-                                        <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 hover:bg-relif-orange-200 text-xs font-medium">
-                                            #{tag}
+                                    {(Array.isArray(caseData.service_types) ? caseData.service_types : []).map((serviceType: string, index: number) => (
+                                        <Badge key={index} variant="outline" className="text-xs font-medium">
+                                            {getServiceTypeLabel(serviceType)}
                                         </Badge>
                                     ))}
                                 </div>
-                            ) : (
-                                <span className="text-slate-500 text-xs ml-2">No tags assigned</span>
-                            )}
-                        </li>
-                    </ul>
+                            </li>
+                            <li className="w-full p-2 border-t-[1px] border-slate-100 text-sm text-slate-900">
+                                <strong>Case Tags:</strong>
+                                {(caseData.tags && caseData.tags.length > 0) ? (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                        {caseData.tags.map((tag: string, index: number) => (
+                                            <Badge key={index} className="bg-relif-orange-100 text-relif-orange-800 hover:bg-relif-orange-200 text-xs font-medium">
+                                                #{tag}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <span className="text-slate-500 text-xs ml-2">No tags assigned</span>
+                                )}
+                            </li>
+                        </ul>
 
-                    <div className="mt-4 pt-4 border-t-[1px] border-slate-100">
-                        <strong className="text-sm text-slate-900">Description:</strong>
-                        <p className="text-sm text-slate-700 mt-2 leading-relaxed bg-slate-50 p-3 rounded-lg">
-                            {caseData.description}
-                        </p>
+                        <div className="mt-4 pt-4 border-t-[1px] border-slate-100 flex-1 flex flex-col">
+                            <strong className="text-sm text-slate-900 mb-2">Description:</strong>
+                            <div className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg flex-1 flex flex-col">
+                                <div className="flex-1 overflow-y-auto">
+                                    <p className="whitespace-pre-wrap">
+                                        {getDescriptionText()}
+                                    </p>
+                                </div>
+                                {caseData?.description && caseData.description.split(' ').length > 50 && (
+                                    <div className="mt-2 pt-2 border-t border-slate-200">
+                                        <button
+                                            onClick={toggleDescription}
+                                            className="text-relif-orange-200 hover:text-relif-orange-300 text-xs font-medium underline focus:outline-none"
+                                        >
+                                            {isDescriptionExpanded ? 'Show Less' : `Read More (${caseData.description.split(' ').length} words)`}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Case Activity Summary Card */}
-                <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
-                    <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
-                        <FaStickyNote className="w-4 h-4" />
-                        Case Activity
-                    </h3>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                            <div className="text-2xl font-bold text-blue-600">5</div>
-                            <div className="text-xs text-blue-600 font-medium">Timeline Events</div>
-                        </div>
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                            <div className="text-2xl font-bold text-green-600">{documents.length}</div>
-                            <div className="text-xs text-green-600 font-medium">Documents</div>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t-[1px] border-slate-100">
-                        <div className="text-sm">
-                            <span className="text-slate-600">Recent Activity: </span>
-                            <span className="text-slate-500">{formatDate(caseData.updated_at, locale)}</span>
-                        </div>
-                    </div>
+                {/* Case Timeline Card */}
+                <div className="w-full h-[750px]">
+                    <CaseTimeline caseId={caseId} onTimelineEventsLoad={setTimelineEventCount} />
                 </div>
             </div>
 
-            {/* Case Timeline Section */}
+            {/* Case Activity Summary Card */}
             <div className="w-full border-[1px] border-slate-200 rounded-lg p-4">
-                <h3 className="text-relif-orange-200 font-bold text-base pb-4 flex items-center gap-2">
-                    <FaClock className="w-4 h-4" />
-                    Case Timeline (5 events)
+                <h3 className="text-relif-orange-200 font-bold text-base pb-3 flex items-center gap-2">
+                    <FaStickyNote className="w-4 h-4" />
+                    Case Activity
                 </h3>
-
-                <div className="relative">
-                    {/* Timeline line */}
-                    <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200"></div>
-
-                    {/* Timeline events */}
-                    <div className="space-y-6">
-                        {/* Case Created */}
-                        <div className="relative flex items-start gap-4">
-                            <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-200 bg-green-50">
-                                <FaPlus className="w-4 h-4 text-green-600" />
-                            </div>
-                            <div className="flex-1 min-w-0 pb-4">
-                                <h4 className="text-sm font-semibold text-slate-900">Case Created</h4>
-                                <p className="text-sm text-slate-600 mt-1">New case opened for urgent housing assistance</p>
-                                <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-                                    <FaUser className="w-3 h-3" />
-                                    <span className="font-medium">Sarah Johnson</span>
-                                    <span>(Case Manager)</span>
-                                    <span>•</span>
-                                    <span>Jan 15, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Case Assigned */}
-                        <div className="relative flex items-start gap-4">
-                            <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-purple-200 bg-purple-50">
-                                <FaUserCheck className="w-4 h-4 text-purple-600" />
-                            </div>
-                            <div className="flex-1 min-w-0 pb-4">
-                                <h4 className="text-sm font-semibold text-slate-900">Case Assigned</h4>
-                                <p className="text-sm text-slate-600 mt-1">Case assigned to case worker</p>
-                                <div className="mt-2">
-                                    <Badge variant="outline" className="text-blue-600 border-blue-200 text-xs">
-                                        John Smith
-                                    </Badge>
-                                </div>
-                                <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-                                    <FaUser className="w-3 h-3" />
-                                    <span className="font-medium">Admin User</span>
-                                    <span>(Administrator)</span>
-                                    <span>•</span>
-                                    <span>Jan 15, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Priority Updated */}
-                        <div className="relative flex items-start gap-4">
-                            <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-orange-200 bg-orange-50">
-                                <FaExclamationTriangle className="w-4 h-4 text-orange-600" />
-                            </div>
-                            <div className="flex-1 min-w-0 pb-4">
-                                <h4 className="text-sm font-semibold text-slate-900">Priority Updated</h4>
-                                <p className="text-sm text-slate-600 mt-1">Case priority changed from Medium to High</p>
-                                <div className="flex items-center gap-2 text-xs mt-2">
-                                    <Badge variant="outline" className="text-red-600 border-red-200">Medium</Badge>
-                                    <span className="text-slate-500">→</span>
-                                    <Badge variant="outline" className="text-green-600 border-green-200">High</Badge>
-                                </div>
-                                <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-                                    <FaUser className="w-3 h-3" />
-                                    <span className="font-medium">Sarah Johnson</span>
-                                    <span>(Case Manager)</span>
-                                    <span>•</span>
-                                    <span>Jan 15, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Document Added */}
-                        <div className="relative flex items-start gap-4">
-                            <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-cyan-200 bg-cyan-50">
-                                <FaFileAlt className="w-4 h-4 text-cyan-600" />
-                            </div>
-                            <div className="flex-1 min-w-0 pb-4">
-                                <h4 className="text-sm font-semibold text-slate-900">Document Added</h4>
-                                <p className="text-sm text-slate-600 mt-1">New document uploaded to case</p>
-                                <div className="mt-2">
-                                    <Badge variant="outline" className="text-cyan-600 border-cyan-200 text-xs">
-                                        📄 Housing Application Form
-                                    </Badge>
-                                </div>
-                                <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-                                    <FaUser className="w-3 h-3" />
-                                    <span className="font-medium">John Smith</span>
-                                    <span>(Case Worker)</span>
-                                    <span>•</span>
-                                    <span>Jan 16, 2024</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Status Changed */}
-                        <div className="relative flex items-start gap-4">
-                            <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-blue-200 bg-blue-50">
-                                <FaFlag className="w-4 h-4 text-blue-600" />
-                            </div>
-                            <div className="flex-1 min-w-0 pb-4">
-                                <h4 className="text-sm font-semibold text-slate-900">Status Updated</h4>
-                                <p className="text-sm text-slate-600 mt-1">Case status changed to In Progress</p>
-                                <div className="flex items-center gap-2 text-xs mt-2">
-                                    <Badge variant="outline" className="text-red-600 border-red-200">Open</Badge>
-                                    <span className="text-slate-500">→</span>
-                                    <Badge variant="outline" className="text-green-600 border-green-200">In Progress</Badge>
-                                </div>
-                                <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-                                    <FaUser className="w-3 h-3" />
-                                    <span className="font-medium">John Smith</span>
-                                    <span>(Case Worker)</span>
-                                    <span>•</span>
-                                    <span>Jan 18, 2024</span>
-                                </div>
-                            </div>
-                        </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{timelineEventCount}</div>
+                        <div className="text-xs text-blue-600 font-medium">Timeline Events</div>
                     </div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">{documents.length}</div>
+                        <div className="text-xs text-green-600 font-medium">Documents</div>
+                    </div>
+                </div>
 
-                    {/* Timeline end indicator */}
-                    <div className="relative flex items-center gap-4 mt-6">
-                        <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 border-slate-300 bg-slate-100">
-                            <FaCheck className="w-4 h-4 text-slate-500" />
-                        </div>
-                        <div className="text-sm text-slate-500 italic">
-                            Timeline current
-                        </div>
+                <div className="mt-4 pt-4 border-t-[1px] border-slate-100">
+                    <div className="text-sm">
+                        <span className="text-slate-600">Recent Activity: </span>
+                        <span className="text-slate-500">{formatDate(caseData.updated_at, locale)}</span>
                     </div>
                 </div>
             </div>
@@ -926,95 +830,79 @@ const CaseOverview = (): ReactNode => {
                 </div>
             )}
 
-            {/* Document Viewer Modal */}
-            {viewingDocument && (
+            {/* Document Upload Dialog */}
+            {showUploadDialog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] mx-4 overflow-hidden">
-                        <div className="flex justify-between items-center mb-4">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                        <h3 className="text-lg font-semibold mb-4">Upload Documents</h3>
+                        
+                        <div className="space-y-4">
                             <div>
-                                <h3 className="text-lg font-semibold">{viewingDocument.document_name}</h3>
-                                <p className="text-sm text-gray-500">
-                                    {formatFileSize(viewingDocument.file_size)} • {getMimeTypeLabel(viewingDocument.mime_type)}
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Select Files
+                                </label>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                    onChange={handleFileSelect}
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG, TXT
                                 </p>
                             </div>
-                            <div className="flex gap-2">
-                                {(viewingDocument.file_url || viewingDocument.url) && (
-                                    <button
-                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-                                        onClick={() => {
-                                            const link = document.createElement('a');
-                                            link.href = viewingDocument.file_url || viewingDocument.url;
-                                            link.download = viewingDocument.document_name;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        }}
-                                    >
-                                        Download
-                                    </button>
-                                )}
-                                <button
-                                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
-                                    onClick={() => setViewingDocument(null)}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div className="h-[500px] border border-gray-200 rounded">
-                            {(viewingDocument.file_url || viewingDocument.url) ? (
-                                <>
-                                    {viewingDocument.mime_type.startsWith('image/') ? (
-                                        <img 
-                                            src={viewingDocument.file_url || viewingDocument.url}
-                                            alt={viewingDocument.document_name}
-                                            className="w-full h-full object-contain"
-                                        />
-                                    ) : viewingDocument.mime_type === 'application/pdf' ? (
-                                        <iframe
-                                            src={`${viewingDocument.file_url || viewingDocument.url}#toolbar=1`}
-                                            className="w-full h-full"
-                                            title={viewingDocument.document_name}
-                                        />
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                                            <div className="text-4xl mb-4">📄</div>
-                                            <h3 className="text-lg font-semibold mb-2">Preview Not Available</h3>
-                                            <p className="text-sm text-center mb-4">
-                                                This file type cannot be previewed in the browser.
-                                            </p>
-                                            <button
-                                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                                onClick={() => {
-                                                    const link = document.createElement('a');
-                                                    link.href = viewingDocument.file_url || viewingDocument.url;
-                                                    link.download = viewingDocument.document_name;
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    document.body.removeChild(link);
-                                                }}
-                                            >
-                                                Download to View
-                                            </button>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                                    <div className="text-4xl mb-4">⚠️</div>
-                                    <h3 className="text-lg font-semibold mb-2">Document URL Not Available</h3>
-                                    <p className="text-sm text-center">
-                                        This document cannot be previewed because the file URL is not available.
-                                    </p>
+
+                            {uploadFiles.length > 0 && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Selected Files ({uploadFiles.length})
+                                    </label>
+                                    <div className="max-h-32 overflow-y-auto space-y-1">
+                                        {uploadFiles.map((file, index) => (
+                                            <div key={index} className="text-sm text-gray-600 flex justify-between items-center">
+                                                <span className="truncate">{file.name}</span>
+                                                <span className="text-xs text-gray-500 ml-2">
+                                                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <Button
+                                onClick={handleUploadDocuments}
+                                className="bg-relif-orange-200 hover:bg-relif-orange-300 text-white"
+                                disabled={isOperationLoading || uploadFiles.length === 0}
+                            >
+                                {isOperationLoading ? 'Uploading...' : 'Upload Documents'}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setShowUploadDialog(false);
+                                    setUploadFiles([]);
+                                }}
+                                disabled={isOperationLoading}
+                            >
+                                Cancel
+                            </Button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Document Viewer */}
+            <DocumentViewer
+                isOpen={!!viewingDocument}
+                onClose={() => setViewingDocument(null)}
+                document={viewingDocument}
+            />
         </div>
     );
 };
 
-export default CaseOverview;
+export default Content;
