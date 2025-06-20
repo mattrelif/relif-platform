@@ -32,79 +32,72 @@ const Toolbar = ({ beneficiary, refreshData }: Props): ReactNode => {
     const beneficiaryPath = pathname.split("/").slice(0, 6).join("/");
 
     return (
-        <>
-            <div className="w-full h-max flex items-center justify-between gap-4 p-4 lg:p-2">
-                <div className="flex items-center gap-2">
-                    {platformRole === "ORG_ADMIN" && (
-                        <>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setStatusDialogOpenState(true)}
-                                        >
-                                            <FaUserCheck className="w-4 h-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Change Status</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+        <TooltipProvider>
+            <div className="w-full h-max flex items-center justify-end gap-2 p-2">
+                {platformRole === "ORG_ADMIN" && (
+                    <>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setStatusDialogOpenState(true)}
+                                >
+                                    <FaUserCheck className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Change Status</p>
+                            </TooltipContent>
+                        </Tooltip>
 
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link href={`${beneficiaryPath}/edit`}>
-                                            <Button variant="outline" size="sm">
-                                                <FaEdit className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{dict.commons.beneficiaries.beneficiaryId.toolbar.editBeneficiary}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link href={`${beneficiaryPath}/edit`}>
+                                    <Button variant="outline" size="icon" className="h-8 w-8">
+                                        <FaEdit className="w-3 h-3" />
+                                    </Button>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{dict.commons.beneficiaries.beneficiaryId.toolbar.editBeneficiaryTooltip}</p>
+                            </TooltipContent>
+                        </Tooltip>
 
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setMoveDialogOpenState(true)}
-                                        >
-                                            <IoMdMove className="w-4 h-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{dict.commons.beneficiaries.beneficiaryId.toolbar.moveBeneficiary}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setMoveDialogOpenState(true)}
+                                >
+                                    <IoMdMove className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{dict.commons.beneficiaries.beneficiaryId.toolbar.moveBeneficiaryTooltip}</p>
+                            </TooltipContent>
+                        </Tooltip>
 
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setRemoveDialogOpenState(true)}
-                                        >
-                                            <FaTrash className="w-4 h-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{dict.commons.beneficiaries.beneficiaryId.toolbar.removeBeneficiary}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </>
-                    )}
-                </div>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setRemoveDialogOpenState(true)}
+                                >
+                                    <FaTrash className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{dict.commons.beneficiaries.beneficiaryId.toolbar.removeBeneficiaryTooltip}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </>
+                )}
             </div>
 
             <RemoveModal
@@ -127,7 +120,7 @@ const Toolbar = ({ beneficiary, refreshData }: Props): ReactNode => {
                 statusDialogOpenState={statusDialogOpenState}
                 setStatusDialogOpenState={setStatusDialogOpenState}
             />
-        </>
+        </TooltipProvider>
     );
 };
 
